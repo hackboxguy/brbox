@@ -10,5 +10,5 @@ git checkout $BR_LAST_STABLE_VERSION
 git pull . $BR_LAST_STABLE_VERSION
 popd
 ####################check if download folder exists########
-[ ! -d  "$BR_DOWNLOAD_FOLDER/"  ] && { echo "Error  : BR-download folder $BR_DOWNLOAD_FOLDER not found!"   ; exit -1; }
+[ ! -d  "$BR_DOWNLOAD_FOLDER/"  ] && echo "Warning: BR-download folder $BR_DOWNLOAD_FOLDER not found, will take longer time to build the disk!"  
 echo "Success: Buildroot preperation done!!"
