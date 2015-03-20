@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #this script builds the builroot based image
 #BR_OUTPUT_FOLDER=./buildroot
 BR_FOLDER=./buildroot
