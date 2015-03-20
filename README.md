@@ -5,7 +5,7 @@ buildroot based distribution targeted for intel mini-boxes based on J1900
 1. ```mkdir -p /home/user/sandbox```
 2. ```cd /home/user/sandbox```
 3. ```svn co http://github.com/hackboxguy/brbox```      (when asked, enter your git username and password)
-4. ```cd /home/user/sandbox/brbox/```
+4. ```cd /home/user/sandbox/brbox/trunk```
 5. ```./prepare-buildroot.sh```
 6. ```./build-image.sh -o /mnt/buildramdisk -v 01.00    (-o is the output folder -v is the version number of the build)```
 
