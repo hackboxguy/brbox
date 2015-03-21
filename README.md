@@ -21,4 +21,4 @@ after ./build-image.sh is complete, you will see following files under /mnt/buil
   1. /mnt/buildramdisk/01.00/images/out.disk.img (this is the image to be copied to usb-flash-memory)
   2. /mnt/buildramdisk/01.00/images/rootfs.tar   (root file system for future use)
 
-use ```sudo dd if=/mnt/buildramdisk/01.00/images/out.disk.img of=/dev/sdX bs=1M``` (replace /dev/sdX with correct device node)
+use ```sudo dd if=/mnt/buildramdisk/01.00/images/out.disk.img of=/dev/sdX bs=1M``` (replace /dev/sdX with correct device node, after writing the image to usb-flash drive, insert the usb-flash-drive into the usb port of J1900 motherboard and boot the system)
