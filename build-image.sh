@@ -36,9 +36,9 @@ make O=$BR_OUTPUT_FOLDER $BR_BOARD_CONFIG
 make O=$BR_OUTPUT_FOLDER
 popd
 
-#PREPARE_SCRIPT=$(pwd)/scripts/$GRUB1_PREPARE_SCRIPT
-#COPY_SCRIPT=$(pwd)/scripts/$GRUB1_COPY_SCRIPT
-#./scripts/grub1-bootdisk.sh -o $BR_OUTPUT_FOLDER -r $RAW_DISK_IMAGE -i $BR_OUTPUT_FOLDER/images/out.disk.img -v $BUILDNUMBER -p $PREPARE_SCRIPT -c $COPY_SCRIPT
+PREPARE_SCRIPT=$(pwd)/scripts/$GRUB1_PREPARE_SCRIPT
+COPY_SCRIPT=$(pwd)/scripts/$GRUB1_COPY_SCRIPT
+./scripts/grub1-bootdisk.sh -o $BR_OUTPUT_FOLDER -r $RAW_DISK_IMAGE -i $BR_OUTPUT_FOLDER/images/out.disk.img -v $BUILDNUMBER -p $PREPARE_SCRIPT -c $COPY_SCRIPT
 
 
 

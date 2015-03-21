@@ -1,7 +1,14 @@
 # brbox
 buildroot based distribution targeted for intel mini-boxes based on J1900
 
-###How to start from fresh?
+###How to prepare fresh ubuntu 14.04 for brbox
+1. ```sudo mkdir -p /mnt/buildramdisk```
+2. ```sudo chown user:user /mnt/buildramdisk``` (replace user with correct username)
+3. ```sudo apt-get update```
+4. ```sudo apt-get install subversion git ckermit build-essential gcc-multilib libncurses5-dev expect```
+5. ```sudo vi /etc/fstab``` (add last line as "tmpfs   /mnt/buildramdisk    tmpfs   defaults,gid=100,size=6G 0 0"
+
+###How to start brbox from fresh?
 1. ```mkdir -p /home/user/sandbox```
 2. ```cd /home/user/sandbox```
 3. ```svn co http://github.com/hackboxguy/brbox```      (when asked, enter your git username and password)
