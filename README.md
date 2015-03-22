@@ -14,7 +14,7 @@ buildroot based distribution targeted for intel mini-boxes based on J1900
 3. ```svn co http://github.com/hackboxguy/brbox```      (when asked, enter your git username and password)
 4. ```cd /home/user/sandbox/brbox/trunk```
 5. ```./prepare-buildroot.sh```
-6. ```./build-image.sh -o /mnt/buildramdisk -v 01.00```    (-o is the output folder -v is the version number of the build)
+6. ```./build-image.sh -o /mnt/buildramdisk -v 01.00 -s pw```    (-o is the output folder -v is the version number of the build, -s is your sudo passwd)
 
 For the first time, this will take about 1 to 2 hours (because packages are to be downloaded fresh to download directory)
 after ./build-image.sh is complete, you will see following files under /mnt/buildramdisk/01.00/output/images
