@@ -4,7 +4,7 @@
 BR_FOLDER=./buildroot
 IMAGE_VERSION=XX.YY
 BR_BOARD_CONFIG=qemu_x86_64_defconfig
-BR_BOARD_LINUX_CONFIG=linux.config
+BR_BOARD_LINUX_CONFIG=linux-3.18.config
 RAW_DISK_IMAGE=./raw-images/disk.grub1.img.xz
 GRUB1_PREPARE_SCRIPT=grub1-prepare.sh
 GRUB1_COPY_SCRIPT=grub1-copy.sh
