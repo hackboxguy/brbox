@@ -9,6 +9,7 @@ RAW_DISK_IMAGE=./raw-images/disk.grub1.img.xz
 GRUB1_PREPARE_SCRIPT=grub1-prepare.sh
 GRUB1_COPY_SCRIPT=grub1-copy.sh
 GRUB1_SUDO_EXE_SCRIPT=sudo-executor-grub1-prepare.sh
+GRUB2_DISK_CREATOR=grub2-bootdisk.sh
 IMAGE_ONLY=0
 ###############################################################################
 while getopts o:v:c:s:i f
@@ -40,8 +41,12 @@ if [ $IMAGE_ONLY = 0 ]; then
 	popd
 fi
 
-PREPARE_SCRIPT=$(pwd)/scripts/$GRUB1_PREPARE_SCRIPT
-COPY_SCRIPT=$(pwd)/scripts/$GRUB1_COPY_SCRIPT
-SUDO_EXE_SCR=$(pwd)/scripts/$GRUB1_SUDO_EXE_SCRIPT
-./scripts/grub1-bootdisk.sh -o $BR_OUTPUT_FOLDER -r $RAW_DISK_IMAGE -i $BR_OUTPUT_FOLDER/images/out.disk.img -v $BUILDNUMBER -p $PREPARE_SCRIPT -c $COPY_SCRIPT -s $SUDOPW -x $SUDO_EXE_SCR
+#PREPARE_SCRIPT=$(pwd)/scripts/$GRUB1_PREPARE_SCRIPT
+#COPY_SCRIPT=$(pwd)/scripts/$GRUB1_COPY_SCRIPT
+#SUDO_EXE_SCR=$(pwd)/scripts/$GRUB1_SUDO_EXE_SCRIPT
+#./scripts/grub1-bootdisk.sh -o $BR_OUTPUT_FOLDER -r $RAW_DISK_IMAGE -i $BR_OUTPUT_FOLDER/images/out.disk.img -v $BUILDNUMBER -p $PREPARE_SCRIPT -c $COPY_SCRIPT -s $SUDOPW -x $SUDO_EXE_SCR
+
+GRUB2_SCRIPT=$(pwd)/scripts/$GRUB2_DISK_CREATOR
+./scripts/sudo-grub2-bootdisk.sh $GRUB2_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/out.disk.img $SUDOPW
+
 
