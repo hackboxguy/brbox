@@ -1,14 +1,26 @@
 #!/bin/sh
+###########################################################
+IMAGESIZE=128M
+BOOTSIZE=1M
+ROOT1SIZE=28M
+ROOT2SIZE=28M
+STTNGSIZE=2M
+USRDATSIZE=64M
+ROOT1_LABEL=root1   #linux-1
+ROOT2_LABEL=root2   #linux-2
+STTNG_LABEL=sttng   #settings
+USRDAT_LABEL=usrdat #userdata
 
-IMAGESIZE=32M
-FSSIZE=28M
+#FSSIZE=28M
 BR_OUTPUT_FOLDER=/mnt/buildramdisk/x86
-#BINARIES_DIR=$BR_OUTPUT_FOLDER/images
 SUDO=
-#SUDOPW=none
 IMAGE_VERSION=01.00.12345
-#OUTPUT_FILENAME="bootable-usb-disk.img"
 OUTPUT_DISK=bootable-usb-disk.img
+GRUB_MENU_ENTRY1='brbox1'
+GRUB_MENU_ENTRY2='brbox2'
+GRUB2_TIMEOUT=1
+ROOTDELAY=5
+###########################################################
 while getopts o:v:i: f
 do
     case $f in
@@ -21,23 +33,20 @@ done
 BINARIES_DIR=$BR_OUTPUT_FOLDER/images
 IMAGENAME=$(mktemp)
 MKIMG_TIMESTAMP=$(date +%Y%m%d%H%M%S)
-#OUTPUT_FILENAME="disk_$MKIMG_TIMESTAMP.img.gz"
-#OUTPUT_DISK="$BINARIES_DIR/$OUTPUT_FILENAME"
 ROOTFS="$BINARIES_DIR/rootfs.tar"
 ROOTMOUNTPOINT=$(mktemp -d)
 
 printf "creating image file ..................................... "
-    #$SUDO fallocate -l "$IMAGESIZE" "$IMAGENAME"
     fallocate -l "$IMAGESIZE" "$IMAGENAME" >/dev/null
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "partitioning image %s ... " "$IMAGENAME"
-    #$SUDO sgdisk -Z "$IMAGENAME"
-    #$SUDO sgdisk -n 1::+1M -t 1:4 -c 1:boot "$IMAGENAME"
-    #$SUDO sgdisk -n 2::+"$FSSIZE" -c 2:root "$IMAGENAME"
     sgdisk -Z "$IMAGENAME" >/dev/null
-    sgdisk -n 1::+1M -t 1:ef02 -c 1:boot "$IMAGENAME" >/dev/null
-    sgdisk -n 2::+"$FSSIZE" -c 2:root "$IMAGENAME" >/dev/null
+    sgdisk -n 1::+"$BOOTSIZE"   -t 1:ef02 -c 1:boot  "$IMAGENAME" >/dev/null
+    sgdisk -n 2::+"$ROOT1SIZE"  -c 2:$ROOT1_LABEL    "$IMAGENAME" >/dev/null
+    sgdisk -n 3::+"$ROOT2SIZE"  -c 3:$ROOT2_LABEL    "$IMAGENAME" >/dev/null
+    sgdisk -n 4::+"$STTNGSIZE"  -c 4:$STTNG_LABEL    "$IMAGENAME" >/dev/null
+    sgdisk -n 5::+"$USRDATSIZE" -c 5:$USRDAT_LABEL   "$IMAGENAME" >/dev/null
     printf "partitioning . "
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
@@ -51,7 +60,7 @@ printf "Creating loopdevice ..................................... "
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "Formating root partition ................................ "
-    $SUDO mkfs.ext3 -L root "${LOOPDEVICE}p2" 1>/dev/null 2>/dev/null
+    $SUDO mkfs.ext3 -L $ROOT1_LABEL "${LOOPDEVICE}p2" 1>/dev/null 2>/dev/null
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "Mounting loopdevice root partition ...................... "
@@ -81,11 +90,11 @@ test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "real grub.cfg ........................................... "
 cat <<ENDOFGRUBCFG >grub.cfg
-set timeout=5
+set timeout=$GRUB2_TIMEOUT
 insmod ext2
-menuentry 'brbox' {
+menuentry $GRUB_MENU_ENTRY1 {
     search -u $ROOTUUID -s root
-    linux /boot/bzImage rootdelay=15 root=PARTUUID="$PARTUUID" consoleblank=0 rw mem=0x80000000 enable_mtrr_cleanup mtrr_spare_reg_nr=1
+    linux /boot/bzImage rootdelay=$ROOTDELAY root=PARTUUID="$PARTUUID" consoleblank=0 rw mem=0x80000000 enable_mtrr_cleanup mtrr_spare_reg_nr=1 brboxsystem=$GRUB_MENU_ENTRY1
 }
 ENDOFGRUBCFG
 test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
