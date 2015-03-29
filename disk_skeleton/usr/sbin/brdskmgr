@@ -4,6 +4,7 @@ SHOW_BOOT_VERSION=0
 FLIP_BOOT_MARKER=0
 GRUBCFG_FILE_PATH=/boot/grub/grub.cfg
 VERSION_FILE_PATH=/boot/version-num.txt
+UUID_FILE_PATH=/boot/brbox-uuid.txt
 SHOW_BKBOOT_VERSION=0
 ONE_BRBOX_NAME=brbox1 #name of the first brbox system
 TWO_BRBOX_NAME=brbox2 #name of the second brbox system
@@ -38,7 +39,7 @@ ReadBootMarker() #$1=path of grubcfg file
 	echo $RESULT
 	return 0
 }
-WriteBootMarker() #$1=path_of_grubcfg_file $2=flag_vlue
+WriteBootMarker() #$1=path_of_grubcfg_file $2=flag_vlue $3=path_of_uuid_file
 {
 	sed -i "s|set default=.*|set default=$2|" $1
 	return 0
@@ -168,10 +169,11 @@ do
     esac
 done
 
-[ $SHOW_BOOT_SYSTEM = 1    ] && ReadBootSystem
-[ $SHOW_BOOT_VERSION = 1   ] && ReadBootVersion $VERSION_FILE_PATH
-[ $SHOW_BKBOOT_VERSION = 1 ] && ReadBkBootVersion
-[ $FLIP_BOOT_MARKER = 1    ] && FlipBootMarker
+#execute one of the commands in the given sequence
+[ $SHOW_BOOT_SYSTEM = 1    ] && { ReadBootSystem; return $?; }
+[ $SHOW_BOOT_VERSION = 1   ] && { ReadBootVersion $VERSION_FILE_PATH; return $?; }
+[ $SHOW_BKBOOT_VERSION = 1 ] && { ReadBkBootVersion; return $?; }
+[ $FLIP_BOOT_MARKER = 1    ] && { FlipBootMarker; return $?; }
 
 
 

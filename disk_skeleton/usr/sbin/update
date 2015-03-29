@@ -1,2 +1,39 @@
 #!/bin/sh
+BRDSKMGR_TOOL=/usr/sbin/brdskmgr
+ONE_BRBOX_NAME=brbox1 #name of the first brbox system
+TWO_BRBOX_NAME=brbox2 #name of the second brbox system
+ONE_BRBOX_PART=sda2 #partition
+TWO_BRBOX_PART=sda3 #partition
+
+while getopts u: f
+do
+    case $f in
+	u) UPDATE_FILE=$OPTARG ;;    #update file path
+    esac
+done
+
+[ ! -f  "$UPDATE_FILE"  ] && { echo "Error: Update file not found!!!"; return 1; }
+#TODO:mkimage file integrity 
+
+#check which system is booted
+CUR_BOOT=$($BRDSKMGR_TOOL -c)
+[ $? != 0 ] && { echo "Error: Unable to read current system!!!"; return 1; }
+
+#if first system is booted, then update second system
+if [ "$CUR_BOOT" = "$ONE_BRBOX_NAME" ]; then
+	BRBOX_PARTITION=/dev/$TWO_BRBOX_PART
+elif [ "$CUR_BOOT" = "$TWO_BRBOX_NAME" ]; then
+	BRBOX_PARTITION=/dev/$ONE_BRBOX_PART
+else
+	#booted system is neither brbox1 nor brbox2
+	echo "Error: Unknown boot system!!!"; return 1;
+	return 1
+fi
+
+dd if=$UPDATE_FILE of=$BRBOX_PARTITION bs=1M 1>/dev/null 2>/dev/null
+[ $? != 0 ] && { echo "Error: Unable to write update file to $BRBOX_PARTITION!!!"; return 1; }
+sync
+$BRDSKMGR_TOOL -f #flip the boot-marker flag, so that next time updated system will boot
+[ $? != 0 ] && { echo "Error: Unable to flip boot-marker flag!!!"; return 1; }
+return 0
 
