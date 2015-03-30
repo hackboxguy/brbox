@@ -22,7 +22,7 @@ GRUB_MENU_ENTRY2='brbox2'
 GRUB2_TIMEOUT=1
 ROOTDELAY=5
 VERSION_FILE_PATH=/boot/version-num.txt
-UUID_FILE_PATH=/boot/brbox-uuid.txt
+#UUID_FILE_PATH=/boot/brbox-uuid.txt
 ###########################################################
 while getopts o:v:i: f
 do
@@ -165,10 +165,10 @@ printf "regenerate grub.img ..................................... "
  $SUDO cp ./version-num.txt "$ROOTMOUNTPOINT"/$VERSION_FILE_PATH
  $SUDO cp ./version-num.txt "$ROOT2MOUNTPOINT"/$VERSION_FILE_PATH
 
- echo "uuidbrbox1=$PARTUUID uuidbrbox2=$PART2UUID" > ./uuid-file.txt
- $SUDO cp ./uuid-file.txt "$ROOTMOUNTPOINT"/$UUID_FILE_PATH
+ #echo "uuidbrbox1=$PARTUUID uuidbrbox2=$PART2UUID" > ./uuid-file.txt
+ #$SUDO cp ./uuid-file.txt "$ROOTMOUNTPOINT"/$UUID_FILE_PATH
  #echo "partuuid=$PART2UUID" > ./uuid-file.txt
- $SUDO cp ./uuid-file.txt "$ROOT2MOUNTPOINT"/$UUID_FILE_PATH
+ #$SUDO cp ./uuid-file.txt "$ROOT2MOUNTPOINT"/$UUID_FILE_PATH
 
  printf "unmounting and deleting mountpoint1 %s .." "$ROOTMOUNTPOINT"
      $SUDO umount "$ROOTMOUNTPOINT"
@@ -201,7 +201,7 @@ printf "regenerate grub.img ..................................... "
      $SUDO losetup -d "$LOOPDEVICE" 
      rm -rf "$IMAGENAME"
      rm ./version-num.txt
-     rm ./uuid-file.txt
+     #rm ./uuid-file.txt
      rm grub.cfg.in
      rm grub.cfg
      test 0 -eq $? && echo "[OK]" || echo "[FAIL]"

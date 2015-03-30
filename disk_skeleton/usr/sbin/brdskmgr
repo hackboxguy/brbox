@@ -4,7 +4,7 @@ SHOW_BOOT_VERSION=0
 FLIP_BOOT_MARKER=0
 GRUBCFG_FILE_PATH=/boot/grub/grub.cfg
 VERSION_FILE_PATH=/boot/version-num.txt
-UUID_FILE_PATH=/boot/brbox-uuid.txt
+#UUID_FILE_PATH=/boot/brbox-uuid.txt
 SHOW_BKBOOT_VERSION=0
 ONE_BRBOX_NAME=brbox1 #name of the first brbox system
 TWO_BRBOX_NAME=brbox2 #name of the second brbox system
@@ -41,20 +41,17 @@ ReadBootMarker() #$1=path of grubcfg file
 }
 WriteBootMarker() #$1=path_of_grubcfg_file $2=flag_vlue $3=path_of_uuid_file
 {
-	#if $2==0, read modify uuid of menuentry brbox1
-	#if $2==1, read modify uuid of menuentry brbox2
-	#NEW_UUID=$(cat $3 | grep -o "partuuid=.*" | sed 's/partuuid=//')
-	if [ $2 = 0 ]; then
-		NEW_UUID=$(awk '{print $1}' $3)
-		NEW_UUID=$(echo $NEW_UUID | grep -o "uuidbrbox1=.*" | sed 's/uuidbrbox1=//')
-		sed -i "s|brboxsystem=brbox1 root=PARTUUID=.*|brboxsystem=brbox1 root=PARTUUID=$NEW_UUID|" $1
-	elif [ $2 = 1 ]; then
-		NEW_UUID=$(awk '{print $2}' $3)
-		NEW_UUID=$(echo $NEW_UUID | grep -o "uuidbrbox2=.*" | sed 's/uuidbrbox2=//')
-		sed -i "s|brboxsystem=brbox2 root=PARTUUID=.*|brboxsystem=brbox2 root=PARTUUID=$NEW_UUID|" $1
-	else
-		return 1
-	fi
+#	if [ $2 = 0 ]; then
+#		NEW_UUID=$(awk '{print $1}' $3)
+#		NEW_UUID=$(echo $NEW_UUID | grep -o "uuidbrbox1=.*" | sed 's/uuidbrbox1=//')
+#		sed -i "s|brboxsystem=brbox1 root=PARTUUID=.*|brboxsystem=brbox1 root=PARTUUID=$NEW_UUID|" $1
+#	elif [ $2 = 1 ]; then
+#		NEW_UUID=$(awk '{print $2}' $3)
+#		NEW_UUID=$(echo $NEW_UUID | grep -o "uuidbrbox2=.*" | sed 's/uuidbrbox2=//')
+#		sed -i "s|brboxsystem=brbox2 root=PARTUUID=.*|brboxsystem=brbox2 root=PARTUUID=$NEW_UUID|" $1
+#	else
+#		return 1
+#	fi
 	sed -i "s|set default=.*|set default=$2|" $1
 	return 0
 }
@@ -137,16 +134,16 @@ FlipBootMarker()
 		fi
 		if [ $BOOT_MARKER = 0 ];then #flipping is not done, so do it
 			#mount second system for reading its partuuid to be included in grub.cfg of first system
-			MOUNT_DIR=$(MountDevice /dev/$TWO_BRBOX_PART)
-			if [ $? != "0" ]; then #unable mount second system, filesystem might be fresh or corrupt
-				return 1
-			fi
-			WriteBootMarker $GRUBCFG_FILE_PATH 1 $MOUNT_DIR/$UUID_FILE_PATH
+			#MOUNT_DIR=$(MountDevice /dev/$TWO_BRBOX_PART)
+			#if [ $? != "0" ]; then #unable mount second system, filesystem might be fresh or corrupt
+			#	return 1
+			#fi
+			WriteBootMarker $GRUBCFG_FILE_PATH 1 #$MOUNT_DIR/$UUID_FILE_PATH
 			RESULT=$?
 			sync
-			umount /dev/$TWO_BRBOX_PART
-			sync
-			rm -r $MOUNT_DIR
+			#umount /dev/$TWO_BRBOX_PART
+			#sync
+			#rm -r $MOUNT_DIR
 			return $RESULT
 		else
 			return 0 #already boot-marker is flipped,no action needed	
@@ -164,7 +161,7 @@ FlipBootMarker()
 			return 1
 		fi
 		if [ $BOOT_MARKER = 1 ];then #flipping is not done, so do it
-			WriteBootMarker $MOUNT_DIR/$GRUBCFG_FILE_PATH 0 $MOUNT_DIR/$UUID_FILE_PATH
+			WriteBootMarker $MOUNT_DIR/$GRUBCFG_FILE_PATH 0 #$MOUNT_DIR/$UUID_FILE_PATH
 			RESULT=$?
 			sync
 		else
