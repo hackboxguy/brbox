@@ -193,6 +193,7 @@ printf "regenerate grub.img ..................................... "
  #    test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
  printf "creating output image ................................... "
      cp $IMAGENAME $OUTPUT_DISK
+     chmod +r $OUTPUT_DISK 
      test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
  printf "cleaning up ............................................. "
