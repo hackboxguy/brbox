@@ -6,10 +6,10 @@ ROOT1SIZE=28M
 ROOT2SIZE=28M
 STTNGSIZE=2M
 USRDATSIZE=64M
-ROOT1_LABEL=root1   #linux-1
-ROOT2_LABEL=root2   #linux-2
-STTNG_LABEL=sttng   #settings
-USRDAT_LABEL=usrdat #userdata
+ROOT1_LABEL=ROOT1   #linux-1
+ROOT2_LABEL=ROOT2   #linux-2
+STTNG_LABEL=STTNG   #settings
+USRDAT_LABEL=USRDAT #userdata
 
 #FSSIZE=28M
 BR_OUTPUT_FOLDER=/mnt/buildramdisk/x86
@@ -22,7 +22,7 @@ GRUB_MENU_ENTRY2='brbox2'
 GRUB2_TIMEOUT=1
 ROOTDELAY=5
 VERSION_FILE_PATH=/boot/version-num.txt
-#UUID_FILE_PATH=/boot/brbox-uuid.txt
+UUID_FILE_PATH=/boot/brbox-uuid.txt
 ###########################################################
 while getopts o:v:i: f
 do
@@ -92,19 +92,23 @@ printf "copying root2 files - this may take some time ........... "
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 
-printf "generating grub config files ............................ "
-    ROOTUUID=$($SUDO /usr/bin/linux64 /sbin/blkid "$LOOPDEVICE"p2 -s UUID |cut -d\" -f2)
+#printf "generating grub config files ............................ "
+#    ROOTUUID=$($SUDO /usr/bin/linux64 /sbin/blkid "$LOOPDEVICE"p2 -s UUID |cut -d\" -f2)
     PARTUUID=$($SUDO sgdisk -i=2 "$LOOPDEVICE" |grep 'Partition unique GUID' |cut -d\  -f4)
-    ROOT2UUID=$($SUDO /usr/bin/linux64 /sbin/blkid "$LOOPDEVICE"p3 -s UUID |cut -d\" -f2)
+ #   ROOT2UUID=$($SUDO /usr/bin/linux64 /sbin/blkid "$LOOPDEVICE"p3 -s UUID |cut -d\" -f2)
     PART2UUID=$($SUDO sgdisk -i=3 "$LOOPDEVICE" |grep 'Partition unique GUID' |cut -d\  -f4)
-    test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
+#    test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
+ROOTUUID=$ROOT1_LABEL
+ROOT2UUID=$ROOT2_LABEL
+#PARTUUID=$ROOT1_LABEL
+#PART2UUID=$ROOT2_LABEL
 
 printf "compiled in grub.cfg .................................... "
 cat <<ENDOFGRUBCFG >grub.cfg.in
 insmod part_gpt
 insmod part_msdos
 insmod ext2
-search -u $ROOTUUID -s root
+search -l $ROOTUUID -s root
 configfile /boot/grub/grub.cfg
 ENDOFGRUBCFG
 test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
@@ -115,15 +119,15 @@ test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 printf "real grub.cfg ........................................... "
 cat <<ENDOFGRUBCFG >grub.cfg
 set timeout=$GRUB2_TIMEOUT
-set default=1
+set default=0
 insmod ext2
 menuentry $GRUB_MENU_ENTRY1 {
-    search -u $ROOTUUID -s root
-    linux /boot/bzImage rootdelay=$ROOTDELAY root=PARTUUID="$PARTUUID" consoleblank=0 rw mem=0x80000000 enable_mtrr_cleanup mtrr_spare_reg_nr=1 brboxsystem=$GRUB_MENU_ENTRY1
+    search -l $ROOTUUID -s root
+    linux /boot/bzImage rootdelay=$ROOTDELAY consoleblank=0 rw mem=0x80000000 enable_mtrr_cleanup mtrr_spare_reg_nr=1 brboxsystem=$GRUB_MENU_ENTRY1 root=PARTUUID=$PARTUUID
 }
 menuentry $GRUB_MENU_ENTRY2 {
-    search -u $ROOT2UUID -s root
-    linux /boot/bzImage rootdelay=$ROOTDELAY root=PARTUUID="$PART2UUID" consoleblank=0 rw mem=0x80000000 enable_mtrr_cleanup mtrr_spare_reg_nr=1 brboxsystem=$GRUB_MENU_ENTRY2
+    search -l $ROOT2UUID -s root
+    linux /boot/bzImage rootdelay=$ROOTDELAY consoleblank=0 rw mem=0x80000000 enable_mtrr_cleanup mtrr_spare_reg_nr=1 brboxsystem=$GRUB_MENU_ENTRY2 root=PARTUUID=$PART2UUID
 }
 ENDOFGRUBCFG
 test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
@@ -158,10 +162,10 @@ printf "regenerate grub.img ..................................... "
  $SUDO cp ./version-num.txt "$ROOTMOUNTPOINT"/$VERSION_FILE_PATH
  $SUDO cp ./version-num.txt "$ROOT2MOUNTPOINT"/$VERSION_FILE_PATH
 
- #echo "rootuuid=$ROOTUUID partuuid=$PARTUUID" > ./uuid-file.txt
- #$SUDO cp ./uuid-file.txt "$ROOTMOUNTPOINT"/$UUID_FILE_PATH
- #echo "rootuuid=$ROOT2UUID partuuid=$PART2UUID" > ./uuid-file.txt
- #$SUDO cp ./uuid-file.txt "$ROOT2MOUNTPOINT"/$UUID_FILE_PATH
+ echo "uuidbrbox1=$PARTUUID uuidbrbox2=$PART2UUID" > ./uuid-file.txt
+ $SUDO cp ./uuid-file.txt "$ROOTMOUNTPOINT"/$UUID_FILE_PATH
+ #echo "partuuid=$PART2UUID" > ./uuid-file.txt
+ $SUDO cp ./uuid-file.txt "$ROOT2MOUNTPOINT"/$UUID_FILE_PATH
 
  printf "unmounting and deleting mountpoint1 %s .." "$ROOTMOUNTPOINT"
      $SUDO umount "$ROOTMOUNTPOINT"
@@ -179,7 +183,7 @@ printf "regenerate grub.img ..................................... "
      test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
  #take a copy of brbox1 system for creating mkimage compressed upgrade package
- dd if="${LOOPDEVICE}p2" of=$UIMG_DISK bs=1M 1>/dev/null 2>/dev/null
+ dd if="${LOOPDEVICE}p3" of=$UIMG_DISK bs=1M 1>/dev/null 2>/dev/null
 
  #printf "Compressing Image: %s ... " "$OUTPUT_DISK"
  #    gzip -c "$IMAGENAME" >"$OUTPUT_DISK"
@@ -193,7 +197,7 @@ printf "regenerate grub.img ..................................... "
      $SUDO losetup -d "$LOOPDEVICE" 
      rm -rf "$IMAGENAME"
      rm ./version-num.txt
-     #rm ./uuid-file.txt
+     rm ./uuid-file.txt
      rm grub.cfg.in
      rm grub.cfg
      test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
