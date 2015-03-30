@@ -31,13 +31,13 @@ start() {
 	fi
 	umask 077
 	start-stop-daemon -S -q -p /var/run/dropbear.pid --exec /usr/sbin/dropbear -- -d ${CONFIG_PATH}/etc/dropbear/dropbear_dss_host_key -r ${CONFIG_PATH}/etc/dropbear/dropbear_rsa_host_key -j -k
-	[ $? =0 ] && echo "OK" || echo "FAIL"
+	[ $? = 0 ] && echo "OK" || echo "FAIL"
 }
 
 stop() {
 	echo -n "Stopping dropbear sshd: "
 	start-stop-daemon -K -q -p /var/run/dropbear.pid
-	[ $? =0 ] && echo "OK" || echo "FAIL"
+	[ $? = 0 ] && echo "OK" || echo "FAIL"
 }
 
 restart() {
