@@ -11,14 +11,16 @@ GRUB1_COPY_SCRIPT=grub1-copy.sh
 GRUB1_SUDO_EXE_SCRIPT=sudo-executor-grub1-prepare.sh
 GRUB2_DISK_CREATOR=grub2-bootdisk.sh
 IMAGE_ONLY=0
+PREPARE_ONLY=0
 ###############################################################################
-while getopts o:v:c:s:i f
+while getopts o:v:c:s:ip f
 do
     case $f in
 	o) BR_OUTPUT_FOLDER=$OPTARG;;  #buildroot output folder
 	v) IMAGE_VERSION=$OPTARG ;;    #image version
 	s) SUDOPW=$OPTARG ;;           #sud password
 	i) IMAGE_ONLY=1 ;;             #-i can be used only for binary image creation(build will be skipped)
+        p) PREPARE_ONLY=1 ;;            #just prepare buildroot, dont build
     esac
 done
 
@@ -37,6 +39,10 @@ if [ $IMAGE_ONLY = 0 ]; then
 	pushd .
 	cd $BR_FOLDER
 	make O=$BR_OUTPUT_FOLDER $BR_BOARD_CONFIG
+	if [ $PREPARE_ONLY = 1 ]; then
+		popd
+		exit 0
+	fi	
 	make O=$BR_OUTPUT_FOLDER
 	popd
 fi
