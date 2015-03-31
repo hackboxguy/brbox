@@ -21,7 +21,7 @@ GRUB_MENU_ENTRY1='brbox1'
 GRUB_MENU_ENTRY2='brbox2'
 GRUB2_TIMEOUT=1
 ROOTDELAY=5
-VERSION_FILE_PATH=/boot/version-num.txt
+#VERSION_FILE_PATH=/boot/version-num.txt
 #UUID_FILE_PATH=/boot/brbox-uuid.txt
 ###########################################################
 while getopts o:v:i: f
@@ -159,11 +159,11 @@ printf "regenerate grub.img ..................................... "
      $SUDO /usr/bin/linux64 cp grub.cfg "$ROOT2MOUNTPOINT"/boot/grub/grub.cfg
      test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
- echo $IMAGE_VERSION > ./version-num.txt
+# echo $IMAGE_VERSION > ./version-num.txt
 # $SUDO cp ./version-num.txt "$ROOTMOUNTPOINT"/boot/
 # $SUDO cp ./version-num.txt "$ROOT2MOUNTPOINT"/boot/
- $SUDO cp ./version-num.txt "$ROOTMOUNTPOINT"/$VERSION_FILE_PATH
- $SUDO cp ./version-num.txt "$ROOT2MOUNTPOINT"/$VERSION_FILE_PATH
+# $SUDO cp ./version-num.txt "$ROOTMOUNTPOINT"/$VERSION_FILE_PATH
+# $SUDO cp ./version-num.txt "$ROOT2MOUNTPOINT"/$VERSION_FILE_PATH
 
  #echo "uuidbrbox1=$PARTUUID uuidbrbox2=$PART2UUID" > ./uuid-file.txt
  #$SUDO cp ./uuid-file.txt "$ROOTMOUNTPOINT"/$UUID_FILE_PATH
@@ -200,7 +200,7 @@ printf "regenerate grub.img ..................................... "
      $SUDO partx -d "$LOOPDEVICE" 
      $SUDO losetup -d "$LOOPDEVICE" 
      rm -rf "$IMAGENAME"
-     rm ./version-num.txt
+     #rm ./version-num.txt
      #rm ./uuid-file.txt
      rm grub.cfg.in
      rm grub.cfg

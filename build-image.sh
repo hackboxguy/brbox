@@ -27,6 +27,7 @@ done
 
 svn up > /dev/null
 BUILDNUMBER=$(LANG=en_US; svn info 2>&1 | grep "Last Changed Rev:" | sed -e 's/.* //')
+TMP_BUILDNUM=$(printf "%05d" $BUILDNUMBER)
 BUILDNUMBER=$(printf "$IMAGE_VERSION.%05d" $BUILDNUMBER)
 [ ! -d  "$BR_OUTPUT_FOLDER" ] && { echo "Error: output folder $BR_OUTPUT_FOLDER not found!"   ; exit -1; }
 
@@ -38,19 +39,14 @@ if [ $IMAGE_ONLY = 0 ]; then
 	cp configs/busybox.config           $BR_FOLDER/package/busybox/
 	pushd .
 	cd $BR_FOLDER
-	make O=$BR_OUTPUT_FOLDER $BR_BOARD_CONFIG
+	make O=$BR_OUTPUT_FOLDER $BR_BOARD_CONFIG BRBOX_RELVERSION=$IMAGE_VERSION BRBOX_BUILDNUM=$TMP_BUILDNUM
 	if [ $PREPARE_ONLY = 1 ]; then
 		popd
 		exit 0
 	fi	
-	make O=$BR_OUTPUT_FOLDER
+	make O=$BR_OUTPUT_FOLDER BRBOX_RELVERSION=$IMAGE_VERSION BRBOX_BUILDNUM=$TMP_BUILDNUM
 	popd
 fi
-
-#PREPARE_SCRIPT=$(pwd)/scripts/$GRUB1_PREPARE_SCRIPT
-#COPY_SCRIPT=$(pwd)/scripts/$GRUB1_COPY_SCRIPT
-#SUDO_EXE_SCR=$(pwd)/scripts/$GRUB1_SUDO_EXE_SCRIPT
-#./scripts/grub1-bootdisk.sh -o $BR_OUTPUT_FOLDER -r $RAW_DISK_IMAGE -i $BR_OUTPUT_FOLDER/images/out.disk.img -v $BUILDNUMBER -p $PREPARE_SCRIPT -c $COPY_SCRIPT -s $SUDOPW -x $SUDO_EXE_SCR
 
 GRUB2_SCRIPT=$(pwd)/scripts/$GRUB2_DISK_CREATOR
 ./scripts/sudo-grub2-bootdisk.sh $GRUB2_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/out.disk.img $SUDOPW
