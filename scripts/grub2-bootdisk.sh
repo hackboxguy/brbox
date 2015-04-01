@@ -16,7 +16,7 @@ BR_OUTPUT_FOLDER=/mnt/buildramdisk/x86
 SUDO=
 IMAGE_VERSION=01.00.12345
 OUTPUT_DISK=0 #bootable-usb-disk.img
-UIMG_DISK=0
+#UIMG_DISK=0
 GRUB_MENU_ENTRY1='brbox1'
 GRUB_MENU_ENTRY2='brbox2'
 GRUB2_TIMEOUT=1
@@ -30,16 +30,16 @@ do
 	o) BR_OUTPUT_FOLDER=$OPTARG;;  #buildroot output folder
 	v) IMAGE_VERSION=$OPTARG ;;    #image version
 	i) OUTPUT_DISK=$OPTARG ;;      #path of the complete usb bootable disk
-	u) UIMG_DISK=$OPTARG ;;        #path of the upgrade package
+	#u) UIMG_DISK=$OPTARG ;;        #path of the upgrade package
     esac
 done
 [ "$OUTPUT_DISK" = 0 ] && OUTPUT_DISK=$BR_OUTPUT_FOLDER/images/bootable-usb-disk.img
-[ "$UIMG_DISK"   = 0 ] && UIMG_DISK=$BR_OUTPUT_FOLDER/images/uBrboxUpdate.uimg
+#[ "$UIMG_DISK"   = 0 ] && UIMG_DISK=$BR_OUTPUT_FOLDER/images/uBrboxUpdate.uimg
 
 BINARIES_DIR=$BR_OUTPUT_FOLDER/images
 IMAGENAME=$(mktemp)
 MKIMG_TIMESTAMP=$(date +%Y%m%d%H%M%S)
-ROOTFS="$BINARIES_DIR/rootfs.tar"
+ROOTFS="$BINARIES_DIR/rootfs.tar.xz"
 ROOTMOUNTPOINT=$(mktemp -d)
 ROOT2MOUNTPOINT=$(mktemp -d)
 
@@ -87,11 +87,11 @@ printf "Mounting loopdevice root2 partition ..................... "
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "copying root1 files - this may take some time ........... "
-    $SUDO tar -C "$ROOTMOUNTPOINT" -xf "$ROOTFS"
+    $SUDO tar -C "$ROOTMOUNTPOINT" -Jxf "$ROOTFS"
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "copying root2 files - this may take some time ........... "
-    $SUDO tar -C "$ROOT2MOUNTPOINT" -xf "$ROOTFS"
+    $SUDO tar -C "$ROOT2MOUNTPOINT" -Jxf "$ROOTFS"
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 
@@ -186,7 +186,7 @@ printf "regenerate grub.img ..................................... "
      test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
  #take a copy of brbox1 system for creating mkimage compressed upgrade package
- dd if="${LOOPDEVICE}p3" of=$UIMG_DISK bs=1M 1>/dev/null 2>/dev/null
+ #dd if="${LOOPDEVICE}p3" of=$UIMG_DISK bs=1M 1>/dev/null 2>/dev/null
 
  #printf "Compressing Image: %s ... " "$OUTPUT_DISK"
  #    gzip -c "$IMAGENAME" >"$OUTPUT_DISK"
