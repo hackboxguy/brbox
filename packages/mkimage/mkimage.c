@@ -134,7 +134,7 @@ table_entry_t type_name[] =
     {	IH_TYPE_STANDALONE, "standalone",           "Standalone Program", },
     {	IH_TYPE_UBOOT,	    "uboot", 	  "U-Boot Image", 	},
     {	IH_TYPE_BRBOX_PROJ,  STR_TYPE_BRBOX_PROJ,  "BrBox Proj Image",},//whole BrBox project file
-    {	IH_TYPE_BRBOX_ROOT,  STR_TYPE_BRBOX_PROJ,  "BrBox Root Image",},
+    {	IH_TYPE_BRBOX_ROOT,  STR_TYPE_BRBOX_ROOT,  "BrBox Root Image",},
     {	IH_TYPE_BRBOX_STTNG, STR_TYPE_BRBOX_STTNG, "BrBox Settng Image",},
     {	IH_TYPE_BRBOX_USRDAT,STR_TYPE_BRBOX_USRDAT,"BrBox UsrDat Image",},
     {	-1,		    "",		  "",			},
