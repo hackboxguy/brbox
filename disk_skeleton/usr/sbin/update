@@ -31,12 +31,15 @@ if [ "$CUR_BOOT" = "$ONE_BRBOX_NAME" ]; then
 elif [ "$CUR_BOOT" = "$TWO_BRBOX_NAME" ]; then
 	BRBOX_PARTITION=/dev/$ONE_BRBOX_PART
 	BRBOX_LABEL=$ROOT1_LABEL
+	#before updating brbox1, update my(brbox2) grub.cfg's "set default" flag to 1 so that mbr-grub can call my(brbox2) grub.cfg incase of corrupt brbox1
+	#this will ensure that brbox2 will be booted incase of corrupt brbox1
+	sed -i "s|set default=.*|set default=1|" $GRUBCFG_FILE_PATH
 else
 	#booted system is neither brbox1 nor brbox2
 	echo "Error: Unknown boot system!!!"; return 1;
 	return 1
 fi
-
+#todo: set a flag in /mnt/setting to know that fmw-update has begun
 $MKFSTOOL -F -L $BRBOX_LABEL $BRBOX_PARTITION 1>/dev/null 2>/dev/null
 if [ $? != "0" ]; then #unable format ext3 filesystem
 	echo "Error: Unable to format ext3 filesystem!!!"; return 1;
@@ -68,5 +71,6 @@ umount $BRBOX_PARTITION
 rm -r $TEMP_MOUNT_POINT
 $BRDSKMGR_TOOL -f #flip the boot-marker flag, so that next time updated system will boot
 [ $? != 0 ] && { echo "Error: Unable to flip boot-marker flag!!!"; return 1; }
+#todo: reset a flag in /mnt/setting to know that fmw-update has has completed successfully(this will inform the system that fmw update was success).
 return 0
 

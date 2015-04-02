@@ -112,7 +112,12 @@ insmod part_gpt
 insmod part_msdos
 insmod ext2
 search -l $ROOTUUID -s root
-configfile /boot/grub/grub.cfg
+if [ -e /boot/grub/grub.cfg ]; then
+	configfile /boot/grub/grub.cfg
+else
+	search -l $ROOT2UUID -s root
+	configfile /boot/grub/grub.cfg
+fi
 ENDOFGRUBCFG
 test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
