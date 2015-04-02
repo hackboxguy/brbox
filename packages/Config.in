@@ -1,0 +1,8 @@
+menu "BrBox Packages"
+
+config BR2_TARGET_BRBOX_COMMON
+        bool "Common packages"
+        help
+          Enable building of common (non-board-specific) packages
+
+endmenu
