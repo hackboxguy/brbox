@@ -19,6 +19,9 @@ done
 
 [ ! -f  "$UPDATE_FILE"  ] && { echo "Error: Update file not found!!!"; return 1; }
 #TODO:mkimage file integrity 
+file $UPDATE_FILE | grep "XZ compressed data" > /dev/null
+[ $? != 0 ] && { echo "Error: Update file must be xz compressed!!!"; return 1; }
+
 
 #check which system is booted
 CUR_BOOT=$($BRDSKMGR_TOOL -c)
@@ -56,7 +59,7 @@ if [ $? != "0" ]; then #unable mount device, filesystem might be corrupt
 	rm -r $TEMP_MOUNT_POINT
 	return 1
 fi
-tar -C $TEMP_MOUNT_POINT -xf $UPDATE_FILE
+tar -C $TEMP_MOUNT_POINT -Jxf $UPDATE_FILE
 if [ $? != "0" ]; then #unable to copy files
 	echo "Error: Unable to copy files!!!"; return 1;
 	umount $BRBOX_PARTITION
