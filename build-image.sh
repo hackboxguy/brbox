@@ -1,10 +1,9 @@
 #!/bin/bash
 #this script builds the builroot based image
-#BR_OUTPUT_FOLDER=./buildroot
 BR_FOLDER=./buildroot
 IMAGE_VERSION=XX.YY
-BR_BOARD_CONFIG=qemu_x86_64_defconfig
-BR_BOARD_LINUX_CONFIG=linux.config #linux-3.18.config
+BR_BOARD_CONFIG=baytrail/qemu_x86_64_defconfig
+BR_BOARD_LINUX_CONFIG=baytrail/linux.config 
 RAW_DISK_IMAGE=./raw-images/disk.grub1.img.xz
 GRUB1_PREPARE_SCRIPT=grub1-prepare.sh
 GRUB1_COPY_SCRIPT=grub1-copy.sh
