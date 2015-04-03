@@ -30,7 +30,7 @@ endif
 all:	 version mkimage 
 
 mkimage:	$(SOURCES) $(HEADERS)
-	$(CROSS_COMPILE)gcc $(I386_FLAG) $(LFLAGS) -static -Wall -DUSE_HOSTCC $(SOURCES) -o mkimage
+	$(CROSS_COMPILE)gcc $(I386_FLAG) $(LFLAGS) -static -Wall -DUSE_HOSTCC $(SOURCES) -o brbox-mkimage
 
 .PHONY: version
 version:
@@ -39,5 +39,5 @@ version:
 
 clean:
 	rm -f BuildNumber.h
-	rm -f mkimage
+	rm -f brbox-mkimage
 
