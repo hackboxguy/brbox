@@ -7,11 +7,16 @@ BR_BOARD_SYSTEM_CONFIG=baytrail
 BR_BOARD_CONFIG=qemu_x86_64_defconfig
 BR_BOARD_LINUX_CONFIG=linux.config 
 
-RAW_DISK_IMAGE=./raw-images/disk.grub1.img.xz
+#RAW_DISK_IMAGE=./raw-images/disk.grub1.img.xz
 GRUB1_PREPARE_SCRIPT=grub1-prepare.sh
 GRUB1_COPY_SCRIPT=grub1-copy.sh
 GRUB1_SUDO_EXE_SCRIPT=sudo-executor-grub1-prepare.sh
 GRUB2_DISK_CREATOR=grub2-bootdisk.sh
+
+#output images
+BOOTABLE_USB_IMG=bootable-usb-disk.img
+BRBOX_ROOT_IMG=uBrBoxRoot.uimg
+
 IMAGE_ONLY=0
 PREPARE_ONLY=0
 ###############################################################################
@@ -53,7 +58,11 @@ if [ $IMAGE_ONLY = 0 ]; then
 	popd
 fi
 
+#create bootable-usb-disk.img
 GRUB2_SCRIPT=$(pwd)/scripts/$GRUB2_DISK_CREATOR
-./scripts/sudo-grub2-bootdisk.sh $GRUB2_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/out.disk.img $SUDOPW
+./scripts/sudo-grub2-bootdisk.sh $GRUB2_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
+
+#create Rootfs upgrade package
+./scripts/brbox-mkuimg.sh -r $BR_OUTPUT_FOLDER/images/rootfs.tar.xz -v $BUILDNUMBER -o $BR_OUTPUT_FOLDER/images/$BRBOX_ROOT_IMG -m disk_skeleton/usr/sbin/brbox-mkimage
 
 
