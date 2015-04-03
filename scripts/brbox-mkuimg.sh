@@ -16,7 +16,7 @@ PACKAGE_HEADER_STRING=BrBox
 ###############################################################################
 CreateBrBoxRoot() #$1=in-rootfs.tar.xz-file $2=VersionString $3=out-file-path
 {
-	printf "Creating Roofs Upgrade package ....................... "
+	printf "Creating Roofs Upgrade package .......................... "
 	#todo: check if $1 is compressed tar.xz file
 	VERSION_STR="$PACKAGE_HEADER_STRING $BRBOX_ROOT V-$2"
 	$MKIMAGE -T $BRBOX_ROOT \
