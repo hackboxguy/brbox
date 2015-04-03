@@ -8,8 +8,119 @@ TWO_BRBOX_PART=sda3 #partition
 ROOT1_LABEL=ROOT1   #linux-1
 ROOT2_LABEL=ROOT2   #linux-2
 GRUBCFG_FILE_PATH=/boot/grub/grub.cfg
+MKIMAGE=/usr/sbin/brbox-mkimage
+#file types
+SINGL_MK_OK="singl_mk_ok"
+SINGL_MK_NOK="singl_mk_nok"
+MULTI_MK_OK="multi_mk_ok"
+MULTI_MK_NOK="multi_mk_nok"
+SINGL_BINARY="singl_binary"
 
+BRBOX_PROJ="BrBoxProj"    #complete project including all sub-modules
+BRBOX_ROOT="BrBoxRoot"    #rootfs
+BRBOX_STTNG="BrBoxSttng"  #settings partition
+BRBOX_USRDAT="BrBoxUsrDt" #user-data partition 
 
+GLOBAL_VAR_TOTAL_FILES=0
+###############################################################################
+IsItMultiMkFile() #$1=file $2=text-file-to-store-mkimage-header-text
+{
+	$MKIMAGE -h 1 $1 2>$2 
+	[ $? != "0" ] && return 1 #not a Mk file
+	cat $2 | grep "Multi-File" > /dev/null
+	[ $? != "0" ] && return 1 #Mk-file, but not a Multi-Mk-File
+	return 0 #this is a Multi-Mk-file
+}
+IsItSingleMkFile() #$1=file $2=text-file-to-store-mkimage-header-text
+{
+	$MKIMAGE -h 1 $1 2>$2 
+	[ $? != "0" ] && return 1 #not a Mk-file
+	cat $2 | grep "Multi-File" > /dev/null
+	[ $? = "0" ] && return 1 #this is a Multi-MK-File
+	return 0 #this is a Single-MK-file
+}
+CheckFileType() #$1=file $2=text-file-to-store-mkimage-header-text
+{
+	GLOBAL_VAR_TOTAL_FILES=0
+	IsItMultiMkFile $1 $2
+	if [ $? != "0" ]; then
+		IsItSingleMkFile $1 $2
+		if [ $? = "0" ]; then
+			#echo -e "Single-MK-File"
+			$MKIMAGE -l $1 2>/dev/null
+			[ $? != "0" ] && { echo $SINGL_MK_NOK ; return 1; }
+			echo $SINGL_MK_OK
+		else
+			echo $SINGL_BINARY
+		fi
+	else
+		#echo -e "Multi-MK-File"
+		TOTAL_SUB_IMAGES=$($MKIMAGE -l -t $1 2>$2)
+		[ $? != "0" ] && { echo $MULTI_MK_NOK ; return 1; }
+		#count total sub-images
+		TOTAL_SUB_IMAGES=$(echo $TOTAL_SUB_IMAGES | grep "are:")
+		[ $? != "0" ] && { echo $MULTI_MK_NOK ; return 1; }
+		TOTAL_SUB_IMAGES=$(echo "$TOTAL_SUB_IMAGES" | sed s/".*are: "//)
+		echo $MULTI_MK_OK
+		echo "total-sub-images=$TOTAL_SUB_IMAGES">>$2 #caller needs this value(pass it through mk-header-text file)
+	fi
+	return 0
+}
+GetImageType() #$-input-file
+{
+	IMGNAME=$($MKIMAGE -l $1 2>&1 | grep "Image Name:")
+	[ $? != "0" ] && return 1
+	IMGNAME=$(echo $IMGNAME | awk '{print $4}')
+	[ $? != "0" ] && return 1
+	echo $IMGNAME
+	return 0
+}
+ProcessImageType() #$1-inputfile $2=IMGTYPE $3=outputfile
+{
+	#BRBOX_PROJ="BrBoxProj"    #complete project including all sub-modules
+	#BRBOX_ROOT="BrBoxRoot"    #rootfs
+	#BRBOX_STTNG="BrBoxSttng"  #settings partition
+	#BRBOX_USRDAT="BrBoxUsrDt" #user-data partition 
+	if [ "$2" = "$BRBOX_ROOT" ]; then
+		dd if=$1 bs=64 skip=1 of=$3 1>/dev/null 2>/dev/null #just strip 64byte mkheader and create rootfs.tar.xz
+		return $?
+	else
+		return 1
+	fi
+}
+
+ProcessUpdate() #$1=input-update-file $2-output-file(if-applicable)
+{
+	TMPFILE=$(mktemp)
+	echo -n "Checking file health:......... "
+	FILE_TYPE=$(CheckFileType $1 $TMPFILE)
+	[ $? != "0" ] && { echo -e "Error!!! invalid image($FILE_TYPE)" ; rm -rf $TMPFILE ; return 1; }
+	if [ "$FILE_TYPE" = "$SINGL_MK_OK" ]; then
+		rm -rf $TMPFILE #for single mk, we dont need this file
+		echo -e "$FILE_TYPE.. [OK]"
+		printf "Checking file type............ "
+		IMGTYPE=$(GetImageType $1)
+		[ $? != "0" ] && { echo "[FAIL]" ; return 1; }
+		echo "$IMGTYPE.... [OK]"
+		ProcessImageType $1 $IMGTYPE $2
+		return $?
+	elif [ "$FILE_TYPE" = "$MULTI_MK_OK" ]; then
+		TOTAL_SUB_IMAGES=$(grep "total-sub-images=" $TMPFILE)
+		TOTAL_SUB_IMAGES=$(echo $TOTAL_SUB_IMAGES | sed 's/total-sub-images=//' )
+		echo -e "$FILE_TYPE total-sub-images=$TOTAL_SUB_IMAGES"
+		#TODO: ProcessMultiMKUpdate $1 $TOTAL_SUB_IMAGES $TMPFILE
+		return 1 #$?
+	elif [ "$FILE_TYPE" = "$SINGL_BINARY" ]; then
+		echo -e "$FILE_TYPE"
+		rm -rf $TMPFILE
+		return 1
+	else
+		echo -e "Unknown image type"
+		rm -rf $TMPFILE
+		return 1
+	fi
+}
+###############################################################################
 while getopts u: f
 do
     case $f in
@@ -18,14 +129,16 @@ do
 done
 
 [ ! -f  "$UPDATE_FILE"  ] && { echo "Error: Update file not found!!!"; return 1; }
+TMP_ROOTFSFILE=$(mktemp) #creates an emptyfile which will be filled by ProcessUpdate as rootfs.tar.xz
+ProcessUpdate $UPDATE_FILE $TMP_ROOTFSFILE
 #TODO:mkimage file integrity 
-file $UPDATE_FILE | grep "XZ compressed data" > /dev/null
-[ $? != 0 ] && { echo "Error: Update file must be xz compressed!!!"; return 1; }
+file $TMP_ROOTFSFILE | grep "XZ compressed data" > /dev/null
+[ $? != 0 ] && { echo "Error: Update file must be xz compressed!!!"; rm -rf $TMP_ROOTFSFILE; return 1; }
 
 
 #check which system is booted
 CUR_BOOT=$($BRDSKMGR_TOOL -c)
-[ $? != 0 ] && { echo "Error: Unable to read current system!!!"; return 1; }
+[ $? != 0 ] && { echo "Error: Unable to read current system!!!"; rm -rf $TMP_ROOTFSFILE; return 1; }
 
 #if first system is booted, then update second system
 if [ "$CUR_BOOT" = "$ONE_BRBOX_NAME" ]; then
@@ -34,46 +147,58 @@ if [ "$CUR_BOOT" = "$ONE_BRBOX_NAME" ]; then
 elif [ "$CUR_BOOT" = "$TWO_BRBOX_NAME" ]; then
 	BRBOX_PARTITION=/dev/$ONE_BRBOX_PART
 	BRBOX_LABEL=$ROOT1_LABEL
-	#before updating brbox1, update my(brbox2) grub.cfg's "set default" flag to 1 so that mbr-grub can call my(brbox2) grub.cfg incase of corrupt brbox1
+	#before updating brbox1, update my(brbox2) grub.cfg's "set default" flag to 1 so that
+	#mbr-grub can call my(brbox2) grub.cfg incase of corrupt brbox1
 	#this will ensure that brbox2 will be booted incase of corrupt brbox1
 	sed -i "s|set default=.*|set default=1|" $GRUBCFG_FILE_PATH
 else
 	#booted system is neither brbox1 nor brbox2
-	echo "Error: Unknown boot system!!!"; return 1;
+	echo "Error: Unknown boot system!!!" 
+	rm -rf $TMP_ROOTFSFILE;
 	return 1
 fi
-#todo: set a flag in /mnt/setting to know that fmw-update has begun
+#TODO: set a flag in /mnt/setting to know that fmw-update has begun
+printf "Formatting $BRBOX_PARTITION as ext3................ "
 $MKFSTOOL -F -L $BRBOX_LABEL $BRBOX_PARTITION 1>/dev/null 2>/dev/null
 if [ $? != "0" ]; then #unable format ext3 filesystem
-	echo "Error: Unable to format ext3 filesystem!!!"; return 1;
+	echo "Error: Unable to format ext3 filesystem!!!"
+	rm -rf $TMP_ROOTFSFILE;
 	return 1
 fi
+echo "[OK]"
+
 TEMP_MOUNT_POINT=$(mktemp -d)
 if [ $? != "0" ]; then #unable to create temp mount directory
-	echo "Error: Unable to create temp directory!!!"; return 1;
+	echo "Error: Unable to create temp directory!!!"
+	rm -rf $TMP_ROOTFSFILE;
 	return 1
 fi
 mount $BRBOX_PARTITION $TEMP_MOUNT_POINT
 if [ $? != "0" ]; then #unable mount device, filesystem might be corrupt
-	echo "Error: Unable to mount $BRBOX_PARTITION to $TEMP_MOUNT_POINT!!!"; return 1;
+	echo "Error: Unable to mount $BRBOX_PARTITION to $TEMP_MOUNT_POINT!!!"
 	rm -r $TEMP_MOUNT_POINT
+	rm -rf $TMP_ROOTFSFILE
 	return 1
 fi
-tar -C $TEMP_MOUNT_POINT -Jxf $UPDATE_FILE
+printf "Copying new filesystem to $BRBOX_PARTITION ........ "
+tar -C $TEMP_MOUNT_POINT -Jxf $TMP_ROOTFSFILE
 if [ $? != "0" ]; then #unable to copy files
-	echo "Error: Unable to copy files!!!"; return 1;
+	echo "Error: Unable to copy files!!!"
 	umount $BRBOX_PARTITION
 	rm -r $TEMP_MOUNT_POINT
+	rm -rf $TMP_ROOTFSFILE
 	return 1
 fi
+echo "[OK]"
 
 cp $GRUBCFG_FILE_PATH $TEMP_MOUNT_POINT/$GRUBCFG_FILE_PATH
-#TODO: cp /boot/version-num.txt /tmp/tmp.0EBZpt/boot/
 sync
 umount $BRBOX_PARTITION
 rm -r $TEMP_MOUNT_POINT
+rm -rf $TMP_ROOTFSFILE
 $BRDSKMGR_TOOL -f #flip the boot-marker flag, so that next time updated system will boot
 [ $? != 0 ] && { echo "Error: Unable to flip boot-marker flag!!!"; return 1; }
-#todo: reset a flag in /mnt/setting to know that fmw-update has has completed successfully(this will inform the system that fmw update was success).
+#TODO: reset a flag in /mnt/setting to know that fmw-update has has completed successfully(this will inform the system that fmw update was success).
+echo "FinalResult ................................ [OK]"
 return 0
 

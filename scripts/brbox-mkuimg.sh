@@ -1,18 +1,18 @@
 #!/bin/sh
 #brbox upgrade-package creator based on mkimage tool
-MKIMAGE=./mkimage
+MKIMAGE=./brbox-mkimage
 BRBOX_PROJ="BrBoxProj"    #complete project including all sub-modules
 BRBOX_ROOT="BrBoxRoot"    #rootfs
 BRBOX_STTNG="BrBoxSttng"  #settings partition
 BRBOX_USRDAT="BrBoxUsrDt" #user-data partition 
 USAGE="script for generating BrBox binary update packages"
-USAGE1="usage:./$0 -r <rootfs.tar.xz> -v <version.xx.yy>"
+USAGE1="usage:./$0 -r <rootfs.tar.xz> -v <version.xx.yy> -m <mkimage_tool_path>"
 ROOTFS_FILE="rootfs.tar.xz"
 VERSION="00.01"
-OUT_FILE=./uOutFile.img
+OUT_FILE=./uOutFile.uimg
 PACKAGE_HEADER_STRING=BrBox
 ###############################################################################
-#./brbox-mkuimg.sh -r rootfs.tar.xz -v 00.02 -o out.uimg
+#./brbox-mkuimg.sh -r rootfs.tar.xz -v 00.02 -o out.uimg -m ../disk_skeleton/usr/sbin/brbox-mkimage
 ###############################################################################
 CreateBrBoxRoot() #$1=in-rootfs.tar.xz-file $2=VersionString $3=out-file-path
 {
@@ -36,9 +36,10 @@ if [ $# -lt 1  ]; then
 	exit $ERR_ARGC
 fi
 ##############parse the arguments##############################################
-while getopts r:v:o: f
+while getopts r:v:o:m: f
 do
     case $f in
+	m) MKIMAGE=$OPTARG ;;     #mkimage binary path
 	r) ROOTFS_FILE=$OPTARG ;;
 	v) VERSION=$OPTARG ;;
 	o) OUT_FILE=$OPTARG ;;
