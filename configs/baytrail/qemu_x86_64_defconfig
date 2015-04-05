@@ -1475,6 +1475,19 @@ BR2_PACKAGE_UTIL_LINUX_LIBUUID=y
 # BR2_PACKAGE_UEMACS is not set
 
 #
+# BrBox Packages
+#
+BR2_TARGET_BRBOX_COMMON=y
+BR2_TARGET_BRBOX_COMMON_SVNURL="http://github.com/hackboxguy/brbox/trunk"
+
+#
+# Common packages
+#
+BR2_PACKAGE_BRBOX_MKIMAGE=y
+BR2_PACKAGE_BRBOX_MKIMAGE_SOURCE="$(BR2_TARGET_BRBOX_COMMON_SVNURL)/sources/utils/brbox-mkimage"
+BR2_PACKAGE_HOST_BRBOX_MKIMAGE=y
+
+#
 # Filesystem images
 #
 # BR2_TARGET_ROOTFS_CLOOP is not set

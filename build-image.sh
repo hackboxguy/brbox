@@ -63,6 +63,6 @@ GRUB2_SCRIPT=$(pwd)/scripts/$GRUB2_DISK_CREATOR
 ./scripts/sudo-grub2-bootdisk.sh $GRUB2_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 
 #create Rootfs upgrade package
-./scripts/brbox-mkuimg.sh -r $BR_OUTPUT_FOLDER/images/rootfs.tar.xz -v $BUILDNUMBER -o $BR_OUTPUT_FOLDER/images/$BRBOX_ROOT_IMG -m disk_skeleton/usr/sbin/brbox-mkimage
+./scripts/brbox-mkuimg.sh -r $BR_OUTPUT_FOLDER/images/rootfs.tar.xz -v $BUILDNUMBER -o $BR_OUTPUT_FOLDER/images/$BRBOX_ROOT_IMG -m $BR_OUTPUT_FOLDER/host/usr/bin/brbox-mkimage
 
 

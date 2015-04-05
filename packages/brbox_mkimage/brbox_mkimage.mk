@@ -31,7 +31,7 @@ $(BRBOX_MKIMAGE_DIR)/.stamp_built: $(BRBOX_MKIMAGE_DIR)/.stamp_configured
 
 $(BRBOX_MKIMAGE_DIR)/.stamp_target_installed: $(BRBOX_MKIMAGE_DIR)/.stamp_built
 	mkdir -p $(TARGET_DIR)/usr/sbin
-	cp -a $(BRBOX_MKIMAGE_DIR)/babrbox-mkimage $(TARGET_DIR)/usr/sbin/
+	cp -a $(BRBOX_MKIMAGE_DIR)/brbox-mkimage $(TARGET_DIR)/usr/sbin/
 	touch $@
 
 brbox_mkimage: $(BRBOX_MKIMAGE_DIR)/.stamp_target_installed
