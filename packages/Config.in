@@ -5,4 +5,17 @@ config BR2_TARGET_BRBOX_COMMON
         help
           Enable building of common (non-board-specific) packages
 
+config BR2_TARGET_BRBOX_COMMON_SVNURL
+        string "base svn location of Common Packages"
+	default "http://github.com/hackboxguy/brbox/trunk"
+        depends on BR2_TARGET_BRBOX_COMMON
+        help
+          From which svn location to checkout the sources during build process
+
+if BR2_TARGET_BRBOX_COMMON
+menu "Common packages"
+source "package/brbox/brbox_mkimage/Config.in"
+endmenu
+endif
+
 endmenu
