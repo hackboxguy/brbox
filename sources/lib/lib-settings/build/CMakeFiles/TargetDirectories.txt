@@ -1,0 +1,1 @@
+/home/adav/sandbox/brbox/trunk/sources/lib/lib-settings/build/CMakeFiles/AdSttngs.dir
