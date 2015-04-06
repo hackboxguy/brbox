@@ -1,1 +1,0 @@
-/usr/bin/c++  -fPIC -O3 -DNDEBUG   -shared -Wl,-soname,libAdSttngs.so.0 -o libAdSttngs.so.0.1.1 CMakeFiles/AdSttngs.dir/src/strmap.cpp.o CMakeFiles/AdSttngs.dir/src/settings.cpp.o 
