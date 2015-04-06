@@ -1,0 +1,13 @@
+config BR2_PACKAGE_BRBOX_BAYTRAIL_UPDATE
+	bool "Update Script for baytrail based target"
+	default n
+	help
+	  provides in-system failsafe upgrade feature for baytrail based boards.
+
+config BR2_PACKAGE_BRBOX_BAYTRAIL_UPDATE_SOURCE
+string "SVN Location of sources"
+	default "http://github.com/hackboxguy/brbox/trunk/sources/scripts/baytrail_update"
+	depends on BR2_PACKAGE_BRBOX_BAYTRAIL_UPDATE
+	help
+	  From which directory to copy the sources during build process
+

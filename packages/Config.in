@@ -18,4 +18,8 @@ source "package/brbox/brbox_mkimage/Config.in"
 endmenu
 endif
 
+
+source "package/brbox/brbox_baytrail_update/Config.in"
+
+
 endmenu
