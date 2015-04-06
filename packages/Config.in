@@ -27,6 +27,7 @@ endif
 
 
 source "package/brbox/brbox_baytrail_update/Config.in"
+source "package/brbox/brbox_libAdSttngs/Config.in"
 
 
 endmenu

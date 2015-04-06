@@ -1,0 +1,6 @@
+config BR2_PACKAGE_BRBOX_LIBADSTTNGS
+	bool "libAdSettings"
+	default y
+	help
+	  settings library to be used along with lib-adav for writing services
+
