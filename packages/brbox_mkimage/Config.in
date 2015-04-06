@@ -4,13 +4,6 @@ config BR2_PACKAGE_BRBOX_MKIMAGE
 	help
 	  mkimage tool modified to support BRBOX image types plus some extra features
 
-config BR2_PACKAGE_BRBOX_MKIMAGE_SOURCE
-	string "SVN Location of sources"
-	default "$(BR2_TARGET_BRBOX_COMMON_SVNURL)/sources/utils/brbox-mkimage"
-	depends on BR2_PACKAGE_BRBOX_MKIMAGE
-	help
-	  From which directory to copy the sources during build process
-
 config BR2_PACKAGE_HOST_BRBOX_MKIMAGE
 	bool "Modified u-boot mkimage tool (for host)"
 	default n

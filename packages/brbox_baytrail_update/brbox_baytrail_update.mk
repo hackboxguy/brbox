@@ -7,7 +7,8 @@
 BRBOX_BAYTRAIL_UPDATE_DIR:=$(BUILD_DIR)/brbox_baytrail_update
 
 # Strip off the annoying quoting
-BRBOX_BAYTRAIL_UPDATE_SRC:=$(call qstrip,$(BR2_PACKAGE_BRBOX_BAYTRAIL_UPDATE_SOURCE))
+#BRBOX_BAYTRAIL_UPDATE_SRC:=$(call qstrip,$(BR2_PACKAGE_BRBOX_BAYTRAIL_UPDATE_SOURCE))
+BRBOX_BAYTRAIL_UPDATE_SRC:=$(call qstrip,$(BR2_TARGET_BRBOX_SVNURL))/sources/scripts/baytrail_update
 
 $(BRBOX_BAYTRAIL_UPDATE_DIR)/.stamp_downloaded:
 	mkdir -p $(BUILD_DIR)

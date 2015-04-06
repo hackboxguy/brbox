@@ -5,10 +5,3 @@ config BR2_PACKAGE_BRBOX_BAYTRAIL_UPDATE
 	help
 	  provides in-system failsafe upgrade feature for baytrail based boards.
 
-config BR2_PACKAGE_BRBOX_BAYTRAIL_UPDATE_SOURCE
-string "SVN Location of sources"
-	default "$(BR2_TARGET_BRBOX_SVNURL)/sources/scripts/baytrail_update"
-	depends on BR2_PACKAGE_BRBOX_BAYTRAIL_UPDATE
-	help
-	  From which directory to copy the sources during build process
-

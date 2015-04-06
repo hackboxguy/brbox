@@ -8,7 +8,8 @@ HOST_BRBOX_MKIMAGE_DIR:=$(BUILD_DIR)/host-brbox_mkimage
 HOST_BRBOX_MKIMAGE_BIN:=$(HOST_BRBOX_MKIMAGE_DIR)/build
 
 # Strip off the annoying quoting
-HOST_BRBOX_MKIMAGE_SRC:=$(call qstrip,$(BR2_PACKAGE_BRBOX_MKIMAGE_SOURCE))
+#HOST_BRBOX_MKIMAGE_SRC:=$(call qstrip,$(BR2_PACKAGE_BRBOX_MKIMAGE_SOURCE))
+HOST_BRBOX_MKIMAGE_SRC:=$(call qstrip,$(BR2_TARGET_BRBOX_SVNURL))/sources/utils/brbox-mkimage
 
 $(HOST_BRBOX_MKIMAGE_DIR)/.stamp_downloaded:
 	mkdir -p $(BUILD_DIR)
