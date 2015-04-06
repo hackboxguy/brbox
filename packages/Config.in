@@ -1,13 +1,27 @@
 menu "BrBox Packages"
 
+config BR2_TARGET_BRBOX_PACKAGES
+        bool "BrBox Related packages"
+	default n
+        help
+          Enable building of all BrBox related packages
+
+config BR2_TARGET_BRBOX_SVNURL
+        string "base svn location of BrBox Packages"
+	default "http://github.com/hackboxguy/brbox/trunk"
+        depends on BR2_TARGET_BRBOX_PACKAGES
+        help
+          From which svn location to checkout the sources during build process
+
 config BR2_TARGET_BRBOX_COMMON
         bool "Common packages"
+	depends on BR2_TARGET_BRBOX_PACKAGES
         help
           Enable building of common (non-board-specific) packages
 
 config BR2_TARGET_BRBOX_COMMON_SVNURL
         string "base svn location of Common Packages"
-	default "http://github.com/hackboxguy/brbox/trunk"
+	default "$(BR2_TARGET_BRBOX_SVNURL)"
         depends on BR2_TARGET_BRBOX_COMMON
         help
           From which svn location to checkout the sources during build process
