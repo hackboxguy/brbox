@@ -1,11 +1,7 @@
-################################################################################
-#
-# libAdSttngs
-#
-################################################################################
-LIBADSTTNG_VERSION = 1.0
-LIBADSTTNG_SOURCE = lib-settings.tar.gz
-LIBADSTTNG_SITE = svn://github.com/hackboxguy/brbox/trunk/sources/released-tarballs
-LIBADSTTNG_INSTALL_STAGING = YES
-LIBADSTTNG_INSTALL_TARGET = YES
+#BRBOX_LIBADSTTNGS_SOURCE=lib-settings.tar.gz
+BRBOX_LIBADSTTNGS_SITE_METHOD=local
+BRBOX_LIBADSTTNGS_SITE=$(TOPDIR)/../sources/lib/lib-settings
+BRBOX_LIBADSTTNGS_INSTALL_STAGING=YES
+BRBOX_LIBADSTTNGS_INSTALL_TARGET=YES
 $(eval $(cmake-package))
+
