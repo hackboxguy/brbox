@@ -17,10 +17,14 @@ $(BRBOX_LIBADSTTNGS_DIR)/.stamp_extracted: $(BRBOX_LIBADSTTNGS_DIR)/.stamp_downl
 	touch $@
 
 $(BRBOX_LIBADSTTNGS_DIR)/.stamp_configured: $(BRBOX_LIBADSTTNGS_DIR)/.stamp_extracted
+	pushd .
+	cd $(BRBOX_LIBADSTTNGS_DIR)	
+	cmake $(BRBOX_LIBADSTTNGS_DIR) -DOUTBIN:STRING=$(TARGET_DIR)/usr/lib/
+	popd
 	touch $@
 
 $(BRBOX_LIBADSTTNGS_DIR)/.stamp_built: $(BRBOX_LIBADSTTNGS_DIR)/.stamp_configured
-	$(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(BRBOX_LIBADSTTNGS_DIR)/build \
+	$(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(BRBOX_LIBADSTTNGS_DIR) \
 		CROSS_COMPILE="$(TARGET_CROSS)" STRIP="$(TARGET_STRIP)" \
 		EXTRA_CFLAGS="$(TARGET_CFLAGS)" \
 		EXTRA_CXXFLAGS="$(TARGET_CXXFLAGS)" \
@@ -28,8 +32,8 @@ $(BRBOX_LIBADSTTNGS_DIR)/.stamp_built: $(BRBOX_LIBADSTTNGS_DIR)/.stamp_configure
 	touch $@
 
 $(BRBOX_LIBADSTTNGS_DIR)/.stamp_target_installed: $(BRBOX_LIBADSTTNGS_DIR)/.stamp_built
-	mkdir -p $(TARGET_DIR)/usr/lib
-	cp -a $(BRBOX_LIBADSTTNGS_DIR)/build/libAdSttngs* $(TARGET_DIR)/usr/lib/
+	#mkdir -p $(TARGET_DIR)/usr/lib
+	#cp -a $(BRBOX_LIBADSTTNGS_DIR)/build/libAdSttngs* $(TARGET_DIR)/usr/lib/
 	touch $@
 
 brbox_libAdSttngs: $(BRBOX_LIBADSTTNGS_DIR)/.stamp_target_installed
