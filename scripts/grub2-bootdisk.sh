@@ -121,11 +121,11 @@ set default=0
 insmod ext2
 menuentry $GRUB_MENU_ENTRY1 {
     search -l $ROOTUUID -s root
-    linux /boot/bzImage rootdelay=$ROOTDELAY consoleblank=0 ro enable_mtrr_cleanup mtrr_spare_reg_nr=1 brboxsystem=$GRUB_MENU_ENTRY1 root=PARTUUID=$PARTUUID
+    linux /boot/bzImage rootdelay=$ROOTDELAY consoleblank=0 ro enable_mtrr_cleanup mtrr_spare_reg_nr=1 brboxsystem=$GRUB_MENU_ENTRY1 net.ifnames=0 root=PARTUUID=$PARTUUID
 }
 menuentry $GRUB_MENU_ENTRY2 {
     search -l $ROOT2UUID -s root
-    linux /boot/bzImage rootdelay=$ROOTDELAY consoleblank=0 ro enable_mtrr_cleanup mtrr_spare_reg_nr=1 brboxsystem=$GRUB_MENU_ENTRY2 root=PARTUUID=$PART2UUID
+    linux /boot/bzImage rootdelay=$ROOTDELAY consoleblank=0 ro enable_mtrr_cleanup mtrr_spare_reg_nr=1 brboxsystem=$GRUB_MENU_ENTRY2 net.ifnames=0 root=PARTUUID=$PART2UUID
 }
 ENDOFGRUBCFG
 test 0 -eq $? && echo "[OK]" || echo "[FAIL]"

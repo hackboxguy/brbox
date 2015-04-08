@@ -2,9 +2,9 @@
 auto lo
 iface lo inet loopback
 
-auto eno1
+auto eth0
 #allow-hotplug eth0
-iface eno1 inet dhcp
+iface eth0 inet dhcp
 #iface eth0 inet manual
 #	up ifconfig $IFACE 0.0.0.0 up
 #	down ifconfig $IFACE down
