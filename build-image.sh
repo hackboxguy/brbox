@@ -55,9 +55,10 @@ if [ $IMAGE_ONLY = 0 ]; then
 		exit 0
 	fi	
 	make O=$BR_OUTPUT_FOLDER BRBOX_RELVERSION=$IMAGE_VERSION BRBOX_BUILDNUM=$TMP_BUILDNUM
+	BUILD_RESULT=$?	
 	popd
 fi
-
+[ "$BUILD_RESULT" != "0" ] && echo "Error!!! build failed!!!!" && exit 1 
 #create bootable-usb-disk.img
 GRUB2_SCRIPT=$(pwd)/scripts/$GRUB2_DISK_CREATOR
 ./scripts/sudo-grub2-bootdisk.sh $GRUB2_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
