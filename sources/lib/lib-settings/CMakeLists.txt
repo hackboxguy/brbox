@@ -9,6 +9,7 @@ set(STTNGS_LIBVER_MINOR 1)
 set(STTNGS_LIBVER_PATCH 1)
 set(STTNGS_LIBVER_STRING ${STTNGS_LIBVER_MAJOR}.${STTNGS_LIBVER_MINOR}.${STTNGS_LIBVER_PATCH})
 
+#set(CMAKE_INSTALL_PREFIX /home/adav/usr/lib)
 project(${STTNGS_LIBNAME})
 set(CMAKE_BUILD_TYPE Release)
 
@@ -28,16 +29,19 @@ file(GLOB SOURCES "src/*.cpp")
 #Generate the shared library from the sources
 add_library(${STTNGS_LIBNAME} SHARED ${SOURCES})
  
-#Set the location for library installation -- i.e., /usr/lib in this case
+#Set the location for library installation -- i.e., /usr/local/lib by default or override with CMAKE_INSTALL_PREFIX
 # Use "sudo make install" to apply
-install(TARGETS ${STTNGS_LIBNAME} DESTINATION /usr/lib)
+file(GLOB  INCFILES "include/*.h")
+install(TARGETS ${STTNGS_LIBNAME} DESTINATION lib)
+install(FILES ${INCFILES} DESTINATION include)
 
 set_target_properties(${STTNGS_LIBNAME} PROPERTIES VERSION ${STTNGS_LIBVER_STRING}
                                            SOVERSION ${STTNGS_LIBVER_MAJOR})
 
 #for cross compiling
-#cmake -H. -BOutput -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain-arm-backup.cmake
+#cmake -H. -BOutput -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain-arm-backup.cmake -DCMAKE_INSTALL_PREFIX=/home/adav/tmp/
 #cmake --build Output -- all
+#cmake --build Output -- install
 
 #for local compiling
 #cmake -H. -BOutput

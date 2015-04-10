@@ -29,10 +29,14 @@ file(GLOB SOURCES "src/*.cpp")
 
 #Generate the shared library from the sources
 add_library(${ADCMN_LIBNAME} SHARED ${SOURCES})
- 
-#Set the location for library installation -- i.e., /usr/lib in this case
+
+#Set the location for library installation -- i.e., /usr/local/lib by default or override with CMAKE_INSTALL_PREFIX
 # Use "sudo make install" to apply
-install(TARGETS ${ADCMN_LIBNAME} DESTINATION /usr/lib)
+file(GLOB  INCFILES "include/*.h")
+install(TARGETS ${ADCMN_LIBNAME} DESTINATION lib)
+install(FILES ${INCFILES} DESTINATION include)
+
+
 
 set_target_properties(${ADCMN_LIBNAME} PROPERTIES VERSION ${ADCMN_LIBVER_STRING}
                                            SOVERSION ${ADCMN_LIBVER_MAJOR})
