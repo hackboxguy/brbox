@@ -12,10 +12,10 @@ set(STTNGS_LIBVER_STRING ${STTNGS_LIBVER_MAJOR}.${STTNGS_LIBVER_MINOR}.${STTNGS_
 project(${STTNGS_LIBNAME})
 set(CMAKE_BUILD_TYPE Release)
 
-SET(OUTBIN "./" CACHE STRING "./") #this value can be passed via cmdline as "cmake . -DOUTBIN=/tmp/"
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTBIN}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTBIN}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTBIN}/lib)
+#SET(OUTBIN "./" CACHE STRING "./") #this value can be passed via cmdline as "cmake . -DOUTBIN=/tmp/"
+#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTBIN}/lib)
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTBIN}/lib)
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTBIN}/lib)
 
 
 #Bring the headers into project
@@ -35,7 +35,14 @@ install(TARGETS ${STTNGS_LIBNAME} DESTINATION /usr/lib)
 set_target_properties(${STTNGS_LIBNAME} PROPERTIES VERSION ${STTNGS_LIBVER_STRING}
                                            SOVERSION ${STTNGS_LIBVER_MAJOR})
 
-#cmake -H. -BOutput or #cmake -H. -BOutput -DOUTBIN=/mnt/buildramdisk/lib-output/
+#for cross compiling
+#cmake -H. -BOutput -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain-arm-backup.cmake
 #cmake --build Output -- all
-#cmake --build Output -- clean
+
+#for local compiling
+#cmake -H. -BOutput
+#cmake --build Output -- all
+
+#for cleaning make generated output
 #rm -rf Output
+
