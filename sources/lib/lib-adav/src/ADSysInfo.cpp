@@ -123,8 +123,8 @@ int ADSysInfo::get_cpu_model_name(char* model)
 		;
 	}
 
-	//our mercury's proc system doesnt have "model name" string, hence this hack first checks
-	//if this board is mercury.. else it goes onto next scan for "model name"
+	//our arm's proc system doesnt have "model name" string, hence this hack first checks
+	//if this board is arm.. else it goes onto next scan for "model name"
 	find_str = strstr (arg, "Processor	:"); 
 	if (find_str != NULL) 
 	{
@@ -165,8 +165,8 @@ int ADSysInfo::get_cpu_frequency(char* freq)
 	}
 
 	sprintf(freq,"unknown");
-	//our mercury's proc system doesnt have "model name" string, hence this hack first checks
-	//if this board is mercury.. else it goes onto next scan for "model name"
+	//our arm's proc system doesnt have "model name" string, hence this hack first checks
+	//if this board is arm.. else it goes onto next scan for "model name"
 	find_str = strstr (arg, "BogoMIPS        :"); 
 	if (find_str != NULL) 
 	{
