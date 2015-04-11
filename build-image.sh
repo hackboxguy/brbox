@@ -57,6 +57,8 @@ if [ $IMAGE_ONLY = 0 ]; then
 	make O=$BR_OUTPUT_FOLDER BRBOX_RELVERSION=$IMAGE_VERSION BRBOX_BUILDNUM=$TMP_BUILDNUM
 	BUILD_RESULT=$?	
 	popd
+else
+	BUILD_RESULT=0  #for image-only, just set build-result as success
 fi
 [ "$BUILD_RESULT" != "0" ] && echo "Error!!! build failed!!!!" && exit 1 
 #create bootable-usb-disk.img
