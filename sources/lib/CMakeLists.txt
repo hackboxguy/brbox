@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.9)
 set(PROJECT_NAME AdLibraries)
 project(${PROJECT_NAME})
 add_subdirectory(lib-settings)
-add_subdirectory(lib-adav)
+add_subdirectory(lib-adav-old)
 
 #for cross compiling
 #cmake -H. -BOutput -DCMAKE_TOOLCHAIN_FILE=toolchain-arm-backup.cmake

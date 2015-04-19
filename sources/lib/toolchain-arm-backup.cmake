@@ -4,11 +4,11 @@ SET(CMAKE_SYSTEM_NAME Linux)
 #SET(CMAKE_SYSTEM_VERSION 1)
 
 # specify the cross compiler
-SET(CMAKE_C_COMPILER   /opt/mercury-arm-backup/usr/bin/arm-buildroot-linux-uclibcgnueabi-gcc)
-SET(CMAKE_CXX_COMPILER /opt/mercury-arm-backup/usr/bin/arm-buildroot-linux-uclibcgnueabi-g++)
+SET(CMAKE_C_COMPILER   /opt/arm-backup/usr/bin/arm-buildroot-linux-uclibcgnueabi-gcc)
+SET(CMAKE_CXX_COMPILER /opt/arm-backup/usr/bin/arm-buildroot-linux-uclibcgnueabi-g++)
 
 # where is the target environment 
-SET(CMAKE_FIND_ROOT_PATH  /opt/mercury-arm-backup /opt/mercury-arm-backup/usr/arm-buildroot-linux-uclibcgnueabi/sysroot)
+SET(CMAKE_FIND_ROOT_PATH  /opt/arm-backup /opt/arm-backup/usr/arm-buildroot-linux-uclibcgnueabi/sysroot)
 
 # search for programs in the build host directories
 SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
