@@ -1,6 +1,6 @@
 config BR2_PACKAGE_BRBOX_LIBADCMN
 	bool "libAdCommon"
-	default y
+	default n
 	help
 	  ADAV Common library for writing various services
 

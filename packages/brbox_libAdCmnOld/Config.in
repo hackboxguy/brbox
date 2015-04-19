@@ -1,0 +1,13 @@
+config BR2_PACKAGE_BRBOX_LIBADCMNOLD
+	bool "libAdCommonOld"
+	default y
+	select BR2_PACKAGE_JSON_C 
+	select BR2_PACKAGE_BRBOX_LIBADSTTNGS
+	depends on BR2_TOOLCHAIN_HAS_THREADS
+	help
+	  This shared object provide all services with gerneric thread/proxy/json interface .
+
+comment "libAdCommonOld needs a toolchain with thread support"
+	depends on !(BR2_TOOLCHAIN_HAS_THREADS)
+
+
