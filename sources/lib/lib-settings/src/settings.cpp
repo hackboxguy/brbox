@@ -92,12 +92,12 @@ static int get_converted_tuple(const Settings *settings, const char *section, co
 static Section * get_section(Section *sections, unsigned int n, const char *name);
 static void enum_map(const char *key, const char *value, const void *obj);
 
-extern void sm_delete(StrMap *map);
-extern int sm_enum(const StrMap *map, settings_section_enum_func enum_func, const void *obj);
-extern int sm_get(const StrMap *map, const char *key, char *out_buf, unsigned int n_out_buf);
-extern StrMap * sm_new(unsigned int capacity);
-extern int sm_put(StrMap *map, const char *key, const char *value);
-extern int sm_get_count(const StrMap *map);
+void sm_delete(StrMap *map);
+int sm_enum(const StrMap *map, settings_section_enum_func enum_func, const void *obj);
+int sm_get(const StrMap *map, const char *key, char *out_buf, unsigned int n_out_buf);
+StrMap * sm_new(unsigned int capacity);
+int sm_put(StrMap *map, const char *key, const char *value);
+int sm_get_count(const StrMap *map);
 
 Settings * settings_new()
 {

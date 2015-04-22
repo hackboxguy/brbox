@@ -35,6 +35,12 @@
  *    along with strmap.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "strmap.h"
+void sm_delete(StrMap *map);
+int sm_enum(const StrMap *map, settings_section_enum_func enum_func, const void *obj);
+int sm_get(const StrMap *map, const char *key, char *out_buf, unsigned int n_out_buf);
+StrMap * sm_new(unsigned int capacity);
+int sm_put(StrMap *map, const char *key, const char *value);
+int sm_get_count(const StrMap *map);
 
 typedef struct Pair Pair;
 

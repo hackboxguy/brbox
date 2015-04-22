@@ -1,9 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
-set(COMPONENT_NAME sysmgr)      #set the name of the binary
-set(LIB_ADSTTNG AdSttngs)          #settings library
-set(LIB_ADCOMMN AdCmn)             #common library
-set(INC_COMP1 ../srv/src)          #dependent components
-set(LIB_ADCOMMN_SRC lib-adav-old)  #switch between old and new libadCmn
+set(COMPONENT_NAME sysmgr)  #set the name of the binary
+set(LIB_ADSTTNG AdSttngs)   #settings library
+set(LIB_ADCOMMN AdCmn)      #common library
 
 
 
@@ -14,14 +12,14 @@ project(${COMPONENT_NAME})
 file(GLOB SOURCES "src/*.cpp")
 add_executable(${COMPONENT_NAME} ${SOURCES})
 set(INC_ADSTTNG "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-settings/include")
-set(INC_ADCOMMN "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/${LIB_ADCOMMN_SRC}/include")
+set(INC_ADCOMMN "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-adav-old/include")
 
 
 # Add #include path of all dependent components
 include_directories(${INC_ADSTTNG} ${INC_ADCOMMN} ${CMAKE_CURRENT_BINARY_DIR})
 
 # Specify component's dependency.
-target_link_libraries(${COMPONENT_NAME} ${LIB_ADSTTNG} ${LIB_ADCOMMN} json-c pthread)
+target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread)
 
 #install the binary to 
 install(TARGETS ${COMPONENT_NAME} DESTINATION bin)
