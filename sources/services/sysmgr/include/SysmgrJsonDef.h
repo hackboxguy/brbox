@@ -13,6 +13,7 @@ typedef struct SYSMGR_FMW_VER_PACKET_T
 }SYSMGR_FMW_VER_PACKET;
 
 //rpc-2
+//{ "jsonrpc": "2.0", "method": "get_ip_addr", "id": 43 }
 #define SYSMGR_RPC_IP_ADDR_GET         "get_ip_addr"
 #define SYSMGR_RPC_IP_ADDR_SET         "set_ip_addr"
 #define SYSMGR_RPC_IP_ADDR_ARGVER      "iface"
