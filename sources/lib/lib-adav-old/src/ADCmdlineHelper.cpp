@@ -46,7 +46,7 @@ int ADCmdlineHelper::init_myself()
 	settings[0]='\0';
 
 	//internal default arguments available for all the clients
-		strcpy(short_options,"hvpiegtdlnskwrabxzqcof");//--help,--version,--ip,--autotest,--delay,--loopcount,--testnum, --settings
+		strcpy(short_options,"hvpiegtdlnskwrabxz");//--help,--version,--ip,--autotest,--delay,--loopcount,--testnum, --settings
 		insert_options_entry((char*)"help"      ,optional_argument,'h',1);
 
 		insert_options_entry((char*)"version"   ,no_argument,'v',1);
@@ -105,17 +105,6 @@ int ADCmdlineHelper::init_myself()
 		insert_options_entry((char*)"settings" ,optional_argument,'s',1);
 		insert_help_entry((char*)"--settings=filepath        (settings text filepath to be loaded and stored)");
 		
-		//deviceInfo related cmdline arguments
-		insert_options_entry((char*)"devtype" ,optional_argument,'q',1);
-		insert_help_entry((char*)"--devtype=[OVD/KVD/MAGIC/NAUTILUS] (pass device type to service)");
-		insert_options_entry((char*)"dvcvariant" ,optional_argument,'c',1);
-		insert_help_entry((char*)"--dvcvariant=[XX21/XX15/XX13/XX08] (pass device variant type to service)");
-		insert_options_entry((char*)"dvcdetvariant" ,optional_argument,'o',1);
-		insert_help_entry((char*)"--dvcdetvariant=[4621/5521] (pass detailed device variant type to service)");
-		insert_options_entry((char*)"cpuboardtype" ,optional_argument,'f',1);
-		insert_help_entry((char*)"--cpuboardtype=[MERCURY1_0/MERCURY1_2/FREDDY1_0/MERCURY2_0] (pass cpu board type to service)");
-
-
 	}
 	return 0;
 }

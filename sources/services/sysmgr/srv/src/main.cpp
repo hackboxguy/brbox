@@ -13,7 +13,7 @@ using namespace std;
 int main(int argc, const char* argv[])
 {
 	char ver[255];snprintf(ver,254,"%05d",SRC_CONTROL_VERSION);
-	MyCmdline CmdLine(CMDLINE_HELPER_MODE_SERVER,46000,ver);//(char*)"00.01");//TYSS_VERSION);
+	MyCmdline CmdLine(CMDLINE_HELPER_MODE_SERVER,SYSMGR_JSON_PORT_NUMBER,ver);//40000 is the portnumber
 	CmdLine.parse_cmdline_arguments(argc,(char**)argv);
 	if(CmdLine.is_help_printed())
 		return -1;//user just requested to print the help info
@@ -22,13 +22,16 @@ int main(int argc, const char* argv[])
 
 
 
-	ADJsonRpcMgr RpcMgr; //main rpc handler
+	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION); //main rpc handler
 	NetRpc IpAddr(SYSMGR_RPC_IP_ADDR_GET,0);
 	RpcMgr.AttachRpc(&IpAddr);
 	RpcMgr.AttachHeartBeat(&AppTimer);
+	RpcMgr.SupportShutdownRpc(false);//this is a system-manager, needs to be alive all the time, hence dont support shutdown via rpc
 	RpcMgr.Start(CmdLine.get_port_number(),CmdLine.get_socket_log(),CmdLine.get_emulation_mode());
 
 
+
+	RpcMgr.SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE_READY);//server is ready to serve rpc's
 	//wait for sigkill or sigterm signal
 	AppTimer.wait_for_exit_signal();//loop till KILL or TERM signal is received
 	AppTimer.stop_timer();//stop sending heart-beats to other objects

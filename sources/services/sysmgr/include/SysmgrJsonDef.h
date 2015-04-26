@@ -1,7 +1,8 @@
 #ifndef __SYSMGR_JSON_DEF_H_
 #define __SYSMGR_JSON_DEF_H_
 /*****************************************************************************/
-#define SYSMGR_JSON_PORT_NUMBER 42600
+#define SYSMGR_JSON_PORT_NUMBER 40000
+/*****************************************************************************/
 
 //rpc-1
 #define SYSMGR_RPC_FMW_VER_GET         "get_fmw_ver"

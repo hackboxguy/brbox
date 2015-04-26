@@ -10,8 +10,10 @@
 #include "ADJsonRpcMapper.hpp"
 #include "ADTimer.hpp"
 #include "ADTaskWorker.hpp"
+#include "ADCmnStringProcessor.hpp"
+
 using namespace std;
-/*****************************************************************************/
+/* ------------------------------------------------------------------------- */
 // following commands are common rpc's when a server uses this rpc-manager
 typedef enum EJSON_RPCGMGR_CMD_T
 {
@@ -25,31 +27,47 @@ typedef enum EJSON_RPCGMGR_CMD_T
 	EJSON_RPCGMGR_CMD_END,
 	EJSON_RPCGMGR_CMD_NONE
 }EJSON_RPCGMGR_CMD;
+/* ------------------------------------------------------------------------- */
 //EJSON_RPCGMGR_GET_TASK_STS
 #define RPCMGR_RPC_TASK_STS_GET         "get_rpc_req_status"
 #define RPCMGR_RPC_TASK_STS_ARGID       "taskId"
 #define RPCMGR_RPC_TASK_STS_ARGSTS      "taskStatus"
-
+//standard integer data communication packet
+typedef struct RPCMGR_TASK_STS_PACKET_T
+{
+	int taskID;
+	char task_sts[512];//inProg/Success/Fail
+}RPCMGR_TASK_STS_PACKET;
+/* ------------------------------------------------------------------------- */
 //EJSON_RPCGMGR_GET_RPC_SRV_VERSION
 #define RPCMGR_RPC_SER_VER_GET          "get_rpc_srv_version"
 #define RPCMGR_RPC_SER_VER_ARGVER       "version"
-
+//standard integer data communication packet
+typedef struct RPCMGR_INTEGER_PACKET_T
+{
+	int value;
+}RPCMGR_INTEGER_PACKET;
+/* ------------------------------------------------------------------------- */
 //EJSON_RPCGMGR_TRIGGER_DATASAVE
 #define RPCMGR_RPC_TRIG_SAVE            "trigger_settings_save"
 #define RPCMGR_RPC_TRIG_SAVE_ARGID      RPCMGR_RPC_TASK_STS_ARGID
 //#define RPCMGR_RPC_TRIG_SAVE_ARGSTS   RPCMGR_RPC_TASK_STS_ARGSTS
-
+/* ------------------------------------------------------------------------- */
 //EJSON_RPCGMGR_GET_SETTINGS_STS
 #define RPCMGR_RPC_STTNG_STS_GET        "get_settings_status"
 #define RPCMGR_RPC_STTNG_STS_ARGSTS     "status"
-
+typedef struct RPCMGR_SETTINGS_STS_PACKET_T
+{
+	char status[512];
+}RPCMGR_SETTINGS_STS_PACKET;
+/* ------------------------------------------------------------------------- */
 //EJSON_RPCGMGR_SHUTDOWN_SERVICE
 #define RPCMGR_RPC_TRIG_SHUTDOWN        "trigger_shutdown"
 #define RPCMGR_RPC_TRIG_SHUTDOWN_ARGID  RPCMGR_RPC_TASK_STS_ARGID
-
+/* ------------------------------------------------------------------------- */
 //EJSON_RPCGMGR_RESET_TASK_STS
 #define RPCMGR_RPC_RESET_TASKSTS        "reset_task_status"
-
+/* ------------------------------------------------------------------------- */
 //EJSON_RPCGMGR_GET_READY_STS
 #define RPCMGR_RPC_READY_STS_GET        "get_ready_status"
 #define RPCMGR_RPC_READY_STS_ARGSTS     "status"
@@ -62,7 +80,12 @@ typedef enum EJSON_RPCGMGR_READY_STATE_T
 	EJSON_RPCGMGR_READY_STATE_UNKNOWN,
 	EJSON_RPCGMGR_READY_STATE_NONE
 }EJSON_RPCGMGR_READY_STATE;
-/*****************************************************************************/
+typedef struct RPCMGR_READY_STS_PACKET_T
+{
+	EJSON_RPCGMGR_READY_STATE status;
+	char status_str[512];
+}RPCMGR_READY_STS_PACKET;
+/* ------------------------------------------------------------------------- */
 //to understand this, read C++ subject observer pattern
 class ADJsonRpcMgrProducer; //subject
 class ADJsonRpcMgrConsumer  //observer
@@ -71,11 +94,14 @@ class ADJsonRpcMgrConsumer  //observer
 //	std::string strGetRpc;
 //	std::string strSetRpc;
 public:
+	int parent_index;
 	int index;
 	std::string strRpcName;
 	//std::string strSetRpc;
 
 	std::string GetRpcName(){return strRpcName;};
+	int GetRpcParentIndex(){return parent_index;};
+
 	//std::string GetRpcNameSetType(){return strGetRpc;};
 	//std::string GetPageTag(){return Tag;};
 	//std::string GetPageOverrideName(){return OvrName;};
@@ -96,7 +122,7 @@ public:
 	virtual int ProcessWorkAsync(unsigned char* pWorkData)=0;
 
 };
-/*****************************************************************************/
+/* ------------------------------------------------------------------------- */
 class ADJsonRpcMgrProducer
 {
 	std::vector<ADJsonRpcMgrConsumer*> rpclist;
@@ -117,6 +143,16 @@ protected:
 	{
 		std::vector<ADJsonRpcMgrConsumer*>::iterator iter = rpclist.begin() + index;
 		return (*iter);
+	}
+	ADJsonRpcMgrConsumer* getRpcHandlerByParentIndex(int index) //based on index, returns the object ptr
+	{
+		std::vector<ADJsonRpcMgrConsumer*>::iterator iter;
+		for(iter=rpclist.begin();iter != rpclist.end();++iter)
+		{
+			if((*iter)->GetRpcParentIndex() == index)
+				return (*iter);
+		}
+		return NULL;
 	}
 public:
 	virtual ~ADJsonRpcMgrProducer(){};
@@ -159,18 +195,27 @@ public:
 		else
 			return pPageHandler->ProcessWork(pReq,pPageHandler->index);
 	}
-	int ProcessWorkAsync(unsigned char* pWorkData)
+	RPC_SRV_RESULT AsyncTaskWork(int cmd,unsigned char* pWorkData)
 	{
-		return -1;
+		ADJsonRpcMgrConsumer* pPageHandler=getRpcHandlerByParentIndex(cmd);//get the attached object pointer by parent_index)
+		if(pPageHandler == NULL)
+			return RPC_SRV_RESULT_FAIL;
+		pPageHandler->ProcessWorkAsync(pWorkData);//TODO: handle return value
+		return RPC_SRV_RESULT_SUCCESS;
 	}
 
 };
-/*****************************************************************************/
-class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, public ADTaskWorkerConsumer, public ADTimerConsumer
+/* ------------------------------------------------------------------------- */
+class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, public ADTaskWorkerConsumer, public ADTimerConsumer, public ADCmnStringProcessor
 {
 	ADTimer* myTimer;
 	ADJsonRpcProxy  Proxy;//json-net-proxy
 	ADJsonRpcMapper	JMapper;
+	int svnVersion;
+
+	ADTaskWorker AsyncTaskWorker;
+	bool shutdown_support;
+	EJSON_RPCGMGR_READY_STATE ServiceReadyFlag;
 
 	//ADJsonRpcMapConsumer overrides
 	virtual int process_json_to_binary(JsonDataCommObj* pReq);//{return 0;};//only applicable for mapper
@@ -178,7 +223,7 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	virtual int process_work(JsonDataCommObj* pReq);//{return 0;};
 
 	//ADTaskWorkerConsumer override
-	virtual RPC_SRV_RESULT run_work(int cmd,unsigned char* pWorkData,ADTaskWorkerProducer *pTaskWorker){return RPC_SRV_RESULT_SUCCESS;};
+	virtual RPC_SRV_RESULT run_work(int cmd,unsigned char* pWorkData,ADTaskWorkerProducer *pTaskWorker);//{return RPC_SRV_RESULT_SUCCESS;};
 
 	//ADTimerConsumer overrides: 100ms timer and sigio 
 	virtual int sigio_notification(){return 0;};
@@ -188,14 +233,54 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	int MyMapJsonToBinary(JsonDataCommObj* pReq);
 	int MyMapBinaryToJson(JsonDataCommObj* pReq);
 	int MyProcessWork(JsonDataCommObj* pReq);
+	int create_req_obj(JsonDataCommObj* pReq);
+	int delete_req_obj(JsonDataCommObj* pReq);
+	int prepare_req_object(JsonDataCommObj* pReq,RPC_SRV_ACT action,int cmd);
+
+	//EJSON_RPCGMGR_GET_TASK_STS
+	int json_to_bin_get_task_sts(JsonDataCommObj* pReq);
+	int process_get_task_status(RPC_SRV_REQ* pReq);
+	int bin_to_json_get_task_sts(JsonDataCommObj* pReq);
+
+	//EJSON_RPCGMGR_GET_RPC_SRV_VERSION
+	int json_to_bin_get_rpc_srv_version(JsonDataCommObj* pReq);
+	int process_rpc_server_version(RPC_SRV_REQ* pReq);
+	int bin_to_json_get_rpc_srv_version(JsonDataCommObj* pReq);
+
+	//EJSON_RPCGMGR_TRIGGER_DATASAVE
+	int json_to_bin_trigger_datasave(JsonDataCommObj* pReq);
+	int process_trigger_datasave(RPC_SRV_REQ* pReq);
+	int bin_to_json_trigger_datasave(JsonDataCommObj* pReq);
+
+	//EJSON_RPCGMGR_GET_SETTINGS_STS
+	int json_to_bin_get_settings_sts(JsonDataCommObj* pReq);
+	int process_get_settings_status(RPC_SRV_REQ* pReq);
+	int bin_to_json_get_settings_sts(JsonDataCommObj* pReq);
+
+	//EJSON_RPCGMGR_SHUTDOWN_SERVICE
+	int json_to_bin_shutdown_service(JsonDataCommObj* pReq);
+	int process_shutdown_service(RPC_SRV_REQ* pReq);
+	int bin_to_json_shutdown_service(JsonDataCommObj* pReq);
+
+	//EJSON_RPCGMGR_RESET_TASK_STS
+	int json_to_bin_reset_task_sts(JsonDataCommObj* pReq);
+	int process_reset_task_sts(RPC_SRV_REQ* pReq);
+	int bin_to_json_reset_task_sts(JsonDataCommObj* pReq);
+
+	//EJSON_RPCGMGR_GET_READY_STS
+	int json_to_bin_get_ready_sts(JsonDataCommObj* pReq);
+	int process_get_ready_status(RPC_SRV_REQ* pReq);
+	int bin_to_json_get_ready_sts(JsonDataCommObj* pReq);
 
 public:
-	ADJsonRpcMgr();
+	ADJsonRpcMgr(int ver);
 	~ADJsonRpcMgr();
 	int AttachHeartBeat(ADTimer* pTimer);
 	int Start(int port,int socket_log,int emulation);
+	int SupportShutdownRpc(bool support);
+	int SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE sts);
 
 };
-/*****************************************************************************/
+/* ------------------------------------------------------------------------- */
 
 #endif
