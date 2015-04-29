@@ -25,19 +25,25 @@ int main(int argc, const char* argv[])
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION); //main rpc handler
-	NetRpc MacGet(SYSMGR_RPC_MAC_ADDR_GET,EJSON_SYSMGR_RPC_GET_MAC_ADDR);//network related rpc handler class
-	NetRpc MacSet(SYSMGR_RPC_MAC_ADDR_SET,EJSON_SYSMGR_RPC_SET_MAC_ADDR);//network related rpc handler class
+
+	NetRpc MacGet  (SYSMGR_RPC_MAC_ADDR_GET ,EJSON_SYSMGR_RPC_GET_MAC_ADDR);  //network related rpc handler class
+	NetRpc MacSet  (SYSMGR_RPC_MAC_ADDR_SET ,EJSON_SYSMGR_RPC_SET_MAC_ADDR);  //network related rpc handler class
+	NetRpc Ethcount(SYSMGR_RPC_ETH_COUNT_GET,EJSON_SYSMGR_RPC_GET_ETH_COUNT); //network related rpc handler class
+	NetRpc Ethname (SYSMGR_RPC_ETH_NAME_GET ,EJSON_SYSMGR_RPC_GET_ETH_NAME);  //network related rpc handler class
+
 	RpcMgr.AttachRpc(&MacGet);
 	RpcMgr.AttachRpc(&MacSet);
+	RpcMgr.AttachRpc(&Ethcount);
+	RpcMgr.AttachRpc(&Ethname);
 
-
+	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr
 	RpcMgr.SupportShutdownRpc(false);//this is a system-manager, needs to be alive all the time, hence dont support shutdown via rpc
 	RpcMgr.Start(CmdLine.get_port_number(),CmdLine.get_socket_log(),CmdLine.get_emulation_mode());
+	//server is ready to serve rpc's
+	RpcMgr.SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE_READY);
 
 
-
-	RpcMgr.SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE_READY);//server is ready to serve rpc's
 	//wait for sigkill or sigterm signal
 	AppTimer.wait_for_exit_signal();//loop till KILL or TERM signal is received
 	AppTimer.stop_timer();//stop sending heart-beats to other objects

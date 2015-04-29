@@ -31,6 +31,8 @@ public:
 	~ADSysInfo();
 	int read_system_status(int *mem,int* memfree,int *cores,int* cur_load,int* avg_load,int* uptime,char* cpu_model);
 	int read_network_info(char* eth,char *mac,char* ip,char* netmask);
+	int read_network_info_ifconfig(char* eth,char* mac,char* ip,char* netmask);
+
 	int read_mem_info(char* mem,char *memfree,char* memused);
 	int read_load_info(char* curload,char* avgload,char* uptime);
 	int read_cpu_info(char* cpumodel,char *cores,char* cpufreq);

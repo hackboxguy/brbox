@@ -332,6 +332,35 @@ int ADSysInfo::read_network_info(char* eth,char *mac,char* ip,char* netmask)
 	return -1;
 }
 /*****************************************************************************/
+int ADSysInfo::read_network_info_ifconfig(char* eth,char* mac,char* ip,char* netmask)
+{
+	char cmd[512];char temp_str[256];
+	sprintf(cmd,"ifconfig | grep %s >/dev/null",eth);
+	if(system(cmd)!=0) //parameter write error
+		return -1;//RPC_SRV_RESULT_FAIL;
+	//ifconfig | grep eth0 | awk '{print $5}'
+	sprintf(cmd,"ifconfig | grep %s | awk '{print $5}'",eth);
+
+	FILE *shell;
+	shell= popen(cmd,"r");
+	if(shell == NULL)
+		return -1;//RPC_SRV_RESULT_FAIL;
+	if(fgets(temp_str,250,shell)!=NULL)
+	{
+		temp_str[255]='\0';
+		strcpy(mac,temp_str);
+		pclose(shell);
+	}
+	else
+	{
+		pclose(shell);
+		return -1;//RPC_SRV_RESULT_FAIL;
+	}
+	sprintf(ip,"NotConnected");     //this function is just for reading MAC ID
+	sprintf(netmask,"NotConnected");//this function is just for reading MAC ID
+	return 0;//RPC_SRV_RESULT_SUCCESS;
+}
+/*****************************************************************************/
 int ADSysInfo::read_mem_info(char* mem,char *memfree,char* memused)
 {
 	int intmem,intmemfree,intcores,intcload,intaload,intutime;

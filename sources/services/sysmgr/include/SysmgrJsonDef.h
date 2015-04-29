@@ -6,8 +6,10 @@
 typedef enum EJSON_SYSMGR_RPC_TYPES_T
 {
 	EJSON_SYSMGR_RPC_GET_MAC_ADDR=0,
-	EJSON_SYSMGR_RPC_SET_MAC_ADDR,	     
-  	EJSON_SYSMGR_RPC_END,
+	EJSON_SYSMGR_RPC_SET_MAC_ADDR,
+	EJSON_SYSMGR_RPC_GET_ETH_COUNT, //returns number of eth interfaces available on the device
+	EJSON_SYSMGR_RPC_GET_ETH_NAME,
+	EJSON_SYSMGR_RPC_END,
 	EJSON_SYSMGR_RPC_NONE
 }EJSON_SYSMGR_RPC_TYPES;
 /* ------------------------------------------------------------------------- */
@@ -26,31 +28,24 @@ typedef enum EJSON_SYSMGR_IFACE_TYPE_T
 	EJSON_SYSMGR_IFACE_TYPE_UNKNOWN,
 	EJSON_SYSMGR_IFACE_TYPE_NONE,
 }EJSON_SYSMGR_IFACE_TYPE;
-typedef struct SYSMGR_MAC_ADDR_PACKET_T
+typedef struct SYSMGR_MAC_ADDR_PACKET_T //common communication object for different mac related rpc's
 {
 	EJSON_SYSMGR_IFACE_TYPE eth_type;
 	char mac_addr[512];
+	int EthCountIndx;//can be used as eth-index or eth-count
+	char eth_name[512];
 }SYSMGR_MAC_ADDR_PACKET;
 /* ------------------------------------------------------------------------- */
-
-//rpc-1
-#define SYSMGR_RPC_FMW_VER_GET         "get_fmw_ver"
-//#define SYSMGR_RPC_FMW_VER_SET         "set_fmw_ver"
-#define SYSMGR_RPC_FMW_VER_ARGVER      "version"
-typedef struct SYSMGR_FMW_VER_PACKET_T
-{
-	char fmw_ver[512];
-}SYSMGR_FMW_VER_PACKET;
+//EJSON_SYSMGR_RPC_GET_ETH_COUNT
+#define SYSMGR_RPC_ETH_COUNT_GET             "get_eth_count"
+#define SYSMGR_RPC_ETH_COUNT_ARG             "count"
+typedef SYSMGR_MAC_ADDR_PACKET SYSMGR_ETH_COUNT_PACKET;
 /* ------------------------------------------------------------------------- */
-//rpc-2
-//{ "jsonrpc": "2.0", "method": "get_ip_addr", "id": 43 }
-#define SYSMGR_RPC_IP_ADDR_GET         "get_ip_addr"
-#define SYSMGR_RPC_IP_ADDR_SET         "set_ip_addr"
-#define SYSMGR_RPC_IP_ADDR_ARGVER      "iface"
-typedef struct SYSMGR_IP_ADDR_PACKET_T
-{
-	char ip_addr[512];
-}SYSMGR_IP_ADDR_PACKET;
+//EJSON_SYSMGR_RPC_GET_ETH_NAME
+#define SYSMGR_RPC_ETH_NAME_GET             "get_eth_name"
+#define SYSMGR_RPC_ETH_NAME_ARG_INDEX       "index"
+#define SYSMGR_RPC_ETH_NAME_ARG             "name"
+typedef SYSMGR_MAC_ADDR_PACKET SYSMGR_ETH_NAME_PACKET;
 /* ------------------------------------------------------------------------- */
 
 #endif
