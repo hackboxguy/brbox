@@ -20,7 +20,7 @@ set(INC_SRVCOMMN "${CMAKE_CURRENT_SOURCE_DIR}/../include") #rpc server's cmn hea
 include_directories(${INC_ADSTTNG} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${CMAKE_CURRENT_BINARY_DIR})
 
 # Specify component's dependency.
-target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread)
+target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt)
 
 #install the binary and server-rpc-headers to CMAKE_INSTALL_PREFIX destination
 #file(GLOB  INCFILES "${INC_SRVCOMMN}/*.*")
