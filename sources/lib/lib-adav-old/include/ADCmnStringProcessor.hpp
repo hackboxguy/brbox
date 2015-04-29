@@ -121,5 +121,6 @@ public:
     int prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq,char* name1,char* val1,char* name2,char* val2,
                         char* name3,char* val3,char* name4,char* val4);
 
+    int prepare_req_object(JsonDataCommObj* pReq,RPC_SRV_ACT action,int cmd);
 };
 #endif

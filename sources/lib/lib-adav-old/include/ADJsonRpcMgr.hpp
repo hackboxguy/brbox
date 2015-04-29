@@ -166,9 +166,11 @@ public:
 	}
 	int MapJsonToBinary(JsonDataCommObj* pReq)
 	{
-		if(pReq->cmd_index>=get_total_attached_rpcs())
+		if((pReq->cmd_index-EJSON_RPCGMGR_CMD_END)>=get_total_attached_rpcs())
 			return -1;//not my call, i dont have an object of this index
-		ADJsonRpcMgrConsumer* pPageHandler = getRpcHandler(pReq->cmd_index);
+		if((pReq->cmd_index-EJSON_RPCGMGR_CMD_END)<0)
+			return -1;//something is wrong
+		ADJsonRpcMgrConsumer* pPageHandler = getRpcHandler(pReq->cmd_index-EJSON_RPCGMGR_CMD_END);
 		if(pPageHandler==NULL)
 			return -1;
 		else
@@ -176,20 +178,24 @@ public:
 	}
 	int MapBinaryToJson(JsonDataCommObj* pReq)
 	{
-		if(pReq->cmd_index>=get_total_attached_rpcs())
+		if((pReq->cmd_index-EJSON_RPCGMGR_CMD_END)>=get_total_attached_rpcs())
 			return -1;//not my call, i dont have an object of this index
-		ADJsonRpcMgrConsumer* pPageHandler = getRpcHandler(pReq->cmd_index);
+		if((pReq->cmd_index-EJSON_RPCGMGR_CMD_END)<0)
+			return -1;//something is wrong
+		ADJsonRpcMgrConsumer* pPageHandler = getRpcHandler(pReq->cmd_index-EJSON_RPCGMGR_CMD_END);
 		if(pPageHandler==NULL)
 			return -1;
 		else
-			return pPageHandler->MapBinaryToJson(pReq,pPageHandler->index);
+			return pPageHandler->MapBinaryToJson(pReq,pPageHandler->index);//pass rpc's own index
 	}
 	//int WorkRpc(RPC_SRV_REQ *pPanelReq)
 	int ProcessWork(JsonDataCommObj* pReq)
 	{
-		if(pReq->cmd_index>=get_total_attached_rpcs())
+		if((pReq->cmd_index-EJSON_RPCGMGR_CMD_END)>=get_total_attached_rpcs())
 			return -1;//not my call, i dont have an object of this index
-		ADJsonRpcMgrConsumer* pPageHandler = getRpcHandler(pReq->cmd_index);
+		if((pReq->cmd_index-EJSON_RPCGMGR_CMD_END)<0)
+			return -1;//something is wrong
+		ADJsonRpcMgrConsumer* pPageHandler = getRpcHandler(pReq->cmd_index-EJSON_RPCGMGR_CMD_END);
 		if(pPageHandler==NULL)
 			return -1;
 		else
@@ -200,8 +206,10 @@ public:
 		ADJsonRpcMgrConsumer* pPageHandler=getRpcHandlerByParentIndex(cmd);//get the attached object pointer by parent_index)
 		if(pPageHandler == NULL)
 			return RPC_SRV_RESULT_FAIL;
-		pPageHandler->ProcessWorkAsync(pWorkData);//TODO: handle return value
-		return RPC_SRV_RESULT_SUCCESS;
+		if(pPageHandler->ProcessWorkAsync(pWorkData)==0)//TODO: handle correct return value
+			return RPC_SRV_RESULT_SUCCESS;
+		else
+			return RPC_SRV_RESULT_FAIL;
 	}
 
 };
@@ -235,7 +243,7 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	int MyProcessWork(JsonDataCommObj* pReq);
 	int create_req_obj(JsonDataCommObj* pReq);
 	int delete_req_obj(JsonDataCommObj* pReq);
-	int prepare_req_object(JsonDataCommObj* pReq,RPC_SRV_ACT action,int cmd);
+	//int prepare_req_object(JsonDataCommObj* pReq,RPC_SRV_ACT action,int cmd);
 
 	//EJSON_RPCGMGR_GET_TASK_STS
 	int json_to_bin_get_task_sts(JsonDataCommObj* pReq);

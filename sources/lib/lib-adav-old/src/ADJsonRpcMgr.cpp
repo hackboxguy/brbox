@@ -81,8 +81,8 @@ int ADJsonRpcMgr::Start(int port,int socket_log,int emulation)
 	{
 		ADJsonRpcMgrConsumer* rpc=getRpcHandler(i);//get the attached object pointer by index
 		strcpy(rpc_name, rpc->strRpcName.c_str());
-		rpc->parent_index=i+EJSON_RPCGMGR_CMD_END;//keep rpc-mgr index locally in attached rpc object
-		JMapper.attach_rpc_method(i+EJSON_RPCGMGR_CMD_END,rpc_name);//attached with index offset of EJSON_RPCGMGR_CMD_END(7)
+		rpc->parent_index=i+EJSON_RPCGMGR_CMD_END;//keep rpc-mgr global-index locally in attached rpc object
+		JMapper.attach_rpc_method(i+EJSON_RPCGMGR_CMD_END,rpc_name);//attached with global-index offset of EJSON_RPCGMGR_CMD_END(7)
 	}
 	//TODO: TyWorker.SetReady();
 	return 0;
@@ -118,6 +118,8 @@ int ADJsonRpcMgr::delete_req_obj(JsonDataCommObj* pReq)
 /* ------------------------------------------------------------------------- */
 int ADJsonRpcMgr::process_json_to_binary(JsonDataCommObj* pReq)
 {
+	//printf("ADJsonRpcMgr::process_json_to_binary called\n");
+
 	//RPC_SRV_REQ *pPanelReq=NULL;
 	//pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	//EJSON_RPCGMGR_CMD cmd = (EJSON_RPCGMGR_CMD)pPanelReq->cmd;
@@ -139,6 +141,8 @@ int ADJsonRpcMgr::process_json_to_binary(JsonDataCommObj* pReq)
 }
 int ADJsonRpcMgr::process_binary_to_json(JsonDataCommObj* pReq)
 {
+	//printf("ADJsonRpcMgr::process_binary_to_json called\n");
+
 	//RPC_SRV_REQ *pPanelReq=NULL;
 	//pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	//EJSON_RPCGMGR_CMD cmd = (EJSON_RPCGMGR_CMD)pPanelReq->cmd;
@@ -158,10 +162,10 @@ int ADJsonRpcMgr::process_binary_to_json(JsonDataCommObj* pReq)
 }
 int ADJsonRpcMgr::process_work(JsonDataCommObj* pReq)
 {
-	RPC_SRV_REQ *pPanelReq=NULL;
-	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
-	EJSON_RPCGMGR_CMD cmd = (EJSON_RPCGMGR_CMD)pPanelReq->cmd;
-	if(cmd>=EJSON_RPCGMGR_CMD_END)
+	//RPC_SRV_REQ *pPanelReq=NULL;
+	//pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	EJSON_RPCGMGR_CMD rpc = (EJSON_RPCGMGR_CMD)pReq->cmd_index;
+	if(rpc>=EJSON_RPCGMGR_CMD_END)
 		return ProcessWork(pReq);//callback of the attached object from the list
 	else
 		return MyProcessWork(pReq);//handle my own rpc calls
@@ -208,8 +212,8 @@ int ADJsonRpcMgr::MyProcessWork(JsonDataCommObj* pReq)
 	//TODO
 	RPC_SRV_REQ *pPanelReq=NULL;
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
-	EJSON_RPCGMGR_CMD cmd = (EJSON_RPCGMGR_CMD)pPanelReq->cmd;
-	switch(cmd)
+	EJSON_RPCGMGR_CMD rpc = (EJSON_RPCGMGR_CMD)pReq->cmd_index;
+	switch(rpc)
 	{
 		case EJSON_RPCGMGR_GET_TASK_STS       :return process_get_task_status(pPanelReq);break;
 		case EJSON_RPCGMGR_GET_RPC_SRV_VERSION:return process_rpc_server_version(pPanelReq);break;
@@ -223,14 +227,14 @@ int ADJsonRpcMgr::MyProcessWork(JsonDataCommObj* pReq)
 	return -1;
 }
 /* ------------------------------------------------------------------------- */
-int ADJsonRpcMgr::prepare_req_object(JsonDataCommObj* pReq,RPC_SRV_ACT action,int cmd)
+/*int ADJsonRpcMgr::prepare_req_object(JsonDataCommObj* pReq,RPC_SRV_ACT action,int cmd)
 {
 	RPC_SRV_REQ *pPanelReq=NULL;
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	pPanelReq->action   = action;
 	pPanelReq->cmd      = cmd;
 	return 0;
-}
+}*/
 /* ------------------------------------------------------------------------- */
 //EJSON_RPCGMGR_GET_TASK_STS (common rpc for all services)
 int ADJsonRpcMgr::json_to_bin_get_task_sts(JsonDataCommObj* pReq)

@@ -574,6 +574,15 @@ int ADCmnStringProcessor::prepare_result_string(RPC_SRV_RESULT result,JsonDataCo
     json_object_object_add(pReq->json_resp_obj, name2, json_object_new_int(val2));//param2-int
     return 0;
 }
+/*****************************************************************************/
+int ADCmnStringProcessor::prepare_req_object(JsonDataCommObj* pReq,RPC_SRV_ACT action,int cmd)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	pPanelReq->action   = action;
+	pPanelReq->cmd      = cmd;
+	return 0;
+}
 
 
 

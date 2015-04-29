@@ -5,15 +5,9 @@ using namespace std;
 SysmgrCltCmdline::SysmgrCltCmdline()
 {
 	CmdlineHelper.attach_helper(this);
-	//note:"hvitdln" are already used by the producer class in library
-	//here sdfc specific commandline options can be added
-	//CmdlineHelper.insert_options_entry((char*)"tasksts" ,optional_argument,EJSON_SDES_GET_TASK_STS);
-	//CmdlineHelper.insert_help_entry((char*)"--tasksts=taskID          (read the status of the task which was in progress)");
 
-	//CmdlineHelper.insert_options_entry((char*)"keypush" ,optional_argument,EJSON_SDES_PUSH_IR_PB_KEY);
-	//CmdlineHelper.insert_help_entry((char*)"--keypush=key              [push IR/PB key code via rpc instead of sensing from H/W]");
-
-
+	CmdlineHelper.insert_options_entry((char*)"mac" ,optional_argument,EJSON_SYSMGR_RPC_GET_MAC_ADDR);
+	CmdlineHelper.insert_help_entry((char*)"--mac=ethN,<addr>          [get/set mac address]");
 }
 /*****************************************************************************/
 SysmgrCltCmdline::~SysmgrCltCmdline()
@@ -23,18 +17,22 @@ SysmgrCltCmdline::~SysmgrCltCmdline()
 //override virtual functions of ADGeneric Chain
 int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 {
-	/*EJSON_SDES_CMD command =(EJSON_SDES_CMD)arg;
+	EJSON_SYSMGR_RPC_TYPES command =(EJSON_SYSMGR_RPC_TYPES)arg;
 	switch(command)
 	{
-		case EJSON_SDES_GET_TASK_STS:
-	CmdlineHelper.push_get_task_progress_command((char*)SDES_RPC_NAME_GET_TASK_STATUS,(char*)SDES_RPC_ARG_TASK_STS_ID_PARAM,(char*)SDES_RPC_ARG_TASK_STS_PARAM,EJSON_SDES_GET_TASK_STS,sub_arg);
+		case EJSON_SYSMGR_RPC_GET_MAC_ADDR:
+			{
+			const char *table[]   = SYSMGR_RPC_MAC_ADDR_ARG_IFACE_TABL;
+			CmdlineHelper.push_string_get_set_with_enum_arg
+			(EJSON_SYSMGR_RPC_GET_MAC_ADDR,EJSON_SYSMGR_RPC_SET_MAC_ADDR,SYSMGR_RPC_MAC_ADDR_GET,SYSMGR_RPC_MAC_ADDR_SET,
+			SYSMGR_RPC_MAC_ADDR_ARG_IFACE,EJSON_SYSMGR_IFACE_TYPE_UNKNOWN,&table[0],
+			SYSMGR_RPC_MAC_ADDR_ARG,sub_arg);
+			}
 			break;
-		case EJSON_SDES_PUSH_IR_PB_KEY:
-	CmdlineHelper.push_single_int_get_set_command(EJSON_SDES_PUSH_IR_PB_KEY,EJSON_SDES_PUSH_IR_PB_KEY,SDES_RPC_NAME_PUSH_IR_PB_KEY,SDES_RPC_NAME_PUSH_IR_PB_KEY,(char*)SDES_RPC_KEYVAL_INTG_NAME,sub_arg);
 		default:
 			return 0;
 			break;	
-	}*/
+	}
 	return 0;
 }
 
