@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.9)
-set(PROJECT_NAME BrBoxsysmgr)
+set(PROJECT_NAME Smarteye)
 project(${PROJECT_NAME})
 add_subdirectory(srv)
 add_subdirectory(clt)

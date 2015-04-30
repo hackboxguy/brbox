@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.9)
-set(COMPONENT_NAME sysmgrclt)  #set the name of the binary
+set(COMPONENT_NAME smarteyeclt)  #set the name of the binary
 set(LIB_ADSTTNG AdSttngs)   #settings library
 set(LIB_ADCOMMN AdCmn)      #common library
 

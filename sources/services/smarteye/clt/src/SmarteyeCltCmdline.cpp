@@ -1,26 +1,26 @@
-#include "SysmgrCltCmdline.h"
+#include "SmarteyeCltCmdline.h"
 
 using namespace std;
 /*****************************************************************************/
-SysmgrCltCmdline::SysmgrCltCmdline()
+SmarteyeCltCmdline::SmarteyeCltCmdline()
 {
 	CmdlineHelper.attach_helper(this);
 
-	CmdlineHelper.insert_options_entry((char*)"mac" ,optional_argument,EJSON_SYSMGR_RPC_GET_MAC_ADDR);
-	CmdlineHelper.insert_help_entry((char*)"--mac=ethN,<addr>          [get/set mac address]");
-	CmdlineHelper.insert_options_entry((char*)"ethcount" ,optional_argument,EJSON_SYSMGR_RPC_GET_ETH_COUNT);
-	CmdlineHelper.insert_help_entry((char*)"--ethcount                 [read total available eth interfaces]");
+	//CmdlineHelper.insert_options_entry((char*)"mac" ,optional_argument,EJSON_SYSMGR_RPC_GET_MAC_ADDR);
+	//CmdlineHelper.insert_help_entry((char*)"--mac=ethN,<addr>          [get/set mac address]");
+	//CmdlineHelper.insert_options_entry((char*)"ethcount" ,optional_argument,EJSON_SYSMGR_RPC_GET_ETH_COUNT);
+	//CmdlineHelper.insert_help_entry((char*)"--ethcount                 [read total available eth interfaces]");
 
 }
 /*****************************************************************************/
-SysmgrCltCmdline::~SysmgrCltCmdline()
+SmarteyeCltCmdline::~SmarteyeCltCmdline()
 {
 }
 /*****************************************************************************/
 //override virtual functions of ADGeneric Chain
-int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
+int SmarteyeCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 {
-	EJSON_SYSMGR_RPC_TYPES command =(EJSON_SYSMGR_RPC_TYPES)arg;
+	/*EJSON_SYSMGR_RPC_TYPES command =(EJSON_SYSMGR_RPC_TYPES)arg;
 	switch(command)
 	{
 		case EJSON_SYSMGR_RPC_GET_MAC_ADDR:
@@ -40,11 +40,11 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 		default:
 			return 0;
 			break;	
-	}
+	}*/
 	return 0;
 }
 
-int SysmgrCltCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker)
+int SmarteyeCltCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker)
 {
 	switch(pCmdObj->command)
 	{
@@ -54,23 +54,23 @@ int SysmgrCltCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *
 	return 0;
 }
 /*****************************************************************************/
-int SysmgrCltCmdline::run_my_autotest(char* ip,int interval_us,int max_loop,int test_num)
+int SmarteyeCltCmdline::run_my_autotest(char* ip,int interval_us,int max_loop,int test_num)
 {
 	return 0;
 }
 /*****************************************************************************/
 #include "SrcControlVersion.h"
-int SysmgrCltCmdline::print_my_version()
+int SmarteyeCltCmdline::print_my_version()
 {
 	printf("version - %05d\n",SRC_CONTROL_VERSION);
 	return 0;
 }
-int SysmgrCltCmdline::get_my_server_port()
+int SmarteyeCltCmdline::get_my_server_port()
 {
-	return SYSMGR_JSON_PORT_NUMBER;
+	return SMARTEYE_JSON_PORT_NUMBER;
 }
 /*****************************************************************************/
-int SysmgrCltCmdline::parse_cmdline_arguments(int argc, char **argv)
+int SmarteyeCltCmdline::parse_cmdline_arguments(int argc, char **argv)
 {
 	return CmdlineHelper.parse_cmdline_arguments(argc,argv);
 }

@@ -1,9 +1,9 @@
-#ifndef __SYSMGRCLT_CMDLINE_H_
-#define __SYSMGRCLT_CMDLINE_H_
+#ifndef __SMARTEYECLT_CMDLINE_H_
+#define __SMARTEYECLT_CMDLINE_H_
 #include "ADCmdlineHelper.hpp"
-#include "SysmgrJsonDef.h"
+#include "SmarteyeJsonDef.h"
 #include "ADCmnStringProcessor.hpp"
-class SysmgrCltCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
+class SmarteyeCltCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 {
 	ADCmdlineHelper CmdlineHelper;
 
@@ -14,8 +14,8 @@ class SysmgrCltCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcess
 	virtual int print_my_version();
 	virtual int get_my_server_port();
 public:
-	SysmgrCltCmdline();
-	~SysmgrCltCmdline();
+	SmarteyeCltCmdline();
+	~SmarteyeCltCmdline();
 	int parse_cmdline_arguments(int argc, char **argv);
 };
 #endif
