@@ -15,12 +15,12 @@ set(INC_ADSTTNG  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-settings/include"
 set(INC_ADCOMMN  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-adav-old/include")
 set(INC_SRVCOMMN "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 
-
+find_package( OpenCV REQUIRED ) #core imgproc highgui )
 # Add #include path of all dependent components
 include_directories(${INC_ADSTTNG} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${CMAKE_CURRENT_BINARY_DIR})
 
 # Specify component's dependency.
-target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt)
+target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt ${OpenCV_LIBS})
 
 #install the binary and server-rpc-headers to CMAKE_INSTALL_PREFIX destination
 file(GLOB  INCFILES "${INC_SRVCOMMN}/*.*")
@@ -37,6 +37,14 @@ if(SUBVERSION_FOUND)
 else()
 	message( FATAL_ERROR "unable to read sub-version Revision number, this is needed for embedding into this component" )
 endif()
+
+#find_package( OpenCV )
+#if (OPENCV_FOUND)
+#  include_directories(${OPENCV_INCLUDE_DIRS})
+#else()
+#	message( FATAL_ERROR "Error!!! Missing opencv library, try sudo apt-get install libopencv-dev" )
+#endif (OPENCV_FOUND)
+
 
 #for cross compiling
 #cmake -H. -BOutput -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain-arm-backup.cmake -DCMAKE_INSTALL_PREFIX=/home/user/tmp/
