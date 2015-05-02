@@ -5,9 +5,12 @@
 #include <stdio.h>
 #include <iostream>
 #include "ADCommon.hpp"
+#include "SmarteyeJsonDef.h"
 using namespace std;
 using namespace cv;
 #define MIN_WIDTH_THRESHOLD 50 //ignore squares with too small width
+#define MAX_SQARES_FILTER   20 //when too many contours are found, then increase the threshold and scan again.
+#define MIN_SCAN_THRESHOLD  100 //start with 100, can go upto 200
 /*---------------------------------------------------------------------------*/
 class  ImgIdentify
 {
@@ -17,11 +20,12 @@ class  ImgIdentify
 	int apply_threshold(Mat& src_gray,int trsh,RNG &rng,Mat& drawing, vector<vector<Point> > &contours);
 	int scale_image(Mat& image, const float imgScaleFactor);
 	RPC_SRV_RESULT capture_camera_image(int video_device,int frmPixels,int frmLines,Mat& image);
-
+	RPC_SRV_RESULT identify_image_box(bool logImage=false,std::string imgPath="");//check identify-pattern-box exists
 public:
 	 ImgIdentify();
 	~ ImgIdentify();
-	RPC_SRV_RESULT identify_image();
+	RPC_SRV_RESULT IdentifyPattern(EJSON_SYSMGR_IFACE_TYPE pattern);
+
 };
 /*---------------------------------------------------------------------------*/
 #endif

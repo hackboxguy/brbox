@@ -6,8 +6,8 @@ SmarteyeCltCmdline::SmarteyeCltCmdline()
 {
 	CmdlineHelper.attach_helper(this);
 
-	//CmdlineHelper.insert_options_entry((char*)"mac" ,optional_argument,EJSON_SYSMGR_RPC_GET_MAC_ADDR);
-	//CmdlineHelper.insert_help_entry((char*)"--mac=ethN,<addr>          [get/set mac address]");
+	CmdlineHelper.insert_options_entry((char*)"imgcheck" ,optional_argument,EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN);
+	CmdlineHelper.insert_help_entry((char*)"--imgcheck=imgtype           [checks captured image against<ident/red/green/blue/white>]");
 	//CmdlineHelper.insert_options_entry((char*)"ethcount" ,optional_argument,EJSON_SYSMGR_RPC_GET_ETH_COUNT);
 	//CmdlineHelper.insert_help_entry((char*)"--ethcount                 [read total available eth interfaces]");
 
@@ -20,27 +20,23 @@ SmarteyeCltCmdline::~SmarteyeCltCmdline()
 //override virtual functions of ADGeneric Chain
 int SmarteyeCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 {
-	/*EJSON_SYSMGR_RPC_TYPES command =(EJSON_SYSMGR_RPC_TYPES)arg;
+	EJSON_SMARTEYE_RPC_TYPES command =(EJSON_SMARTEYE_RPC_TYPES)arg;
 	switch(command)
 	{
-		case EJSON_SYSMGR_RPC_GET_MAC_ADDR:
+		case EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN:
 			{
-			const char *table[]   = SYSMGR_RPC_MAC_ADDR_ARG_IFACE_TABL;
-			CmdlineHelper.push_string_get_set_with_enum_arg
-			(EJSON_SYSMGR_RPC_GET_MAC_ADDR,EJSON_SYSMGR_RPC_SET_MAC_ADDR,SYSMGR_RPC_MAC_ADDR_GET,SYSMGR_RPC_MAC_ADDR_SET,
-			SYSMGR_RPC_MAC_ADDR_ARG_IFACE,EJSON_SYSMGR_IFACE_TYPE_UNKNOWN,&table[0],
-			SYSMGR_RPC_MAC_ADDR_ARG,sub_arg);
+			const char *table[]   = SMARTEYE_RPC_ID_PATTERN_CHECK_ARG_TABL;
+			CmdlineHelper.push_single_enum_get_set_command(
+							EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN,EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN,
+							SMARTEYE_RPC_ID_PATTERN_CHECK,SMARTEYE_RPC_ID_PATTERN_CHECK,
+							&table[0],EJSON_SMARTEYE_IDPATTERN_UNKNOWN,
+							(char*)SMARTEYE_RPC_ID_PATTERN_CHECK_ARG,sub_arg);
 			}
-			break;
-		case EJSON_SYSMGR_RPC_GET_ETH_COUNT:
-			CmdlineHelper.push_single_int_get_set_command
-			(EJSON_SYSMGR_RPC_GET_ETH_COUNT,EJSON_SYSMGR_RPC_GET_ETH_COUNT,SYSMGR_RPC_ETH_COUNT_GET,SYSMGR_RPC_ETH_COUNT_GET,
-			(char*)SYSMGR_RPC_ETH_COUNT_ARG,sub_arg,1);
 			break;
 		default:
 			return 0;
 			break;	
-	}*/
+	}
 	return 0;
 }
 

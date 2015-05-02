@@ -14,6 +14,10 @@ public:
 	virtual int ProcessWork(JsonDataCommObj* pReq,int index);
 	virtual int ProcessWorkAsync(unsigned char* pWorkData);
 
+	int json_to_bin_check_id_pattern(JsonDataCommObj* pReq);
+	int bin_to_json_check_id_pattern(JsonDataCommObj* pReq);
+	int process_check_id_pattern(JsonDataCommObj* pReq);
+
 	/*int json_to_bin_get_mac_addr(JsonDataCommObj* pReq);
 	int bin_to_json_get_mac_addr(JsonDataCommObj* pReq);
 	int process_get_mac_addr(JsonDataCommObj* pReq);

@@ -127,21 +127,24 @@ RPC_SRV_RESULT ImgIdentify::capture_camera_image(int video_device,int frmPixels,
 	capture.set(CV_CAP_PROP_FRAME_HEIGHT,frmLines);//1080
 	if(!capture.isOpened())
 	{
-		//cout << "Failed to connect to the camera." << endl;
+		cout << "Failed to connect to the camera." << endl;
 		return RPC_SRV_RESULT_DEV_NOT_ACCESSIBLE;//-1;
 	}
 	capture >> image;
 	if(image.empty())
 	{
-		//cout << "Failed to capture an image" << endl;
+		cout << "Failed to capture an image" << endl;
 		return RPC_SRV_RESULT_FILE_EMPTY;//-1;
 	}
 	return RPC_SRV_RESULT_SUCCESS;//0;
 }
-RPC_SRV_RESULT ImgIdentify::identify_image()
+/*---------------------------------------------------------------------------*/
+RPC_SRV_RESULT ImgIdentify::identify_image_box(bool logImage,std::string imgPath)
 {
 	Mat image,src_gray;
 	RPC_SRV_RESULT res;
+	vector<vector<Point> > contours;
+
 	//capture image
 	res=capture_camera_image(0,1920,1080,image);
 	if(res!=RPC_SRV_RESULT_SUCCESS)
@@ -151,7 +154,48 @@ RPC_SRV_RESULT ImgIdentify::identify_image()
 	cvtColor( image, src_gray, CV_BGR2GRAY );
 	blur( src_gray, src_gray, Size(3,3) );
 
-	//while(filter
+	//apply threshold,and filter out un-wanted non-square stuff
+	int LoopCount=0,scan_thresh=MIN_SCAN_THRESHOLD;
+	RNG rng(12345);
+	Mat contour_image;
+	do
+	{
+		apply_threshold(src_gray,scan_thresh,rng,contour_image,contours);//filter-out unwanted non-square stuff
+		scan_thresh+=20;//start from 100, and go upto 180
+	}while(contours.size()>MAX_SQARES_FILTER && LoopCount++<4);
 
-	return RPC_SRV_RESULT_SUCCESS;//0;
+	//if(contours.size()>MAX_SQARES_FILTER)
+		//return RPC_SRV_RESULT_FAIL;//still there are many squares
+
+	vector<Point> biggest_square;
+	vector<Point> smaller_square;
+	//find largest square
+	find_largest_square(contours/*squares*/,biggest_square);//find outer white box of ovd/kvd identify pattern
+	//find a smaller square which is 3times smaller than largest
+	if(find_relative_square(contours/*squares*/,biggest_square,smaller_square,3,20)==0)//; //+/- 20pixel tolerence
+		res=RPC_SRV_RESULT_SUCCESS;
+	else
+		res=RPC_SRV_RESULT_FAIL;//required image is not found
+
+	//check if user requested to log the countour image
+	if(logImage)
+		imwrite( imgPath, contour_image );
+
+	return res;
 }
+/*---------------------------------------------------------------------------*/
+RPC_SRV_RESULT ImgIdentify::IdentifyPattern(EJSON_SYSMGR_IFACE_TYPE pattern)
+{
+	switch(pattern)
+	{
+		case EJSON_SMARTEYE_IDPATTERN_IDENT:return identify_image_box(true,"/home/adav/tmp/adav-cam.jpg");
+		case EJSON_SMARTEYE_IDPATTERN_RED  :
+		case EJSON_SMARTEYE_IDPATTERN_GREEN:
+		case EJSON_SMARTEYE_IDPATTERN_BLUE :
+		case EJSON_SMARTEYE_IDPATTERN_WHITE:
+		default:break;
+	}
+	return RPC_SRV_RESULT_FAIL;
+}
+/*---------------------------------------------------------------------------*/
+
