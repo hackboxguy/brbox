@@ -93,17 +93,18 @@ class ADJsonRpcMgrConsumer  //observer
 //protected:
 //	std::string strGetRpc;
 //	std::string strSetRpc;
+	bool emulation;
+	bool logmsg;
 public:
 	int parent_index;
 	int index;
 	std::string strRpcName;
-	bool emulation;
-	bool logmsg;
 
 	//std::string strSetRpc;
 
 	std::string GetRpcName(){return strRpcName;};
 	int GetRpcParentIndex(){return parent_index;};
+	bool get_debug_log_flag(){return logmsg;};
 
 	//std::string GetRpcNameSetType(){return strGetRpc;};
 	//std::string GetPageTag(){return Tag;};

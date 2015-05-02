@@ -47,12 +47,12 @@ int MyCmdline::parse_cmdline_arguments(int argc, char **argv)
 	return CmdlineHelper.parse_cmdline_arguments(argc,argv);
 }
 /*****************************************************************************/
-int MyCmdline::get_emulation_mode()
+bool MyCmdline::get_emulation_mode()
 {
 	if(CmdlineHelper.get_emulation_mode()==CMDLINE_OPT_TYPE_YES)
-		return 1;
+		return true;
 	else
-		return 0;
+		return false;
 }
 /*****************************************************************************/
 int MyCmdline::is_help_printed()

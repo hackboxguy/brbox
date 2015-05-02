@@ -19,14 +19,16 @@ int main(int argc, const char* argv[])
 	if(CmdLine.is_help_printed())
 		return -1;//user just requested to print the help info
 
+	bool dbglog = CmdLine.get_debug_log();
+	bool emulat = CmdLine.get_emulation_mode();
+
 	//start 100ms timer
 	ADTimer AppTimer(100);//only one instance per application(or process) must exist
-
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION); //main rpc handler
 
-	SmarteyeRpc PatternGet(SMARTEYE_RPC_ID_PATTERN_CHECK ,EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN,false,false);
+	SmarteyeRpc PatternGet(SMARTEYE_RPC_ID_PATTERN_CHECK ,EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN,emulat,dbglog);
 
 	RpcMgr.AttachRpc(&PatternGet);
 

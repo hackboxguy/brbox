@@ -127,13 +127,15 @@ RPC_SRV_RESULT ImgIdentify::capture_camera_image(int video_device,int frmPixels,
 	capture.set(CV_CAP_PROP_FRAME_HEIGHT,frmLines);//1080
 	if(!capture.isOpened())
 	{
-		cout << "Failed to connect to the camera." << endl;
+		//cout << "Failed to connect to the camera." << endl;
+		LOG_ERR_MSG("BRBOX:smarteye","ImgIdentify::capture_camera_image:failed to connect to camera");
 		return RPC_SRV_RESULT_DEV_NOT_ACCESSIBLE;//-1;
 	}
 	capture >> image;
 	if(image.empty())
 	{
-		cout << "Failed to capture an image" << endl;
+		//cout << "Failed to capture an image" << endl;
+		LOG_ERR_MSG("BRBOX:smarteye","ImgIdentify::capture_camera_image:failed to capture image");
 		return RPC_SRV_RESULT_FILE_EMPTY;//-1;
 	}
 	return RPC_SRV_RESULT_SUCCESS;//0;
@@ -160,10 +162,12 @@ RPC_SRV_RESULT ImgIdentify::identify_image_box(bool logImage,std::string imgPath
 	Mat contour_image;
 	do
 	{
-		cout<<"apply_threshold: scan_thresh = "<<scan_thresh<<endl;
+		//cout<<"apply_threshold: scan_thresh = "<<scan_thresh<<endl;
+		LOG_DEBUG_MSG_1_ARG(logflag,"BRBOX:smarteye","ImgIdentify::identify_image_box:scan_thresh=%d",scan_thresh);
 		apply_threshold(src_gray,scan_thresh,rng,contour_image,contours);//filter-out unwanted non-square stuff
 		scan_thresh+=20;//start from 100, and go upto 180
-		cout<<"apply_threshold: retured total squares = "<<contours.size()<<endl;
+		//cout<<"apply_threshold: retured total squares = "<<contours.size()<<endl;
+		LOG_DEBUG_MSG_1_ARG(logflag,"BRBOX:smarteye","ImgIdentify::identify_image_box:total_squares=%d",(int)contours.size());
 	}while(contours.size()>MAX_SQARES_FILTER && LoopCount++<4);
 
 	//if(contours.size()>MAX_SQARES_FILTER)

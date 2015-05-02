@@ -19,7 +19,7 @@ public:
 	MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_str);
 	~MyCmdline();
 	int parse_cmdline_arguments(int argc, char **argv);
-	int get_emulation_mode();
+	bool get_emulation_mode();
 	int is_help_printed();
 	int get_socket_log();
 	bool get_debug_log();

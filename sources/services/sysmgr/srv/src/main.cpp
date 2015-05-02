@@ -19,6 +19,9 @@ int main(int argc, const char* argv[])
 	if(CmdLine.is_help_printed())
 		return -1;//user just requested to print the help info
 
+	bool dbglog = CmdLine.get_debug_log();
+	bool emulat = CmdLine.get_emulation_mode();
+
 	//start 100ms timer
 	ADTimer AppTimer(100);//only one instance per application(or process) must exist
 
@@ -26,10 +29,10 @@ int main(int argc, const char* argv[])
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION); //main rpc handler
 
-	NetRpc MacGet  (SYSMGR_RPC_MAC_ADDR_GET ,EJSON_SYSMGR_RPC_GET_MAC_ADDR,false,false);  //network related rpc handler class
-	NetRpc MacSet  (SYSMGR_RPC_MAC_ADDR_SET ,EJSON_SYSMGR_RPC_SET_MAC_ADDR,false,false);  //network related rpc handler class
-	NetRpc Ethcount(SYSMGR_RPC_ETH_COUNT_GET,EJSON_SYSMGR_RPC_GET_ETH_COUNT,false,false); //network related rpc handler class
-	NetRpc Ethname (SYSMGR_RPC_ETH_NAME_GET ,EJSON_SYSMGR_RPC_GET_ETH_NAME,false,false);  //network related rpc handler class
+	NetRpc MacGet  (SYSMGR_RPC_MAC_ADDR_GET ,EJSON_SYSMGR_RPC_GET_MAC_ADDR ,emulat,dbglog);  //network related rpc handler class
+	NetRpc MacSet  (SYSMGR_RPC_MAC_ADDR_SET ,EJSON_SYSMGR_RPC_SET_MAC_ADDR ,emulat,dbglog);  //network related rpc handler class
+	NetRpc Ethcount(SYSMGR_RPC_ETH_COUNT_GET,EJSON_SYSMGR_RPC_GET_ETH_COUNT,emulat,dbglog);  //network related rpc handler class
+	NetRpc Ethname (SYSMGR_RPC_ETH_NAME_GET ,EJSON_SYSMGR_RPC_GET_ETH_NAME ,emulat,dbglog);  //network related rpc handler class
 
 	RpcMgr.AttachRpc(&MacGet);
 	RpcMgr.AttachRpc(&MacSet);

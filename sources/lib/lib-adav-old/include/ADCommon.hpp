@@ -93,7 +93,21 @@ typedef enum ADLIB_SERVICE_READY_STATE_T
 
 
 #include <syslog.h>
-#define LOG_ERR_MSG(logflag,service,msg)\
+#define LOG_ERR_MSG(service,msg)\
+do			\
+{			\
+	openlog (service, LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL0);\
+	syslog(LOG_ERR, msg);\
+	closelog ();\
+} while (0)
+#define LOG_ERR_MSG_WITH_ARG(service,msg,arg)\
+do			\
+{			\
+	openlog (service, LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL0);\
+	syslog(LOG_ERR, msg,arg);\
+	closelog ();\
+} while (0)
+#define LOG_DEBUG_MSG(logflag,service,msg)\
 do			\
 {			\
 	if(logflag==true)\
@@ -103,13 +117,23 @@ do			\
 	closelog ();\
 	}\
 } while (0)
-#define LOG_ERR_MSG_WITH_ARG(logflag,service,msg,arg)\
+#define LOG_DEBUG_MSG_1_ARG(logflag,service,msg,arg1)\
 do			\
 {			\
 	if(logflag==true)\
 	{\
 		openlog (service, LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL0);\
-		syslog(LOG_ERR, msg,arg);\
+		syslog(LOG_ERR, msg,arg1);\
+		closelog ();\
+	}\
+} while (0)
+#define LOG_DEBUG_MSG_2_ARG(logflag,service,msg,arg1,arg2)\
+do			\
+{			\
+	if(logflag==true)\
+	{\
+		openlog (service, LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL0);\
+		syslog(LOG_ERR, msg,arg1,arg2);\
 		closelog ();\
 	}\
 } while (0)

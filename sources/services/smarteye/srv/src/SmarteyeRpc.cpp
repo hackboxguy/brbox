@@ -81,6 +81,10 @@ int SmarteyeRpc::process_check_id_pattern(JsonDataCommObj* pReq)
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	SYSMGR_ID_PATTERN_PACKET* pPacket;
 	pPacket=(SYSMGR_ID_PATTERN_PACKET*)pPanelReq->dataRef;
+
+	//set debug logging flag
+	ImgId.logflag=get_debug_log_flag();//get_debug_log_flag() is a function f parent class ADJsonRpcMgrConsumer
+
 	pPanelReq->result=ImgId.IdentifyPattern(pPacket->pattern_type);
 	return 0;
 }
