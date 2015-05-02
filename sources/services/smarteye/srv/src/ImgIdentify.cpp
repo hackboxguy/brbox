@@ -160,8 +160,10 @@ RPC_SRV_RESULT ImgIdentify::identify_image_box(bool logImage,std::string imgPath
 	Mat contour_image;
 	do
 	{
+		cout<<"apply_threshold: scan_thresh = "<<scan_thresh<<endl;
 		apply_threshold(src_gray,scan_thresh,rng,contour_image,contours);//filter-out unwanted non-square stuff
 		scan_thresh+=20;//start from 100, and go upto 180
+		cout<<"apply_threshold: retured total squares = "<<contours.size()<<endl;
 	}while(contours.size()>MAX_SQARES_FILTER && LoopCount++<4);
 
 	//if(contours.size()>MAX_SQARES_FILTER)

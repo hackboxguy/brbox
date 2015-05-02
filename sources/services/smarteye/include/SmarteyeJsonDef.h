@@ -1,7 +1,8 @@
 #ifndef __SMARTEYE_JSON_DEF_H_
 #define __SMARTEYE_JSON_DEF_H_
 /* ------------------------------------------------------------------------- */
-#define SMARTEYE_JSON_PORT_NUMBER 40001
+#include "ADCmnPortList.h"
+#define SMARTEYE_JSON_PORT_NUMBER    ADCMN_PORT_SMARTEYE
 /* ------------------------------------------------------------------------- */
 typedef enum EJSON_SMARTEYE_RPC_TYPES_T
 {

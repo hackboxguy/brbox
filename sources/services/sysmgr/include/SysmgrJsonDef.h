@@ -1,7 +1,8 @@
 #ifndef __SYSMGR_JSON_DEF_H_
 #define __SYSMGR_JSON_DEF_H_
 /* ------------------------------------------------------------------------- */
-#define SYSMGR_JSON_PORT_NUMBER 40000
+#include "ADCmnPortList.h"
+#define SYSMGR_JSON_PORT_NUMBER    ADCMN_PORT_SYSMGR
 /* ------------------------------------------------------------------------- */
 typedef enum EJSON_SYSMGR_RPC_TYPES_T
 {
