@@ -43,10 +43,11 @@ int ADCmdlineHelper::init_myself()
 	port=-1;
 	emulation_mode=CMDLINE_OPT_TYPE_NO;
 	socket_log=CMDLINE_OPT_TYPE_NO;
+	debug_log=CMDLINE_OPT_TYPE_NO;
 	settings[0]='\0';
 
 	//internal default arguments available for all the clients
-		strcpy(short_options,"hvpiegtdlnskwrabxz");//--help,--version,--ip,--autotest,--delay,--loopcount,--testnum, --settings
+		strcpy(short_options,"hvpiegtdlnskwrabxzu");//--help,--version,--ip,--autotest,--delay,--loopcount,--testnum, --settings
 		insert_options_entry((char*)"help"      ,optional_argument,'h',1);
 
 		insert_options_entry((char*)"version"   ,no_argument,'v',1);
@@ -54,6 +55,9 @@ int ADCmdlineHelper::init_myself()
 
 		insert_options_entry((char*)"port"        ,optional_argument,'p',1);
 		insert_help_entry((char*)"--port                     (server's listening tcp port number)");
+
+		insert_options_entry((char*)"debuglog"        ,no_argument,'u',1);
+		insert_help_entry((char*)"--debuglog                 (server's listening tcp port number)");
 
 	if(my_mode==CMDLINE_HELPER_MODE_CLIENT)
 	{
@@ -225,6 +229,7 @@ int ADCmdlineHelper::parse_cmdline_arguments(int argc, char **argv)
 			case 'v':print_subscribers_version();help_printed=1;break;//print_version();return 0;break;
 			case 'p':parse_port_number_opt(subarg);
 				break;
+			case 'u':debug_log=CMDLINE_OPT_TYPE_YES;break;//log debug messages
 			case 'i':parse_ip_list_opt(subarg);//push all user supplied ip list to the chain.
 				break;
 			case 'e':
@@ -871,6 +876,13 @@ int ADCmdlineHelper::get_socket_log_opt()
 		return 1;
 	else
 		return 0;
+}
+bool ADCmdlineHelper::get_debug_log_opt()
+{
+	if(debug_log==CMDLINE_OPT_TYPE_YES)
+		return true;
+	else
+		return false;
 }
 /*****************************************************************************/
 //note: caller must allocate atleast 256 bytes for "ip" pointer before calling this function

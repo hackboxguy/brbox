@@ -93,19 +93,25 @@ typedef enum ADLIB_SERVICE_READY_STATE_T
 
 
 #include <syslog.h>
-#define LOG_ERR_MSG(service,msg)\
+#define LOG_ERR_MSG(logflag,service,msg)\
 do			\
 {			\
+	if(logflag==true)\
+	{\
 	openlog (service, LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL0);\
 	syslog(LOG_ERR, msg);\
 	closelog ();\
+	}\
 } while (0)
-#define LOG_ERR_MSG_WITH_ARG(service,msg,arg)\
+#define LOG_ERR_MSG_WITH_ARG(logflag,service,msg,arg)\
 do			\
 {			\
-	openlog (service, LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL0);\
-	syslog(LOG_ERR, msg,arg);\
-	closelog ();\
+	if(logflag==true)\
+	{\
+		openlog (service, LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL0);\
+		syslog(LOG_ERR, msg,arg);\
+		closelog ();\
+	}\
 } while (0)
 /*****************************************************************************/
 //used for creating memory for structures

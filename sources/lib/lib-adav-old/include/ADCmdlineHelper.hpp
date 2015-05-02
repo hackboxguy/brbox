@@ -137,6 +137,8 @@ class ADCmdlineHelper:public ADCmdlineHelperProducer, public ADChainConsumer ,pu
 	int port;//server's listening port number
 	CMDLINE_OPT_TYPE emulation_mode;
 	CMDLINE_OPT_TYPE socket_log;
+	CMDLINE_OPT_TYPE debug_log;
+
 	char settings[1024];//max filepath
 	char short_options[255];//short options table
 
@@ -211,7 +213,8 @@ int push_get_task_progress_command_with_dev_addr(char* get_rpc_name,char *addr, 
 	int push_string_get_set_with_enum_arg(int getcmd,int setcmd,const char* get_rpc,const char* set_rpc,
 			const char* enum_name,int enum_max,const char** enum_table, const char* string_name,char* subarg,RPC_SRV_ACT forced_act=RPC_SRV_ACT_READ_AND_WRITE);
 
-	int get_socket_log_opt();
+	int  get_socket_log_opt();
+	bool get_debug_log_opt();
 
 	//int push_string_get_set_with_string_arg_command(int getcmd,int setcmd,const char* get_rpc_name,const char* set_rpc_name,char* param1_name, char* param1_val, char *param2_name,char* subarg,RPC_SRV_ACT forced_act=RPC_SRV_ACT_READ_AND_WRITE);
 

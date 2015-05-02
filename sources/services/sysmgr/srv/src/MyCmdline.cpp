@@ -64,6 +64,10 @@ int MyCmdline::get_socket_log()
 {
 	return CmdlineHelper.get_socket_log_opt();
 }
+bool MyCmdline::get_debug_log()
+{
+	return CmdlineHelper.get_debug_log_opt();
+}
 /*****************************************************************************/
 int MyCmdline::get_port_number()
 {

@@ -97,6 +97,9 @@ public:
 	int parent_index;
 	int index;
 	std::string strRpcName;
+	bool emulation;
+	bool logmsg;
+
 	//std::string strSetRpc;
 
 	std::string GetRpcName(){return strRpcName;};
@@ -113,7 +116,13 @@ public:
 	//	return 0;
 	//};
 	//ADJsonRpcMgrConsumer(std::string getrpc,std::string setrpc){strGetRpc=getrpc;strSetRpc=setrpc;};
-	ADJsonRpcMgrConsumer(std::string rpc_name,int consumer_index){strRpcName=rpc_name;index=consumer_index;};
+	ADJsonRpcMgrConsumer(std::string rpc_name,int consumer_index,bool emu,bool log)
+	{
+		strRpcName=rpc_name;
+		index=consumer_index;
+		emulation=emu;
+		logmsg=log;
+	};
 	virtual ~ADJsonRpcMgrConsumer(){};
 	virtual int MapJsonToBinary(JsonDataCommObj* pReq,int index)=0;
 	virtual int MapBinaryToJson(JsonDataCommObj* pReq,int index)=0;

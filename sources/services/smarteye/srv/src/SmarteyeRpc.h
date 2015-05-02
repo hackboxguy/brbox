@@ -7,7 +7,7 @@
 class  SmarteyeRpc : public ADJsonRpcMgrConsumer, public ADCmnStringProcessor
 {
 public:
-	 SmarteyeRpc(std::string rpcName,int myIndex);//getRpc,std::string setRpc);
+	 SmarteyeRpc(std::string rpcName,int myIndex,bool emu,bool log);//getRpc,std::string setRpc);
 	~ SmarteyeRpc();
 	virtual int MapJsonToBinary(JsonDataCommObj* pReq,int index);
 	virtual int MapBinaryToJson(JsonDataCommObj* pReq,int index);

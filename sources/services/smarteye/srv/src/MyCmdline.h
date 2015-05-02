@@ -22,6 +22,7 @@ public:
 	int get_emulation_mode();
 	int is_help_printed();
 	int get_socket_log();
+	bool get_debug_log();
 	int get_port_number();
 
 	//service specific part

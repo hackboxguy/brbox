@@ -4,7 +4,7 @@
 //#include "ADSysInfo.hpp"
 //#include "SysmgrJsonDef.h"
 /* ------------------------------------------------------------------------- */
-SmarteyeRpc:: SmarteyeRpc(std::string rpcName,int myIndex):ADJsonRpcMgrConsumer(rpcName,myIndex)
+SmarteyeRpc:: SmarteyeRpc(std::string rpcName,int myIndex,bool emu, bool log):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
 {
 }
 /* ------------------------------------------------------------------------- */
