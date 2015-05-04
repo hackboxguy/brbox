@@ -7,7 +7,7 @@ SmarteyeCltCmdline::SmarteyeCltCmdline()
 	CmdlineHelper.attach_helper(this);
 
 	CmdlineHelper.insert_options_entry((char*)"imgcheck" ,optional_argument,EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN);
-	CmdlineHelper.insert_help_entry((char*)"--imgcheck=imgtype           [checks captured image against<ident/red/green/blue/white>]");
+	CmdlineHelper.insert_help_entry((char*)"--imgcheck=imgtype         [checks captured image against<ident/red/green/blue/white>]");
 	//CmdlineHelper.insert_options_entry((char*)"ethcount" ,optional_argument,EJSON_SYSMGR_RPC_GET_ETH_COUNT);
 	//CmdlineHelper.insert_help_entry((char*)"--ethcount                 [read total available eth interfaces]");
 

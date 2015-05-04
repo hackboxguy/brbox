@@ -26,7 +26,7 @@ int main(int argc, const char* argv[])
 	ADTimer AppTimer(100);//only one instance per application(or process) must exist
 
 	//attach rpc classes to ADJsonRpcMgr
-	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION); //main rpc handler
+	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog); //main rpc handler
 
 	SmarteyeRpc PatternGet(SMARTEYE_RPC_ID_PATTERN_CHECK ,EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN,emulat,dbglog);
 

@@ -27,7 +27,7 @@ int main(int argc, const char* argv[])
 
 
 	//attach rpc classes to ADJsonRpcMgr
-	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION); //main rpc handler
+	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog); //main rpc handler
 
 	NetRpc MacGet  (SYSMGR_RPC_MAC_ADDR_GET ,EJSON_SYSMGR_RPC_GET_MAC_ADDR ,emulat,dbglog);  //network related rpc handler class
 	NetRpc MacSet  (SYSMGR_RPC_MAC_ADDR_SET ,EJSON_SYSMGR_RPC_SET_MAC_ADDR ,emulat,dbglog);  //network related rpc handler class

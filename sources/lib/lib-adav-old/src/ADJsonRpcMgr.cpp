@@ -1,9 +1,10 @@
 #include "ADJsonRpcMgr.hpp"
 /* ------------------------------------------------------------------------- */
-ADJsonRpcMgr::ADJsonRpcMgr(int ver)
+ADJsonRpcMgr::ADJsonRpcMgr(int ver,bool debuglog)
 {
 	//strcpy(svnVersion,ver);
 	svnVersion=ver;
+	ServiceDebugFlag=debuglog;
 	JMapper.AttachProxy(&Proxy);//let Proxy know who to call back for mapping
 	JMapper.AttachMapper(this); //attach myself as mapper, jmapper shall call me back for mapper functions
 	JMapper.AttachWorker(this); //attach myself as worker
@@ -67,7 +68,7 @@ int ADJsonRpcMgr::Start(int port,int socket_log,int emulation)
 	char rpc_name[1024];
 	//TODO:myCmdLine.get_emulation_mode()
 	Proxy.start_listening(port,socket_log);
-	//attach first 7 rpc's which are common to all services
+	//attach first 9 rpc's which are common to all services
 	JMapper.attach_rpc_method(EJSON_RPCGMGR_GET_TASK_STS       ,(char*)RPCMGR_RPC_TASK_STS_GET);
 	JMapper.attach_rpc_method(EJSON_RPCGMGR_GET_RPC_SRV_VERSION,(char*)RPCMGR_RPC_SER_VER_GET);
 	JMapper.attach_rpc_method(EJSON_RPCGMGR_TRIGGER_DATASAVE   ,(char*)RPCMGR_RPC_TRIG_SAVE);
@@ -75,7 +76,8 @@ int ADJsonRpcMgr::Start(int port,int socket_log,int emulation)
 	JMapper.attach_rpc_method(EJSON_RPCGMGR_SHUTDOWN_SERVICE   ,(char*)RPCMGR_RPC_TRIG_SHUTDOWN);
 	JMapper.attach_rpc_method(EJSON_RPCGMGR_RESET_TASK_STS     ,(char*)RPCMGR_RPC_RESET_TASKSTS);
 	JMapper.attach_rpc_method(EJSON_RPCGMGR_GET_READY_STS      ,(char*)RPCMGR_RPC_READY_STS_GET);
-
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_GET_DEBUG_LOG      ,(char*)RPCMGR_RPC_DEBUG_LOG_GET);
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_SET_DEBUG_LOG      ,(char*)RPCMGR_RPC_DEBUG_LOG_SET);
 	int total = get_total_attached_rpcs();
 	for(int i=0;i<total;i++) 
 	{
@@ -184,6 +186,8 @@ int ADJsonRpcMgr::MyMapJsonToBinary(JsonDataCommObj* pReq)
 		case EJSON_RPCGMGR_SHUTDOWN_SERVICE   :result=json_to_bin_shutdown_service(pReq);break;
 		case EJSON_RPCGMGR_RESET_TASK_STS     :result=json_to_bin_reset_task_sts(pReq);break;
 		case EJSON_RPCGMGR_GET_READY_STS      :result=json_to_bin_get_ready_sts(pReq);break;
+		case EJSON_RPCGMGR_GET_DEBUG_LOG      :result=json_to_bin_get_debug_logging(pReq);break;
+		case EJSON_RPCGMGR_SET_DEBUG_LOG      :result=json_to_bin_set_debug_logging(pReq);break;
 		default:break;
 	}
 	return result;
@@ -202,6 +206,8 @@ int ADJsonRpcMgr::MyMapBinaryToJson(JsonDataCommObj* pReq)
 		case EJSON_RPCGMGR_SHUTDOWN_SERVICE   :result=bin_to_json_shutdown_service(pReq);break;
 		case EJSON_RPCGMGR_RESET_TASK_STS     :result=bin_to_json_reset_task_sts(pReq);break;
 		case EJSON_RPCGMGR_GET_READY_STS      :result=bin_to_json_get_ready_sts(pReq);break;
+		case EJSON_RPCGMGR_GET_DEBUG_LOG      :result=bin_to_json_get_debug_logging(pReq);break;
+		case EJSON_RPCGMGR_SET_DEBUG_LOG      :result=bin_to_json_set_debug_logging(pReq);break;
 		default:break;
 	}
 	return result;
@@ -222,6 +228,8 @@ int ADJsonRpcMgr::MyProcessWork(JsonDataCommObj* pReq)
 		case EJSON_RPCGMGR_SHUTDOWN_SERVICE   :return process_shutdown_service(pPanelReq);break;
 		case EJSON_RPCGMGR_RESET_TASK_STS     :return process_reset_task_sts(pPanelReq);break;
 		case EJSON_RPCGMGR_GET_READY_STS      :return process_get_ready_status(pPanelReq);break;
+		case EJSON_RPCGMGR_GET_DEBUG_LOG      :return process_get_debug_logging(pPanelReq);break;
+		case EJSON_RPCGMGR_SET_DEBUG_LOG      :return process_set_debug_logging(pPanelReq);break;
 		default:break;
 	}
 	return -1;
@@ -399,5 +407,58 @@ int ADJsonRpcMgr::bin_to_json_get_ready_sts(JsonDataCommObj* pReq)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
-
+int ADJsonRpcMgr::json_to_bin_get_debug_logging(JsonDataCommObj* pReq)
+{
+	RPCMGR_DEBUG_LOG_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_DEBUG_LOG_PACKET,RPC_SRV_ACT_READ,EJSON_RPCGMGR_GET_DEBUG_LOG);
+	return 0;
+}
+int ADJsonRpcMgr::process_get_debug_logging(RPC_SRV_REQ* pReq)
+{
+	RPCMGR_DEBUG_LOG_PACKET* pPacket;
+	pPacket=(RPCMGR_DEBUG_LOG_PACKET*)pReq->dataRef;
+	//cout<<"ADJsonRpcMgr::process_get_debug_logging:flag-value="<<ServiceDebugFlag<<endl;
+	if(ServiceDebugFlag==true)
+		pPacket->status=EJSON_RPCGMGR_FLAG_STATE_ENABLE;
+	else if(ServiceDebugFlag==false)
+		pPacket->status=EJSON_RPCGMGR_FLAG_STATE_DISABLE;
+	else
+		pPacket->status=EJSON_RPCGMGR_FLAG_STATE_UNKNOWN;
+	pReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+int ADJsonRpcMgr::bin_to_json_get_debug_logging(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_ENUM(RPC_SRV_REQ,RPCMGR_DEBUG_LOG_PACKET,RPCMGR_RPC_DEBUG_LOG_ARGSTS,status,RPCMGR_RPC_DEBUG_LOG_ARGSTS_TBL,EJSON_RPCGMGR_FLAG_STATE_UNKNOWN);
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int ADJsonRpcMgr::json_to_bin_set_debug_logging(JsonDataCommObj* pReq)
+{
+	RPCMGR_DEBUG_LOG_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_DEBUG_LOG_PACKET,RPC_SRV_ACT_WRITE,EJSON_RPCGMGR_SET_DEBUG_LOG);
+	JSON_STRING_TO_ENUM(RPCMGR_RPC_DEBUG_LOG_ARGSTS,RPCMGR_RPC_DEBUG_LOG_ARGSTS_TBL,EJSON_RPCGMGR_FLAG_STATE,EJSON_RPCGMGR_FLAG_STATE_UNKNOWN,pPanelCmdObj->status);
+	return 0;
+}
+int ADJsonRpcMgr::process_set_debug_logging(RPC_SRV_REQ* pReq)
+{
+	RPCMGR_DEBUG_LOG_PACKET* pPacket;
+	pPacket=(RPCMGR_DEBUG_LOG_PACKET*)pReq->dataRef;
+	switch(pPacket->status)
+	{
+		case EJSON_RPCGMGR_FLAG_STATE_DISABLE:ServiceDebugFlag=false;break;
+		case EJSON_RPCGMGR_FLAG_STATE_ENABLE :ServiceDebugFlag=true ;break;
+		default                              :pReq->result=RPC_SRV_RESULT_ARG_ERROR;return 0;
+	}
+	//apply debuglog flag to all attached rpc's
+	setRpcDebugLogFlag(ServiceDebugFlag);
+	pReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+int ADJsonRpcMgr::bin_to_json_set_debug_logging(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,RPCMGR_DEBUG_LOG_PACKET);
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
 

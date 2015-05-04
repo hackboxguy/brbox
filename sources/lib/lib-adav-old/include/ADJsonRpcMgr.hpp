@@ -24,6 +24,8 @@ typedef enum EJSON_RPCGMGR_CMD_T
         EJSON_RPCGMGR_SHUTDOWN_SERVICE=4,    //rpc-server shotdown cmd
 	EJSON_RPCGMGR_RESET_TASK_STS=5,      //reset task-status chain(warning: ensure that no task is in progress when resetting)
 	EJSON_RPCGMGR_GET_READY_STS=6,       //ready status of the service
+	EJSON_RPCGMGR_GET_DEBUG_LOG=7,       //read the  status of debug logging flag
+	EJSON_RPCGMGR_SET_DEBUG_LOG=8,       //enable/disable debug logging
 	EJSON_RPCGMGR_CMD_END,
 	EJSON_RPCGMGR_CMD_NONE
 }EJSON_RPCGMGR_CMD;
@@ -86,6 +88,25 @@ typedef struct RPCMGR_READY_STS_PACKET_T
 	char status_str[512];
 }RPCMGR_READY_STS_PACKET;
 /* ------------------------------------------------------------------------- */
+//EJSON_RPCGMGR_GET_DEBUG_LOG
+//EJSON_RPCGMGR_SET_DEBUG_LOG
+#define RPCMGR_RPC_DEBUG_LOG_GET        "get_debug_logging"
+#define RPCMGR_RPC_DEBUG_LOG_SET        "set_debug_logging"
+#define RPCMGR_RPC_DEBUG_LOG_ARGSTS     "status"
+#define RPCMGR_RPC_DEBUG_LOG_ARGSTS_TBL {"disable","enable","unknown","none","\0"}
+typedef enum EJSON_RPCGMGR_FLAG_STATE_T  //generic enable/disable flag type
+{
+	EJSON_RPCGMGR_FLAG_STATE_DISABLE,
+	EJSON_RPCGMGR_FLAG_STATE_ENABLE,
+	EJSON_RPCGMGR_FLAG_STATE_UNKNOWN,
+	EJSON_RPCGMGR_FLAG_STATE_NONE
+}EJSON_RPCGMGR_FLAG_STATE;
+typedef struct RPCMGR_DEBUG_LOG_PACKET_T
+{
+	EJSON_RPCGMGR_FLAG_STATE status;
+	//char status_str[512];
+}RPCMGR_DEBUG_LOG_PACKET;
+/* ------------------------------------------------------------------------- */
 //to understand this, read C++ subject observer pattern
 class ADJsonRpcMgrProducer; //subject
 class ADJsonRpcMgrConsumer  //observer
@@ -105,6 +126,8 @@ public:
 	std::string GetRpcName(){return strRpcName;};
 	int GetRpcParentIndex(){return parent_index;};
 	bool get_debug_log_flag(){return logmsg;};
+	int  set_debug_log_flag(bool flag){logmsg=flag;return 0;};
+
 
 	//std::string GetRpcNameSetType(){return strGetRpc;};
 	//std::string GetPageTag(){return Tag;};
@@ -163,6 +186,13 @@ protected:
 				return (*iter);
 		}
 		return NULL;
+	}
+	int setRpcDebugLogFlag(bool debuglog) //set debuglog flag to all attached rpc's
+	{
+		std::vector<ADJsonRpcMgrConsumer*>::iterator iter;
+		for(iter=rpclist.begin();iter != rpclist.end();++iter)
+			(*iter)->set_debug_log_flag(debuglog);
+		return 0;
 	}
 public:
 	virtual ~ADJsonRpcMgrProducer(){};
@@ -234,6 +264,8 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	ADTaskWorker AsyncTaskWorker;
 	bool shutdown_support;
 	EJSON_RPCGMGR_READY_STATE ServiceReadyFlag;
+	//EJSON_RPCGMGR_FLAG_STATE  ServiceDebugFlag;
+	bool  ServiceDebugFlag;
 
 	//ADJsonRpcMapConsumer overrides
 	virtual int process_json_to_binary(JsonDataCommObj* pReq);//{return 0;};//only applicable for mapper
@@ -290,8 +322,18 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	int process_get_ready_status(RPC_SRV_REQ* pReq);
 	int bin_to_json_get_ready_sts(JsonDataCommObj* pReq);
 
+	//EJSON_RPCGMGR_GET_DEBUG_LOG=7
+	int json_to_bin_get_debug_logging(JsonDataCommObj* pReq);
+	int process_get_debug_logging(RPC_SRV_REQ* pReq);
+	int bin_to_json_get_debug_logging(JsonDataCommObj* pReq);
+
+	//EJSON_RPCGMGR_SET_DEBUG_LOG=8
+	int json_to_bin_set_debug_logging(JsonDataCommObj* pReq);
+	int process_set_debug_logging(RPC_SRV_REQ* pReq);
+	int bin_to_json_set_debug_logging(JsonDataCommObj* pReq);
+
 public:
-	ADJsonRpcMgr(int ver);
+	ADJsonRpcMgr(int ver,bool debuglog=false);
 	~ADJsonRpcMgr();
 	int AttachHeartBeat(ADTimer* pTimer);
 	int Start(int port,int socket_log,int emulation);

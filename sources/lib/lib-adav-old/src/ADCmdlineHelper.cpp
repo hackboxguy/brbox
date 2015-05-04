@@ -1,6 +1,7 @@
 //#include <json.h>
 #include <string.h>
 #include "ADCmdlineHelper.hpp"
+#include "ADJsonRpcMgr.hpp"
 #include <iostream>
 #include <stdio.h>
 using namespace std;
@@ -47,7 +48,7 @@ int ADCmdlineHelper::init_myself()
 	settings[0]='\0';
 
 	//internal default arguments available for all the clients
-		strcpy(short_options,"hvpiegtdlnskwrabxzu");//--help,--version,--ip,--autotest,--delay,--loopcount,--testnum, --settings
+		strcpy(short_options,"hvpiegtdlnskwrabxzuc");//--help,--version,--ip,--autotest,--delay,--loopcount,--testnum, --settings
 		insert_options_entry((char*)"help"      ,optional_argument,'h',1);
 
 		insert_options_entry((char*)"version"   ,no_argument,'v',1);
@@ -55,9 +56,6 @@ int ADCmdlineHelper::init_myself()
 
 		insert_options_entry((char*)"port"        ,optional_argument,'p',1);
 		insert_help_entry((char*)"--port                     (server's listening tcp port number)");
-
-		insert_options_entry((char*)"debuglog"        ,no_argument,'u',1);
-		insert_help_entry((char*)"--debuglog                 (server's listening tcp port number)");
 
 	if(my_mode==CMDLINE_HELPER_MODE_CLIENT)
 	{
@@ -97,14 +95,21 @@ int ADCmdlineHelper::init_myself()
 		insert_options_entry((char*)"readysts" ,optional_argument,'z',1);
 		insert_help_entry((char*)"--readysts                 (read the ready state of service)");
 
+		insert_options_entry((char*)"logdebug" ,optional_argument,'c',1);
+		insert_help_entry((char*)"--logdebug=[enable/disable](read/write debug logging status of the service)");
 	}
 	else if(my_mode==CMDLINE_HELPER_MODE_SERVER)
 	{
+		insert_options_entry((char*)"debuglog"        ,no_argument,'u',1);
+		insert_help_entry((char*)"--debuglog                 (enable debug logging)");
+
 		insert_options_entry((char*)"emulation" ,optional_argument,'e',1);
-		insert_help_entry((char*)"--emulation=[yes/no]       (disable actual h/w access, default is no)");
+		//insert_help_entry((char*)"--emulation=[yes/no]       (disable actual h/w access, default is no)");
+		insert_help_entry((char*)"--emulation                (disable actual h/w access, run in emulation mode)");
 
 		insert_options_entry((char*)"logsocket" ,optional_argument,'g',1);
-		insert_help_entry((char*)"--logsocket=[yes/no]       (log json req/resp strings on socket, default is no)");
+		//insert_help_entry((char*)"--logsocket=[yes/no]       (log json req/resp strings on socket, default is no)");
+		insert_help_entry((char*)"--logsocket                (enable json req/resp string-print on socket)");
 
 		insert_options_entry((char*)"settings" ,optional_argument,'s',1);
 		insert_help_entry((char*)"--settings=filepath        (settings text filepath to be loaded and stored)");
@@ -234,9 +239,11 @@ int ADCmdlineHelper::parse_cmdline_arguments(int argc, char **argv)
 				break;
 			case 'e':
 				//printf("cmdline_helper:emulation mode arg found\n");
-				parse_emulation_mode_opt(subarg);
+				//parse_emulation_mode_opt(subarg);
+				emulation_mode=CMDLINE_OPT_TYPE_YES;
 				break;
-			case 'g':parse_socket_log_opt(subarg);
+			case 'g'://parse_socket_log_opt(subarg);
+				socket_log=CMDLINE_OPT_TYPE_YES;
 				break;
 			case 't'://auto-test
 				autotest=1;
@@ -259,6 +266,15 @@ int ADCmdlineHelper::parse_cmdline_arguments(int argc, char **argv)
 				break;
 			case 'k'://indx:0:read task status
 				push_get_task_progress_command((char*)ADLIB_RPC_NAME_GET_TASK_STATUS,(char*)ADLIB_RPC_PARM_TASK_STS_ID,(char*)ADLIB_RPC_PARM_TASK_STS,ADLIB_RPC_INDX_GET_TASK_STATUS,subarg);
+				break;
+			case 'c'://debug logging read/write flag
+				{
+				const char *table[]   = RPCMGR_RPC_DEBUG_LOG_ARGSTS_TBL;
+				push_single_enum_get_set_command
+				(EJSON_RPCGMGR_GET_DEBUG_LOG,EJSON_RPCGMGR_SET_DEBUG_LOG,
+				RPCMGR_RPC_DEBUG_LOG_GET,RPCMGR_RPC_DEBUG_LOG_SET,
+				&table[0],EJSON_RPCGMGR_FLAG_STATE_UNKNOWN,(char*)RPCMGR_RPC_DEBUG_LOG_ARGSTS,subarg);
+				}
 				break;
 			case 'w'://indx:1:shut-down rpc command
 				push_action_type_noarg_command(ADLIB_RPC_INDX_SHUTDOWN_SERVICE,ADLIB_RPC_NAME_SHUTDOWN_SERVICE,(char*)ADLIB_RPC_PARM_TASK_STS_ID);
