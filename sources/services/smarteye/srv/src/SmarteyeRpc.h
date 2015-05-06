@@ -6,8 +6,9 @@
 /* ------------------------------------------------------------------------- */
 class  SmarteyeRpc : public ADJsonRpcMgrConsumer, public ADCmnStringProcessor
 {
+	SMARTEYE_CMN_DATA_CACHE *pDataCache;
 public:
-	 SmarteyeRpc(std::string rpcName,int myIndex,bool emu,bool log);//getRpc,std::string setRpc);
+	 SmarteyeRpc(std::string rpcName,int myIndex,bool emu,bool log,SMARTEYE_CMN_DATA_CACHE *pData);
 	~ SmarteyeRpc();
 	virtual int MapJsonToBinary(JsonDataCommObj* pReq,int index);
 	virtual int MapBinaryToJson(JsonDataCommObj* pReq,int index);
@@ -18,23 +19,14 @@ public:
 	int bin_to_json_check_id_pattern(JsonDataCommObj* pReq);
 	int process_check_id_pattern(JsonDataCommObj* pReq);
 
-	/*int json_to_bin_get_mac_addr(JsonDataCommObj* pReq);
-	int bin_to_json_get_mac_addr(JsonDataCommObj* pReq);
-	int process_get_mac_addr(JsonDataCommObj* pReq);
+	int json_to_bin_get_debug_outfile(JsonDataCommObj* pReq);
+	int bin_to_json_get_debug_outfile(JsonDataCommObj* pReq);
+	int process_get_debug_outfile(JsonDataCommObj* pReq);
 
-	int json_to_bin_set_mac_addr(JsonDataCommObj* pReq);
-	int bin_to_json_set_mac_addr(JsonDataCommObj* pReq);
-	int process_set_mac_addr(JsonDataCommObj* pReq);
+	int json_to_bin_set_debug_outfile(JsonDataCommObj* pReq);
+	int bin_to_json_set_debug_outfile(JsonDataCommObj* pReq);
+	int process_set_debug_outfile(JsonDataCommObj* pReq);
 
-	//returns total number of available eth interfaces(except local loopback)
-	int json_to_bin_get_eth_count(JsonDataCommObj* pReq);
-	int bin_to_json_get_eth_count(JsonDataCommObj* pReq);
-	int process_get_eth_count(JsonDataCommObj* pReq);
-
-	//returns name of the eth interface for a given index
-	int json_to_bin_get_eth_name(JsonDataCommObj* pReq);
-	int bin_to_json_get_eth_name(JsonDataCommObj* pReq);
-	int process_get_eth_name(JsonDataCommObj* pReq);*/
 };
 /* ------------------------------------------------------------------------- */
 

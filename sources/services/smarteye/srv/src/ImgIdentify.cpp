@@ -141,7 +141,7 @@ RPC_SRV_RESULT ImgIdentify::capture_camera_image(int video_device,int frmPixels,
 	return RPC_SRV_RESULT_SUCCESS;//0;
 }
 /*---------------------------------------------------------------------------*/
-RPC_SRV_RESULT ImgIdentify::identify_image_box(bool logImage,std::string imgPath)
+RPC_SRV_RESULT ImgIdentify::identify_image_box(/*bool logImage,*/std::string imgPath)
 {
 	Mat image,src_gray;
 	RPC_SRV_RESULT res;
@@ -184,17 +184,17 @@ RPC_SRV_RESULT ImgIdentify::identify_image_box(bool logImage,std::string imgPath
 		res=RPC_SRV_RESULT_FAIL;//required image is not found
 
 	//check if user requested to log the countour image
-	if(logImage)
+	if(imgPath!="")
 		imwrite( imgPath, contour_image );
 
 	return res;
 }
 /*---------------------------------------------------------------------------*/
-RPC_SRV_RESULT ImgIdentify::IdentifyPattern(EJSON_SYSMGR_IFACE_TYPE pattern)
+RPC_SRV_RESULT ImgIdentify::IdentifyPattern(EJSON_SMARTEYE_IFACE_TYPE pattern,std::string imgPath)
 {
 	switch(pattern)
 	{
-		case EJSON_SMARTEYE_IDPATTERN_IDENT:return identify_image_box(true,"/home/adav/tmp/adav-cam.jpg");
+		case EJSON_SMARTEYE_IDPATTERN_IDENT:return identify_image_box(imgPath);//"/home/adav/tmp/adav-cam.jpg");
 		case EJSON_SMARTEYE_IDPATTERN_RED  :
 		case EJSON_SMARTEYE_IDPATTERN_GREEN:
 		case EJSON_SMARTEYE_IDPATTERN_BLUE :

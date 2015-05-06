@@ -25,12 +25,19 @@ int main(int argc, const char* argv[])
 	//start 100ms timer
 	ADTimer AppTimer(100);//only one instance per application(or process) must exist
 
+	//create a common data Cache of the service
+	SMARTEYE_CMN_DATA_CACHE DataCache;
+
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog); //main rpc handler
 
-	SmarteyeRpc PatternGet(SMARTEYE_RPC_ID_PATTERN_CHECK ,EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN,emulat,dbglog);
+	SmarteyeRpc PatternGet(SMARTEYE_RPC_ID_PATTERN_CHECK ,EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN ,emulat,dbglog,&DataCache);
+	SmarteyeRpc DbgFileGet(SMARTEYE_RPC_DEBUG_OUTFILE_GET,EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET,emulat,dbglog,&DataCache);
+	SmarteyeRpc DbgFileSet(SMARTEYE_RPC_DEBUG_OUTFILE_SET,EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_SET,emulat,dbglog,&DataCache);
 
 	RpcMgr.AttachRpc(&PatternGet);
+	RpcMgr.AttachRpc(&DbgFileGet);
+	RpcMgr.AttachRpc(&DbgFileSet);
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr

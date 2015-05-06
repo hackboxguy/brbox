@@ -20,12 +20,12 @@ class  ImgIdentify
 	int apply_threshold(Mat& src_gray,int trsh,RNG &rng,Mat& drawing, vector<vector<Point> > &contours);
 	int scale_image(Mat& image, const float imgScaleFactor);
 	RPC_SRV_RESULT capture_camera_image(int video_device,int frmPixels,int frmLines,Mat& image);
-	RPC_SRV_RESULT identify_image_box(bool logImage=false,std::string imgPath="");//check identify-pattern-box exists
+	RPC_SRV_RESULT identify_image_box(/*bool logImage=false,*/std::string imgPath="");//check identify-pattern-box exists
 public:
 	bool logflag;
 	 ImgIdentify();
 	~ ImgIdentify();
-	RPC_SRV_RESULT IdentifyPattern(EJSON_SYSMGR_IFACE_TYPE pattern);
+	RPC_SRV_RESULT IdentifyPattern(EJSON_SMARTEYE_IFACE_TYPE pattern,std::string imgPath);
 
 };
 /*---------------------------------------------------------------------------*/

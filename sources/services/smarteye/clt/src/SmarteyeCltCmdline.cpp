@@ -8,9 +8,8 @@ SmarteyeCltCmdline::SmarteyeCltCmdline()
 
 	CmdlineHelper.insert_options_entry((char*)"imgcheck" ,optional_argument,EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN);
 	CmdlineHelper.insert_help_entry((char*)"--imgcheck=imgtype         [checks captured image against<ident/red/green/blue/white>]");
-	//CmdlineHelper.insert_options_entry((char*)"ethcount" ,optional_argument,EJSON_SYSMGR_RPC_GET_ETH_COUNT);
-	//CmdlineHelper.insert_help_entry((char*)"--ethcount                 [read total available eth interfaces]");
-
+	CmdlineHelper.insert_options_entry((char*)"debugimgfile" ,optional_argument,EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET);
+	CmdlineHelper.insert_help_entry((char*)"--debugimgfile=filepath    [read/write debug image file path]");
 }
 /*****************************************************************************/
 SmarteyeCltCmdline::~SmarteyeCltCmdline()
@@ -32,6 +31,11 @@ int SmarteyeCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 							&table[0],EJSON_SMARTEYE_IDPATTERN_UNKNOWN,
 							(char*)SMARTEYE_RPC_ID_PATTERN_CHECK_ARG,sub_arg);
 			}
+			break;
+		case EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET:
+			CmdlineHelper.push_string_get_set_command(EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET,EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_SET,
+			SMARTEYE_RPC_DEBUG_OUTFILE_GET,SMARTEYE_RPC_DEBUG_OUTFILE_SET,
+			(char*)SMARTEYE_RPC_DEBUG_OUTFILE_ARG,sub_arg);
 			break;
 		default:
 			return 0;
