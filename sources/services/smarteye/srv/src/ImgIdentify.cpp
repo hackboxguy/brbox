@@ -67,6 +67,7 @@ int ImgIdentify::find_relative_square_new(const vector<vector <Point> >& squares
 
 	Rect relative_rect = boundingRect(Mat(biggest_square));
 //cout<<"ref.width="<<relative_rect.width<<" ref.height="<<relative_rect.height<<endl;
+LOG_DEBUG_MSG_2_ARG(logflag,"BRBOX:smarteye","ImgIdentify::find_relative_square_new:refW=%d refH=%d",relative_rect.width,relative_rect.height);
 
 	for (size_t i = 0; i < squares.size(); i++) 
 	{
@@ -76,6 +77,8 @@ int ImgIdentify::find_relative_square_new(const vector<vector <Point> >& squares
 
 		tmp_width =(float)relative_rect.width/rectangle.width;
 		tmp_height=(float)relative_rect.height/rectangle.height;
+LOG_DEBUG_MSG_2_ARG(logflag,"BRBOX:smarteye","ImgIdentify::find_relative_square_new:valueW=%d valueH=%d",rectangle.width,rectangle.height);
+LOG_DEBUG_MSG_2_ARG(logflag,"BRBOX:smarteye","ImgIdentify::find_relative_square_new:ratioW=%f ratioH=%f",tmp_width,tmp_height);
 //cout<<"tmpW="<<tmp_width<<" tmpH="<<tmp_height<<" W="<<rectangle.width<<" H="<<rectangle.height<<endl;
 		if( (tmp_width >= (float)(scale_W-tolerence) ) && (tmp_width <= (float)(scale_W+tolerence)) )
 		{
