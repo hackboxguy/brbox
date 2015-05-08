@@ -21,6 +21,10 @@ int main(int argc, const char* argv[])
 	if(CmdLine.is_help_printed())
 		return -1;//user just requested to print the help info
 
+	//read the board-type info from cmdline argument
+	ADCMN_DEV_INFO DevInfo;
+	CmdLine.get_dev_info(&DevInfo);
+
 	bool dbglog = CmdLine.get_debug_log();
 	bool emulat = CmdLine.get_emulation_mode();
 
