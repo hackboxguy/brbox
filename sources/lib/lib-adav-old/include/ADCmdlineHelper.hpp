@@ -2,7 +2,7 @@
 #define __ADCMDLINEHELPER_H_
 #include "ADGenericChain.hpp"
 #include "ADJsonRpcClient.hpp"
-//#include "ADCmnStringProcessor.hpp"
+#include "ADCmnDevTypes.h"
 #include <getopt.h>
 #include "ADCmnCltCmdProcessor.hpp"
 #include "ADThreadedSockClient.hpp"
@@ -141,6 +141,7 @@ class ADCmdlineHelper:public ADCmdlineHelperProducer, public ADChainConsumer ,pu
 
 	char settings[1024];//max filepath
 	char short_options[255];//short options table
+	ADCMN_DEV_INFO DeviceInfo;//dev-type/dev-variant/cpu-board-type
 
 	//ADThreadedSockClient callback functions	
 	virtual int run_user_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);
@@ -157,6 +158,7 @@ class ADCmdlineHelper:public ADCmdlineHelperProducer, public ADChainConsumer ,pu
 	int parse_port_number_opt(char* subarg);
 	int parse_emulation_mode_opt(char* subarg);
 	int parse_socket_log_opt(char* subarg);
+	int parse_board_type_opt(char* subarg);
 
 
 	int grep_ip_line(char* ip_filepath,int line,char* ip);
@@ -190,7 +192,7 @@ public:
 	int get_loop_count();
 	int get_interval_delay_ms();
 	char* get_settings_file();
-
+	int get_dev_info(ADCMN_DEV_INFO *pInfo);
 
 
 	//prepare command types

@@ -48,7 +48,7 @@ int ADCmdlineHelper::init_myself()
 	settings[0]='\0';
 
 	//internal default arguments available for all the clients
-		strcpy(short_options,"hvpiegtdlnskwrabxzuc");//--help,--version,--ip,--autotest,--delay,--loopcount,--testnum, --settings
+		strcpy(short_options,"hvpiegtdlnskwrabxzucf");//--help,--version,--ip,--autotest,--delay,--loopcount,--testnum, --settings
 		insert_options_entry((char*)"help"      ,optional_argument,'h',1);
 
 		insert_options_entry((char*)"version"   ,no_argument,'v',1);
@@ -113,7 +113,10 @@ int ADCmdlineHelper::init_myself()
 
 		insert_options_entry((char*)"settings" ,optional_argument,'s',1);
 		insert_help_entry((char*)"--settings=filepath        (settings text filepath to be loaded and stored)");
-		
+
+		insert_options_entry((char*)"boardtype" ,optional_argument,'f',1);
+		insert_help_entry((char*)"--boardtype=[RASPI_A/RASPI_APLUS/RASPI_B/RASPI_BPLUS/RASPI_B2/BAYTRAIL/BAYTRAIL_I210] (pass cpu board type to service)");
+	
 	}
 	return 0;
 }
@@ -296,6 +299,9 @@ int ADCmdlineHelper::parse_cmdline_arguments(int argc, char **argv)
 			case 'z':
 				push_string_get_set_command(ADLIB_RPC_INDX_GET_READY_STS,ADLIB_RPC_INDX_GET_READY_STS,ADLIB_RPC_NAME_GET_READY_STS,ADLIB_RPC_NAME_GET_READY_STS,
 					(char*)ADLIB_RPC_PARM_GET_READY_STS,subarg,RPC_SRV_ACT_READONLY);
+				break;
+			case 'f'://board-type
+				parse_board_type_opt(subarg);
 				break;
 			default:if(parse_subscribers_cmdline((arg-CONSUMERS_OPTIONS_ARG_START_BOUNDARY),subarg)!=0) return -1;//remove the offset which was added by me
 				break;
@@ -899,6 +905,27 @@ bool ADCmdlineHelper::get_debug_log_opt()
 		return true;
 	else
 		return false;
+}
+
+int ADCmdlineHelper::parse_board_type_opt(char* subarg)
+{
+	if(get_next_subargument(&subarg)==0)
+		return 0;
+	const char *table[]= ADCMN_BOARD_TYPE_TABLE;
+
+	int result;
+	ADCmnStringProcessor string_proc;
+	result = string_proc.string_to_enum(table,subarg,ADCMN_BOARD_TYPE_UNKNOWN);
+	if(result>=ADCMN_BOARD_TYPE_UNKNOWN)
+		DeviceInfo.BoardType=ADCMN_BOARD_TYPE_UNKNOWN;
+	else
+		DeviceInfo.BoardType   =(ADCMN_BOARD_TYPE)result;
+	return 0;
+}
+int ADCmdlineHelper::get_dev_info(ADCMN_DEV_INFO *pInfo)
+{
+	pInfo->BoardType     = DeviceInfo.BoardType;
+	return	0;
 }
 /*****************************************************************************/
 //note: caller must allocate atleast 256 bytes for "ip" pointer before calling this function
