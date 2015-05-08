@@ -348,6 +348,7 @@ int ADSysInfo::read_network_info_ifconfig(char* eth,char* mac,char* ip,char* net
 	if(fgets(temp_str,250,shell)!=NULL)
 	{
 		temp_str[255]='\0';
+		temp_str[strlen(temp_str)-1]='\0';//remove trailing '/n' nextline character
 		strcpy(mac,temp_str);
 		pclose(shell);
 	}
@@ -406,6 +407,54 @@ int ADSysInfo::read_cpu_info(char* cpumodel,char *cores,char* cpufreq)
 		//sprintf(cpufreq ,"%d",);
 	}
 	return 0;
+}
+/*****************************************************************************/
+RPC_SRV_RESULT ADSysInfo::get_total_eth_count(int &count)
+{
+	char command[1024];
+	char temp_str[256];
+	FILE *shell;
+	count=0;
+
+	sprintf(command,"ifconfig | grep \"Link encap\" | grep -v \"Local Loopback\" >/dev/null");
+	if(system(command)!=0) //only loopback interface is present, hence return EthCountIndx=0
+	{
+		return RPC_SRV_RESULT_SUCCESS;
+	}
+	sprintf(command,"ifconfig | grep \"Link encap\" | grep -v \"Local Loopback\" | sed -n '$='");
+
+	shell= popen(command,"r");
+	if(shell == NULL)
+		return RPC_SRV_RESULT_FILE_OPEN_ERR;
+
+	if(fgets(temp_str,250,shell)!=NULL)
+	{
+		temp_str[255]='\0';
+		count=atoi(temp_str);
+	}
+	pclose(shell);
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/*****************************************************************************/
+RPC_SRV_RESULT ADSysInfo::get_nth_eth_name(int index,char *name)
+{
+	char command[1024];
+	char temp_str[256];
+	FILE *shell;
+	sprintf(command,"ifconfig | grep \"Link encap\" | grep -v \"Local Loopback\" | sed -n '%d,1p' | awk '{print $1}'",index);
+	shell= popen(command,"r");
+	if(shell == NULL)
+		return RPC_SRV_RESULT_FILE_OPEN_ERR;
+
+	if(fgets(temp_str,250,shell)!=NULL)
+	{
+		temp_str[255]='\0';
+		temp_str[strlen(temp_str)-1]='\0';//remove trailing '/n' nextline character
+		strcpy(name,temp_str);
+	}
+	pclose(shell);
+	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
 

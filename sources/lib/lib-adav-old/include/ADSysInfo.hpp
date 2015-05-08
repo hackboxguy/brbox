@@ -4,7 +4,7 @@
 //#include <sys/ioctl.h>
 //#include <netinet/in.h>
 //#include <net/if.h>
-//#include <arpa/inet.h>
+#include "ADCommon.hpp"
 #define MAX_IFS 64
 #define MAX_ALLOWED_INTERFACES 8
 
@@ -36,6 +36,8 @@ public:
 	int read_mem_info(char* mem,char *memfree,char* memused);
 	int read_load_info(char* curload,char* avgload,char* uptime);
 	int read_cpu_info(char* cpumodel,char *cores,char* cpufreq);
+	RPC_SRV_RESULT get_total_eth_count(int &count);
+	RPC_SRV_RESULT get_nth_eth_name(int index,char *name);
 
 };
 #endif

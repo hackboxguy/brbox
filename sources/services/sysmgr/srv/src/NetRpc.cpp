@@ -136,29 +136,9 @@ int NetRpc::process_get_eth_count(JsonDataCommObj* pReq)
 	pPacket=(SYSMGR_ETH_COUNT_PACKET*)pPanelReq->dataRef;
 	pPacket->EthCountIndx=0;
 
-	char command[1024];
-	char temp_str[256];
-	FILE *shell;
-	sprintf(command,"ifconfig | grep \"Link encap\" | grep -v \"Local Loopback\" >/dev/null");
-	if(system(command)!=0) //only loopback interface is present, hence return EthCountIndx=0
-	{
-		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
-		return 0;
-	}
-	sprintf(command,"ifconfig | grep \"Link encap\" | grep -v \"Local Loopback\" | sed -n '$='");
-	shell= popen(command,"r");
-	if(shell == NULL)
-	{
-		pPanelReq->result=RPC_SRV_RESULT_FILE_OPEN_ERR;
-		return 0;
-	}
-	if(fgets(temp_str,250,shell)!=NULL)
-	{
-		temp_str[255]='\0';
-		pPacket->EthCountIndx=atoi(temp_str);
-	}
-	pclose(shell);
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	ADSysInfo SysInfo;
+	pPanelReq->result=SysInfo.get_total_eth_count(pPacket->EthCountIndx);
+
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
@@ -182,6 +162,22 @@ int NetRpc::process_get_eth_name(JsonDataCommObj* pReq)
 	pPacket=(SYSMGR_ETH_COUNT_PACKET*)pPanelReq->dataRef;
 	//pPacket->EthCountIndx=0;
 	//TODO:
+	ADSysInfo SysInfo;int tmpCount;
+	pPanelReq->result=SysInfo.get_total_eth_count(tmpCount);
+	if(pPanelReq->result!=RPC_SRV_RESULT_SUCCESS)
+		return 0;
+	if(tmpCount==0)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;//no eth interfaces are available
+		return 0;
+	}
+	//zero based index must be passed by the client
+	if(pPacket->EthCountIndx > (tmpCount-1) )
+	{
+		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;
+		return 0;
+	}
+	pPanelReq->result=SysInfo.get_nth_eth_name(pPacket->EthCountIndx+1,pPacket->eth_name);
 	return 0;
 }
 
