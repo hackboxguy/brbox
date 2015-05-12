@@ -11,7 +11,6 @@ BR_BOARD_LINUX_CONFIG=linux.config
 GRUB1_PREPARE_SCRIPT=grub1-prepare.sh
 GRUB1_COPY_SCRIPT=grub1-copy.sh
 GRUB1_SUDO_EXE_SCRIPT=sudo-executor-grub1-prepare.sh
-GRUB2_DISK_CREATOR=grub2-bootdisk.sh
 
 #output images
 BOOTABLE_USB_IMG=bootable-usb-disk.img
@@ -32,7 +31,22 @@ do
     esac
 done
 
+#	t) BOARD_TYPE=$OPTARG ;;             #board-type= baytrail/raspi2
 #TODO: switch case for br-board-system-config
+
+if [ $BR_BOARD_SYSTEM_CONFIG="raspi2" ]; then
+	BR_BOARD_CONFIG=raspberrypi2_defconfig
+	BR_BOARD_LINUX_CONFIG_PATH=board/raspberry/raspberry2/
+	#GRUB2_DISK_CREATOR=raspi-bootdisk.sh
+	BOOT_IMG_SCRIPT=$(pwd)/scripts/raspi-bootdisk.sh
+
+else
+	BR_BOARD_CONFIG=qemu_x86_64_defconfig
+	BR_BOARD_LINUX_CONFIG_PATH=board/qemu/x86_64/
+	#GRUB2_DISK_CREATOR=grub2-bootdisk.sh
+	BOOT_IMG_SCRIPT=$(pwd)/scripts/grub2-bootdisk.sh
+
+fi
 
 svn up > /dev/null
 BUILDNUMBER=$(LANG=en_US; svn info 2>&1 | grep "Last Changed Rev:" | sed -e 's/.* //')
@@ -44,7 +58,7 @@ BR_OUTPUT_FOLDER=$BR_OUTPUT_FOLDER/$IMAGE_VERSION
 if [ $IMAGE_ONLY = 0 ]; then
 	mkdir -p $BR_OUTPUT_FOLDER
 	cp configs/$BR_BOARD_SYSTEM_CONFIG/$BR_BOARD_CONFIG         $BR_FOLDER/configs/
-	cp configs/$BR_BOARD_SYSTEM_CONFIG/$BR_BOARD_LINUX_CONFIG   $BR_FOLDER/board/qemu/x86_64/
+	cp configs/$BR_BOARD_SYSTEM_CONFIG/$BR_BOARD_LINUX_CONFIG   $BR_FOLDER/$BR_BOARD_LINUX_CONFIG_PATH
 	cp configs/$BR_BOARD_SYSTEM_CONFIG/busybox.config           $BR_FOLDER/package/busybox/
 	#TODO: configs/$BR_BOARD_SYSTEM_CONFIG/uclibc.config        $BR_FOLDER/package/uclibc/
 	pushd .
@@ -61,11 +75,15 @@ else
 	BUILD_RESULT=0  #for image-only, just set build-result as success
 fi
 [ "$BUILD_RESULT" != "0" ] && echo "Error!!! build failed!!!!" && exit 1 
-#create bootable-usb-disk.img
-GRUB2_SCRIPT=$(pwd)/scripts/$GRUB2_DISK_CREATOR
-./scripts/sudo-grub2-bootdisk.sh $GRUB2_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 
-#create Rootfs upgrade package
-./scripts/brbox-mkuimg.sh -r $BR_OUTPUT_FOLDER/images/rootfs.tar.xz -v $BUILDNUMBER -o $BR_OUTPUT_FOLDER/images/$BRBOX_ROOT_IMG -m $BR_OUTPUT_FOLDER/host/usr/bin/brbox-mkimage
-
+if [ $BR_BOARD_SYSTEM_CONFIG="raspi2" ]; then
+	#GRUB2_SCRIPT=$(pwd)/scripts/$GRUB2_DISK_CREATOR
+	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
+else 
+	#create bootable-usb-disk.img
+	#GRUB2_SCRIPT=$(pwd)/scripts/$GRUB2_DISK_CREATOR
+	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
+	#create Rootfs upgrade package
+	./scripts/brbox-mkuimg.sh -r $BR_OUTPUT_FOLDER/images/rootfs.tar.xz -v $BUILDNUMBER -o $BR_OUTPUT_FOLDER/images/$BRBOX_ROOT_IMG -m $BR_OUTPUT_FOLDER/host/usr/bin/brbox-mkimage
+fi
 

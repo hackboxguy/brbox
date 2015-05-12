@@ -16,7 +16,7 @@ USRDAT_LABEL=USRDAT #userdata
 #FSSIZE=28M
 BR_OUTPUT_FOLDER=/mnt/buildramdisk/x86
 SUDO=
-#IMAGE_VERSION=01.00.12345
+IMAGE_VERSION=01.00.12345
 OUTPUT_DISK=0 #bootable-usb-disk.img
 #UIMG_DISK=0
 GRUB_MENU_ENTRY1='brbox1'
@@ -24,10 +24,11 @@ GRUB_MENU_ENTRY2='brbox2'
 GRUB2_TIMEOUT=1
 ROOTDELAY=5
 ###########################################################
-while getopts o:i: f
+while getopts o:v:i: f
 do
     case $f in
 	o) BR_OUTPUT_FOLDER=$OPTARG;;  #buildroot output folder
+	v) IMAGE_VERSION=$OPTARG ;;    #image version
 	i) OUTPUT_DISK=$OPTARG ;;      #path of the complete usb bootable disk
     esac
 done
