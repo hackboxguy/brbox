@@ -1,0 +1,1 @@
+logo.nologo ro root=/dev/mmcblk0p2 rootwait

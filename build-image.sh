@@ -39,7 +39,6 @@ if [ $BR_BOARD_SYSTEM_CONFIG="raspi2" ]; then
 	BR_BOARD_LINUX_CONFIG_PATH=board/raspberrypi2/
 	#GRUB2_DISK_CREATOR=raspi-bootdisk.sh
 	BOOT_IMG_SCRIPT=$(pwd)/scripts/raspi-bootdisk.sh
-
 else
 	BR_BOARD_CONFIG=qemu_x86_64_defconfig
 	BR_BOARD_LINUX_CONFIG_PATH=board/qemu/x86_64/
@@ -84,6 +83,7 @@ else
 	#GRUB2_SCRIPT=$(pwd)/scripts/$GRUB2_DISK_CREATOR
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 	#create Rootfs upgrade package
-	./scripts/brbox-mkuimg.sh -r $BR_OUTPUT_FOLDER/images/rootfs.tar.xz -v $BUILDNUMBER -o $BR_OUTPUT_FOLDER/images/$BRBOX_ROOT_IMG -m $BR_OUTPUT_FOLDER/host/usr/bin/brbox-mkimage
 fi
+
+./scripts/brbox-mkuimg.sh -r $BR_OUTPUT_FOLDER/images/rootfs.tar.xz -v $BUILDNUMBER -o $BR_OUTPUT_FOLDER/images/$BRBOX_ROOT_IMG -m $BR_OUTPUT_FOLDER/host/usr/bin/brbox-mkimage
 
