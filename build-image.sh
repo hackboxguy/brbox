@@ -34,7 +34,7 @@ done
 #	t) BOARD_TYPE=$OPTARG ;;             #board-type= baytrail/raspi2
 #TODO: switch case for br-board-system-config
 
-if [ $BR_BOARD_SYSTEM_CONFIG="raspi2" ]; then
+if [ $BR_BOARD_SYSTEM_CONFIG = "raspi2" ]; then
 	BR_BOARD_CONFIG=raspberrypi2_defconfig
 	BR_BOARD_LINUX_CONFIG_PATH=board/raspberrypi2/
 	#GRUB2_DISK_CREATOR=raspi-bootdisk.sh
