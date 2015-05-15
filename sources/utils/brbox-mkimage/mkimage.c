@@ -897,11 +897,11 @@ copy_file (int ifd, const char *datafile, int pad)
 	(void) munmap((void *)ptr, sbuf.st_size);
 	(void) close (dfd);
 }
-#include "BuildNumber.h"
+#include "SrcControlVersion.h"
 void
 usage ()
 {
-	fprintf (stderr, "%s build-version: %d\n",cmdname,MKIMG_BUILD_NUMBER);
+	fprintf (stderr, "%s build-version: %d\n",cmdname,SRC_CONTROL_VERSION);//MKIMG_BUILD_NUMBER);
 
 	fprintf (stderr, "Usage: %s -l image\n"
 			 "          -l ==> list image header information\n"

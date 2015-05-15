@@ -34,10 +34,10 @@ mkimage:	$(SOURCES) $(HEADERS)
 
 .PHONY: version
 version:
-	@echo -n "#define MKIMG_BUILD_NUMBER " > BuildNumber.h
-	svn info | grep "Revision:" | sed -e 's/.* //' >> BuildNumber.h
+	@echo -n "#define SRC_CONTROL_VERSION " > SrcControlVersion.h
+	svn info | grep "Revision:" | sed -e 's/.* //' >> SrcControlVersion.h
 
 clean:
-	rm -f BuildNumber.h
+	rm -f SrcControlVersion.h
 	rm -f brbox-mkimage
 
