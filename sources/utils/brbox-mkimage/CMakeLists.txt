@@ -20,13 +20,15 @@ set(CMAKE_EXE_LINKER_FLAGS -static)
 install(TARGETS ${COMPONENT_NAME} DESTINATION bin)
 
 #automatically include svn revision to a headerfile which will be included in this component
-find_package(Subversion REQUIRED)
-if(SUBVERSION_FOUND)
-  Subversion_WC_INFO(${PROJECT_SOURCE_DIR} Project)
-  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SrcControlVersion.h "#define SRC_CONTROL_VERSION ${Project_WC_LAST_CHANGED_REV}\n")
-else()
-	message( FATAL_ERROR "unable to read sub-version Revision number, this is needed for embedding into this component" )
-endif()
+#find_package(Subversion REQUIRED)
+#if(SUBVERSION_FOUND)
+#  Subversion_WC_INFO(${PROJECT_SOURCE_DIR} Project)
+#  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SrcControlVersion.h "#define SRC_CONTROL_VERSION ${Project_WC_LAST_CHANGED_REV}\n")
+#else()
+#	message( FATAL_ERROR "unable to read sub-version Revision number, this is needed for embedding into this component" )
+#endif()
+
+FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SrcControlVersion.h "#define SRC_CONTROL_VERSION 0001\n")
 
 #for cross compiling
 #cmake -H. -BOutput -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain-arm-backup.cmake -DCMAKE_INSTALL_PREFIX=/home/user/tmp/
