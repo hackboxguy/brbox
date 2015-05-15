@@ -17,7 +17,7 @@ set(CMAKE_CXX_COMPILER g++)
 set(CMAKE_CXX_FLAGS -m32)
 set(CMAKE_EXE_LINKER_FLAGS -static)
 
-install(TARGETS ${COMPONENT_NAME} DESTINATION bin)
+install(TARGETS ${COMPONENT_NAME} DESTINATION sbin)
 
 #automatically include svn revision to a headerfile which will be included in this component
 #find_package(Subversion REQUIRED)

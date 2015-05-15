@@ -85,5 +85,5 @@ else
 	#create Rootfs upgrade package
 fi
 
-./scripts/brbox-mkuimg.sh -r $BR_OUTPUT_FOLDER/images/rootfs.tar.xz -v $BUILDNUMBER -o $BR_OUTPUT_FOLDER/images/$BRBOX_ROOT_IMG -m $BR_OUTPUT_FOLDER/host/usr/bin/brbox-mkimage
+./scripts/brbox-mkuimg.sh -r $BR_OUTPUT_FOLDER/images/rootfs.tar.xz -v $BUILDNUMBER -o $BR_OUTPUT_FOLDER/images/$BRBOX_ROOT_IMG -m $BR_OUTPUT_FOLDER/host/usr/sbin/brbox-mkimage
 
