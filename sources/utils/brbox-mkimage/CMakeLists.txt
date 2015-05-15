@@ -3,19 +3,21 @@ set(COMPONENT_NAME brbox-mkimage)  #set the name of the binary
 
 
 project(${COMPONENT_NAME})
+set(MKIMG_HOST_BUILD OFF CACHE BOOL OFF) #by default switch-off local-x86 host build
 file(GLOB SOURCES "*.c")
+# for local x86 host, build as 32bit binary
+if(${MKIMG_HOST_BUILD})
+	set(CMAKE_C_COMPILER gcc)
+	set(CMAKE_C_FLAGS -m32)
+	set(CMAKE_CXX_COMPILER g++)
+	set(CMAKE_CXX_FLAGS -m32)
+endif()
+set(CMAKE_EXE_LINKER_FLAGS -static)
+
 # Add #include path of all dependent components
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_executable(${COMPONENT_NAME} ${SOURCES})
 add_definitions( -DUSE_HOSTCC )
-
-
-# which compilers to use for C and C++
-set(CMAKE_C_COMPILER gcc)
-set(CMAKE_C_FLAGS -m32)
-set(CMAKE_CXX_COMPILER g++)
-set(CMAKE_CXX_FLAGS -m32)
-set(CMAKE_EXE_LINKER_FLAGS -static)
 
 install(TARGETS ${COMPONENT_NAME} DESTINATION sbin)
 
