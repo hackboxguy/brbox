@@ -84,7 +84,7 @@ else
 fi
 [ "$BUILD_RESULT" != "0" ] && echo "Error!!! build failed!!!!" && exit 1 
 
-if [ $BR_BOARD_SYSTEM_CONFIG="raspi2" ]; then
+if [ $BR_BOARD_SYSTEM_CONFIG = "raspi2" ]; then
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 	ROOTFS_TYPE=$ROOTFS_TYPE_RP2
 else 
