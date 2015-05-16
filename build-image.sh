@@ -18,6 +18,15 @@ BRBOX_ROOT_IMG=uBrBoxRoot.uimg
 
 IMAGE_ONLY=0
 PREPARE_ONLY=0
+
+#root-fs types for differenet h/w (taken from brbox-mkimage/image.h)
+ROOTFS_TYPE_BTR="BrBoxRtBtr"
+ROOTFS_TYPE_RP1="BrBoxRtRp1"
+ROOTFS_TYPE_RP2="BrBoxRtRp2"
+ROOTFS_TYPE_BBB="BrBoxRtBbb"
+ROOTFS_TYPE_WDB="BrBoxRtWdb"
+
+#$BR_BOARD_SYSTEM_CONFIG : baytrail/raspi2
 ###############################################################################
 while getopts b:o:v:c:s:ip f
 do
@@ -76,14 +85,14 @@ fi
 [ "$BUILD_RESULT" != "0" ] && echo "Error!!! build failed!!!!" && exit 1 
 
 if [ $BR_BOARD_SYSTEM_CONFIG="raspi2" ]; then
-	#GRUB2_SCRIPT=$(pwd)/scripts/$GRUB2_DISK_CREATOR
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
+	ROOTFS_TYPE=$ROOTFS_TYPE_RP2
 else 
-	#create bootable-usb-disk.img
-	#GRUB2_SCRIPT=$(pwd)/scripts/$GRUB2_DISK_CREATOR
+	#baytrail
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 	#create Rootfs upgrade package
+	ROOTFS_TYPE=$ROOTFS_TYPE_BTR
 fi
 
-./scripts/brbox-mkuimg.sh -r $BR_OUTPUT_FOLDER/images/rootfs.tar.xz -v $BUILDNUMBER -o $BR_OUTPUT_FOLDER/images/$BRBOX_ROOT_IMG -m $BR_OUTPUT_FOLDER/host/usr/sbin/brbox-mkimage
+./scripts/brbox-mkuimg.sh -r $BR_OUTPUT_FOLDER/images/rootfs.tar.xz -v $BUILDNUMBER -o $BR_OUTPUT_FOLDER/images/$BRBOX_ROOT_IMG -m $BR_OUTPUT_FOLDER/host/usr/sbin/brbox-mkimage -t $ROOTFS_TYPE
 

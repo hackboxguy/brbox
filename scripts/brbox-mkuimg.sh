@@ -2,11 +2,11 @@
 #brbox upgrade-package creator based on mkimage tool
 MKIMAGE=./brbox-mkimage
 BRBOX_PROJ="BrBoxProj"    #complete project including all sub-modules
-BRBOX_ROOT="BrBoxRoot"    #rootfs
+BRBOX_ROOT="BrBoxRtBtr"   #rootfs-baytrail
 BRBOX_STTNG="BrBoxSttng"  #settings partition
 BRBOX_USRDAT="BrBoxUsrDt" #user-data partition 
 USAGE="script for generating BrBox binary update packages"
-USAGE1="usage:./$0 -r <rootfs.tar.xz> -v <version.xx.yy> -m <mkimage_tool_path>"
+USAGE1="usage:./$0 -r <rootfs.tar.xz> -v <version.xx.yy> -m <mkimage_tool_path> -t <rootfs_type>"
 ROOTFS_FILE="rootfs.tar.xz"
 VERSION="00.01"
 OUT_FILE=./uOutFile.uimg
@@ -36,13 +36,14 @@ if [ $# -lt 1  ]; then
 	exit $ERR_ARGC
 fi
 ##############parse the arguments##############################################
-while getopts r:v:o:m: f
+while getopts r:v:o:m:t: f
 do
     case $f in
 	m) MKIMAGE=$OPTARG ;;     #mkimage binary path
 	r) ROOTFS_FILE=$OPTARG ;;
 	v) VERSION=$OPTARG ;;
 	o) OUT_FILE=$OPTARG ;;
+	t) BRBOX_ROOT=$OPTARG;;
     esac
 done
 

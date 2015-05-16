@@ -126,14 +126,24 @@
 #define IH_TYPE_UBOOT		8
 
 #define IH_TYPE_BRBOX_PROJ	9
-#define IH_TYPE_BRBOX_ROOT	10
-#define IH_TYPE_BRBOX_STTNG	11
-#define IH_TYPE_BRBOX_USRDAT    12
+#define IH_TYPE_BRBOX_STTNG	10
+#define IH_TYPE_BRBOX_USRDAT    11
+#define IH_TYPE_BRBOX_ROOT_BTR	12 //baytrail
+#define IH_TYPE_BRBOX_ROOT_RP1	13 //raspi1
+#define IH_TYPE_BRBOX_ROOT_RP2	14 //raspi2
+#define IH_TYPE_BRBOX_ROOT_BBB	15 //beaglebone black
+#define IH_TYPE_BRBOX_ROOT_WDB	16 //wandboard
 
 #define STR_TYPE_BRBOX_PROJ	  "BrBoxProj"  //complete project including all sub-modules
-#define STR_TYPE_BRBOX_ROOT	  "BrBoxRoot"  //root-fs
 #define STR_TYPE_BRBOX_STTNG	  "BrBoxSttng" //settings partition
 #define STR_TYPE_BRBOX_USRDAT	  "BrBoxUsrDt" //user-data partition 
+#define STR_TYPE_BRBOX_ROOT_BTR	  "BrBoxRtBtr" //root-fs bay-trail
+#define STR_TYPE_BRBOX_ROOT_RP1	  "BrBoxRtRp1" //root-fs raspi1
+#define STR_TYPE_BRBOX_ROOT_RP2	  "BrBoxRtRp2" //root-fs raspi2
+#define STR_TYPE_BRBOX_ROOT_BBB	  "BrBoxRtBbb" //root-fs beagle-bone-black
+#define STR_TYPE_BRBOX_ROOT_WDB	  "BrBoxRtWdb" //root-fs wandboard
+
+
 
 
 

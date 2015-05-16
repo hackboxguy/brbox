@@ -17,9 +17,9 @@ MULTI_MK_NOK="multi_mk_nok"
 SINGL_BINARY="singl_binary"
 
 BRBOX_PROJ="BrBoxProj"    #complete project including all sub-modules
-BRBOX_ROOT="BrBoxRoot"    #rootfs
 BRBOX_STTNG="BrBoxSttng"  #settings partition
 BRBOX_USRDAT="BrBoxUsrDt" #user-data partition 
+BRBOX_ROOT="BrBoxRtBtr"   #rootfs-baytrail
 
 GLOBAL_VAR_TOTAL_FILES=0
 ###############################################################################

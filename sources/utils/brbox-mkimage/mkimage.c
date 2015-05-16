@@ -133,10 +133,15 @@ table_entry_t type_name[] =
     {	IH_TYPE_SCRIPT,     "script",	  "Script",		},
     {	IH_TYPE_STANDALONE, "standalone",           "Standalone Program", },
     {	IH_TYPE_UBOOT,	    "uboot", 	  "U-Boot Image", 	},
-    {	IH_TYPE_BRBOX_PROJ,  STR_TYPE_BRBOX_PROJ,  "BrBox Proj Image",},//whole BrBox project file
-    {	IH_TYPE_BRBOX_ROOT,  STR_TYPE_BRBOX_ROOT,  "BrBox Root Image",},
-    {	IH_TYPE_BRBOX_STTNG, STR_TYPE_BRBOX_STTNG, "BrBox Settng Image",},
-    {	IH_TYPE_BRBOX_USRDAT,STR_TYPE_BRBOX_USRDAT,"BrBox UsrDat Image",},
+    {	IH_TYPE_BRBOX_PROJ,      STR_TYPE_BRBOX_PROJ,     "BrBox Proj Image",},//whole BrBox project file
+    {	IH_TYPE_BRBOX_STTNG,     STR_TYPE_BRBOX_STTNG,    "BrBox Settng Image",},
+    {	IH_TYPE_BRBOX_USRDAT,    STR_TYPE_BRBOX_USRDAT,   "BrBox UsrDat Image",},
+    {	IH_TYPE_BRBOX_ROOT_BTR,  STR_TYPE_BRBOX_ROOT_BTR, "BrBox RfsBtr Image",},
+    {	IH_TYPE_BRBOX_ROOT_RP1,  STR_TYPE_BRBOX_ROOT_RP1, "BrBox RfsRp1 Image",},
+    {	IH_TYPE_BRBOX_ROOT_RP2,  STR_TYPE_BRBOX_ROOT_RP2, "BrBox RfsRp2 Image",},
+    {	IH_TYPE_BRBOX_ROOT_BBB,  STR_TYPE_BRBOX_ROOT_BBB, "BrBox RfsBbb Image",},
+     {	IH_TYPE_BRBOX_ROOT_WDB,  STR_TYPE_BRBOX_ROOT_WDB, "BrBox RfsWdb Image",},
+
     {	-1,		    "",		  "",			},
 };
 
@@ -1485,12 +1490,20 @@ unsigned char get_image_type(char *image_name)
 		return IH_TYPE_RAMDISK;
 	else if(strcmp(image_name,STR_TYPE_BRBOX_PROJ) == 0 )
 		return IH_TYPE_BRBOX_PROJ;
-	else if(strcmp(image_name,STR_TYPE_BRBOX_ROOT) == 0 )
-		return IH_TYPE_BRBOX_ROOT;
 	else if(strcmp(image_name,STR_TYPE_BRBOX_STTNG) == 0 )
 		return IH_TYPE_BRBOX_STTNG;
 	else if(strcmp(image_name,STR_TYPE_BRBOX_USRDAT) == 0 )
 		return IH_TYPE_BRBOX_USRDAT;
+	else if(strcmp(image_name,STR_TYPE_BRBOX_ROOT_BTR) == 0 )
+		return IH_TYPE_BRBOX_ROOT_BTR;
+	else if(strcmp(image_name,STR_TYPE_BRBOX_ROOT_RP1) == 0 )
+		return IH_TYPE_BRBOX_ROOT_RP1;
+	else if(strcmp(image_name,STR_TYPE_BRBOX_ROOT_RP2) == 0 )
+		return IH_TYPE_BRBOX_ROOT_RP2;
+	else if(strcmp(image_name,STR_TYPE_BRBOX_ROOT_BBB) == 0 )
+		return IH_TYPE_BRBOX_ROOT_BBB;
+	else if(strcmp(image_name,STR_TYPE_BRBOX_ROOT_WDB) == 0 )
+		return IH_TYPE_BRBOX_ROOT_WDB;
 	else
 		return IH_TYPE_INVALID;
 }
