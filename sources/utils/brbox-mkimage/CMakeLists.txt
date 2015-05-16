@@ -3,7 +3,7 @@ set(COMPONENT_NAME brbox-mkimage)  #set the name of the binary
 
 
 project(${COMPONENT_NAME})
-set(MKIMG_HOST_BUILD OFF CACHE BOOL OFF) #by default switch-off local-x86 host build
+set(MKIMG_HOST_BUILD ON CACHE BOOL ON) #by default switch-off local-x86 host build
 file(GLOB SOURCES "*.c")
 # for local x86 host, build as 32bit binary
 if(${MKIMG_HOST_BUILD})
