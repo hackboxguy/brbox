@@ -1,8 +1,10 @@
 #this cmake is only used for installing installing scripts to target)
 cmake_minimum_required(VERSION 2.8.9)
 #set(COMPONENT_NAME baytrail-upd)    #set the name of the binary
-set(BRDS_SCR baytrail-brdskmgr)     #script to be copied to target
-set(UPDT_SCR baytrail-update)       #script to be copied to target
+set(BRDISKNAME brdskmgr)           #generic script name for all h/w
+set(UPDATENAME update)             #generic script name for all h/w
+set(BRDS_SCR baytrail-brdskmgr)  #script to be copied to target
+set(UPDT_SCR baytrail-update)    #script to be copied to target
 
 #project(${COMPONENT_NAME})
 #file(GLOB SOURCES "*.c")
@@ -13,6 +15,12 @@ set(UPDT_SCR baytrail-update)       #script to be copied to target
 
 file(GLOB  INSTALLFILES ${BRDS_SCR} ${UPDT_SCR})
 install(PROGRAMS ${INSTALLFILES} DESTINATION sbin)
+if(CMAKE_HOST_UNIX)
+install(CODE "EXECUTE_PROCESS(WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/sbin COMMAND ln -sf ${BRDS_SCR} ${BRDISKNAME})")
+install(CODE "EXECUTE_PROCESS(WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/sbin COMMAND ln -sf ${UPDT_SCR} ${UPDATENAME})")
+endif(CMAKE_HOST_UNIX)
+#MESSAGE( STATUS "OUTPUT_INSTALL_DIR: " ${CMAKE_INSTALL_PREFIX}/sbin )
+
 
 #for cross compiling
 #cmake -H. -BOutput -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain-arm-backup.cmake -DCMAKE_INSTALL_PREFIX=/home/user/tmp/
