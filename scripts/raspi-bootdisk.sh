@@ -63,7 +63,10 @@ sudo parted -s $LOOPDEVICE unit cyl mkpart primary fat32 -- 0 2
 sudo parted -s $LOOPDEVICE set 1 boot on  
 sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 2 12  
 sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 12 22  
-sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 22 -2  
+
+sudo parted -s $LOOPDEVICE unit cyl mkpart extended -- 22 -2  
+sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 22 28  
+sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 28 -2  
 #TODO: create userData partition as secondary
 printf "Formating boot partition ................................ "
     $SUDO mkfs.vfat -n boot "${LOOPDEVICE}p1" 1>/dev/null 2>/dev/null
@@ -77,9 +80,11 @@ printf "Formating root2 partition ............................... "
     $SUDO mkfs.ext3 -L $ROOT2_LABEL "${LOOPDEVICE}p3" 1>/dev/null 2>/dev/null
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
+#note: /dev/loop0p4 is allocated to extended partition
 printf "Formating settings partition ............................ "
-    $SUDO mkfs.ext3 -L $STTNG_LABEL "${LOOPDEVICE}p4" 1>/dev/null 2>/dev/null
+    $SUDO mkfs.ext3 -L $STTNG_LABEL "${LOOPDEVICE}p5" 1>/dev/null 2>/dev/null
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
+#note: /dev/loop0p6 is allocated to userdata partition
 
 printf "Mounting loopdevice boot partition ...................... "
     $SUDO mount "${LOOPDEVICE}p1" "$BOOTMOUNTPOINT"
