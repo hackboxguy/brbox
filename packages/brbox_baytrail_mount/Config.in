@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BRBOX_BAYTRAIL_MOUNT
+	bool "Settings partition mount startup-script for baytrail based target"
+	default n
+	depends on BR2_TARGET_BRBOX_PACKAGES
+	help
+	  provides mounting of settings partition on startup for baytrail based boards.
+
