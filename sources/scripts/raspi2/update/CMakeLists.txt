@@ -5,7 +5,7 @@ set(BRDISKNAME brdskmgr)           #generic script name for all h/w
 set(UPDATENAME update)             #generic script name for all h/w
 set(BRDS_SCR raspi2-brdskmgr)      #script to be copied to target
 set(UPDT_SCR raspi2-update)        #script to be copied to target
-set(FSTABFILE S02MountSettings)    #/etc/fstab file
+#set(FSTABFILE S02MountSettings)    #/etc/fstab file
 
 #project(${COMPONENT_NAME})
 #file(GLOB SOURCES "*.c")
@@ -21,7 +21,7 @@ install(CODE "EXECUTE_PROCESS(WORKING_DIRECTORY \$ENV{TARGET_DIR}\${CMAKE_INSTAL
 install(CODE "EXECUTE_PROCESS(WORKING_DIRECTORY \$ENV{TARGET_DIR}\${CMAKE_INSTALL_PREFIX}/sbin COMMAND ln -sf ${UPDT_SCR} ${UPDATENAME})")
 endif(CMAKE_HOST_UNIX)
 #install(PROGRAMS ${FSTABFILE} DESTINATION etc/init.d/) #copy /etc/fstab file
-install(PROGRAMS ${FSTABFILE} DESTINATION ../etc/init.d/) #copy /etc/fstab file
+#install(PROGRAMS ${FSTABFILE} DESTINATION ../etc/init.d/) #copy /etc/fstab file
 
 #MESSAGE( STATUS "OUTPUT_INSTALL_DIR: " ${CMAKE_INSTALL_PREFIX}/sbin )
 #DESTDIR
