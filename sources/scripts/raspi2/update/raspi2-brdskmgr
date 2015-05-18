@@ -8,8 +8,8 @@ VERSION_FILE_PATH=/boot/version-num.txt
 SHOW_BKBOOT_VERSION=0
 ONE_BRBOX_NAME=brbox1 #name of the first brbox system
 TWO_BRBOX_NAME=brbox2 #name of the second brbox system
-ONE_BRBOX_PART=sda2 #partition
-TWO_BRBOX_PART=sda3 #partition
+ONE_BRBOX_PART=mmcblk0p2 #sda2 #partition
+TWO_BRBOX_PART=mmcblk0p3 #sda3 #partition
 #USAGE="script for generating single niro binary from multiple niro fmw"
 USAGE="usage:$0 -c[show_current_booted_system   ] -v[show_version_of_current_system]"
 USAGE1="usage:$0 -b[show_version_of_other_system] -f[flip_boot_marker_flag]"
@@ -17,13 +17,15 @@ USAGE1="usage:$0 -b[show_version_of_other_system] -f[flip_boot_marker_flag]"
 ###############################################################
 ReadBootSystem()
 {
-	RESULT=$(cat /proc/cmdline | grep brboxsystem )
+	RESULT=$(cat /proc/cmdline | grep "root=" )
 	if [ $? != "0" ]; then
 		return 1
 	fi
-	RESULT=$(echo $RESULT | grep -o "brboxsystem=.*" | awk '{print $1}' | sed 's/brboxsystem=//')
-	echo $RESULT
-	return 0
+	RESULT=$(echo $RESULT | grep -o "root=.*" | awk '{print $1}' | sed 's/root=.dev.//')
+	[ "$RESULT" =  "$ONE_BRBOX_PART" ] && echo $ONE_BRBOX_NAME && return 0
+	[ "$RESULT" =  "$TWO_BRBOX_PART" ] && echo $TWO_BRBOX_NAME && return 0
+	echo "unknown" #$RESULT
+	return 1
 }
 #cat /boot/grub/grub.cfg |grep "set default="
 ReadBootMarker() #$1=path of grubcfg file
@@ -127,53 +129,33 @@ FlipBootMarker()
 	if [ $? != "0" ]; then #unable to read current boot system
 		return 1
 	fi
-	if [ "$CUR_BOOT" = "$ONE_BRBOX_NAME" ]; then
-		BOOT_MARKER=$(ReadBootMarker $GRUBCFG_FILE_PATH)
-		if [ $? != "0" ]; then #unable to read boot marker
-			return 1
-		fi
-		if [ $BOOT_MARKER = 0 ];then #flipping is not done, so do it
-			#mount second system for reading its partuuid to be included in grub.cfg of first system
-			#MOUNT_DIR=$(MountDevice /dev/$TWO_BRBOX_PART)
-			#if [ $? != "0" ]; then #unable mount second system, filesystem might be fresh or corrupt
-			#	return 1
-			#fi
-			WriteBootMarker $GRUBCFG_FILE_PATH 1 #$MOUNT_DIR/$UUID_FILE_PATH
-			RESULT=$?
-			sync
-			#umount /dev/$TWO_BRBOX_PART
-			#sync
-			#rm -r $MOUNT_DIR
-			return $RESULT
-		else
-			return 0 #already boot-marker is flipped,no action needed	
-		fi		
-	elif [ "$CUR_BOOT" = "$TWO_BRBOX_NAME" ]; then #mount first partition coz, boot marker resides in first partition
-		MOUNT_DIR=$(MountDevice /dev/$ONE_BRBOX_PART)
-		if [ $? != "0" ]; then #unable mount first system, filesystem might be fresh or corrupt
-			return 1
-		fi
-		BOOT_MARKER=$(ReadBootMarker $MOUNT_DIR/$GRUBCFG_FILE_PATH)
-		if [ $? != "0" ]; then #unable to read boot marker
-			umount /dev/$ONE_BRBOX_PART
-			sync
-			rm -r $MOUNT_DIR
-			return 1
-		fi
-		if [ $BOOT_MARKER = 1 ];then #flipping is not done, so do it
-			WriteBootMarker $MOUNT_DIR/$GRUBCFG_FILE_PATH 0 #$MOUNT_DIR/$UUID_FILE_PATH
-			RESULT=$?
-			sync
-		else
-			RESULT=0 #already boot-marker is flipped,no action needed
-		fi
-		umount /dev/$ONE_BRBOX_PART
-		sync
-		rm -r $MOUNT_DIR
-		return $RESULT	
-	else
+
+	BOOT_MARKER=$(ReadBootMarker)
+	if [ $? != "0" ]; then #unable to read boot marker
 		return 1
 	fi
+
+	if [ "$BOOT_MARKER" != "$CUR_BOOT" ]; then
+		return 0 #already boot-marker is flipped,no action needed	
+	fi
+
+	#if 1, then flip to 2
+	if [ "$BOOT_MARKER" = "$ONE_BRBOX_NAME" ]; then
+		WriteBootMarker $TWO_BRBOX_NAME
+		RESULT=$?
+		sync
+		return $RESULT
+	fi	
+	
+	#if 2, then flip to 1
+	if [ "$BOOT_MARKER" = "$TWO_BRBOX_NAME" ]; then
+		WriteBootMarker $ONE_BRBOX_NAME
+		RESULT=$?
+		sync
+		return $RESULT
+	fi	
+
+	return 1
 }
 ###############################################################
 if [ $# -lt 1  ]; then 
@@ -195,7 +177,7 @@ done
 [ $SHOW_BOOT_SYSTEM = 1    ] && { ReadBootSystem; return $?; }
 [ $SHOW_BOOT_VERSION = 1   ] && { ReadBootVersion $VERSION_FILE_PATH; return $?; }
 [ $SHOW_BKBOOT_VERSION = 1 ] && { ReadBkBootVersion; return $?; }
-[ $FLIP_BOOT_MARKER = 1    ] && { FlipBootMarker; return $?; }
+#[ $FLIP_BOOT_MARKER = 1    ] && { FlipBootMarker; return $?; }
 
 
 
