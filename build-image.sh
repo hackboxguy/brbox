@@ -42,16 +42,17 @@ done
 
 #	t) BOARD_TYPE=$OPTARG ;;             #board-type= baytrail/raspi2
 #TODO: switch case for br-board-system-config
-
-if [ $BR_BOARD_SYSTEM_CONFIG = "raspi2" ]; then
+if [ $BR_BOARD_SYSTEM_CONFIG = "raspi" ]; then
+	BR_BOARD_CONFIG=raspberrypi_defconfig
+	BR_BOARD_LINUX_CONFIG_PATH=board/raspberrypi/
+	BOOT_IMG_SCRIPT=$(pwd)/scripts/raspi-bootdisk.sh
+elif [ $BR_BOARD_SYSTEM_CONFIG = "raspi2" ]; then
 	BR_BOARD_CONFIG=raspberrypi2_defconfig
 	BR_BOARD_LINUX_CONFIG_PATH=board/raspberrypi2/
-	#GRUB2_DISK_CREATOR=raspi-bootdisk.sh
 	BOOT_IMG_SCRIPT=$(pwd)/scripts/raspi-bootdisk.sh
 else
 	BR_BOARD_CONFIG=qemu_x86_64_defconfig
 	BR_BOARD_LINUX_CONFIG_PATH=board/qemu/x86_64/
-	#GRUB2_DISK_CREATOR=grub2-bootdisk.sh
 	BOOT_IMG_SCRIPT=$(pwd)/scripts/grub2-bootdisk.sh
 
 fi
@@ -84,7 +85,10 @@ else
 fi
 [ "$BUILD_RESULT" != "0" ] && echo "Error!!! build failed!!!!" && exit 1 
 
-if [ $BR_BOARD_SYSTEM_CONFIG = "raspi2" ]; then
+if [ $BR_BOARD_SYSTEM_CONFIG = "raspi" ]; then
+	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
+	ROOTFS_TYPE=$ROOTFS_TYPE_RP1
+elif [ $BR_BOARD_SYSTEM_CONFIG = "raspi2" ]; then
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 	ROOTFS_TYPE=$ROOTFS_TYPE_RP2
 else 
