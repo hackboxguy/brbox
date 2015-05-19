@@ -20,7 +20,10 @@ SINGL_BINARY="singl_binary"
 BRBOX_PROJ="BrBoxProj"    #complete project including all sub-modules
 BRBOX_STTNG="BrBoxSttng"  #settings partition
 BRBOX_USRDAT="BrBoxUsrDt" #user-data partition 
-BRBOX_ROOT="BrBoxRtRp2"    #rootfs
+BRBOX_ROOT_RP1="BrBoxRtRp1"    #rootfs
+BRBOX_ROOT_RP2="BrBoxRtRp2"    #rootfs
+BOARD_TYPE_RP1="raspi1"
+BOARD_TYPE_RP2="raspi2"
 
 GLOBAL_VAR_TOTAL_FILES=0
 ###############################################################################
@@ -32,6 +35,7 @@ IsItMultiMkFile() #$1=file $2=text-file-to-store-mkimage-header-text
 	[ $? != "0" ] && return 1 #Mk-file, but not a Multi-Mk-File
 	return 0 #this is a Multi-Mk-file
 }
+###############################################################################
 IsItSingleMkFile() #$1=file $2=text-file-to-store-mkimage-header-text
 {
 	$MKIMAGE -h 1 $1 2>$2 
@@ -40,6 +44,7 @@ IsItSingleMkFile() #$1=file $2=text-file-to-store-mkimage-header-text
 	[ $? = "0" ] && return 1 #this is a Multi-MK-File
 	return 0 #this is a Single-MK-file
 }
+###############################################################################
 CheckFileType() #$1=file $2=text-file-to-store-mkimage-header-text
 {
 	GLOBAL_VAR_TOTAL_FILES=0
@@ -67,6 +72,7 @@ CheckFileType() #$1=file $2=text-file-to-store-mkimage-header-text
 	fi
 	return 0
 }
+###############################################################################
 GetImageType() #$-input-file
 {
 	IMGNAME=$($MKIMAGE -l $1 2>&1 | grep "Image Name:")
@@ -76,12 +82,22 @@ GetImageType() #$-input-file
 	echo $IMGNAME
 	return 0
 }
+###############################################################################
 ProcessImageType() #$1-inputfile $2=IMGTYPE $3=outputfile
 {
 	#BRBOX_PROJ="BrBoxProj"    #complete project including all sub-modules
 	#BRBOX_ROOT="BrBoxRoot"    #rootfs
 	#BRBOX_STTNG="BrBoxSttng"  #settings partition
 	#BRBOX_USRDAT="BrBoxUsrDt" #user-data partition 
+
+	BOARD_TYPE=$($BRDSKMGR_TOOL -t)
+	[ $? != 0 ] && { echo "Error: Unable to read board type!!!"; return 1; }
+
+	BRBOX_ROOT="unknown"
+
+	[ "$BOARD_TYPE" = "$BOARD_TYPE_RP1" ]  && BRBOX_ROOT=$BRBOX_ROOT_RP1
+	[ "$BOARD_TYPE" = "$BOARD_TYPE_RP2" ]  && BRBOX_ROOT=$BRBOX_ROOT_RP2
+
 	if [ "$2" = "$BRBOX_ROOT" ]; then
 		dd if=$1 bs=64 skip=1 of=$3 1>/dev/null 2>/dev/null #just strip 64byte mkheader and create rootfs.tar.xz
 		return $?
@@ -89,7 +105,7 @@ ProcessImageType() #$1-inputfile $2=IMGTYPE $3=outputfile
 		return 1
 	fi
 }
-
+###############################################################################
 ProcessUpdate() #$1=input-update-file $2-output-file(if-applicable)
 {
 	TMPFILE=$(mktemp)
