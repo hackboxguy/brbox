@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BRBOX_SYSMGR
+	bool "System-Manager-Service"
+	default y
+	select BR2_PACKAGE_BRBOX_LIBADCMNOLD
+	help
+	  system manager service for supporting various system features via rpc
+

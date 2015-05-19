@@ -21,7 +21,10 @@ config BR2_TARGET_BRBOX_COMMON
 
 if BR2_TARGET_BRBOX_COMMON
 menu "Common packages"
+source "package/brbox/brbox_libAdSttngs/Config.in"
+source "package/brbox/brbox_libAdCmnOld/Config.in"
 source "package/brbox/brbox_mkimage/Config.in"
+source "package/brbox/brbox_sysmgr/Config.in"
 endmenu
 endif
 
@@ -30,8 +33,6 @@ source "package/brbox/brbox_baytrail_update/Config.in"
 source "package/brbox/brbox_baytrail_mount/Config.in"
 source "package/brbox/brbox_raspi2_update/Config.in"
 source "package/brbox/brbox_raspi2_mount/Config.in"
-source "package/brbox/brbox_libAdSttngs/Config.in"
-source "package/brbox/brbox_libAdCmn/Config.in"
-
+#source "package/brbox/brbox_libAdCmn/Config.in"
 
 endmenu

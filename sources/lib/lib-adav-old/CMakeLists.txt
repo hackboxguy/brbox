@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 2.8.9)
 set(ADCMN_LIBNAME AdCmn)
 #set the path of dependent library here
 set(LIBADSTTNG_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../lib-settings/include")
+set(AUTO_SVN_VERSION    ON CACHE BOOL ON)  #by default include svn revision numbers
+#set(INSTALL_MY_HEADERS  ON CACHE BOOL ON)  #by default install header files to target-install-directory
 
 
 #set the version of the library here
@@ -30,8 +32,9 @@ add_library(${ADCMN_LIBNAME} SHARED ${SOURCES})
 # Use "sudo make install" to apply
 file(GLOB  INCFILES "include/*.*")
 install(TARGETS ${ADCMN_LIBNAME} DESTINATION lib)
+#if(${INSTALL_MY_HEADERS})
 install(FILES ${INCFILES} DESTINATION include)
-
+#endif()
 
 
 set_target_properties(${ADCMN_LIBNAME} PROPERTIES VERSION ${ADCMN_LIBVER_STRING}

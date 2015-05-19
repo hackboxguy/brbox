@@ -9,6 +9,8 @@ set(LIB_ADCOMMN AdCmn)      #common library
 
 
 project(${COMPONENT_NAME})
+set(AUTO_SVN_VERSION    ON CACHE BOOL ON)  #by default include svn revision numbers
+set(INSTALL_MY_HEADERS  ON CACHE BOOL ON)  #by default install header files to target-install-directory
 file(GLOB SOURCES "src/*.cpp")
 add_executable(${COMPONENT_NAME} ${SOURCES})
 set(INC_ADSTTNG  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-settings/include")
@@ -25,17 +27,21 @@ target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pth
 #install the binary and server-rpc-headers to CMAKE_INSTALL_PREFIX destination
 file(GLOB  INCFILES "${INC_SRVCOMMN}/*.*")
 install(TARGETS ${COMPONENT_NAME} DESTINATION bin)
-install(FILES ${INCFILES} DESTINATION include)
-
-
+if(${INSTALL_MY_HEADERS})
+	install(FILES ${INCFILES} DESTINATION include)
+endif()
 
 #automatically include svn revision to a headerfile which will be included in this component
-find_package(Subversion REQUIRED)
-if(SUBVERSION_FOUND)
-  Subversion_WC_INFO(${PROJECT_SOURCE_DIR} Project)
-  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SrcControlVersion.h "#define SRC_CONTROL_VERSION ${Project_WC_LAST_CHANGED_REV}\n")
+if(${AUTO_SVN_VERSION})
+	find_package(Subversion REQUIRED)
+	if(SUBVERSION_FOUND)
+	  Subversion_WC_INFO(${PROJECT_SOURCE_DIR} Project)
+	  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SrcControlVersion.h "#define SRC_CONTROL_VERSION ${Project_WC_LAST_CHANGED_REV}\n")
+	else()
+		message( FATAL_ERROR "unable to read sub-version Revision number, this is needed for embedding into this component" )
+	endif()
 else()
-	message( FATAL_ERROR "unable to read sub-version Revision number, this is needed for embedding into this component" )
+	FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SrcControlVersion.h "#define SRC_CONTROL_VERSION 0001\n")
 endif()
 
 #for cross compiling
