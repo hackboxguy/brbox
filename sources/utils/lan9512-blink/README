@@ -1,0 +1,35 @@
+Warning! There is no datasheet with informations about the configuration of LED and GPIO outputs of the 9512 chip.
+I figured out how to drive the LEDs by trial and error and by reading the source code of the smsc9512 driver.
+So there is a chance that there are side effects although I have not observed any until now.
+
+Usage:
+Call the program without parameters. A help message is shown.
+
+Raw values:
+The GPIO control register is 32 bits wide. It is easier to look at them as 8 nibbles with the most significat nibble on the left
+
+N7 N6 N5 N4 N3 N2 N1 N0
+
+from the source code we can see that N4, N5 and N6 are used to configure the LEDs
+Writing a 1 into this nibble means that the LEDs are used as status display.
+
+N4 controls the duplex LED
+N5 controls the link LED
+N6 controls the speed (100M) LED
+
+Writing a 0 into this nibble means that the LED can be controlled independently and you can switch them on and off as you like.
+In order to to this we have to watch at the bits of N1
+
+B7 B6 B5 B4
+
+B4 controls the duplex LED
+B5 controls the link LED
+B6 controls the speed (100M) LED
+B7 does nothing
+
+'1' switches the LED on, '0' means off
+
+You will notice that the link LED is not flickering and even if you switch the interface to 10M or half duplex the LEDs do not reflect these changes. You can really use them for other purposes.
+
+I hope this explanation is clear. Feel free to ask.
+
