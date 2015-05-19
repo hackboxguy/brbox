@@ -18,9 +18,9 @@ MULTI_MK_NOK="multi_mk_nok"
 SINGL_BINARY="singl_binary"
 
 BRBOX_PROJ="BrBoxProj"    #complete project including all sub-modules
-BRBOX_ROOT="BrBoxRtRp2"    #rootfs
 BRBOX_STTNG="BrBoxSttng"  #settings partition
 BRBOX_USRDAT="BrBoxUsrDt" #user-data partition 
+BRBOX_ROOT="BrBoxRtRp2"    #rootfs
 
 GLOBAL_VAR_TOTAL_FILES=0
 ###############################################################################
@@ -105,7 +105,7 @@ ProcessUpdate() #$1=input-update-file $2-output-file(if-applicable)
 		#echo "$IMGTYPE.... [OK]"
 		ProcessImageType $1 $IMGTYPE $2
 		[ $? != "0" ] && { echo "[FAIL]" ; return 1; }
-		echo "$IMGTYPE.... [OK]"
+		echo "$IMGTYPE... [OK]"
 		return 0
 	elif [ "$FILE_TYPE" = "$MULTI_MK_OK" ]; then
 		TOTAL_SUB_IMAGES=$(grep "total-sub-images=" $TMPFILE)
@@ -135,7 +135,6 @@ done
 TMP_ROOTFSFILE=$(mktemp) #creates an emptyfile which will be filled by ProcessUpdate as rootfs.tar.xz
 ProcessUpdate $UPDATE_FILE $TMP_ROOTFSFILE
 [ $? != "0" ] && { echo "Error: Invalid filetype" ; return 1; }
-#TODO:mkimage file integrity 
 file $TMP_ROOTFSFILE | grep "XZ compressed data" > /dev/null
 [ $? != 0 ] && { echo "Error: Update file must be xz compressed!!!"; rm -rf $TMP_ROOTFSFILE; return 1; }
 
@@ -166,7 +165,7 @@ else
 	return 1
 fi
 #TODO: set a flag in /mnt/setting to know that fmw-update has begun
-printf "Formatting $BRBOX_PARTITION as ext3................ "
+printf "Formatting $BRBOX_PARTITION as ext3........... "
 $MKFSTOOL -F -L $BRBOX_LABEL $BRBOX_PARTITION 1>/dev/null 2>/dev/null
 if [ $? != "0" ]; then #unable format ext3 filesystem
 	echo "Error: Unable to format ext3 filesystem!!!"
@@ -191,7 +190,7 @@ if [ $? != "0" ]; then #unable mount device, filesystem might be corrupt
 	#mount -o remount,ro / 1>/dev/null 2>/dev/null
 	return 1
 fi
-printf "Copying new filesystem to $BRBOX_PARTITION ........ "
+printf "Copying new filesystem to $BRBOX_PARTITION ... "
 tar -C $TEMP_MOUNT_POINT -Jxf $TMP_ROOTFSFILE
 if [ $? != "0" ]; then #unable to copy files
 	echo "Error: Unable to copy files!!!"
@@ -225,11 +224,11 @@ if [ $? != "0" ]; then #unable mount device, boot-filesystem might be corrupt
 	rm -rf $TEMP_BOOT_MOUNT_POINT
 	return 1
 fi
-printf "Copying zImage to $BRBOX_BOOT_PARTITION ........ "
+printf "Copying zImage to $BRBOX_BOOT_PARTITION ........... "
 if [ "$CUR_BOOT" = "$ONE_BRBOX_NAME" ]; then
-	cp $TEMP_MOUNT_POINT/zImage $TEMP_BOOT_MOUNT_POINT/zImage2
+	cp $TEMP_MOUNT_POINT/boot/zImage $TEMP_BOOT_MOUNT_POINT/zImage2
 elif [ "$CUR_BOOT" = "$TWO_BRBOX_NAME" ]; then
-	cp $TEMP_MOUNT_POINT/zImage $TEMP_BOOT_MOUNT_POINT/
+	cp $TEMP_MOUNT_POINT/boot/zImage $TEMP_BOOT_MOUNT_POINT/
 else
 	echo "Error: Unknown boot system!!!" 
 	umount $BRBOX_PARTITION
@@ -239,6 +238,8 @@ else
 	rm -rf $TEMP_BOOT_MOUNT_POINT
 	return 1
 fi
+echo "[OK]"
+
 sync #let zImage be copied to boot partition
 umount $BRBOX_PARTITION
 umount $BRBOX_BOOT_PARTITION

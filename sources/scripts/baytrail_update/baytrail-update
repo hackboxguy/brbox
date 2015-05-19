@@ -5,6 +5,7 @@ ONE_BRBOX_NAME=brbox1 #name of the first brbox system
 TWO_BRBOX_NAME=brbox2 #name of the second brbox system
 ONE_BRBOX_PART=sda2 #partition
 TWO_BRBOX_PART=sda3 #partition
+
 ROOT1_LABEL=ROOT1   #linux-1
 ROOT2_LABEL=ROOT2   #linux-2
 GRUBCFG_FILE_PATH=/boot/grub/grub.cfg
@@ -101,9 +102,11 @@ ProcessUpdate() #$1=input-update-file $2-output-file(if-applicable)
 		printf "Checking file type............ "
 		IMGTYPE=$(GetImageType $1)
 		[ $? != "0" ] && { echo "[FAIL]" ; return 1; }
-		echo "$IMGTYPE.... [OK]"
+		#echo "$IMGTYPE.... [OK]"
 		ProcessImageType $1 $IMGTYPE $2
-		return $?
+		[ $? != "0" ] && { echo "[FAIL]" ; return 1; }
+		echo "$IMGTYPE... [OK]"
+		return 0 #$?
 	elif [ "$FILE_TYPE" = "$MULTI_MK_OK" ]; then
 		TOTAL_SUB_IMAGES=$(grep "total-sub-images=" $TMPFILE)
 		TOTAL_SUB_IMAGES=$(echo $TOTAL_SUB_IMAGES | sed 's/total-sub-images=//' )
@@ -131,7 +134,7 @@ done
 [ ! -f  "$UPDATE_FILE"  ] && { echo "Error: Update file not found!!!"; return 1; }
 TMP_ROOTFSFILE=$(mktemp) #creates an emptyfile which will be filled by ProcessUpdate as rootfs.tar.xz
 ProcessUpdate $UPDATE_FILE $TMP_ROOTFSFILE
-#TODO:mkimage file integrity 
+[ $? != "0" ] && { echo "Error: Invalid filetype" ; return 1; }
 file $TMP_ROOTFSFILE | grep "XZ compressed data" > /dev/null
 [ $? != 0 ] && { echo "Error: Update file must be xz compressed!!!"; rm -rf $TMP_ROOTFSFILE; return 1; }
 
