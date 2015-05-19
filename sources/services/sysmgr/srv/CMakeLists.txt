@@ -11,6 +11,7 @@ set(LIB_ADCOMMN AdCmn)      #common library
 project(${COMPONENT_NAME})
 set(AUTO_SVN_VERSION    ON CACHE BOOL ON)  #by default include svn revision numbers
 set(INSTALL_MY_HEADERS  ON CACHE BOOL ON)  #by default install header files to target-install-directory
+set(STARTUP_SCRIPT SysmgrStartupScr)          #server startup script
 file(GLOB SOURCES "src/*.cpp")
 add_executable(${COMPONENT_NAME} ${SOURCES})
 set(INC_ADSTTNG  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-settings/include")
@@ -27,6 +28,7 @@ target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pth
 #install the binary and server-rpc-headers to CMAKE_INSTALL_PREFIX destination
 file(GLOB  INCFILES "${INC_SRVCOMMN}/*.*")
 install(TARGETS ${COMPONENT_NAME} DESTINATION bin)
+install(PROGRAMS ${STARTUP_SCRIPT} DESTINATION etc/init.d) #copy server's startup script to init.d
 if(${INSTALL_MY_HEADERS})
 	install(FILES ${INCFILES} DESTINATION include)
 endif()
