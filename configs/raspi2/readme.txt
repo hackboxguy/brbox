@@ -1,6 +1,11 @@
 interesting raspi addon:
 http://blog.koalo.de/2013/03/8-tft-for-raspberry-pi.html
 #####################################################
+#######how to blink ACT LED on raspi?################
+echo none > /sys/class/leds/led0/trigger  #this will ensure that no other process will access this led
+echo 1 > /sys/class/leds/led0/brightness  #switch ON led
+echo 0 > /sys/class/leds/led0/brightness  #switch OFF led
+#####################################################
 
 sudo ./mkcard.txt /dev/sdd
 sudo mount /dev/sdd1 /mnt/rpboot
