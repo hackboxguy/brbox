@@ -2,7 +2,7 @@
 #
 # Start/stop server script
 #
-SERVER_NAME=sysmgr
+SERVER_NAME=/opt/fmw/bin/sysmgr
 start() {
 	echo -n "Starting $SERVER_NAME Service: "
 	$SERVER_NAME &
