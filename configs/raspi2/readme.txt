@@ -6,6 +6,19 @@ echo none > /sys/class/leds/led0/trigger  #this will ensure that no other proces
 echo 1 > /sys/class/leds/led0/brightness  #switch ON led
 echo 0 > /sys/class/leds/led0/brightness  #switch OFF led
 #####################################################
+###############raspi sdcard partition sizes##########
+Filesystem                Size      Used Available Use% Mounted on
+/dev/root                71.5M     62.6M      5.0M  93% /
+devtmpfs                441.5M         0    441.5M   0% /dev
+tmpfs                   445.7M         0    445.7M   0% /dev/shm
+tmpfs                   445.7M     36.0K    445.7M   0% /tmp
+tmpfs                   445.7M     32.0K    445.7M   0% /run
+/dev/mmcblk0p5           40.5M    767.0K     37.5M   2% /mnt/settings
+/dev/mmcblk0p6           17.4M    169.0K     16.3M   1% /tmp/usrdata
+/dev/mmcblk0p1           15.0M     10.1M      4.9M  67% /tmp/boot
+/dev/mmcblk0p3           72.5M     62.6M      5.9M  91% /tmp/bkup
+
+
 
 sudo ./mkcard.txt /dev/sdd
 sudo mount /dev/sdd1 /mnt/rpboot
