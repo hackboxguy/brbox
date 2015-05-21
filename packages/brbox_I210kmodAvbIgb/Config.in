@@ -1,0 +1,5 @@
+config BR2_PACKAGE_BRBOX_I210KMODAVBIGB
+	bool "I210kmodAvbIgb"
+	default n
+	help
+	  Intel i210 igb driver with support for AVB
