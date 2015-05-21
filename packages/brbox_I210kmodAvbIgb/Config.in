@@ -1,5 +1,11 @@
 config BR2_PACKAGE_BRBOX_I210KMODAVBIGB
 	bool "I210kmodAvbIgb"
+	depends on BR2_LINUX_KERNEL
 	default n
 	help
 	  Intel i210 igb driver with support for AVB
+
+comment "I210kmodAvbIgb needs a Linux kernel to be built"
+	depends on !BR2_LINUX_KERNEL
+
+

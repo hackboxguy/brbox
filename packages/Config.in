@@ -31,8 +31,8 @@ endif
 
 source "package/brbox/brbox_baytrail_update/Config.in"
 source "package/brbox/brbox_baytrail_mount/Config.in"
+source "package/brbox/brbox_I210kmodAvbIgb/Config.in"
 source "package/brbox/brbox_raspi2_update/Config.in"
 source "package/brbox/brbox_raspi2_mount/Config.in"
-#source "package/brbox/brbox_libAdCmn/Config.in"
 
 endmenu
