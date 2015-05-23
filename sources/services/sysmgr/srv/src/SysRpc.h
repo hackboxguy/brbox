@@ -6,8 +6,9 @@
 /* ------------------------------------------------------------------------- */
 class  SysRpc : public ADJsonRpcMgrConsumer, public ADCmnStringProcessor
 {
+	SYSMGR_CMN_DATA_CACHE *pDataCache;
 public:
-	 SysRpc(std::string rpcName,int myIndex,bool emu,bool log);//getRpc,std::string setRpc);
+	 SysRpc(std::string rpcName,int myIndex,bool emu,bool log,SYSMGR_CMN_DATA_CACHE *pData);//getRpc,std::string setRpc);
 	~ SysRpc();
 	virtual int MapJsonToBinary(JsonDataCommObj* pReq,int index);
 	virtual int MapBinaryToJson(JsonDataCommObj* pReq,int index);
@@ -25,6 +26,14 @@ public:
 	int json_to_bin_get_cpuinfo(JsonDataCommObj* pReq);
 	int bin_to_json_get_cpuinfo(JsonDataCommObj* pReq);
 	int process_get_cpuinfo(JsonDataCommObj* pReq);
+
+	//get/set device operation
+	int json_to_bin_get_devop(JsonDataCommObj* pReq);
+	int bin_to_json_get_devop(JsonDataCommObj* pReq);
+	int process_get_devop(JsonDataCommObj* pReq);
+	int json_to_bin_set_devop(JsonDataCommObj* pReq);
+	int bin_to_json_set_devop(JsonDataCommObj* pReq);
+	int process_set_devop(JsonDataCommObj* pReq);
 
 };
 /* ------------------------------------------------------------------------- */

@@ -14,6 +14,12 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_GET_LOADINFO,
 	EJSON_SYSMGR_RPC_GET_MEMINFO,
 	EJSON_SYSMGR_RPC_GET_CPUINFO,
+	EJSON_SYSMGR_RPC_GET_DEV_OP,
+	EJSON_SYSMGR_RPC_SET_DEV_OP,
+	//EJSON_SYSMGR_RPC_IDENTIFY_DEVICE,
+	//EJSON_SYSMGR_RPC_GET_FMWVER,
+	//EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM, //returns current booted partition brbox1 or brbox2
+	
 
 	EJSON_SYSMGR_RPC_END,
 	EJSON_SYSMGR_RPC_NONE
@@ -89,5 +95,40 @@ typedef struct SYSMGR_CPU_INFO_PACKET_T
 	char cpu_freq[512];
 }SYSMGR_CPU_INFO_PACKET;
 /* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_GET_DEV_OP (device operation)
+//EJSON_SYSMGR_RPC_SET_DEV_OP (device operation)
+#define SYSMGR_RPC_DEV_OP_GET             "get_device_operation"
+#define SYSMGR_RPC_DEV_OP_SET             "set_device_operation"
+#define SYSMGR_RPC_DEV_OP_ARG             "operation"
+#define SYSMGR_RPC_DEV_OP_ARG_TABL        {"idle","on","laststate","off","reboot","booting","rebooting","switchingoff","boot","unknown","none","\0"}
+typedef enum EJSON_SYSMGR_DEV_OP_T
+{
+	EJSON_SYSMGR_DEV_OP_IDLE,        //IDLE
+	EJSON_SYSMGR_DEV_OP_ON,          //ON  
+	EJSON_SYSMGR_DEV_OP_LAST_STATE,  //used for autostartup action
+	EJSON_SYSMGR_DEV_OP_OFF,         //STOP
+	EJSON_SYSMGR_DEV_OP_REBOOT,      //RESTART
+	EJSON_SYSMGR_DEV_OP_BOOTING,     //read_sts:STARTING
+	EJSON_SYSMGR_DEV_OP_REBOOTING,   //read_sts:RESTARTING
+	EJSON_SYSMGR_DEV_OP_SWTCHING_OFF,//read_sts:STOPPING
+	EJSON_SYSMGR_DEV_OP_BOOT,        //START
+	EJSON_SYSMGR_DEV_OP_UNKNOWN,
+	EJSON_SYSMGR_DEV_OP_NONE
+}EJSON_SYSMGR_DEV_OP;
+typedef struct SYSMGR_DEV_OP_PACKET_T
+{
+	EJSON_SYSMGR_DEV_OP operation;
+	char operation_str[255];//needed for settings store/restore(un-used for json-rpc mappers)
+	int taskID;//return the taskID so that client can check the progress
+	void* pDataCache;//void pointer for accessing local data cache in de-coupled set action
+}SYSMGR_DEV_OP_PACKET;
+/* ------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+//keep all the data related to smart-eye-service here
+typedef struct SYSMGR_CMN_DATA_CACHE_T
+{
+	std::string StrTmp;//pChar //Char //Int //pInt //Float //Enum
+}SYSMGR_CMN_DATA_CACHE;
+
 #endif
 

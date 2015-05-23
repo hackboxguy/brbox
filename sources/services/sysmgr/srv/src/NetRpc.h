@@ -6,8 +6,9 @@
 /* ------------------------------------------------------------------------- */
 class  NetRpc : public ADJsonRpcMgrConsumer, public ADCmnStringProcessor
 {
+	SYSMGR_CMN_DATA_CACHE *pDataCache;
 public:
-	 NetRpc(std::string rpcName,int myIndex,bool emu,bool log);//getRpc,std::string setRpc);
+	 NetRpc(std::string rpcName,int myIndex,bool emu,bool log,SYSMGR_CMN_DATA_CACHE *pData);//getRpc,std::string setRpc);
 	~ NetRpc();
 	virtual int MapJsonToBinary(JsonDataCommObj* pReq,int index);
 	virtual int MapBinaryToJson(JsonDataCommObj* pReq,int index);

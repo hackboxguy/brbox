@@ -2,8 +2,9 @@
 #include "ADSysInfo.hpp"
 //#include "SysmgrJsonDef.h"
 /* ------------------------------------------------------------------------- */
-SysRpc:: SysRpc(std::string rpcName,int myIndex,bool emu,bool log):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
+SysRpc:: SysRpc(std::string rpcName,int myIndex,bool emu,bool log,SYSMGR_CMN_DATA_CACHE *pData):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
 {
+	pDataCache=pData;	
 }
 /* ------------------------------------------------------------------------- */
 SysRpc::~ SysRpc()
@@ -19,6 +20,8 @@ int SysRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_GET_LOADINFO :return json_to_bin_get_loadinfo(pReq);
 		case EJSON_SYSMGR_RPC_GET_MEMINFO  :return json_to_bin_get_meminfo(pReq);
 		case EJSON_SYSMGR_RPC_GET_CPUINFO  :return json_to_bin_get_cpuinfo(pReq);
+		case EJSON_SYSMGR_RPC_GET_DEV_OP   :return json_to_bin_get_devop(pReq);
+		case EJSON_SYSMGR_RPC_SET_DEV_OP   :return json_to_bin_set_devop(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -33,6 +36,8 @@ int SysRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_GET_LOADINFO :return bin_to_json_get_loadinfo(pReq);
 		case EJSON_SYSMGR_RPC_GET_MEMINFO  :return bin_to_json_get_meminfo(pReq);
 		case EJSON_SYSMGR_RPC_GET_CPUINFO  :return bin_to_json_get_cpuinfo(pReq);
+		case EJSON_SYSMGR_RPC_GET_DEV_OP   :return bin_to_json_get_devop(pReq);
+		case EJSON_SYSMGR_RPC_SET_DEV_OP   :return bin_to_json_set_devop(pReq);
 		default: break;
 	}
 	return -1;
@@ -47,6 +52,8 @@ int SysRpc::ProcessWork(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_GET_LOADINFO :return process_get_loadinfo(pReq);
 		case EJSON_SYSMGR_RPC_GET_MEMINFO  :return process_get_meminfo(pReq);
 		case EJSON_SYSMGR_RPC_GET_CPUINFO  :return process_get_cpuinfo(pReq);
+		case EJSON_SYSMGR_RPC_GET_DEV_OP   :return process_get_devop(pReq);
+		case EJSON_SYSMGR_RPC_SET_DEV_OP   :return process_set_devop(pReq);
 		default:break;
 	}
 	return 0;
@@ -177,10 +184,6 @@ int SysRpc::process_get_cpuinfo(JsonDataCommObj* pReq)
 		return 0;
 	}
 
-	//pPacket->cpu_model[0]='\0';
-	//pPacket->cpu_cores[0]='\0';
-	//pPacket->cpu_freq[0]='\0';
-
 	if(SysInfo.read_cpu_info(pPacket->cpu_model,pPacket->cpu_cores,pPacket->cpu_freq)==0)
 		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 	else
@@ -188,4 +191,30 @@ int SysRpc::process_get_cpuinfo(JsonDataCommObj* pReq)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
+int SysRpc::json_to_bin_get_devop(JsonDataCommObj* pReq)
+{
+	return 0;
+}
+int SysRpc::bin_to_json_get_devop(JsonDataCommObj* pReq)
+{
+	return 0;
+}
+int SysRpc::process_get_devop(JsonDataCommObj* pReq)
+{
+	return 0;
+}
+int SysRpc::json_to_bin_set_devop(JsonDataCommObj* pReq)
+{
+	return 0;
+}
+int SysRpc::bin_to_json_set_devop(JsonDataCommObj* pReq)
+{
+	return 0;
+}
+int SysRpc::process_set_devop(JsonDataCommObj* pReq)
+{
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+
 

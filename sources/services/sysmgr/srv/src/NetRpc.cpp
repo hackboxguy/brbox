@@ -2,8 +2,9 @@
 #include "ADSysInfo.hpp"
 //#include "SysmgrJsonDef.h"
 /* ------------------------------------------------------------------------- */
-NetRpc:: NetRpc(std::string rpcName,int myIndex,bool emu,bool log):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
+NetRpc:: NetRpc(std::string rpcName,int myIndex,bool emu,bool log,SYSMGR_CMN_DATA_CACHE *pData):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
 {
+	pDataCache=pData;	
 }
 /* ------------------------------------------------------------------------- */
 NetRpc::~ NetRpc()
