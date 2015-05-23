@@ -14,23 +14,18 @@ public:
 	virtual int ProcessWork(JsonDataCommObj* pReq,int index);
 	virtual int ProcessWorkAsync(unsigned char* pWorkData);
 
-	//int json_to_bin_get_mac_addr(JsonDataCommObj* pReq);
-	//int bin_to_json_get_mac_addr(JsonDataCommObj* pReq);
-	//int process_get_mac_addr(JsonDataCommObj* pReq);
+	int json_to_bin_get_loadinfo(JsonDataCommObj* pReq);
+	int bin_to_json_get_loadinfo(JsonDataCommObj* pReq);
+	int process_get_loadinfo(JsonDataCommObj* pReq);
 
-	//int json_to_bin_set_mac_addr(JsonDataCommObj* pReq);
-	//int bin_to_json_set_mac_addr(JsonDataCommObj* pReq);
-	//int process_set_mac_addr(JsonDataCommObj* pReq);
+	int json_to_bin_get_meminfo(JsonDataCommObj* pReq);
+	int bin_to_json_get_meminfo(JsonDataCommObj* pReq);
+	int process_get_meminfo(JsonDataCommObj* pReq);
 
-	//returns total number of available eth interfaces(except local loopback)
-	//int json_to_bin_get_eth_count(JsonDataCommObj* pReq);
-	//int bin_to_json_get_eth_count(JsonDataCommObj* pReq);
-	//int process_get_eth_count(JsonDataCommObj* pReq);
+	int json_to_bin_get_cpuinfo(JsonDataCommObj* pReq);
+	int bin_to_json_get_cpuinfo(JsonDataCommObj* pReq);
+	int process_get_cpuinfo(JsonDataCommObj* pReq);
 
-	//returns name of the eth interface for a given index
-	//int json_to_bin_get_eth_name(JsonDataCommObj* pReq);
-	//int bin_to_json_get_eth_name(JsonDataCommObj* pReq);
-	//int process_get_eth_name(JsonDataCommObj* pReq);
 };
 /* ------------------------------------------------------------------------- */
 

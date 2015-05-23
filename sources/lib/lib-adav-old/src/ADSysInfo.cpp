@@ -403,7 +403,7 @@ int ADSysInfo::read_cpu_info(char* cpumodel,char *cores,char* cpufreq)
 	{
 		sprintf(cpumodel,"%s",cpu_model);
 		sprintf(cores,"%d",intcores);
-		get_cpu_frequency(cpufreq);
+		//get_cpu_frequency(cpufreq);//Note: this function is buggy, it causes server hang, to be fixed
 		//sprintf(cpufreq ,"%d",);
 	}
 	return 0;

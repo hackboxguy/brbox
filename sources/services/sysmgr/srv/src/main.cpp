@@ -3,12 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "SysmgrJsonDef.h"
-#include "NetRpc.h"
 #include "ADJsonRpcMgr.hpp"
 #include "MyCmdline.h"
 #include "SrcControlVersion.h"
 #include "ADTimer.hpp"
-
+/* ------------------------------------------------------------------------- */
+#include "NetRpc.h"
+#include "SysRpc.h"
+/* ------------------------------------------------------------------------- */
 using namespace std;
 int main(int argc, const char* argv[])
 {
@@ -28,16 +30,25 @@ int main(int argc, const char* argv[])
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog); //main rpc handler
-
+ 
+	//network related rpc's
 	NetRpc MacGet  (SYSMGR_RPC_MAC_ADDR_GET ,EJSON_SYSMGR_RPC_GET_MAC_ADDR ,emulat,dbglog);  //network related rpc handler class
-	NetRpc MacSet  (SYSMGR_RPC_MAC_ADDR_SET ,EJSON_SYSMGR_RPC_SET_MAC_ADDR ,emulat,dbglog);  //network related rpc handler class
-	NetRpc Ethcount(SYSMGR_RPC_ETH_COUNT_GET,EJSON_SYSMGR_RPC_GET_ETH_COUNT,emulat,dbglog);  //network related rpc handler class
-	NetRpc Ethname (SYSMGR_RPC_ETH_NAME_GET ,EJSON_SYSMGR_RPC_GET_ETH_NAME ,emulat,dbglog);  //network related rpc handler class
-
 	RpcMgr.AttachRpc(&MacGet);
+	NetRpc MacSet  (SYSMGR_RPC_MAC_ADDR_SET ,EJSON_SYSMGR_RPC_SET_MAC_ADDR ,emulat,dbglog);  //network related rpc handler class
 	RpcMgr.AttachRpc(&MacSet);
+	NetRpc Ethcount(SYSMGR_RPC_ETH_COUNT_GET,EJSON_SYSMGR_RPC_GET_ETH_COUNT,emulat,dbglog);  //network related rpc handler class
 	RpcMgr.AttachRpc(&Ethcount);
+	NetRpc Ethname (SYSMGR_RPC_ETH_NAME_GET ,EJSON_SYSMGR_RPC_GET_ETH_NAME ,emulat,dbglog);  //network related rpc handler class
 	RpcMgr.AttachRpc(&Ethname);
+
+	//system related rpc's
+	SysRpc LoadInfoGet(SYSMGR_RPC_LOADINFO_GET,EJSON_SYSMGR_RPC_GET_LOADINFO,emulat,dbglog);//system related rpc handler class
+	RpcMgr.AttachRpc(&LoadInfoGet);
+	SysRpc MemInfoGet(SYSMGR_RPC_MEMINFO_GET  ,EJSON_SYSMGR_RPC_GET_MEMINFO ,emulat,dbglog); //system related rpc handler class
+	RpcMgr.AttachRpc(&MemInfoGet);
+	SysRpc CpuInfoGet(SYSMGR_RPC_CPUINFO_GET  ,EJSON_SYSMGR_RPC_GET_CPUINFO ,emulat,dbglog); //system related rpc handler class
+	RpcMgr.AttachRpc(&CpuInfoGet);
+
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr

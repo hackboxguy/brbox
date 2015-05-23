@@ -10,6 +10,11 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_SET_MAC_ADDR,
 	EJSON_SYSMGR_RPC_GET_ETH_COUNT, //returns number of eth interfaces available on the device
 	EJSON_SYSMGR_RPC_GET_ETH_NAME,
+	
+	EJSON_SYSMGR_RPC_GET_LOADINFO,
+	EJSON_SYSMGR_RPC_GET_MEMINFO,
+	EJSON_SYSMGR_RPC_GET_CPUINFO,
+
 	EJSON_SYSMGR_RPC_END,
 	EJSON_SYSMGR_RPC_NONE
 }EJSON_SYSMGR_RPC_TYPES;
@@ -48,6 +53,41 @@ typedef SYSMGR_MAC_ADDR_PACKET SYSMGR_ETH_COUNT_PACKET;
 #define SYSMGR_RPC_ETH_NAME_ARG             "name"
 typedef SYSMGR_MAC_ADDR_PACKET SYSMGR_ETH_NAME_PACKET;
 /* ------------------------------------------------------------------------- */
-
+//EJSON_SYSMGR_RPC_GET_LOADINFO
+#define SYSMGR_RPC_LOADINFO_GET             "get_load_info"
+#define SYSMGR_RPC_LOADINFO_ARG_CURRENT     "current"
+#define SYSMGR_RPC_LOADINFO_ARG_AVERAGE     "average"
+#define SYSMGR_RPC_LOADINFO_ARG_UPTIME      "uptime"
+typedef struct SYSMGR_LOAD_INFO_PACKET_T
+{
+	char cur_load[512];
+	char avg_load[512];
+	char uptime[512];
+}SYSMGR_LOAD_INFO_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_GET_MEMINFO
+#define SYSMGR_RPC_MEMINFO_GET             "get_mem_info"
+#define SYSMGR_RPC_MEMINFO_ARG_MEM         "memMB"
+#define SYSMGR_RPC_MEMINFO_ARG_MEMFREE     "memfreeMB"
+#define SYSMGR_RPC_MEMINFO_ARG_MEMUSED     "memusedMB"
+typedef struct SYSMGR_MEM_INFO_PACKET_T
+{
+	char mem[512];
+	char memfree[512];
+	char memused[512];
+}SYSMGR_MEM_INFO_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_GET_CPUINFO
+#define SYSMGR_RPC_CPUINFO_GET             "get_cpu_info"
+#define SYSMGR_RPC_CPUINFO_ARG_MODEL       "model"
+#define SYSMGR_RPC_CPUINFO_ARG_CORES       "cores"
+#define SYSMGR_RPC_CPUINFO_ARG_FREQ        "frequency"
+typedef struct SYSMGR_CPU_INFO_PACKET_T
+{
+	char cpu_model[512];
+	char cpu_cores[512];
+	char cpu_freq[512];
+}SYSMGR_CPU_INFO_PACKET;
+/* ------------------------------------------------------------------------- */
 #endif
 
