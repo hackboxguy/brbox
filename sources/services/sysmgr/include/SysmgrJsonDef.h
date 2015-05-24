@@ -152,6 +152,9 @@ typedef struct SYSMGR_CMN_DATA_CACHE_T
 {
 	std::string StrTmp;//pChar //Char //Int //pInt //Float //Enum
 	SYSMGR_DEV_OP_PACKET DevOp;
+	char crnt_fmwver[100];//current version
+	char bkup_fmwver[100];//backup version
+	char krnl_fmwver[100];//kernel version
 }SYSMGR_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */
 #endif

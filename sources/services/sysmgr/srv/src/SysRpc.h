@@ -6,6 +6,9 @@
 /* ------------------------------------------------------------------------- */
 class  SysRpc : public ADJsonRpcMgrConsumer, public ADCmnStringProcessor
 {
+	bool crnt_fmwver_updated;
+	bool bkup_fmwver_updated;
+	bool krnl_fmwver_updated;
 	SYSMGR_CMN_DATA_CACHE *pDataCache;
 public:
 	 SysRpc(std::string rpcName,int myIndex,bool emu,bool log,SYSMGR_CMN_DATA_CACHE *pData);//getRpc,std::string setRpc);

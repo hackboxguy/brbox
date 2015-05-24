@@ -4,7 +4,10 @@
 /* ------------------------------------------------------------------------- */
 SysRpc:: SysRpc(std::string rpcName,int myIndex,bool emu,bool log,SYSMGR_CMN_DATA_CACHE *pData):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
 {
-	pDataCache=pData;	
+	pDataCache=pData;
+	crnt_fmwver_updated=false;
+	bkup_fmwver_updated=false;
+	krnl_fmwver_updated=false;
 }
 /* ------------------------------------------------------------------------- */
 SysRpc::~ SysRpc()
@@ -333,18 +336,36 @@ int SysRpc::process_get_fmwver(JsonDataCommObj* pReq)
 	switch(pPacket->module)
 	{
 		case SYSMGR_FMW_MODULE_BRBOX_CURRENT:
+			if(crnt_fmwver_updated==true)
+			{
+				strcpy(pPacket->cmn_fname_ver_str,pDataCache->crnt_fmwver);
+				pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+				return 0;
+			}
 			sprintf(command,"%s -v > %s",SYSMGR_BRDSK_TOOL,SYSMGR_TEMP_FMW_READ_FILE);
 			break;
 		case SYSMGR_FMW_MODULE_BRBOX_BACKUP :
+			if(bkup_fmwver_updated==true)
+			{
+				strcpy(pPacket->cmn_fname_ver_str,pDataCache->bkup_fmwver);
+				pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+				return 0;
+			}
 			sprintf(command,"%s -b > %s",SYSMGR_BRDSK_TOOL,SYSMGR_TEMP_FMW_READ_FILE);
 			break;
-		//case SYSMGR_FMW_MODULE_BRBOX_KERNEL :break;
+		//case SYSMGR_FMW_MODULE_BRBOX_KERNEL :
+			//if(krnl_fmwver_updated==true)
+			//{
+			//	strcpy(pPacket->cmn_fname_ver_str,pDataCache->krnl_fmwver);
+			//	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+			//	return 0;
+			//}
+			//break;
 		default:
 			pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
 			return 0;
 			break;
 	}
-	//sprintf(command,"%s -v > %s",SYSMGR_BRDSK_TOOL,SYSMGR_TEMP_FMW_READ_FILE);
 	if(system(command)!=0)
 	{
 		pPanelReq->result=RPC_SRV_RESULT_FILE_OPEN_ERR;
@@ -366,6 +387,25 @@ int SysRpc::process_get_fmwver(JsonDataCommObj* pReq)
 			temp_str[strlen(temp_str)-1]='\0';
 		strcpy(pPacket->cmn_fname_ver_str,temp_str);
 		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+		
+		switch(pPacket->module)
+		{
+		case SYSMGR_FMW_MODULE_BRBOX_CURRENT:
+			crnt_fmwver_updated=true;
+			strcpy(pDataCache->crnt_fmwver,temp_str);
+			break;
+		case SYSMGR_FMW_MODULE_BRBOX_BACKUP :
+			bkup_fmwver_updated=true;
+			strcpy(pDataCache->bkup_fmwver,temp_str);
+			break;
+		//case SYSMGR_FMW_MODULE_BRBOX_KERNEL :
+			//krnl_fmwver_updated=true;
+			//strcpy(pDataCache->krnl_fmwver,temp_str);
+			//break;
+		default:
+			pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+			break;
+		}
 	}
 	else
 		pPanelReq->result=RPC_SRV_RESULT_FILE_READ_ERR;
@@ -373,5 +413,3 @@ int SysRpc::process_get_fmwver(JsonDataCommObj* pReq)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
-
-
