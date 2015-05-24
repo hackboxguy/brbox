@@ -18,7 +18,7 @@ double ImgIdentify::angle(Point pt1, Point pt2, Point pt0)
 }
 /*---------------------------------------------------------------------------*/
 //finds the smaller square-box with reference to biggest_square, the relation is given by the multifying factor "scale_factor"
-//in ovd kvd: outer rectangle in identify pattern is 3 times bigger than inner rectangle, hence scale factor to be used is 3
+//this logic works for a pattern which has 3 times bigger rectangle when compared to inner rectangle, hence scale factor to be used is 3
 int ImgIdentify::find_relative_square(const vector<vector <Point> >& squares, vector<Point> biggest_square,vector<Point>& relative_square,int scale_factor,int tolerence) 
 {
 	if (!squares.size()) 
@@ -219,7 +219,7 @@ RPC_SRV_RESULT ImgIdentify::identify_image_box(std::string imgPath)
 	vector<Point> biggest_square;
 	vector<Point> smaller_square;
 	//find largest square
-	find_largest_square(contours/*squares*/,biggest_square,1.5,1.8);//find outer white box of ovd/kvd identify pattern
+	find_largest_square(contours/*squares*/,biggest_square,1.5,1.8);//find outer white box of identify pattern
 	//find a smaller square which is 3times smaller than largest
 
 //	if(find_relative_square(contours/*squares*/,biggest_square,smaller_square,3,30)==0)//; //+/- 20pixel tolerence
