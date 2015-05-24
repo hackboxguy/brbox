@@ -361,7 +361,9 @@ int SysRpc::process_get_fmwver(JsonDataCommObj* pReq)
 	size_t read_bytes = fread(temp_str,1,100,shell);
 	if(read_bytes>0)
 	{
-		temp_str[100]='\0';
+		temp_str[read_bytes]='\0';
+		if(temp_str[strlen(temp_str)-1]=='\n')//remove the carriage return line
+			temp_str[strlen(temp_str)-1]='\0';
 		strcpy(pPacket->cmn_fname_ver_str,temp_str);
 		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 	}
