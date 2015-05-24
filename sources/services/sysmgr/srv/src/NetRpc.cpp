@@ -39,7 +39,7 @@ int NetRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 	return -1;
 }
 /* ------------------------------------------------------------------------- */
-int NetRpc::ProcessWork(JsonDataCommObj* pReq,int index)
+int NetRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pObj)
 {
 	//printf("NetRpc::ProcessWork called\n");
 	EJSON_SYSMGR_RPC_TYPES command =(EJSON_SYSMGR_RPC_TYPES)index;
@@ -53,9 +53,11 @@ int NetRpc::ProcessWork(JsonDataCommObj* pReq,int index)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
-int NetRpc::ProcessWorkAsync(unsigned char* pWorkData)
+RPC_SRV_RESULT NetRpc::ProcessWorkAsync(int index,unsigned char* pWorkData)
 {
-	return 0;
+	RPC_SRV_RESULT ret_val=RPC_SRV_RESULT_FAIL;
+
+	return ret_val;
 }
 /* ------------------------------------------------------------------------- */
 int NetRpc::json_to_bin_get_mac_addr(JsonDataCommObj* pReq)

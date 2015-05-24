@@ -457,4 +457,38 @@ RPC_SRV_RESULT ADSysInfo::get_nth_eth_name(int index,char *name)
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
+RPC_SRV_RESULT ADSysInfo::run_shell_script(char* script,bool emulation)
+{
+	if(emulation)//emulate as if something is happening and return success
+	{
+		usleep(1000000);
+		usleep(1000000);
+		usleep(1000000);
+		usleep(1000000);
+		usleep(1000000);
+		usleep(1000000);
+		usleep(1000000);
+		usleep(1000000);
+		return RPC_SRV_RESULT_SUCCESS;
+	}
+	char command[1024];
+	sprintf(command,"%s",script);//this script could be a bomb, so be careful when using this function in root access
+	int res=system(command);
+	res/=256;   //response of system command is always in multiples of 256 of the actual response of the script
+	switch(res) //if needed, grep actual result from the script "Result: Success" or "Result: Fail"
+	{
+		case 0:return  RPC_SRV_RESULT_SUCCESS;break;
+		case 1:return  RPC_SRV_RESULT_FILE_OPEN_ERR;break;
+		case 2:return  RPC_SRV_RESULT_FILE_READ_ERR;break;
+		case 3:return  RPC_SRV_RESULT_FILE_WRITE_ERR;break;
+		case 4:return  RPC_SRV_RESULT_ARG_ERROR;break;
+		case 5:return  RPC_SRV_RESULT_ARG_ERROR;break;
+		case 6:return  RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;break;
+		case 7:return  RPC_SRV_RESULT_FILE_SAME;break;
+		case 8:return  RPC_SRV_RESULT_FILE_DIFFERENT;break;
+		case 9:return  RPC_SRV_RESULT_FILE_NOT_FOUND;break;//printf("run_shell_script file not found\n");break;
+		default:return RPC_SRV_RESULT_FAIL;
+	}
+	return RPC_SRV_RESULT_SUCCESS;
+}
 

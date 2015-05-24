@@ -38,6 +38,7 @@ public:
 	int read_cpu_info(char* cpumodel,char *cores,char* cpufreq);
 	RPC_SRV_RESULT get_total_eth_count(int &count);
 	RPC_SRV_RESULT get_nth_eth_name(int index,char *name);
+	RPC_SRV_RESULT run_shell_script(char* script,bool emulation);
 
 };
 #endif

@@ -127,7 +127,7 @@ public:
 	int GetRpcParentIndex(){return parent_index;};
 	bool get_debug_log_flag(){return logmsg;};
 	int  set_debug_log_flag(bool flag){logmsg=flag;return 0;};
-
+	bool get_emulation_flag(){return emulation;};
 
 	//std::string GetRpcNameSetType(){return strGetRpc;};
 	//std::string GetPageTag(){return Tag;};
@@ -151,8 +151,8 @@ public:
 	virtual int MapJsonToBinary(JsonDataCommObj* pReq,int index)=0;
 	virtual int MapBinaryToJson(JsonDataCommObj* pReq,int index)=0;
 	//virtual int WorkRpc(RPC_SRV_REQ *pPanelReq/*data-cache?*/)=0;
-	virtual int ProcessWork(JsonDataCommObj* pReq,int index)=0;
-	virtual int ProcessWorkAsync(unsigned char* pWorkData)=0;
+	virtual int ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pObj)=0;
+	virtual RPC_SRV_RESULT ProcessWorkAsync(int index,unsigned char* pWorkData)=0;
 
 };
 /* ------------------------------------------------------------------------- */
@@ -160,6 +160,8 @@ class ADJsonRpcMgrProducer
 {
 	std::vector<ADJsonRpcMgrConsumer*> rpclist;
 protected:
+	ADTaskWorker AsyncTaskWorker;
+
 	ADJsonRpcMgrConsumer* getRpcHandler(std::string rpcName) //based on rpc-name string, returns the object ptr
 	{
 		std::vector<ADJsonRpcMgrConsumer*>::iterator iter;
@@ -239,16 +241,41 @@ public:
 		if(pPageHandler==NULL)
 			return -1;
 		else
-			return pPageHandler->ProcessWork(pReq,pPageHandler->index);
+			return pPageHandler->ProcessWork(pReq,pPageHandler->index,this);
 	}
 	RPC_SRV_RESULT AsyncTaskWork(int cmd,unsigned char* pWorkData)
 	{
-		ADJsonRpcMgrConsumer* pPageHandler=getRpcHandlerByParentIndex(cmd);//get the attached object pointer by parent_index)
-		if(pPageHandler == NULL)
+		//ADJsonRpcMgrConsumer* pPageHandler=getRpcHandlerByParentIndex(cmd);//get the attached object pointer by parent_index)
+		//if(pPageHandler == NULL)
+		//	return RPC_SRV_RESULT_FAIL;
+		//if(pPageHandler->ProcessWorkAsync(0,pWorkData)==0)//TODO: handle correct return value
+		//	return RPC_SRV_RESULT_SUCCESS;
+		//else
+		//	return RPC_SRV_RESULT_FAIL;
+		if((cmd-EJSON_RPCGMGR_CMD_END)>=get_total_attached_rpcs())
+			return RPC_SRV_RESULT_FAIL;//not my call, i dont have an object of this index
+		if((cmd-EJSON_RPCGMGR_CMD_END)<0)
+			return RPC_SRV_RESULT_FAIL;//something is wrong
+		ADJsonRpcMgrConsumer* pPageHandler = getRpcHandler(cmd-EJSON_RPCGMGR_CMD_END);
+		if(pPageHandler==NULL)
 			return RPC_SRV_RESULT_FAIL;
-		if(pPageHandler->ProcessWorkAsync(pWorkData)==0)//TODO: handle correct return value
-			return RPC_SRV_RESULT_SUCCESS;
 		else
+		{
+			return pPageHandler->ProcessWorkAsync(cmd-EJSON_RPCGMGR_CMD_END,pWorkData);
+			//if(pPageHandler->ProcessWorkAsync(cmd-EJSON_RPCGMGR_CMD_END,pWorkData)==0)
+			//	return RPC_SRV_RESULT_SUCCESS;
+			//else
+			//	return RPC_SRV_RESULT_FAIL;
+		}
+	}
+	RPC_SRV_RESULT PushAsyncTask(int cmd,unsigned char* pWorkData,int *taskID,WORK_CMD_AFTER_DONE done_flag)
+	{
+		//TODO: add my own cmd offset to 'cmd' parameter
+		if(AsyncTaskWorker.push_task(cmd+EJSON_RPCGMGR_CMD_END,pWorkData,taskID,done_flag)==0)
+			//pReq->result=RPC_SRV_RESULT_IN_PROG;
+			return RPC_SRV_RESULT_IN_PROG;
+		else
+			//pReq->result=RPC_SRV_RESULT_FAIL;
 			return RPC_SRV_RESULT_FAIL;
 	}
 
@@ -261,7 +288,7 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	ADJsonRpcMapper	JMapper;
 	int svnVersion;
 
-	ADTaskWorker AsyncTaskWorker;
+	//ADTaskWorker AsyncTaskWorker;
 	bool shutdown_support;
 	EJSON_RPCGMGR_READY_STATE ServiceReadyFlag;
 	//EJSON_RPCGMGR_FLAG_STATE  ServiceDebugFlag;

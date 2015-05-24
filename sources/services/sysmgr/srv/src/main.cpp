@@ -53,7 +53,7 @@ int main(int argc, const char* argv[])
 
 	SysRpc DevOpGet(SYSMGR_RPC_DEV_OP_GET     ,EJSON_SYSMGR_RPC_GET_DEV_OP ,emulat,dbglog,&DataCache); //get device operation
 	RpcMgr.AttachRpc(&DevOpGet);
-	SysRpc DevOpSet(SYSMGR_RPC_DEV_OP_SET     ,EJSON_SYSMGR_RPC_GET_DEV_OP ,emulat,dbglog,&DataCache); //get device operation
+	SysRpc DevOpSet(SYSMGR_RPC_DEV_OP_SET     ,EJSON_SYSMGR_RPC_SET_DEV_OP ,emulat,dbglog,&DataCache); //get device operation
 	RpcMgr.AttachRpc(&DevOpSet);
 
 

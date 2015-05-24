@@ -12,8 +12,8 @@ public:
 	~ SmarteyeRpc();
 	virtual int MapJsonToBinary(JsonDataCommObj* pReq,int index);
 	virtual int MapBinaryToJson(JsonDataCommObj* pReq,int index);
-	virtual int ProcessWork(JsonDataCommObj* pReq,int index);
-	virtual int ProcessWorkAsync(unsigned char* pWorkData);
+	virtual int ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pObj);
+	virtual RPC_SRV_RESULT ProcessWorkAsync(int index,unsigned char* pWorkData);
 
 	int json_to_bin_check_id_pattern(JsonDataCommObj* pReq);
 	int bin_to_json_check_id_pattern(JsonDataCommObj* pReq);

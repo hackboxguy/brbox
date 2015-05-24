@@ -51,7 +51,7 @@ RPC_SRV_RESULT ADJsonRpcMgr::run_work(int cmd,unsigned char* pWorkData,ADTaskWor
 					RPCMGR_TASK_STS_PACKET *pPacket;
 					pPacket=(RPCMGR_TASK_STS_PACKET *)pWorkData;
 					myTimer->forced_exit();//tell timer to break mainloop so that server can shutdown
-					//OBJ_MEM_DELETE(pWorkData);
+					OBJ_MEM_DELETE(pWorkData);
 					ret_val=RPC_SRV_RESULT_SUCCESS;//anway server is going to shutdown, result may not be necessary
 				}
 				break;
@@ -59,7 +59,7 @@ RPC_SRV_RESULT ADJsonRpcMgr::run_work(int cmd,unsigned char* pWorkData,ADTaskWor
 				break;
 		}
 	}
-	OBJ_MEM_DELETE(pWorkData);
+	//OBJ_MEM_DELETE(pWorkData);
 	return ret_val;
 }
 /* ------------------------------------------------------------------------- */

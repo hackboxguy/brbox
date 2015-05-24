@@ -100,13 +100,13 @@ typedef struct SYSMGR_CPU_INFO_PACKET_T
 #define SYSMGR_RPC_DEV_OP_GET             "get_device_operation"
 #define SYSMGR_RPC_DEV_OP_SET             "set_device_operation"
 #define SYSMGR_RPC_DEV_OP_ARG             "operation"
-#define SYSMGR_RPC_DEV_OP_ARG_TABL        {"idle","on","laststate","off","reboot","booting","rebooting","switchingoff","boot","unknown","none","\0"}
+#define SYSMGR_RPC_DEV_OP_ARG_TABL        {"idle","on","laststate","standby","reboot","booting","rebooting","switchingoff","boot","unknown","none","\0"}
 typedef enum EJSON_SYSMGR_DEV_OP_T
 {
 	EJSON_SYSMGR_DEV_OP_IDLE,        //IDLE
 	EJSON_SYSMGR_DEV_OP_ON,          //ON  
 	EJSON_SYSMGR_DEV_OP_LAST_STATE,  //used for autostartup action
-	EJSON_SYSMGR_DEV_OP_OFF,         //STOP
+	EJSON_SYSMGR_DEV_OP_STANDBY,     //STANDBY(low power Wake-On-Lan mode)
 	EJSON_SYSMGR_DEV_OP_REBOOT,      //RESTART
 	EJSON_SYSMGR_DEV_OP_BOOTING,     //read_sts:STARTING
 	EJSON_SYSMGR_DEV_OP_REBOOTING,   //read_sts:RESTARTING
@@ -120,7 +120,7 @@ typedef struct SYSMGR_DEV_OP_PACKET_T
 	EJSON_SYSMGR_DEV_OP operation;
 	char operation_str[255];//needed for settings store/restore(un-used for json-rpc mappers)
 	int taskID;//return the taskID so that client can check the progress
-	void* pDataCache;//void pointer for accessing local data cache in de-coupled set action
+	//void* pDataCache;//void pointer for accessing local data cache in de-coupled set action
 }SYSMGR_DEV_OP_PACKET;
 /* ------------------------------------------------------------------------- */
 /* ------------------------------------------------------------------------- */
@@ -128,6 +128,7 @@ typedef struct SYSMGR_DEV_OP_PACKET_T
 typedef struct SYSMGR_CMN_DATA_CACHE_T
 {
 	std::string StrTmp;//pChar //Char //Int //pInt //Float //Enum
+	SYSMGR_DEV_OP_PACKET DevOp;
 }SYSMGR_CMN_DATA_CACHE;
 
 #endif

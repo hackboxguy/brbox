@@ -34,7 +34,7 @@ int GpioCtrlRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 	return -1;
 }
 /* ------------------------------------------------------------------------- */
-int GpioCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index)
+int GpioCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pObj)
 {
 	EJSON_GPIOCTL_RPC_TYPES command =(EJSON_GPIOCTL_RPC_TYPES)index;
 	switch(command)
@@ -46,9 +46,11 @@ int GpioCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
-int GpioCtrlRpc::ProcessWorkAsync(unsigned char* pWorkData)
+RPC_SRV_RESULT GpioCtrlRpc::ProcessWorkAsync(int index,unsigned char* pWorkData)
 {
-	return 0;
+	RPC_SRV_RESULT ret_val=RPC_SRV_RESULT_FAIL;
+
+	return ret_val;
 }
 /* ------------------------------------------------------------------------- */
 int GpioCtrlRpc::json_to_bin_gpio_get(JsonDataCommObj* pReq)

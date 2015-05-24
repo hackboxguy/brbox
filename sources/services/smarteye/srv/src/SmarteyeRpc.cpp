@@ -36,7 +36,7 @@ int SmarteyeRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 	return -1;
 }
 /* ------------------------------------------------------------------------- */
-int SmarteyeRpc::ProcessWork(JsonDataCommObj* pReq,int index)
+int SmarteyeRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pObj)
 {
 	EJSON_SMARTEYE_RPC_TYPES command =(EJSON_SMARTEYE_RPC_TYPES)index;
 	switch(command)
@@ -49,9 +49,11 @@ int SmarteyeRpc::ProcessWork(JsonDataCommObj* pReq,int index)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
-int SmarteyeRpc::ProcessWorkAsync(unsigned char* pWorkData)
+RPC_SRV_RESULT SmarteyeRpc::ProcessWorkAsync(int index,unsigned char* pWorkData)
 {
-	return 0;
+	RPC_SRV_RESULT ret_val=RPC_SRV_RESULT_FAIL;
+
+	return ret_val;
 }
 /* ------------------------------------------------------------------------- */
 int SmarteyeRpc::json_to_bin_check_id_pattern(JsonDataCommObj* pReq)

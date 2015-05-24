@@ -1,5 +1,5 @@
 #include "SysmgrCltCmdline.h"
-
+#include "ADJsonRpcMgr.hpp"
 using namespace std;
 /* ------------------------------------------------------------------------- */
 SysmgrCltCmdline::SysmgrCltCmdline()
@@ -19,6 +19,10 @@ SysmgrCltCmdline::SysmgrCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--meminfo                  [read system's memory info]");
 	CmdlineHelper.insert_options_entry((char*)"cpuinfo" ,optional_argument,EJSON_SYSMGR_RPC_GET_CPUINFO);
 	CmdlineHelper.insert_help_entry((char*)"--cpuinfo                  [read system's cpu info]");
+
+	CmdlineHelper.insert_options_entry((char*)"devop" ,optional_argument,EJSON_SYSMGR_RPC_GET_DEV_OP);
+	CmdlineHelper.insert_help_entry((char*)"--devop=state              [read/write device operation state=<idle/on/standby/reboot>]");
+
 
 }
 /* ------------------------------------------------------------------------- */
@@ -64,6 +68,14 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			push_get_info_command(EJSON_SYSMGR_RPC_GET_CPUINFO,(char*)SYSMGR_RPC_CPUINFO_GET,
 			(char*)SYSMGR_RPC_CPUINFO_ARG_MODEL,(char*)SYSMGR_RPC_CPUINFO_ARG_CORES,
 			(char*)SYSMGR_RPC_CPUINFO_ARG_FREQ);
+			break;
+		case EJSON_SYSMGR_RPC_GET_DEV_OP://is used of set type as well
+			{
+			const char *table[]   = SYSMGR_RPC_DEV_OP_ARG_TABL;
+			CmdlineHelper.push_single_enum_get_set_command(EJSON_SYSMGR_RPC_GET_DEV_OP,EJSON_SYSMGR_RPC_SET_DEV_OP,
+			SYSMGR_RPC_DEV_OP_GET,SYSMGR_RPC_DEV_OP_SET,&table[0],EJSON_SYSMGR_DEV_OP_UNKNOWN,
+			(char*)SYSMGR_RPC_DEV_OP_ARG,sub_arg,(char*)RPCMGR_RPC_TASK_STS_ARGID);
+			}
 			break;
 		default:
 			return 0;

@@ -12,8 +12,8 @@ public:
 	~ SysRpc();
 	virtual int MapJsonToBinary(JsonDataCommObj* pReq,int index);
 	virtual int MapBinaryToJson(JsonDataCommObj* pReq,int index);
-	virtual int ProcessWork(JsonDataCommObj* pReq,int index);
-	virtual int ProcessWorkAsync(unsigned char* pWorkData);
+	virtual int ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pObj);
+	virtual RPC_SRV_RESULT ProcessWorkAsync(int index,unsigned char* pWorkData);
 
 	int json_to_bin_get_loadinfo(JsonDataCommObj* pReq);
 	int bin_to_json_get_loadinfo(JsonDataCommObj* pReq);
@@ -33,7 +33,9 @@ public:
 	int process_get_devop(JsonDataCommObj* pReq);
 	int json_to_bin_set_devop(JsonDataCommObj* pReq);
 	int bin_to_json_set_devop(JsonDataCommObj* pReq);
-	int process_set_devop(JsonDataCommObj* pReq);
+	int process_set_devop(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj);
+	RPC_SRV_RESULT process_async_set_devop(SYSMGR_DEV_OP_PACKET* pPacket);
+
 
 };
 /* ------------------------------------------------------------------------- */
