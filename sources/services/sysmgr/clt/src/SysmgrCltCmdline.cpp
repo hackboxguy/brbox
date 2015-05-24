@@ -19,11 +19,10 @@ SysmgrCltCmdline::SysmgrCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--meminfo                  [read system's memory info]");
 	CmdlineHelper.insert_options_entry((char*)"cpuinfo" ,optional_argument,EJSON_SYSMGR_RPC_GET_CPUINFO);
 	CmdlineHelper.insert_help_entry((char*)"--cpuinfo                  [read system's cpu info]");
-
 	CmdlineHelper.insert_options_entry((char*)"devop" ,optional_argument,EJSON_SYSMGR_RPC_GET_DEV_OP);
 	CmdlineHelper.insert_help_entry((char*)"--devop=state              [read/write device operation state=<idle/on/standby/reboot>]");
-
-
+	CmdlineHelper.insert_options_entry((char*)"fversion" ,optional_argument,EJSON_SYSMGR_RPC_GET_FMWVER);
+	CmdlineHelper.insert_help_entry((char*)"--fversion=module          [get fmw module version, module=<current/backup/kernel/project>]");
 }
 /* ------------------------------------------------------------------------- */
 SysmgrCltCmdline::~SysmgrCltCmdline()
@@ -77,6 +76,9 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			(char*)SYSMGR_RPC_DEV_OP_ARG,sub_arg,(char*)RPCMGR_RPC_TASK_STS_ARGID);
 			}
 			break;
+		case EJSON_SYSMGR_RPC_GET_FMWVER:
+			push_fmw_version_read_command(sub_arg);
+			break;
 		default:
 			return 0;
 			break;	
@@ -95,7 +97,8 @@ int SysmgrCltCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *
 		case EJSON_SYSMGR_RPC_GET_CPUINFO:
 			run_get_info_command(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
 			break;
-
+		case EJSON_SYSMGR_RPC_GET_FMWVER:
+			run_fmw_version_command(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
 		default:return -1;
 			break;
 	}
@@ -220,4 +223,67 @@ int SysmgrCltCmdline::run_get_info_command(CmdExecutionObj *pCmdObj,ADJsonRpcCli
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
+int SysmgrCltCmdline::push_fmw_version_read_command(char* subarg)
+{
+	CmdExecutionObj *pCmdObj=NULL;
+	OBJECT_MEM_NEW(pCmdObj,CmdExecutionObj);
+	if(pCmdObj==NULL)
+	{
+		printf("failed create pCmdObj!!!\n");
+		return -1;
+	}
+	strcpy(pCmdObj->get_rpc_name,SYSMGR_RPC_FMW_VER_GET);
+	if(CmdlineHelper.get_next_subargument(&subarg)==0)//user must specify either eth0 or eth1
+	{
+		OBJ_MEM_DELETE(pCmdObj);
+		printf("please specify correct module type []!!!\n");
+		return -1;
+	}
+	else 
+	{
+		const char *table[]   = SYSMGR_RPC_FMW_VER_ARG_TABL;
+		SYSMGR_FMW_MODULE_TYPE module=(SYSMGR_FMW_MODULE_TYPE)string_to_enum(table,subarg,SYSMGR_FMW_MODULE_UNKNOWN);
+		if(module>=SYSMGR_FMW_MODULE_UNKNOWN)
+		{
+			printf("For fmw version read, module_type must be specified\n");
+			OBJ_MEM_DELETE(pCmdObj);
+			return -1;
+		}
+		else
+		{	
+			strcpy(pCmdObj->first_arg_param_name,SYSMGR_RPC_FMW_VER_ARG_MODULE);//"module"
+			strcpy(pCmdObj->first_arg_param_value,table[module]);//"MrcSpiImg"
+			strcpy(pCmdObj->second_arg_param_name,SYSMGR_RPC_FMW_VER_ARG);//"version"
+			pCmdObj->command=EJSON_SYSMGR_RPC_GET_FMWVER;
+			pCmdObj->action=RPC_SRV_ACT_READ;
+		}
+	}
+	pCmdObj->cmd_type=CLIENT_CMD_TYPE_USER_DEFINED;
+	//put the request into chain
+	if(CmdlineHelper.CmdChain.chain_put((void *)pCmdObj)!=0)
+	{
+		printf("push_fmw_version_read_command: failed! unable to push json-req-task-obj to chain!\n");
+		OBJ_MEM_DELETE(pCmdObj);
+		return -1;
+	}
+	return 0;
+}
+int SysmgrCltCmdline::run_fmw_version_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker)
+{
+	ADThreadedSockClient *pOrig = (ADThreadedSockClient*)pWorker;
+	if(pCmdObj->action == RPC_SRV_ACT_READ)
+	{
+		//following command has different name for req_arg and for resp_arg.
+		pCmdObj->result=pSrvSockConn->get_string_type_with_string_para(pCmdObj->get_rpc_name,pCmdObj->first_arg_param_name,pCmdObj->first_arg_param_value,pCmdObj->second_arg_param_value,pCmdObj->second_arg_param_name);
+		pOrig->log_print_message(pSrvSockConn,pCmdObj->get_rpc_name,RPC_SRV_ACT_READ,pCmdObj->result,pOutMsgList,pCmdObj->second_arg_param_value);
+	}
+	else
+	{
+		pOrig->my_log_print_message(pSrvSockConn,(char*)"run_fmw_version_command",RPC_SRV_ACT_UNKNOWN,(char*)CLIENT_CMD_RESULT_INVALID_ACT,pOutMsgList);
+		return -1;
+	}
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+
 

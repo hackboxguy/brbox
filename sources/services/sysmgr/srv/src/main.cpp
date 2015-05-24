@@ -50,11 +50,12 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&MemInfoGet);
 	SysRpc CpuInfoGet(SYSMGR_RPC_CPUINFO_GET  ,EJSON_SYSMGR_RPC_GET_CPUINFO ,emulat,dbglog,&DataCache); //system related rpc handler class
 	RpcMgr.AttachRpc(&CpuInfoGet);
-
 	SysRpc DevOpGet(SYSMGR_RPC_DEV_OP_GET     ,EJSON_SYSMGR_RPC_GET_DEV_OP ,emulat,dbglog,&DataCache); //get device operation
 	RpcMgr.AttachRpc(&DevOpGet);
-	SysRpc DevOpSet(SYSMGR_RPC_DEV_OP_SET     ,EJSON_SYSMGR_RPC_SET_DEV_OP ,emulat,dbglog,&DataCache); //get device operation
+	SysRpc DevOpSet(SYSMGR_RPC_DEV_OP_SET     ,EJSON_SYSMGR_RPC_SET_DEV_OP ,emulat,dbglog,&DataCache); //set device operation
 	RpcMgr.AttachRpc(&DevOpSet);
+	SysRpc FmwVerGet(SYSMGR_RPC_FMW_VER_GET   ,EJSON_SYSMGR_RPC_GET_FMWVER ,emulat,dbglog,&DataCache); //get fmv version
+	RpcMgr.AttachRpc(&FmwVerGet);
 
 
 	//start listening for rpc-commands

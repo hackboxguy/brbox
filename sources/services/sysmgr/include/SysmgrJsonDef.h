@@ -16,8 +16,8 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_GET_CPUINFO,
 	EJSON_SYSMGR_RPC_GET_DEV_OP,
 	EJSON_SYSMGR_RPC_SET_DEV_OP,
+	EJSON_SYSMGR_RPC_GET_FMWVER,
 	//EJSON_SYSMGR_RPC_IDENTIFY_DEVICE,
-	//EJSON_SYSMGR_RPC_GET_FMWVER,
 	//EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM, //returns current booted partition brbox1 or brbox2
 	
 
@@ -120,9 +120,32 @@ typedef struct SYSMGR_DEV_OP_PACKET_T
 	EJSON_SYSMGR_DEV_OP operation;
 	char operation_str[255];//needed for settings store/restore(un-used for json-rpc mappers)
 	int taskID;//return the taskID so that client can check the progress
-	//void* pDataCache;//void pointer for accessing local data cache in de-coupled set action
 }SYSMGR_DEV_OP_PACKET;
 /* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_GET_FMWVER,
+#define SYSMGR_RPC_FMW_VER_GET             "get_fmw_version"
+#define SYSMGR_RPC_FMW_VER_ARG_MODULE      "module"
+#define SYSMGR_RPC_FMW_VER_ARG             "version"
+#define SYSMGR_RPC_FMW_VER_ARG_TABL        {"current","backup","kernel","project","brbox1","brbox2","unknown","none","\0"}
+typedef enum SYSMGR_FMW_MODULE_TYPE_T
+{
+	SYSMGR_FMW_MODULE_BRBOX_CURRENT,//current rootfs
+	SYSMGR_FMW_MODULE_BRBOX_BACKUP, //backup rootfs
+	SYSMGR_FMW_MODULE_BRBOX_KERNEL, //kernel version
+	SYSMGR_FMW_MODULE_BRBOX_PROJECT,
+	SYSMGR_FMW_MODULE_BRBOX1,
+	SYSMGR_FMW_MODULE_BRBOX2,
+	SYSMGR_FMW_MODULE_UNKNOWN,
+	SYSMGR_FMW_MODULE_NONE
+}SYSMGR_FMW_MODULE_TYPE;
+typedef struct SYSMGR_FMW_MODULE_PACKET_T
+{
+	SYSMGR_FMW_MODULE_TYPE module;
+	char cmn_fname_ver_str[512];//common for exchanging fmw_file_path or version string(MAX_FILE_PATH is 512bytes)
+	int taskID;//for fmw update, return the taskID so that client can check the progress
+}SYSMGR_FMW_MODULE_PACKET;
+#define SYSMGR_BRDSK_TOOL         "brdskmgr"
+#define SYSMGR_TEMP_FMW_READ_FILE "/tmp/temp-fmw-ver.txt"
 /* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct SYSMGR_CMN_DATA_CACHE_T
@@ -130,6 +153,6 @@ typedef struct SYSMGR_CMN_DATA_CACHE_T
 	std::string StrTmp;//pChar //Char //Int //pInt //Float //Enum
 	SYSMGR_DEV_OP_PACKET DevOp;
 }SYSMGR_CMN_DATA_CACHE;
-
+/* ------------------------------------------------------------------------- */
 #endif
 

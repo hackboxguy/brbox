@@ -22,6 +22,7 @@ int SysRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_GET_CPUINFO  :return json_to_bin_get_cpuinfo(pReq);
 		case EJSON_SYSMGR_RPC_GET_DEV_OP   :return json_to_bin_get_devop(pReq);
 		case EJSON_SYSMGR_RPC_SET_DEV_OP   :return json_to_bin_set_devop(pReq);
+		case EJSON_SYSMGR_RPC_GET_FMWVER   :return json_to_bin_get_fmwver(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -38,6 +39,7 @@ int SysRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_GET_CPUINFO  :return bin_to_json_get_cpuinfo(pReq);
 		case EJSON_SYSMGR_RPC_GET_DEV_OP   :return bin_to_json_get_devop(pReq);
 		case EJSON_SYSMGR_RPC_SET_DEV_OP   :return bin_to_json_set_devop(pReq);
+		case EJSON_SYSMGR_RPC_GET_FMWVER   :return bin_to_json_get_fmwver(pReq);
 		default: break;
 	}
 	return -1;
@@ -54,6 +56,7 @@ int SysRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 		case EJSON_SYSMGR_RPC_GET_CPUINFO  :return process_get_cpuinfo(pReq);
 		case EJSON_SYSMGR_RPC_GET_DEV_OP   :return process_get_devop(pReq);
 		case EJSON_SYSMGR_RPC_SET_DEV_OP   :return process_set_devop(pReq,pObj);
+		case EJSON_SYSMGR_RPC_GET_FMWVER   :return process_get_fmwver(pReq);
 		default:break;
 	}
 	return 0;
@@ -293,6 +296,79 @@ RPC_SRV_RESULT SysRpc::process_async_set_devop(SYSMGR_DEV_OP_PACKET* pPacket)
 			break;
 	}
 	return ret_val;
+}
+/* ------------------------------------------------------------------------- */
+int SysRpc::json_to_bin_get_fmwver(JsonDataCommObj* pReq)
+{
+	SYSMGR_FMW_MODULE_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_FMW_MODULE_PACKET,RPC_SRV_ACT_READ,EJSON_SYSMGR_RPC_GET_FMWVER);
+	//extract "module" parameter from json string
+	JSON_STRING_TO_ENUM(SYSMGR_RPC_FMW_VER_ARG_MODULE,SYSMGR_RPC_FMW_VER_ARG_TABL,SYSMGR_FMW_MODULE_TYPE,SYSMGR_FMW_MODULE_UNKNOWN,pPanelCmdObj->module);
+	return 0;
+}
+int SysRpc::bin_to_json_get_fmwver(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_STRING(RPC_SRV_REQ,SYSMGR_FMW_MODULE_PACKET,SYSMGR_RPC_FMW_VER_ARG,cmn_fname_ver_str);
+	return 0;
+}
+int SysRpc::process_get_fmwver(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SYSMGR_FMW_MODULE_PACKET* pPacket;
+	pPacket=(SYSMGR_FMW_MODULE_PACKET*)pPanelReq->dataRef;
+	if(pPanelReq->action!=RPC_SRV_ACT_READ)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+		return 0;
+	}
+	if(get_emulation_flag()==true)
+	{
+		strcpy(pPacket->cmn_fname_ver_str,"00.01.12345");
+		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+		return 0;
+	}
+	strcpy(pPacket->cmn_fname_ver_str,"unknown");
+	char command[255];
+	switch(pPacket->module)
+	{
+		case SYSMGR_FMW_MODULE_BRBOX_CURRENT:
+			sprintf(command,"%s -v > %s",SYSMGR_BRDSK_TOOL,SYSMGR_TEMP_FMW_READ_FILE);
+			break;
+		case SYSMGR_FMW_MODULE_BRBOX_BACKUP :
+			sprintf(command,"%s -b > %s",SYSMGR_BRDSK_TOOL,SYSMGR_TEMP_FMW_READ_FILE);
+			break;
+		//case SYSMGR_FMW_MODULE_BRBOX_KERNEL :break;
+		default:
+			pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+			return 0;
+			break;
+	}
+	//sprintf(command,"%s -v > %s",SYSMGR_BRDSK_TOOL,SYSMGR_TEMP_FMW_READ_FILE);
+	if(system(command)!=0)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_FILE_OPEN_ERR;
+		return 0;
+	}
+	char temp_str[255];
+	FILE *shell;
+	shell= fopen(SYSMGR_TEMP_FMW_READ_FILE,"r");
+	if(shell == NULL )
+	{
+		pPanelReq->result=RPC_SRV_RESULT_FILE_OPEN_ERR;
+		return 0;
+	}
+	size_t read_bytes = fread(temp_str,1,100,shell);
+	if(read_bytes>0)
+	{
+		temp_str[100]='\0';
+		strcpy(pPacket->cmn_fname_ver_str,temp_str);
+		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	}
+	else
+		pPanelReq->result=RPC_SRV_RESULT_FILE_READ_ERR;
+	fclose(shell);
+	return 0;
 }
 /* ------------------------------------------------------------------------- */
 

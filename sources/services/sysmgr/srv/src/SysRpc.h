@@ -36,6 +36,9 @@ public:
 	int process_set_devop(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj);
 	RPC_SRV_RESULT process_async_set_devop(SYSMGR_DEV_OP_PACKET* pPacket);
 
+	int json_to_bin_get_fmwver(JsonDataCommObj* pReq);
+	int bin_to_json_get_fmwver(JsonDataCommObj* pReq);
+	int process_get_fmwver(JsonDataCommObj* pReq);
 
 };
 /* ------------------------------------------------------------------------- */
