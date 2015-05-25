@@ -86,7 +86,7 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			const char *table[]   = SYSMGR_RPC_BOOT_SYSTEM_ARG_TABL;
 			CmdlineHelper.push_single_enum_get_set_command(EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM,
 			EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM,SYSMGR_RPC_BOOT_SYSTEM_GET,SYSMGR_RPC_BOOT_SYSTEM_GET,
-			&table[0],SYSMGR_BOOT_SYSTEM_UNKNOWN,(char*)SYSMGR_RPC_DEV_OP_ARG,sub_arg);
+			&table[0],SYSMGR_BOOT_SYSTEM_UNKNOWN,(char*)SYSMGR_RPC_BOOT_SYSTEM_ARG,sub_arg);
 			}
 			break;
 		default:
