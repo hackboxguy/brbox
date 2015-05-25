@@ -24,6 +24,10 @@ class SysmgrCltCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcess
 	int run_get_info_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,
 			ADThreadedSockClientProducer *pWorker);
 
+	int push_fmw_update_command(char* subarg);
+	int run_fmw_update_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,
+		ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);
+
 public:
 	SysmgrCltCmdline();
 	~SysmgrCltCmdline();

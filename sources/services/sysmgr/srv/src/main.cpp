@@ -20,19 +20,16 @@ int main(int argc, const char* argv[])
 	CmdLine.parse_cmdline_arguments(argc,(char**)argv);
 	if(CmdLine.is_help_printed())
 		return -1;//user just requested to print the help info
-
 	bool dbglog = CmdLine.get_debug_log();
 	bool emulat = CmdLine.get_emulation_mode();
-
 	//start 100ms timer
 	ADTimer AppTimer(100);//only one instance per application(or process) must exist
-
 	//create a common data Cache of the service
 	SYSMGR_CMN_DATA_CACHE DataCache;
-
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog); //main rpc handler
  
+
 	//network related rpc's
 	NetRpc MacGet  (SYSMGR_RPC_MAC_ADDR_GET ,EJSON_SYSMGR_RPC_GET_MAC_ADDR ,emulat,dbglog,&DataCache);  //network related rpc handler class
 	RpcMgr.AttachRpc(&MacGet);
@@ -42,13 +39,12 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&Ethcount);
 	NetRpc Ethname (SYSMGR_RPC_ETH_NAME_GET ,EJSON_SYSMGR_RPC_GET_ETH_NAME ,emulat,dbglog,&DataCache);  //network related rpc handler class
 	RpcMgr.AttachRpc(&Ethname);
-
 	//system related rpc's
-	SysRpc LoadInfoGet(SYSMGR_RPC_LOADINFO_GET  ,EJSON_SYSMGR_RPC_GET_LOADINFO   ,emulat,dbglog,&DataCache);//system related rpc handler class
+	SysRpc LoadInfoGet(SYSMGR_RPC_LOADINFO_GET  ,EJSON_SYSMGR_RPC_GET_LOADINFO   ,emulat,dbglog,&DataCache);//sys related rpc handler class
 	RpcMgr.AttachRpc(&LoadInfoGet);
-	SysRpc MemInfoGet(SYSMGR_RPC_MEMINFO_GET    ,EJSON_SYSMGR_RPC_GET_MEMINFO    ,emulat,dbglog,&DataCache); //system related rpc handler class
+	SysRpc MemInfoGet(SYSMGR_RPC_MEMINFO_GET    ,EJSON_SYSMGR_RPC_GET_MEMINFO    ,emulat,dbglog,&DataCache);//sys related rpc handler class
 	RpcMgr.AttachRpc(&MemInfoGet);
-	SysRpc CpuInfoGet(SYSMGR_RPC_CPUINFO_GET    ,EJSON_SYSMGR_RPC_GET_CPUINFO    ,emulat,dbglog,&DataCache); //system related rpc handler class
+	SysRpc CpuInfoGet(SYSMGR_RPC_CPUINFO_GET    ,EJSON_SYSMGR_RPC_GET_CPUINFO    ,emulat,dbglog,&DataCache);//sys related rpc handler class
 	RpcMgr.AttachRpc(&CpuInfoGet);
 	SysRpc DevOpGet(SYSMGR_RPC_DEV_OP_GET       ,EJSON_SYSMGR_RPC_GET_DEV_OP     ,emulat,dbglog,&DataCache); //get device operation
 	RpcMgr.AttachRpc(&DevOpGet);
@@ -56,8 +52,10 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&DevOpSet);
 	SysRpc FmwVerGet(SYSMGR_RPC_FMW_VER_GET     ,EJSON_SYSMGR_RPC_GET_FMWVER     ,emulat,dbglog,&DataCache); //get fmv version
 	RpcMgr.AttachRpc(&FmwVerGet);
-	SysRpc BootSysGet(SYSMGR_RPC_BOOT_SYSTEM_GET,EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM,emulat,dbglog,&DataCache); //get fmv version
+	SysRpc BootSysGet(SYSMGR_RPC_BOOT_SYSTEM_GET,EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&BootSysGet);
+	SysRpc FmwUpdateSet(SYSMGR_RPC_FMWUPDATE_SET,EJSON_SYSMGR_RPC_SET_FMWUPDATE,emulat,dbglog,&DataCache); 
+	RpcMgr.AttachRpc(&FmwUpdateSet);
 
 
 	//start listening for rpc-commands
@@ -66,8 +64,6 @@ int main(int argc, const char* argv[])
 	RpcMgr.Start(CmdLine.get_port_number(),CmdLine.get_socket_log(),CmdLine.get_emulation_mode());
 	//server is ready to serve rpc's
 	RpcMgr.SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE_READY);
-
-
 	//wait for sigkill or sigterm signal
 	AppTimer.wait_for_exit_signal();//loop till KILL or TERM signal is received
 	AppTimer.stop_timer();//stop sending heart-beats to other objects

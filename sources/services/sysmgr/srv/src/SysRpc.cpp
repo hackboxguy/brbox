@@ -28,6 +28,7 @@ int SysRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_SET_DEV_OP     :return json_to_bin_set_devop(pReq);
 		case EJSON_SYSMGR_RPC_GET_FMWVER     :return json_to_bin_get_fmwver(pReq);
 		case EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM:return json_to_bin_get_bootsys(pReq);
+		case EJSON_SYSMGR_RPC_SET_FMWUPDATE  :return json_to_bin_set_fmwupdate(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -46,6 +47,7 @@ int SysRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_SET_DEV_OP     :return bin_to_json_set_devop(pReq);
 		case EJSON_SYSMGR_RPC_GET_FMWVER     :return bin_to_json_get_fmwver(pReq);
 		case EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM:return bin_to_json_get_bootsys(pReq);
+		case EJSON_SYSMGR_RPC_SET_FMWUPDATE  :return bin_to_json_set_fmwupdate(pReq);
 		default: break;
 	}
 	return -1;
@@ -64,6 +66,7 @@ int SysRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 		case EJSON_SYSMGR_RPC_SET_DEV_OP     :return process_set_devop(pReq,pObj);
 		case EJSON_SYSMGR_RPC_GET_FMWVER     :return process_get_fmwver(pReq);
 		case EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM:return process_get_bootsys(pReq);
+		case EJSON_SYSMGR_RPC_SET_FMWUPDATE  :return process_set_fmwupdate(pReq,pObj);
 		default:break;
 	}
 	return 0;
@@ -79,6 +82,14 @@ RPC_SRV_RESULT SysRpc::ProcessWorkAsync(int cmd,unsigned char* pWorkData)
 				SYSMGR_DEV_OP_PACKET *pPacket;
 				pPacket=(SYSMGR_DEV_OP_PACKET*)pWorkData;
 				ret_val=process_async_set_devop(pPacket);
+				OBJ_MEM_DELETE(pWorkData);
+			}
+			break;
+		case EJSON_SYSMGR_RPC_SET_FMWUPDATE:
+			{
+				SYSMGR_FMWUPDATE_PACKET *pPacket;
+				pPacket=(SYSMGR_FMWUPDATE_PACKET*)pWorkData;
+				ret_val=process_async_set_fmwupdate(pPacket);
 				OBJ_MEM_DELETE(pWorkData);
 			}
 			break;
@@ -299,6 +310,7 @@ RPC_SRV_RESULT SysRpc::process_async_set_devop(SYSMGR_DEV_OP_PACKET* pPacket)
 			sprintf(cmdline,"%s","sleep 3;reboot");//CMDLINE_TRIGGER_REBOOT_CMD);
 			//#define CMDLINE_TRIGGER_REBOOT_CMD       "sleep 3;reboot"
 			ret_val=SysInfo.run_shell_script(cmdline,get_emulation_flag());
+			break;
 		default:
 			break;
 	}
@@ -485,6 +497,73 @@ int SysRpc::process_get_bootsys(JsonDataCommObj* pReq)
 		boot_system_updated=true;
 	}
 	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int SysRpc::json_to_bin_set_fmwupdate(JsonDataCommObj* pReq)
+{
+	SYSMGR_FMWUPDATE_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_FMWUPDATE_PACKET,RPC_SRV_ACT_WRITE,EJSON_SYSMGR_RPC_SET_FMWUPDATE);
+	//extract "module" parameter from json string
+	JSON_STRING_TO_ENUM(SYSMGR_RPC_FMWUPDATE_ARG,SYSMGR_RPC_FMWUPDATE_ARG_TABL,SYSMGR_FMW_MODULE_TYPE,SYSMGR_FMW_MODULE_UNKNOWN,pPanelCmdObj->module);
+	//extract "filepath" parameter from json string
+	JSON_STRING_TO_STRING(SYSMGR_RPC_FMWUPDATE_ARG_FILEPATH,pPanelCmdObj->cmn_fname_ver_str);
+	return 0;
+}
+int SysRpc::bin_to_json_set_fmwupdate(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,SYSMGR_FMWUPDATE_PACKET,RPCMGR_RPC_TASK_STS_ARGID);
+	return 0;
+}
+int SysRpc::process_set_fmwupdate(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SYSMGR_FMWUPDATE_PACKET* pPacket;
+	pPacket=(SYSMGR_FMWUPDATE_PACKET*)pPanelReq->dataRef;
+	if(pPanelReq->action!=RPC_SRV_ACT_WRITE)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+		return 0;
+	}
+	//only 'project' module is supported currently
+	if(pPacket->module!=SYSMGR_FMW_MODULE_BRBOX_PROJECT)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;
+		return 0;
+	}
+
+	//create a copy packet and initialize with supplied values
+	SYSMGR_FMWUPDATE_PACKET* pWorkData=NULL;
+	OBJECT_MEM_NEW(pWorkData,SYSMGR_FMWUPDATE_PACKET);//delete this object in run_work() callback function
+	if(pWorkData == NULL)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_MEM_ERROR;
+		return -1;
+	}
+	pWorkData->module=pPacket->module;
+	strcpy(pWorkData->cmn_fname_ver_str,pPacket->cmn_fname_ver_str);
+
+	pPanelReq->result=pObj->PushAsyncTask(EJSON_SYSMGR_RPC_SET_FMWUPDATE,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_PRESERVE);
+	if(pPanelReq->result!=RPC_SRV_RESULT_IN_PROG)
+		OBJ_MEM_DELETE(pWorkData);
+	return 0;
+}
+RPC_SRV_RESULT SysRpc::process_async_set_fmwupdate(SYSMGR_FMWUPDATE_PACKET* pPacket)
+{
+	char cmdline[512];
+	ADSysInfo SysInfo;
+	RPC_SRV_RESULT ret_val=RPC_SRV_RESULT_ARG_ERROR;
+	switch(pPacket->module)
+	{
+		case SYSMGR_FMW_MODULE_BRBOX_PROJECT :
+			sprintf(cmdline,"%s -u %s",SYSMGR_UPDATE_TOOL,pPacket->cmn_fname_ver_str);
+			ret_val=SysInfo.run_shell_script(cmdline,get_emulation_flag());//backup-fmw will be updated
+			bkup_fmwver_updated=false;//re-read bkup-fmw-version when fmw-version-rpc is called
+			break;
+		default:
+			break;
+	}
+	return ret_val;
 }
 /* ------------------------------------------------------------------------- */
 

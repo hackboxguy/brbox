@@ -47,6 +47,12 @@ public:
 	int json_to_bin_get_bootsys(JsonDataCommObj* pReq);
 	int bin_to_json_get_bootsys(JsonDataCommObj* pReq);
 	int process_get_bootsys(JsonDataCommObj* pReq);
+
+	int json_to_bin_set_fmwupdate(JsonDataCommObj* pReq);
+	int bin_to_json_set_fmwupdate(JsonDataCommObj* pReq);
+	int process_set_fmwupdate(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj);
+	RPC_SRV_RESULT process_async_set_fmwupdate(SYSMGR_FMWUPDATE_PACKET* pPacket);
+
 };
 /* ------------------------------------------------------------------------- */
 

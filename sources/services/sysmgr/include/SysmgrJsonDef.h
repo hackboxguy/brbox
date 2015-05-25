@@ -18,6 +18,10 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_SET_DEV_OP,
 	EJSON_SYSMGR_RPC_GET_FMWVER,
 	EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM, //returns current booted partition brbox1 or brbox2
+	EJSON_SYSMGR_RPC_SET_FMWUPDATE,   //trigger fmw update
+	//tftp file download
+	//ftp file download
+	//get async task in progress
 
 	//EJSON_SYSMGR_RPC_IDENTIFY_DEVICE,
 	EJSON_SYSMGR_RPC_END,
@@ -161,6 +165,14 @@ typedef struct SYSMGR_BOOT_SYSTEM_PACKET_T
 {
 	SYSMGR_BOOT_SYSTEM_TYPE system;
 }SYSMGR_BOOT_SYSTEM_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_SET_FMWUPDATE
+#define SYSMGR_RPC_FMWUPDATE_SET             "get_fmw_version"
+#define SYSMGR_RPC_FMWUPDATE_ARG             SYSMGR_RPC_FMW_VER_ARG_MODULE //"module"
+#define SYSMGR_RPC_FMWUPDATE_ARG_TABL        SYSMGR_RPC_FMW_VER_ARG_TABL
+#define SYSMGR_RPC_FMWUPDATE_ARG_FILEPATH    "filepath"
+typedef SYSMGR_FMW_MODULE_PACKET SYSMGR_FMWUPDATE_PACKET;
+#define SYSMGR_UPDATE_TOOL         "update"
 /* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct SYSMGR_CMN_DATA_CACHE_T

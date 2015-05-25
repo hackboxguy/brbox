@@ -25,6 +25,9 @@ SysmgrCltCmdline::SysmgrCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--fversion=module          [get fmw module version, module=<current/backup/kernel/project>]");
 	CmdlineHelper.insert_options_entry((char*)"bootdev" ,optional_argument,EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM);
 	CmdlineHelper.insert_help_entry((char*)"--bootdev                  [read currently booted system<brbox1/brbox2>]");
+	CmdlineHelper.insert_options_entry((char*)"fupdate" ,optional_argument,EJSON_SYSMGR_RPC_SET_FMWUPDATE);
+	CmdlineHelper.insert_help_entry((char*)"--fupdate=module,filepath  [trigger fmw update of defined module=<project>]");
+
 }
 /* ------------------------------------------------------------------------- */
 SysmgrCltCmdline::~SysmgrCltCmdline()
@@ -89,6 +92,9 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			&table[0],SYSMGR_BOOT_SYSTEM_UNKNOWN,(char*)SYSMGR_RPC_BOOT_SYSTEM_ARG,sub_arg);
 			}
 			break;
+		case EJSON_SYSMGR_RPC_SET_FMWUPDATE:
+			push_fmw_update_command(sub_arg);
+			break;
 		default:
 			return 0;
 			break;	
@@ -109,6 +115,10 @@ int SysmgrCltCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *
 			break;
 		case EJSON_SYSMGR_RPC_GET_FMWVER:
 			run_fmw_version_command(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
+			break;
+		case EJSON_SYSMGR_RPC_SET_FMWUPDATE:
+			run_fmw_update_command(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
+			break;
 		default:return -1;
 			break;
 	}
@@ -295,5 +305,76 @@ int SysmgrCltCmdline::run_fmw_version_command(CmdExecutionObj *pCmdObj,ADJsonRpc
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
+int SysmgrCltCmdline::push_fmw_update_command(char* subarg)
+{
+	CmdExecutionObj *pCmdObj=NULL;
+	OBJECT_MEM_NEW(pCmdObj,CmdExecutionObj);
+	if(pCmdObj==NULL)
+	{
+		printf("failed create pCmdObj!!!\n");
+		return -1;
+	}
+	strcpy(pCmdObj->set_rpc_name,SYSMGR_RPC_FMWUPDATE_SET);
+	pCmdObj->cmd_type=CLIENT_CMD_TYPE_USER_DEFINED;
 
+	if(CmdlineHelper.get_next_subargument(&subarg)==0)//read
+	{	
+		printf("for fmw update module_type and file_path must be specified\n");
+		OBJ_MEM_DELETE(pCmdObj);
+		return -1;
+	}
+	else //set
+	{
+		const char *table[]   = SYSMGR_RPC_FMWUPDATE_ARG_TABL;
+		SYSMGR_FMW_MODULE_TYPE module=(SYSMGR_FMW_MODULE_TYPE)string_to_enum(table,subarg,SYSMGR_FMW_MODULE_UNKNOWN);
+		if(module>=SYSMGR_FMW_MODULE_UNKNOWN)
+		{
+			printf("For fmw update, module_type must be specified\n");
+			OBJ_MEM_DELETE(pCmdObj);
+			return -1;
+		}
+		else
+		{	
+			strcpy(pCmdObj->first_arg_param_name,SYSMGR_RPC_FMWUPDATE_ARG);//"module"
+			strcpy(pCmdObj->first_arg_param_value,table[module]);//"module-type"		
+			pCmdObj->command=EJSON_SYSMGR_RPC_SET_FMWUPDATE;
+			pCmdObj->action=RPC_SRV_ACT_WRITE;
+			if(CmdlineHelper.get_next_subargument(&subarg)==0)//read
+			{	
+				printf("For fmw update, file_path must be specified\n");
+				OBJ_MEM_DELETE(pCmdObj);
+				return -1;
+			}
+			strcpy(pCmdObj->second_arg_param_name,SYSMGR_RPC_FMWUPDATE_ARG_FILEPATH);
+			strcpy(pCmdObj->second_arg_param_value,subarg);
+			strcpy(pCmdObj->third_arg_param_name,RPCMGR_RPC_TASK_STS_ARGID);//taskID
+		}
+	}
+	//put the request into chain
+	if(CmdlineHelper.CmdChain.chain_put((void *)pCmdObj)!=0)
+	{
+		printf("failed! unable to push json-req-task-obj to chain!\n");
+		OBJ_MEM_DELETE(pCmdObj);
+		return -1;
+	}
+	return 0;
+}
+int SysmgrCltCmdline::run_fmw_update_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker)
+{
+	ADThreadedSockClient *pOrig = (ADThreadedSockClient*)pWorker;
+	if(pCmdObj->action == RPC_SRV_ACT_WRITE)
+	{
+		pCmdObj->result=pSrvSockConn->set_double_string_get_single_string_type(pCmdObj->set_rpc_name,pCmdObj->first_arg_param_name,pCmdObj->first_arg_param_value,
+									pCmdObj->second_arg_param_name,pCmdObj->second_arg_param_value,
+									pCmdObj->third_arg_param_name,pCmdObj->third_arg_param_value);
+		pOrig->log_print_message(pSrvSockConn,pCmdObj->set_rpc_name,RPC_SRV_ACT_READ,pCmdObj->result,pOutMsgList,pCmdObj->third_arg_param_value);
+	}
+	else
+	{
+		pOrig->my_log_print_message(pSrvSockConn,(char*)"run_fmw_update_command",RPC_SRV_ACT_UNKNOWN,(char*)CLIENT_CMD_RESULT_INVALID_ACT,pOutMsgList);
+		return -1;
+	}
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
 
