@@ -167,7 +167,7 @@ typedef struct SYSMGR_BOOT_SYSTEM_PACKET_T
 }SYSMGR_BOOT_SYSTEM_PACKET;
 /* ------------------------------------------------------------------------- */
 //EJSON_SYSMGR_RPC_SET_FMWUPDATE
-#define SYSMGR_RPC_FMWUPDATE_SET             "get_fmw_version"
+#define SYSMGR_RPC_FMWUPDATE_SET             "firmware_update"
 #define SYSMGR_RPC_FMWUPDATE_ARG             SYSMGR_RPC_FMW_VER_ARG_MODULE //"module"
 #define SYSMGR_RPC_FMWUPDATE_ARG_TABL        SYSMGR_RPC_FMW_VER_ARG_TABL
 #define SYSMGR_RPC_FMWUPDATE_ARG_FILEPATH    "filepath"
