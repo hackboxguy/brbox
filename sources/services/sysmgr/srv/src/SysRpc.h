@@ -9,6 +9,7 @@ class  SysRpc : public ADJsonRpcMgrConsumer, public ADCmnStringProcessor
 	bool crnt_fmwver_updated;
 	bool bkup_fmwver_updated;
 	bool krnl_fmwver_updated;
+	bool boot_system_updated;
 	SYSMGR_CMN_DATA_CACHE *pDataCache;
 public:
 	 SysRpc(std::string rpcName,int myIndex,bool emu,bool log,SYSMGR_CMN_DATA_CACHE *pData);//getRpc,std::string setRpc);
@@ -43,6 +44,9 @@ public:
 	int bin_to_json_get_fmwver(JsonDataCommObj* pReq);
 	int process_get_fmwver(JsonDataCommObj* pReq);
 
+	int json_to_bin_get_bootsys(JsonDataCommObj* pReq);
+	int bin_to_json_get_bootsys(JsonDataCommObj* pReq);
+	int process_get_bootsys(JsonDataCommObj* pReq);
 };
 /* ------------------------------------------------------------------------- */
 

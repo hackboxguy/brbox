@@ -8,6 +8,7 @@ SysRpc:: SysRpc(std::string rpcName,int myIndex,bool emu,bool log,SYSMGR_CMN_DAT
 	crnt_fmwver_updated=false;
 	bkup_fmwver_updated=false;
 	krnl_fmwver_updated=false;
+	boot_system_updated=false;
 }
 /* ------------------------------------------------------------------------- */
 SysRpc::~ SysRpc()
@@ -20,12 +21,13 @@ int SysRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 	EJSON_SYSMGR_RPC_TYPES command =(EJSON_SYSMGR_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_SYSMGR_RPC_GET_LOADINFO :return json_to_bin_get_loadinfo(pReq);
-		case EJSON_SYSMGR_RPC_GET_MEMINFO  :return json_to_bin_get_meminfo(pReq);
-		case EJSON_SYSMGR_RPC_GET_CPUINFO  :return json_to_bin_get_cpuinfo(pReq);
-		case EJSON_SYSMGR_RPC_GET_DEV_OP   :return json_to_bin_get_devop(pReq);
-		case EJSON_SYSMGR_RPC_SET_DEV_OP   :return json_to_bin_set_devop(pReq);
-		case EJSON_SYSMGR_RPC_GET_FMWVER   :return json_to_bin_get_fmwver(pReq);
+		case EJSON_SYSMGR_RPC_GET_LOADINFO   :return json_to_bin_get_loadinfo(pReq);
+		case EJSON_SYSMGR_RPC_GET_MEMINFO    :return json_to_bin_get_meminfo(pReq);
+		case EJSON_SYSMGR_RPC_GET_CPUINFO    :return json_to_bin_get_cpuinfo(pReq);
+		case EJSON_SYSMGR_RPC_GET_DEV_OP     :return json_to_bin_get_devop(pReq);
+		case EJSON_SYSMGR_RPC_SET_DEV_OP     :return json_to_bin_set_devop(pReq);
+		case EJSON_SYSMGR_RPC_GET_FMWVER     :return json_to_bin_get_fmwver(pReq);
+		case EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM:return json_to_bin_get_bootsys(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -37,12 +39,13 @@ int SysRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 	EJSON_SYSMGR_RPC_TYPES command =(EJSON_SYSMGR_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_SYSMGR_RPC_GET_LOADINFO :return bin_to_json_get_loadinfo(pReq);
-		case EJSON_SYSMGR_RPC_GET_MEMINFO  :return bin_to_json_get_meminfo(pReq);
-		case EJSON_SYSMGR_RPC_GET_CPUINFO  :return bin_to_json_get_cpuinfo(pReq);
-		case EJSON_SYSMGR_RPC_GET_DEV_OP   :return bin_to_json_get_devop(pReq);
-		case EJSON_SYSMGR_RPC_SET_DEV_OP   :return bin_to_json_set_devop(pReq);
-		case EJSON_SYSMGR_RPC_GET_FMWVER   :return bin_to_json_get_fmwver(pReq);
+		case EJSON_SYSMGR_RPC_GET_LOADINFO   :return bin_to_json_get_loadinfo(pReq);
+		case EJSON_SYSMGR_RPC_GET_MEMINFO    :return bin_to_json_get_meminfo(pReq);
+		case EJSON_SYSMGR_RPC_GET_CPUINFO    :return bin_to_json_get_cpuinfo(pReq);
+		case EJSON_SYSMGR_RPC_GET_DEV_OP     :return bin_to_json_get_devop(pReq);
+		case EJSON_SYSMGR_RPC_SET_DEV_OP     :return bin_to_json_set_devop(pReq);
+		case EJSON_SYSMGR_RPC_GET_FMWVER     :return bin_to_json_get_fmwver(pReq);
+		case EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM:return bin_to_json_get_bootsys(pReq);
 		default: break;
 	}
 	return -1;
@@ -54,12 +57,13 @@ int SysRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 	EJSON_SYSMGR_RPC_TYPES command =(EJSON_SYSMGR_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_SYSMGR_RPC_GET_LOADINFO :return process_get_loadinfo(pReq);
-		case EJSON_SYSMGR_RPC_GET_MEMINFO  :return process_get_meminfo(pReq);
-		case EJSON_SYSMGR_RPC_GET_CPUINFO  :return process_get_cpuinfo(pReq);
-		case EJSON_SYSMGR_RPC_GET_DEV_OP   :return process_get_devop(pReq);
-		case EJSON_SYSMGR_RPC_SET_DEV_OP   :return process_set_devop(pReq,pObj);
-		case EJSON_SYSMGR_RPC_GET_FMWVER   :return process_get_fmwver(pReq);
+		case EJSON_SYSMGR_RPC_GET_LOADINFO   :return process_get_loadinfo(pReq);
+		case EJSON_SYSMGR_RPC_GET_MEMINFO    :return process_get_meminfo(pReq);
+		case EJSON_SYSMGR_RPC_GET_CPUINFO    :return process_get_cpuinfo(pReq);
+		case EJSON_SYSMGR_RPC_GET_DEV_OP     :return process_get_devop(pReq);
+		case EJSON_SYSMGR_RPC_SET_DEV_OP     :return process_set_devop(pReq,pObj);
+		case EJSON_SYSMGR_RPC_GET_FMWVER     :return process_get_fmwver(pReq);
+		case EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM:return process_get_bootsys(pReq);
 		default:break;
 	}
 	return 0;
@@ -380,6 +384,7 @@ int SysRpc::process_get_fmwver(JsonDataCommObj* pReq)
 		return 0;
 	}
 	size_t read_bytes = fread(temp_str,1,100,shell);
+	fclose(shell);
 	if(read_bytes>0)
 	{
 		temp_str[read_bytes]='\0';
@@ -409,7 +414,78 @@ int SysRpc::process_get_fmwver(JsonDataCommObj* pReq)
 	}
 	else
 		pPanelReq->result=RPC_SRV_RESULT_FILE_READ_ERR;
-	fclose(shell);
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
+int SysRpc::json_to_bin_get_bootsys(JsonDataCommObj* pReq)
+{
+	SYSMGR_BOOT_SYSTEM_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_BOOT_SYSTEM_PACKET,RPC_SRV_ACT_READ,EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM);
+	return 0;
+}
+int SysRpc::bin_to_json_get_bootsys(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_ENUM(RPC_SRV_REQ,SYSMGR_BOOT_SYSTEM_PACKET,SYSMGR_RPC_BOOT_SYSTEM_ARG,system,SYSMGR_RPC_BOOT_SYSTEM_ARG_TABL,SYSMGR_BOOT_SYSTEM_UNKNOWN);
+	return 0;
+}
+int SysRpc::process_get_bootsys(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SYSMGR_BOOT_SYSTEM_PACKET* pPacket;
+	pPacket=(SYSMGR_BOOT_SYSTEM_PACKET*)pPanelReq->dataRef;
+	if(pPanelReq->action!=RPC_SRV_ACT_READ)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+		return 0;
+	}
+	if(boot_system_updated==true) //is this data already cached?
+	{
+		pPacket->system   = pDataCache->bootsys;
+		pPanelReq->result = RPC_SRV_RESULT_SUCCESS;
+		return 0;
+	}
+
+	//if not in cache, read it for once
+	char command[255];
+	sprintf(command,"%s -c > %s",SYSMGR_BRDSK_TOOL,SYSMGR_TEMP_FMW_READ_FILE);
+	if(system(command)!=0)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_FILE_OPEN_ERR;
+		return 0;
+	}
+
+	char temp_str[255];
+	FILE *shell;
+	shell= fopen(SYSMGR_TEMP_FMW_READ_FILE,"r");
+	if(shell == NULL )
+	{
+		pPanelReq->result=RPC_SRV_RESULT_FILE_OPEN_ERR;
+		return 0;
+	}
+	size_t read_bytes = fread(temp_str,1,100,shell);
+	fclose(shell);
+	if(read_bytes>0)
+	{
+		temp_str[read_bytes]='\0';
+		if(temp_str[strlen(temp_str)-1]=='\n')//remove the carriage return line
+			temp_str[strlen(temp_str)-1]='\0';
+		const char *table[]   = SYSMGR_RPC_BOOT_SYSTEM_ARG_TABL;
+		SYSMGR_BOOT_SYSTEM_TYPE bootsystem=(SYSMGR_BOOT_SYSTEM_TYPE)string_to_enum(table,temp_str,SYSMGR_BOOT_SYSTEM_UNKNOWN);
+		if(bootsystem>=SYSMGR_BOOT_SYSTEM_UNKNOWN)
+		{
+			pPacket->system=SYSMGR_BOOT_SYSTEM_UNKNOWN;
+			pPanelReq->result=RPC_SRV_RESULT_FAIL;
+			return 0;
+		}
+		pPacket->system=bootsystem;
+		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+		//cache this variable, no need to read it again from filesystem
+		pDataCache->bootsys=bootsystem;
+		boot_system_updated=true;
+	}
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+
+

@@ -17,10 +17,9 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_GET_DEV_OP,
 	EJSON_SYSMGR_RPC_SET_DEV_OP,
 	EJSON_SYSMGR_RPC_GET_FMWVER,
-	//EJSON_SYSMGR_RPC_IDENTIFY_DEVICE,
-	//EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM, //returns current booted partition brbox1 or brbox2
-	
+	EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM, //returns current booted partition brbox1 or brbox2
 
+	//EJSON_SYSMGR_RPC_IDENTIFY_DEVICE,
 	EJSON_SYSMGR_RPC_END,
 	EJSON_SYSMGR_RPC_NONE
 }EJSON_SYSMGR_RPC_TYPES;
@@ -147,14 +146,31 @@ typedef struct SYSMGR_FMW_MODULE_PACKET_T
 #define SYSMGR_BRDSK_TOOL         "brdskmgr"
 #define SYSMGR_TEMP_FMW_READ_FILE "/tmp/temp-fmw-ver.txt"
 /* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM
+#define SYSMGR_RPC_BOOT_SYSTEM_GET         "get_boot_system"
+#define SYSMGR_RPC_BOOT_SYSTEM_ARG         "system"
+#define SYSMGR_RPC_BOOT_SYSTEM_ARG_TABL    {"brbox1","brbox2","unknown","none","\0"}
+typedef enum SYSMGR_BOOT_SYSTEM_TYPE_T
+{
+	SYSMGR_BOOT_SYSTEM_BRBOX1,
+	SYSMGR_BOOT_SYSTEM_BRBOX2,
+	SYSMGR_BOOT_SYSTEM_UNKNOWN,
+	SYSMGR_BOOT_SYSTEM_NONE
+}SYSMGR_BOOT_SYSTEM_TYPE;
+typedef struct SYSMGR_BOOT_SYSTEM_PACKET_T
+{
+	SYSMGR_BOOT_SYSTEM_TYPE system;
+}SYSMGR_BOOT_SYSTEM_PACKET;
+/* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct SYSMGR_CMN_DATA_CACHE_T
 {
-	std::string StrTmp;//pChar //Char //Int //pInt //Float //Enum
+	//std::string StrTmp;//pChar //Char //Int //pInt //Float //Enum
 	SYSMGR_DEV_OP_PACKET DevOp;
 	char crnt_fmwver[100];//current version
 	char bkup_fmwver[100];//backup version
 	char krnl_fmwver[100];//kernel version
+	SYSMGR_BOOT_SYSTEM_TYPE bootsys;//brbox1/brbox2
 }SYSMGR_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */
 #endif

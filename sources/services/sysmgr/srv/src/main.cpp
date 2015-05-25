@@ -44,18 +44,20 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&Ethname);
 
 	//system related rpc's
-	SysRpc LoadInfoGet(SYSMGR_RPC_LOADINFO_GET,EJSON_SYSMGR_RPC_GET_LOADINFO,emulat,dbglog,&DataCache);//system related rpc handler class
+	SysRpc LoadInfoGet(SYSMGR_RPC_LOADINFO_GET  ,EJSON_SYSMGR_RPC_GET_LOADINFO   ,emulat,dbglog,&DataCache);//system related rpc handler class
 	RpcMgr.AttachRpc(&LoadInfoGet);
-	SysRpc MemInfoGet(SYSMGR_RPC_MEMINFO_GET  ,EJSON_SYSMGR_RPC_GET_MEMINFO ,emulat,dbglog,&DataCache); //system related rpc handler class
+	SysRpc MemInfoGet(SYSMGR_RPC_MEMINFO_GET    ,EJSON_SYSMGR_RPC_GET_MEMINFO    ,emulat,dbglog,&DataCache); //system related rpc handler class
 	RpcMgr.AttachRpc(&MemInfoGet);
-	SysRpc CpuInfoGet(SYSMGR_RPC_CPUINFO_GET  ,EJSON_SYSMGR_RPC_GET_CPUINFO ,emulat,dbglog,&DataCache); //system related rpc handler class
+	SysRpc CpuInfoGet(SYSMGR_RPC_CPUINFO_GET    ,EJSON_SYSMGR_RPC_GET_CPUINFO    ,emulat,dbglog,&DataCache); //system related rpc handler class
 	RpcMgr.AttachRpc(&CpuInfoGet);
-	SysRpc DevOpGet(SYSMGR_RPC_DEV_OP_GET     ,EJSON_SYSMGR_RPC_GET_DEV_OP ,emulat,dbglog,&DataCache); //get device operation
+	SysRpc DevOpGet(SYSMGR_RPC_DEV_OP_GET       ,EJSON_SYSMGR_RPC_GET_DEV_OP     ,emulat,dbglog,&DataCache); //get device operation
 	RpcMgr.AttachRpc(&DevOpGet);
-	SysRpc DevOpSet(SYSMGR_RPC_DEV_OP_SET     ,EJSON_SYSMGR_RPC_SET_DEV_OP ,emulat,dbglog,&DataCache); //set device operation
+	SysRpc DevOpSet(SYSMGR_RPC_DEV_OP_SET       ,EJSON_SYSMGR_RPC_SET_DEV_OP     ,emulat,dbglog,&DataCache); //set device operation
 	RpcMgr.AttachRpc(&DevOpSet);
-	SysRpc FmwVerGet(SYSMGR_RPC_FMW_VER_GET   ,EJSON_SYSMGR_RPC_GET_FMWVER ,emulat,dbglog,&DataCache); //get fmv version
+	SysRpc FmwVerGet(SYSMGR_RPC_FMW_VER_GET     ,EJSON_SYSMGR_RPC_GET_FMWVER     ,emulat,dbglog,&DataCache); //get fmv version
 	RpcMgr.AttachRpc(&FmwVerGet);
+	SysRpc BootSysGet(SYSMGR_RPC_BOOT_SYSTEM_GET,EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM,emulat,dbglog,&DataCache); //get fmv version
+	RpcMgr.AttachRpc(&BootSysGet);
 
 
 	//start listening for rpc-commands

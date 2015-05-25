@@ -23,6 +23,8 @@ SysmgrCltCmdline::SysmgrCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--devop=state              [read/write device operation state=<idle/on/standby/reboot>]");
 	CmdlineHelper.insert_options_entry((char*)"fversion" ,optional_argument,EJSON_SYSMGR_RPC_GET_FMWVER);
 	CmdlineHelper.insert_help_entry((char*)"--fversion=module          [get fmw module version, module=<current/backup/kernel/project>]");
+	CmdlineHelper.insert_options_entry((char*)"bootdev" ,optional_argument,EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM);
+	CmdlineHelper.insert_help_entry((char*)"--bootdev                  [read currently booted system<brbox1/brbox2>]");
 }
 /* ------------------------------------------------------------------------- */
 SysmgrCltCmdline::~SysmgrCltCmdline()
@@ -78,6 +80,14 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			break;
 		case EJSON_SYSMGR_RPC_GET_FMWVER:
 			push_fmw_version_read_command(sub_arg);
+			break;
+		case EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM:
+			{
+			const char *table[]   = SYSMGR_RPC_BOOT_SYSTEM_ARG_TABL;
+			CmdlineHelper.push_single_enum_get_set_command(EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM,
+			EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM,SYSMGR_RPC_BOOT_SYSTEM_GET,SYSMGR_RPC_BOOT_SYSTEM_GET,
+			&table[0],SYSMGR_BOOT_SYSTEM_UNKNOWN,(char*)SYSMGR_RPC_DEV_OP_ARG,sub_arg);
+			}
 			break;
 		default:
 			return 0;
