@@ -28,6 +28,10 @@ class SysmgrCltCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcess
 	int run_fmw_update_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,
 		ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);
 
+	int push_file_download(char* subarg,EJSON_SYSMGR_RPC_TYPES rpc_cmd);
+	int run_file_download(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,
+		ADThreadedSockClientProducer *pWorker);
+
 public:
 	SysmgrCltCmdline();
 	~SysmgrCltCmdline();

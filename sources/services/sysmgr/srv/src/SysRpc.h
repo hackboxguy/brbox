@@ -53,6 +53,11 @@ public:
 	int process_set_fmwupdate(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj);
 	RPC_SRV_RESULT process_async_set_fmwupdate(SYSMGR_FMWUPDATE_PACKET* pPacket);
 
+	int json_to_bin_download_file(JsonDataCommObj* pReq,EJSON_SYSMGR_RPC_TYPES command);
+	int bin_to_json_download_file(JsonDataCommObj* pReq,EJSON_SYSMGR_RPC_TYPES command);
+	int process_download_file(JsonDataCommObj* pReq,EJSON_SYSMGR_RPC_TYPES command,ADJsonRpcMgrProducer* pObj);
+	RPC_SRV_RESULT process_async_download_file(SYSMGR_DOWNLOAD_FILE_PACKET* pPacket,EJSON_SYSMGR_RPC_TYPES command);
+
 };
 /* ------------------------------------------------------------------------- */
 

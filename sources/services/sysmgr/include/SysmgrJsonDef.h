@@ -19,6 +19,9 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_GET_FMWVER,
 	EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM, //returns current booted partition brbox1 or brbox2
 	EJSON_SYSMGR_RPC_SET_FMWUPDATE,   //trigger fmw update
+	EJSON_SYSMGR_RPC_SET_DOWNLOADFTP,
+	EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP,
+
 	//tftp file download
 	//ftp file download
 	//get async task in progress
@@ -173,6 +176,21 @@ typedef struct SYSMGR_BOOT_SYSTEM_PACKET_T
 #define SYSMGR_RPC_FMWUPDATE_ARG_FILEPATH    "filepath"
 typedef SYSMGR_FMW_MODULE_PACKET SYSMGR_FMWUPDATE_PACKET;
 #define SYSMGR_UPDATE_TOOL         "update"
+/* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_SET_DOWNLOADFTP,
+//EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP,
+#define SYSMGR_RPC_DOWNLOADFTP_SET           "download_ftp_file"
+#define SYSMGR_RPC_DOWNLOADTFTP_SET          "download_tftp_file"
+#define SYSMGR_RPC_DOWNLOADFILE_ARG_SRCADDR  "srcaddr" //incase of ftp it is the url, incase of tftp it is the serverip
+#define SYSMGR_RPC_DOWNLOADFILE_ARG_SRCFILE  "srcfile" 
+#define SYSMGR_RPC_DOWNLOADFILE_ARG_TARFILE  "targetpath"
+typedef struct SYSMGR_DOWNLOAD_FILE_PACKET_T
+{
+	char srcurl[1024];//source url of the ftp server's file
+	char sourcefilepath[1024];//filepath of on the source file incase of tftp download
+	char targetfilepath[1024];//filepath of on the target where file to be downloaded
+	int taskID;//for file download, return the taskID so that client can check the progress
+}SYSMGR_DOWNLOAD_FILE_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct SYSMGR_CMN_DATA_CACHE_T

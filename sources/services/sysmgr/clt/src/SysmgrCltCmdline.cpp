@@ -28,6 +28,11 @@ SysmgrCltCmdline::SysmgrCltCmdline()
 	CmdlineHelper.insert_options_entry((char*)"fupdate" ,optional_argument,EJSON_SYSMGR_RPC_SET_FMWUPDATE);
 	CmdlineHelper.insert_help_entry((char*)"--fupdate=module,filepath  [trigger fmw update of defined module=<project>]");
 
+	CmdlineHelper.insert_options_entry((char*)"ftget" ,optional_argument,EJSON_SYSMGR_RPC_SET_DOWNLOADFTP);
+	CmdlineHelper.insert_help_entry((char*)"--ftget=srcURL,trgtpath    [download file from the ftp server to defined target_file_path]");
+	CmdlineHelper.insert_options_entry((char*)"tftget" ,optional_argument,EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP);
+	CmdlineHelper.insert_help_entry((char*)"--tftget=srvip,trgt,src    [download file from tftp server's(srvip) to target_file_path]");
+
 }
 /* ------------------------------------------------------------------------- */
 SysmgrCltCmdline::~SysmgrCltCmdline()
@@ -95,6 +100,10 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 		case EJSON_SYSMGR_RPC_SET_FMWUPDATE:
 			push_fmw_update_command(sub_arg);
 			break;
+		case EJSON_SYSMGR_RPC_SET_DOWNLOADFTP:
+		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:
+			push_file_download(sub_arg,command);
+			break;
 		default:
 			return 0;
 			break;	
@@ -118,6 +127,10 @@ int SysmgrCltCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *
 			break;
 		case EJSON_SYSMGR_RPC_SET_FMWUPDATE:
 			run_fmw_update_command(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
+			break;
+		case EJSON_SYSMGR_RPC_SET_DOWNLOADFTP:
+		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:
+			run_file_download(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
 			break;
 		default:return -1;
 			break;
@@ -377,4 +390,109 @@ int SysmgrCltCmdline::run_fmw_update_command(CmdExecutionObj *pCmdObj,ADJsonRpcC
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
+int SysmgrCltCmdline::push_file_download(char* subarg,EJSON_SYSMGR_RPC_TYPES rpc_cmd)
+{
+	CmdExecutionObj *pCmdObj=NULL;
+	OBJECT_MEM_NEW(pCmdObj,CmdExecutionObj);
+	if(pCmdObj==NULL)
+	{
+		printf("failed create pCmdObj!!!\n");
+		return -1;
+	}
+	if(rpc_cmd==EJSON_SYSMGR_RPC_SET_DOWNLOADFTP)
+	{
+		strcpy(pCmdObj->get_rpc_name,SYSMGR_RPC_DOWNLOADFTP_SET);
+		strcpy(pCmdObj->set_rpc_name,SYSMGR_RPC_DOWNLOADFTP_SET);
+		pCmdObj->command=EJSON_SYSMGR_RPC_SET_DOWNLOADFTP;
+	}
+	else
+	{
+		strcpy(pCmdObj->get_rpc_name,SYSMGR_RPC_DOWNLOADTFTP_SET);
+		strcpy(pCmdObj->set_rpc_name,SYSMGR_RPC_DOWNLOADTFTP_SET);
+		pCmdObj->command=EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP;
+	}
+	pCmdObj->action=RPC_SRV_ACT_WRITE;
+
+	if(CmdlineHelper.get_next_subargument(&subarg)==0)
+	{	
+		printf("for file download,  ftp server's URL(or tftp server ip) must be specified\n");
+		OBJ_MEM_DELETE(pCmdObj);
+		return -1;
+	}
+	else 
+	{
+		strcpy(pCmdObj->first_arg_param_name,SYSMGR_RPC_DOWNLOADFILE_ARG_SRCADDR);
+		strcpy(pCmdObj->first_arg_param_value,subarg);
+
+		if(CmdlineHelper.get_next_subargument(&subarg)==0)
+		{	
+			printf("for file download,  please specify target download location\n");
+			OBJ_MEM_DELETE(pCmdObj);
+			return -1;
+		}
+		strcpy(pCmdObj->second_arg_param_name,SYSMGR_RPC_DOWNLOADFILE_ARG_TARFILE);
+		strcpy(pCmdObj->second_arg_param_value,subarg);
+		strcpy(pCmdObj->third_arg_param_name,RPCMGR_RPC_TASK_STS_ARGID);//taskID
+
+		if(rpc_cmd==EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP)
+		{
+			if(CmdlineHelper.get_next_subargument(&subarg)==0)
+			{	
+				printf("for file download,  tftp server's filename must be specified\n");
+				OBJ_MEM_DELETE(pCmdObj);
+				return -1;
+			}
+			else 
+			{
+				strcpy(pCmdObj->third_arg_param_name,SYSMGR_RPC_DOWNLOADFILE_ARG_SRCFILE);
+				strcpy(pCmdObj->third_arg_param_value,subarg);
+				//shift taskID string to last as fourth
+				strcpy(pCmdObj->fourth_arg_param_name,RPCMGR_RPC_TASK_STS_ARGID);//taskID
+			}
+
+		}
+	}
+	pCmdObj->cmd_type=CLIENT_CMD_TYPE_USER_DEFINED;
+	//put the request into chain
+	if(CmdlineHelper.CmdChain.chain_put((void *)pCmdObj)!=0)
+	{
+		printf("failed! unable to push json-req-task-obj to chain!\n");
+		OBJ_MEM_DELETE(pCmdObj);
+		return -1;
+	}
+	return 0;
+}
+int SysmgrCltCmdline::run_file_download(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker)
+{
+	ADThreadedSockClient *pOrig = (ADThreadedSockClient*)pWorker;
+	if(pCmdObj->action == RPC_SRV_ACT_WRITE)
+	{
+		if(pCmdObj->command==EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP)
+		{
+			pCmdObj->result=pSrvSockConn->set_tripple_string_get_single_string_type(pCmdObj->set_rpc_name,
+					pCmdObj->first_arg_param_name,pCmdObj->first_arg_param_value,
+					pCmdObj->second_arg_param_name,pCmdObj->second_arg_param_value,
+					pCmdObj->third_arg_param_name,pCmdObj->third_arg_param_value,
+					pCmdObj->fourth_arg_param_name,pCmdObj->fourth_arg_param_value);
+					pOrig->log_print_message(pSrvSockConn,pCmdObj->set_rpc_name,RPC_SRV_ACT_READ,
+					pCmdObj->result,pOutMsgList,pCmdObj->fourth_arg_param_value);
+		}
+		else
+		{
+			pCmdObj->result=pSrvSockConn->set_double_string_get_single_string_type(pCmdObj->set_rpc_name,
+					pCmdObj->first_arg_param_name,pCmdObj->first_arg_param_value,
+					pCmdObj->second_arg_param_name,pCmdObj->second_arg_param_value,
+					pCmdObj->third_arg_param_name,pCmdObj->third_arg_param_value);
+			pOrig->log_print_message(pSrvSockConn,pCmdObj->set_rpc_name,RPC_SRV_ACT_READ,pCmdObj->result,
+					pOutMsgList,pCmdObj->third_arg_param_value);
+		}
+	}
+	else
+	{
+		pOrig->my_log_print_message(pSrvSockConn,(char*)"run_ftp_file_download",RPC_SRV_ACT_UNKNOWN,
+					(char*)CLIENT_CMD_RESULT_INVALID_ACT,pOutMsgList);
+		return -1;
+	}
+	return 0;
+}
 
