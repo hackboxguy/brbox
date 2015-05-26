@@ -56,6 +56,11 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&BootSysGet);
 	SysRpc FmwUpdateSet(SYSMGR_RPC_FMWUPDATE_SET,EJSON_SYSMGR_RPC_SET_FMWUPDATE,emulat,dbglog,&DataCache); 
 	RpcMgr.AttachRpc(&FmwUpdateSet);
+	SysRpc TftpGet(SYSMGR_RPC_DOWNLOADTFTP_SET,EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP,emulat,dbglog,&DataCache); 
+	RpcMgr.AttachRpc(&TftpGet);
+	SysRpc FtpGet(SYSMGR_RPC_DOWNLOADFTP_SET,EJSON_SYSMGR_RPC_SET_DOWNLOADFTP,emulat,dbglog,&DataCache); 
+	RpcMgr.AttachRpc(&FtpGet);
+
 
 
 	//start listening for rpc-commands
