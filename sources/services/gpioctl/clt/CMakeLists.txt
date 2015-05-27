@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.9)
-set(COMPONENT_NAME gpioclt)  #set the name of the binary
+set(COMPONENT_NAME gpioclt)    #set the name of the binary
 set(LIB_ADSTTNG AdSttngs)   #settings library
 set(LIB_ADCOMMN AdCmn)      #common library
 
@@ -9,6 +9,7 @@ set(LIB_ADCOMMN AdCmn)      #common library
 
 
 project(${COMPONENT_NAME})
+set(AUTO_SVN_VERSION     ON CACHE BOOL ON)  #by default include svn revision numbers
 file(GLOB SOURCES "src/*.cpp")
 add_executable(${COMPONENT_NAME} ${SOURCES})
 set(INC_ADSTTNG  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-settings/include")
@@ -30,12 +31,16 @@ install(TARGETS ${COMPONENT_NAME} DESTINATION bin)
 
 
 #automatically include svn revision to a headerfile which will be included in this component
-find_package(Subversion REQUIRED)
-if(SUBVERSION_FOUND)
-  Subversion_WC_INFO(${PROJECT_SOURCE_DIR} Project)
-  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SrcControlVersion.h "#define SRC_CONTROL_VERSION ${Project_WC_LAST_CHANGED_REV}\n")
+if(${AUTO_SVN_VERSION})
+	find_package(Subversion REQUIRED)
+	if(SUBVERSION_FOUND)
+	  Subversion_WC_INFO(${PROJECT_SOURCE_DIR} Project)
+	  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SrcControlVersion.h "#define SRC_CONTROL_VERSION ${Project_WC_LAST_CHANGED_REV}\n")
+	else()
+		message( FATAL_ERROR "unable to read sub-version Revision number, this is needed for embedding into this component" )
+	endif()
 else()
-	message( FATAL_ERROR "unable to read sub-version Revision number, this is needed for embedding into this component" )
+	FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SrcControlVersion.h "#define SRC_CONTROL_VERSION 0001\n")
 endif()
 
 #for cross compiling

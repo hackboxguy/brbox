@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BRBOX_GPIOMGR
+	bool "Gpio-Manager-Service"
+	default y
+	select BR2_PACKAGE_BRBOX_LIBADCMNOLD
+	help
+	  gpio manager service for supporting gpio control features via rpc
+
