@@ -6,6 +6,8 @@ echo none > /sys/class/leds/led0/trigger  #this will ensure that no other proces
 echo 1 > /sys/class/leds/led0/brightness  #switch ON led
 echo 0 > /sys/class/leds/led0/brightness  #switch OFF led
 #####################################################
+#how to read raspi cpu temperature
+#awk '{printf("\nrPI Temperature = %.1f °C\n\n",$1/1e3)}' /sys/class/thermal/thermal_zone0/temp
 ###############raspi sdcard partition sizes##########
 Filesystem                Size      Used Available Use% Mounted on
 /dev/root                71.5M     62.6M      5.0M  93% / (2-12)
