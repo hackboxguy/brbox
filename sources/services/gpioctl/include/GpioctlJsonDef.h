@@ -28,6 +28,7 @@ typedef struct GPIOCTL_IO_ACCESS_PACKET_T
 //keep all the data related to gpioctl-service here
 typedef struct GPIOCTL_CMN_DATA_CACHE_T
 {
+	void *pDevInfo;//device-info-struct(typecast in rpc handlers)
 	unsigned int tmpData;
 }GPIOCTL_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */

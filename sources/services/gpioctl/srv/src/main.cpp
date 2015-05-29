@@ -7,16 +7,17 @@
 #include "SrcControlVersion.h"
 #include "ADTimer.hpp"
 
-//gpioctl
+/* ------------------------------------------------------------------------- */
 #include "GpioctlJsonDef.h"
 #include "GpioCtrlRpc.h"
-
+#define SERVER_JSON_PORT_NUM GPIOCTL_JSON_PORT_NUMBER
+/* ------------------------------------------------------------------------- */
 using namespace std;
 int main(int argc, const char* argv[])
 {
 	//cmdline parsing
 	char ver[255];snprintf(ver,254,"%05d",SRC_CONTROL_VERSION);
-	MyCmdline CmdLine(CMDLINE_HELPER_MODE_SERVER,GPIOCTL_JSON_PORT_NUMBER,ver);//40000 is the portnumber
+	MyCmdline CmdLine(CMDLINE_HELPER_MODE_SERVER,SERVER_JSON_PORT_NUM,ver);//40000 is the portnumber
 	CmdLine.parse_cmdline_arguments(argc,(char**)argv);
 	if(CmdLine.is_help_printed())
 		return -1;//user just requested to print the help info
@@ -30,13 +31,14 @@ int main(int argc, const char* argv[])
 
 	//start 100ms timer
 	ADTimer AppTimer(100);//only one instance per application(or process) must exist
-
 	//create a common data Cache of the service
 	GPIOCTL_CMN_DATA_CACHE DataCache;
+	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog); //main rpc handler
 
+	/****************************RPC list*************************************/
 	GpioCtrlRpc GpioGet(GPIOCTL_RPC_IO_GET ,EJSON_GPIOCTL_RPC_IO_GET ,emulat,dbglog,&DataCache);
 	GpioCtrlRpc GpioSet(GPIOCTL_RPC_IO_SET ,EJSON_GPIOCTL_RPC_IO_SET ,emulat,dbglog,&DataCache);
 

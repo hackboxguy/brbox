@@ -195,6 +195,7 @@ typedef struct SYSMGR_DOWNLOAD_FILE_PACKET_T
 //keep all the data related to smart-eye-service here
 typedef struct SYSMGR_CMN_DATA_CACHE_T
 {
+	void *pDevInfo;//device-info-struct(typecast in rpc handlers)
 	//std::string StrTmp;//pChar //Char //Int //pInt //Float //Enum
 	SYSMGR_DEV_OP_PACKET DevOp;
 	char crnt_fmwver[100];//current version

@@ -10,26 +10,35 @@
 /* ------------------------------------------------------------------------- */
 #include "NetRpc.h"
 #include "SysRpc.h"
+#define SERVER_JSON_PORT_NUM SYSMGR_JSON_PORT_NUMBER
 /* ------------------------------------------------------------------------- */
 using namespace std;
 int main(int argc, const char* argv[])
 {
 	//cmdline parsing
 	char ver[255];snprintf(ver,254,"%05d",SRC_CONTROL_VERSION);
-	MyCmdline CmdLine(CMDLINE_HELPER_MODE_SERVER,SYSMGR_JSON_PORT_NUMBER,ver);//40000 is the portnumber
+	MyCmdline CmdLine(CMDLINE_HELPER_MODE_SERVER,SERVER_JSON_PORT_NUM,ver);//40000 is the portnumber
 	CmdLine.parse_cmdline_arguments(argc,(char**)argv);
 	if(CmdLine.is_help_printed())
 		return -1;//user just requested to print the help info
+
+	//read the board-type info from cmdline argument
+	ADCMN_DEV_INFO DevInfo;
+	CmdLine.get_dev_info(&DevInfo);
+
 	bool dbglog = CmdLine.get_debug_log();
 	bool emulat = CmdLine.get_emulation_mode();
+
 	//start 100ms timer
 	ADTimer AppTimer(100);//only one instance per application(or process) must exist
 	//create a common data Cache of the service
 	SYSMGR_CMN_DATA_CACHE DataCache;
+	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
+
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog); //main rpc handler
  
-
+	/****************************RPC list*************************************/
 	//network related rpc's
 	NetRpc MacGet  (SYSMGR_RPC_MAC_ADDR_GET ,EJSON_SYSMGR_RPC_GET_MAC_ADDR ,emulat,dbglog,&DataCache);  //network related rpc handler class
 	RpcMgr.AttachRpc(&MacGet);
