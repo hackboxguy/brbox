@@ -51,7 +51,7 @@ if [ $? = "0" ]; then
 		echo $BD_TYP_DEFAULT
 		return 1
 	fi
-	[ "$RESULT" = "$CPU_TYPE_RP1" ]  && { RES=$(ReadRaspiType); return $RES; }
+	[ "$RESULT" = "$CPU_TYPE_RP1" ]  && { ReadRaspiType; return $?; }
 	[ "$RESULT" = "$CPU_TYPE_RP2" ]  && { echo $BD_TYP_RASPI_B2; return 0; } #TODO: raspi-A2??
 fi
 
