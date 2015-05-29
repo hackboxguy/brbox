@@ -27,6 +27,7 @@ ROOTFS_TYPE_BBB="BrBoxRtBbb"
 ROOTFS_TYPE_WDB="BrBoxRtWdb"
 
 BOARD_TYPE_BTR="baytrail"                 #base-build
+BOARD_TYPE_BTR_MEDIA="baytrail-media"                 #base-build
 BOARD_TYPE_RP1="raspi1"                   #base-build
 BOARD_TYPE_RP1_SMSW="raspi1-smartsw"      #application-build
 BOARD_TYPE_RP2="raspi2"                   #base-build
@@ -59,11 +60,14 @@ elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP2" ]; then
 	BR_BOARD_CONFIG=raspberrypi2_defconfig
 	BR_BOARD_LINUX_CONFIG_PATH=board/raspberrypi2/
 	BOOT_IMG_SCRIPT=$(pwd)/scripts/raspi-bootdisk.sh
+elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_BTR_MEDIA" ]; then
+	BR_BOARD_CONFIG=qemu_x86_64_defconfig
+	BR_BOARD_LINUX_CONFIG_PATH=board/qemu/x86_64/
+	BOOT_IMG_SCRIPT=$(pwd)/scripts/grub2-bootdisk.sh
 else   #default is baytrail(x86_64)
 	BR_BOARD_CONFIG=qemu_x86_64_defconfig
 	BR_BOARD_LINUX_CONFIG_PATH=board/qemu/x86_64/
 	BOOT_IMG_SCRIPT=$(pwd)/scripts/grub2-bootdisk.sh
-
 fi
 
 svn up > /dev/null
@@ -103,6 +107,9 @@ elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1_SMSW" ]; then
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP2" ]; then
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 	ROOTFS_TYPE=$ROOTFS_TYPE_RP2
+elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_BTR_MEDIA" ]; then
+	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
+	ROOTFS_TYPE=$ROOTFS_TYPE_BTR
 else 
 	#baytrail
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
