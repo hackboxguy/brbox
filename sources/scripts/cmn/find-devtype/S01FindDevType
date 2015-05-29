@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# Detect device type
+#
+DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
+start() {
+	echo -n "Detecting device type: "
+	find-devtype > $DEV_TYPE_FILE
+	echo "OK"
+}
+
+stop() {
+	echo -n "Undetecting device type: "
+	rm -f $DEV_TYPE_FILE
+	echo "OK"
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	stop
+	start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?

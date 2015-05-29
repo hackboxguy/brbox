@@ -25,6 +25,7 @@ source "package/brbox/brbox_libAdSttngs/Config.in"
 source "package/brbox/brbox_libAdCmnOld/Config.in"
 source "package/brbox/brbox_mkimage/Config.in"
 source "package/brbox/brbox_sysmgr/Config.in"
+source "package/brbox/brbox_finddevtype/Config.in"
 endmenu
 endif
 

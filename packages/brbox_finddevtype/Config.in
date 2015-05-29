@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BRBOX_FINDDEVTYPE
+	bool "Find Device type startup-script for brbox platform"
+	default y
+	depends on BR2_TARGET_BRBOX_PACKAGES
+	help
+	  provides detection of board type on startup for brbox based boards.
+
