@@ -44,6 +44,23 @@ ReadRaspiType()
 	return 1
 }
 ###############################################################################
+ReadBaytrailType()
+{
+	RESULT=$(ethtool -i eth0 | grep driver)
+	if [ $? != "0" ]; then
+		echo "$BD_TYP_BAYTRAIL"
+		return 1
+	fi
+	RESULT=$(echo $RESULT | grep igb)
+	if [ $? != "0" ]; then
+		echo "$BD_TYP_BAYTRAIL"
+		return 1
+	fi
+	echo $BD_TYP_BAYTRAIL_I210
+	return 0
+}
+###############################################################################
+#look for raspi
 RESULT=$(cat /proc/cpuinfo | grep "CPU part" )
 if [ $? = "0" ]; then
 	RESULT=$(echo $RESULT | head -n1 | awk '{print $4}'  )
@@ -55,7 +72,12 @@ if [ $? = "0" ]; then
 	[ "$RESULT" = "$CPU_TYPE_RP2" ]  && { echo $BD_TYP_RASPI_B2; return 0; } #TODO: raspi-A2??
 fi
 
-#TODO Baytrail
+#look for Baytrail
+RESULT=$(cat /proc/cpuinfo | grep "model name" | grep J1900 )
+if [ $? = "0" ]; then
+	ReadBaytrailType
+	return $?
+fi
 echo $BD_TYP_DEFAULT
 return 1
 
