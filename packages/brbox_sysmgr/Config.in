@@ -5,3 +5,11 @@ config BR2_PACKAGE_BRBOX_SYSMGR
 	help
 	  system manager service for supporting various system features via rpc
 
+config BR2_PACKAGE_BRBOX_SYSMGR_INIT_ORDER
+        string "smarteye init.d order"
+        default "70"
+        depends on BR2_PACKAGE_BRBOX_SYSMGR
+        help
+          At which place in the init.d startup this service should be started. Needs to be a 2-digit integer.
+          Will be prefixed by "S" by buildroot, so e.g. "77" becomes "S77"
+

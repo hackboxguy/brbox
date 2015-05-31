@@ -5,3 +5,11 @@ config BR2_PACKAGE_BRBOX_SMARTEYE
 	help
 	  smarteye service for machine processed imaging
 
+config BR2_PACKAGE_BRBOX_SMARTEYE_INIT_ORDER
+        string "smarteye init.d order"
+        default "72"
+        depends on BR2_PACKAGE_BRBOX_SMARTEYE
+        help
+          At which place in the init.d startup this service should be started. Needs to be a 2-digit integer.
+          Will be prefixed by "S" by buildroot, so e.g. "77" becomes "S77"
+

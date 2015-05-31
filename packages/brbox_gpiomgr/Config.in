@@ -10,6 +10,6 @@ config BR2_PACKAGE_BRBOX_GPIOMGR_INIT_ORDER
         default "71"
         depends on BR2_PACKAGE_BRBOX_GPIOMGR
         help
-          At wich place in the init.d startup this service should be started. Needs to be a 2-digit integer.
+          At which place in the init.d startup this service should be started. Needs to be a 2-digit integer.
           Will be prefixed by "S" by buildroot, so e.g. "77" becomes "S77"
 

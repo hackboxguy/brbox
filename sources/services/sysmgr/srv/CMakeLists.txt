@@ -12,7 +12,8 @@ project(${COMPONENT_NAME})
 set(AUTO_SVN_VERSION    ON CACHE BOOL ON)  #by default include svn revision numbers
 set(INSTALL_MY_HEADERS  ON CACHE BOOL ON)  #by default install header files to target-install-directory
 set(STARTUP_SCRIPT SysmgrStartupScr)          #server startup script
-set(STARTUP_SCRIPT_ALIAS S70SysMgr)           #todo: automate numbering of startup scripts
+#set(STARTUP_SCRIPT_ALIAS S70SysMgr)           #todo: automate numbering of startup scripts
+set(STARTNUM "70" CACHE STRING "70")       #init order number of the service
 file(GLOB SOURCES "src/*.cpp")
 add_executable(${COMPONENT_NAME} ${SOURCES})
 set(INC_ADSTTNG  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-settings/include")
@@ -34,7 +35,7 @@ if(${INSTALL_MY_HEADERS})
 	install(FILES ${INCFILES} DESTINATION include)
 endif()
 if(CMAKE_HOST_UNIX)
-install(CODE "EXECUTE_PROCESS(WORKING_DIRECTORY \$ENV{TARGET_DIR}\${CMAKE_INSTALL_PREFIX}/etc/init.d COMMAND ln -sf ${STARTUP_SCRIPT} ${STARTUP_SCRIPT_ALIAS})")
+install(CODE "EXECUTE_PROCESS(WORKING_DIRECTORY \$ENV{TARGET_DIR}\${CMAKE_INSTALL_PREFIX}/etc/init.d COMMAND ln -sf ${STARTUP_SCRIPT}  ${STARTNUM}${STARTUP_SCRIPT})")
 endif(CMAKE_HOST_UNIX)
 
 #automatically include svn revision to a headerfile which will be included in this component
