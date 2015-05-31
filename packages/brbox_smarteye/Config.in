@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BRBOX_SMARTEYE
+	bool "Smart-Eye-Service"
+	default n
+	select BR2_PACKAGE_BRBOX_LIBADCMNOLD
+	help
+	  smarteye service for machine processed imaging
+
