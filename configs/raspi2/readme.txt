@@ -93,4 +93,25 @@ Number  Start   End     Size    Type     File system  Flags
  2      16,8MB  98,6MB  81,8MB  primary  ext3
  3      98,6MB  181MB   82,8MB  primary  ext3
  4      181MB   252MB   70,3MB  primary  ext3
+##########################raspi old partition sizes######################
+IMAGESIZE=256M
+sudo parted -s $LOOPDEVICE mklabel msdos
+sudo parted -s $LOOPDEVICE unit cyl mkpart primary fat32 -- 0 2  
+sudo parted -s $LOOPDEVICE set 1 boot on  
+sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 2 12  
+sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 12 22  
+sudo parted -s $LOOPDEVICE unit cyl mkpart extended -- 22 -2  
+sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 22 28  
+sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 28 -2  
+##########################raspi new partition sizes######################
+IMAGESIZE=356M
+sudo parted -s $LOOPDEVICE mklabel msdos
+sudo parted -s $LOOPDEVICE unit cyl mkpart primary fat32 -- 0 2  
+sudo parted -s $LOOPDEVICE set 1 boot on  
+sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 2 17  
+sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 17 32  
+sudo parted -s $LOOPDEVICE unit cyl mkpart extended -- 32 -2  
+sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 32 38  
+sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 38 -2  
+
 
