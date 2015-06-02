@@ -1,8 +1,8 @@
 #include "ADJsonRpcMgr.hpp"
 /* ------------------------------------------------------------------------- */
-ADJsonRpcMgr::ADJsonRpcMgr(int ver,bool debuglog)
+ADJsonRpcMgr::ADJsonRpcMgr(int ver,bool debuglog,ADCMN_DEV_INFO* pDev)
 {
-	//strcpy(svnVersion,ver);
+	pDevInfo=pDev;
 	svnVersion=ver;
 	ServiceDebugFlag=debuglog;
 	JMapper.AttachProxy(&Proxy);//let Proxy know who to call back for mapping

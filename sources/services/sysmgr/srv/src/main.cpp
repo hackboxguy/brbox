@@ -36,7 +36,7 @@ int main(int argc, const char* argv[])
 	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
 
 	//attach rpc classes to ADJsonRpcMgr
-	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog); //main rpc handler
+	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
  
 	/****************************RPC list*************************************/
 	//network related rpc's
@@ -49,25 +49,25 @@ int main(int argc, const char* argv[])
 	NetRpc Ethname (SYSMGR_RPC_ETH_NAME_GET ,EJSON_SYSMGR_RPC_GET_ETH_NAME ,emulat,dbglog,&DataCache);  //network related rpc handler class
 	RpcMgr.AttachRpc(&Ethname);
 	//system related rpc's
-	SysRpc LoadInfoGet(SYSMGR_RPC_LOADINFO_GET  ,EJSON_SYSMGR_RPC_GET_LOADINFO   ,emulat,dbglog,&DataCache);//sys related rpc handler class
+	SysRpc LoadInfoGet(SYSMGR_RPC_LOADINFO_GET  ,EJSON_SYSMGR_RPC_GET_LOADINFO    ,emulat,dbglog,&DataCache);//sys related rpc handler class
 	RpcMgr.AttachRpc(&LoadInfoGet);
-	SysRpc MemInfoGet(SYSMGR_RPC_MEMINFO_GET    ,EJSON_SYSMGR_RPC_GET_MEMINFO    ,emulat,dbglog,&DataCache);//sys related rpc handler class
+	SysRpc MemInfoGet(SYSMGR_RPC_MEMINFO_GET    ,EJSON_SYSMGR_RPC_GET_MEMINFO     ,emulat,dbglog,&DataCache);//sys related rpc handler class
 	RpcMgr.AttachRpc(&MemInfoGet);
-	SysRpc CpuInfoGet(SYSMGR_RPC_CPUINFO_GET    ,EJSON_SYSMGR_RPC_GET_CPUINFO    ,emulat,dbglog,&DataCache);//sys related rpc handler class
+	SysRpc CpuInfoGet(SYSMGR_RPC_CPUINFO_GET    ,EJSON_SYSMGR_RPC_GET_CPUINFO     ,emulat,dbglog,&DataCache);//sys related rpc handler class
 	RpcMgr.AttachRpc(&CpuInfoGet);
-	SysRpc DevOpGet(SYSMGR_RPC_DEV_OP_GET       ,EJSON_SYSMGR_RPC_GET_DEV_OP     ,emulat,dbglog,&DataCache); //get device operation
+	SysRpc DevOpGet(SYSMGR_RPC_DEV_OP_GET       ,EJSON_SYSMGR_RPC_GET_DEV_OP      ,emulat,dbglog,&DataCache); //get device operation
 	RpcMgr.AttachRpc(&DevOpGet);
-	SysRpc DevOpSet(SYSMGR_RPC_DEV_OP_SET       ,EJSON_SYSMGR_RPC_SET_DEV_OP     ,emulat,dbglog,&DataCache); //set device operation
+	SysRpc DevOpSet(SYSMGR_RPC_DEV_OP_SET       ,EJSON_SYSMGR_RPC_SET_DEV_OP      ,emulat,dbglog,&DataCache); //set device operation
 	RpcMgr.AttachRpc(&DevOpSet);
-	SysRpc FmwVerGet(SYSMGR_RPC_FMW_VER_GET     ,EJSON_SYSMGR_RPC_GET_FMWVER     ,emulat,dbglog,&DataCache); //get fmv version
+	SysRpc FmwVerGet(SYSMGR_RPC_FMW_VER_GET     ,EJSON_SYSMGR_RPC_GET_FMWVER      ,emulat,dbglog,&DataCache); //get fmv version
 	RpcMgr.AttachRpc(&FmwVerGet);
-	SysRpc BootSysGet(SYSMGR_RPC_BOOT_SYSTEM_GET,EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM,emulat,dbglog,&DataCache);
+	SysRpc BootSysGet(SYSMGR_RPC_BOOT_SYSTEM_GET,EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM ,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&BootSysGet);
-	SysRpc FmwUpdateSet(SYSMGR_RPC_FMWUPDATE_SET,EJSON_SYSMGR_RPC_SET_FMWUPDATE,emulat,dbglog,&DataCache); 
+	SysRpc FmwUpdateSet(SYSMGR_RPC_FMWUPDATE_SET,EJSON_SYSMGR_RPC_SET_FMWUPDATE   ,emulat,dbglog,&DataCache); 
 	RpcMgr.AttachRpc(&FmwUpdateSet);
-	SysRpc TftpGet(SYSMGR_RPC_DOWNLOADTFTP_SET,EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP,emulat,dbglog,&DataCache); 
+	SysRpc TftpGet(SYSMGR_RPC_DOWNLOADTFTP_SET  ,EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP,emulat,dbglog,&DataCache); 
 	RpcMgr.AttachRpc(&TftpGet);
-	SysRpc FtpGet(SYSMGR_RPC_DOWNLOADFTP_SET,EJSON_SYSMGR_RPC_SET_DOWNLOADFTP,emulat,dbglog,&DataCache); 
+	SysRpc FtpGet(SYSMGR_RPC_DOWNLOADFTP_SET    ,EJSON_SYSMGR_RPC_SET_DOWNLOADFTP ,emulat,dbglog,&DataCache); 
 	RpcMgr.AttachRpc(&FtpGet);
 
 

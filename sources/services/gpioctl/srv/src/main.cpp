@@ -36,7 +36,7 @@ int main(int argc, const char* argv[])
 	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
 
 	//attach rpc classes to ADJsonRpcMgr
-	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog); //main rpc handler
+	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 
 	/****************************RPC list*************************************/
 	GpioCtrlRpc GpioGet(GPIOCTL_RPC_IO_GET ,EJSON_GPIOCTL_RPC_IO_GET ,emulat,dbglog,&DataCache);

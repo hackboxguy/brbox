@@ -11,6 +11,7 @@
 #include "ADTimer.hpp"
 #include "ADTaskWorker.hpp"
 #include "ADCmnStringProcessor.hpp"
+#include "ADCmnDevTypes.h"
 
 using namespace std;
 /* ------------------------------------------------------------------------- */
@@ -26,6 +27,7 @@ typedef enum EJSON_RPCGMGR_CMD_T
 	EJSON_RPCGMGR_GET_READY_STS=6,       //ready status of the service
 	EJSON_RPCGMGR_GET_DEBUG_LOG=7,       //read the  status of debug logging flag
 	EJSON_RPCGMGR_SET_DEBUG_LOG=8,       //enable/disable debug logging
+	//EJSON_RPCGMGR_GET_DEV_TYPE=9,        //read device type
 	EJSON_RPCGMGR_CMD_END,
 	EJSON_RPCGMGR_CMD_NONE
 }EJSON_RPCGMGR_CMD;
@@ -106,6 +108,15 @@ typedef struct RPCMGR_DEBUG_LOG_PACKET_T
 	EJSON_RPCGMGR_FLAG_STATE status;
 	//char status_str[512];
 }RPCMGR_DEBUG_LOG_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_RPCGMGR_GET_DEV_TYPE
+#define RPCMGR_RPC_DEV_TYPE_GET        "get_device_type"
+#define RPCMGR_RPC_DEV_TYPE_ARG        "type"
+typedef struct RPCMGR_DEV_TYPE_PACKET_T
+{
+	//EJSON_RPCGMGR_READY_STATE status;
+	char status_str[512];
+}RPCMGR_DEV_TYPE_PACKET;
 /* ------------------------------------------------------------------------- */
 //to understand this, read C++ subject observer pattern
 class ADJsonRpcMgrProducer; //subject
@@ -287,6 +298,7 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	ADJsonRpcProxy  Proxy;//json-net-proxy
 	ADJsonRpcMapper	JMapper;
 	int svnVersion;
+	ADCMN_DEV_INFO* pDevInfo;
 
 	//ADTaskWorker AsyncTaskWorker;
 	bool shutdown_support;
@@ -360,7 +372,7 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	int bin_to_json_set_debug_logging(JsonDataCommObj* pReq);
 
 public:
-	ADJsonRpcMgr(int ver,bool debuglog=false);
+	ADJsonRpcMgr(int ver,bool debuglog=false,ADCMN_DEV_INFO* pDev=NULL);
 	~ADJsonRpcMgr();
 	int AttachHeartBeat(ADTimer* pTimer);
 	int Start(int port,int socket_log,int emulation);

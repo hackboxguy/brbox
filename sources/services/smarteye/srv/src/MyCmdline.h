@@ -24,6 +24,7 @@ public:
 	int get_socket_log();
 	bool get_debug_log();
 	int get_port_number();
+	int get_dev_info(ADCMN_DEV_INFO *pInfo);
 
 	//service specific part
 };

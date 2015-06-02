@@ -45,6 +45,7 @@ typedef struct SMARTEYE_DEBUG_OUTFILE_PACKET_T
 //keep all the data related to smart-eye-service here
 typedef struct SMARTEYE_CMN_DATA_CACHE_T
 {
+	void *pDevInfo;//device-info-struct(typecast in rpc handlers)
 	std::string StrImgIdDebugFile;//pChar //Char //Int //pInt //Float //Enum
 }SMARTEYE_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */

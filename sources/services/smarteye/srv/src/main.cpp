@@ -8,7 +8,7 @@
 #include "MyCmdline.h"
 #include "SrcControlVersion.h"
 #include "ADTimer.hpp"
-
+/* ------------------------------------------------------------------------- */
 using namespace std;
 int main(int argc, const char* argv[])
 {
@@ -19,17 +19,21 @@ int main(int argc, const char* argv[])
 	if(CmdLine.is_help_printed())
 		return -1;//user just requested to print the help info
 
+	//read the board-type info from cmdline argument
+	ADCMN_DEV_INFO DevInfo;
+	CmdLine.get_dev_info(&DevInfo);
+
 	bool dbglog = CmdLine.get_debug_log();
 	bool emulat = CmdLine.get_emulation_mode();
 
 	//start 100ms timer
 	ADTimer AppTimer(100);//only one instance per application(or process) must exist
-
 	//create a common data Cache of the service
 	SMARTEYE_CMN_DATA_CACHE DataCache;
+	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
 
 	//attach rpc classes to ADJsonRpcMgr
-	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog); //main rpc handler
+	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 
 	SmarteyeRpc PatternGet(SMARTEYE_RPC_ID_PATTERN_CHECK ,EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN ,emulat,dbglog,&DataCache);
 	SmarteyeRpc DbgFileGet(SMARTEYE_RPC_DEBUG_OUTFILE_GET,EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET,emulat,dbglog,&DataCache);

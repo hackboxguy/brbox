@@ -74,3 +74,8 @@ int MyCmdline::get_port_number()
 	return CmdlineHelper.get_port_number();
 }
 /*****************************************************************************/
+int MyCmdline::get_dev_info(ADCMN_DEV_INFO *pInfo)
+{
+	return CmdlineHelper.get_dev_info(pInfo);
+}
+
