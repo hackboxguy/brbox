@@ -229,11 +229,11 @@ int ADTaskWorker::push_task(int work_cmd, unsigned char* pWorkData,int *taskID,W
 		//PushTaskLock.chain_unlock();
 		return -1;
 	}
-
 	if(work_inprog_chain.chain_put((void *)work_inprog_obj)!=0)
 	{
-		work_obj=(WORK_CMD_TASK*)work_chain.chain_get();
-		OBJ_MEM_DELETE(work_obj);
+		work_obj=(WORK_CMD_TASK*)work_chain.chain_remove_by_ident(*taskID);
+		if(work_obj!=NULL)
+			OBJ_MEM_DELETE(work_obj);
 		OBJ_MEM_DELETE(work_inprog_obj);
 		printf("unable to put item in work_in_prog chain\n");
 		//PushTaskLock.chain_unlock();

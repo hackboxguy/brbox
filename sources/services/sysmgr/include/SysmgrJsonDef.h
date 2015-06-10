@@ -21,12 +21,10 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_SET_FMWUPDATE,   //trigger fmw update
 	EJSON_SYSMGR_RPC_SET_DOWNLOADFTP,
 	EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP,
-
-	//tftp file download
-	//ftp file download
-	//get async task in progress
-
+	EJSON_SYSMGR_RPC_GET_ASYNCTASK,
+	//get device type
 	//EJSON_SYSMGR_RPC_IDENTIFY_DEVICE,
+
 	EJSON_SYSMGR_RPC_END,
 	EJSON_SYSMGR_RPC_NONE
 }EJSON_SYSMGR_RPC_TYPES;
@@ -192,6 +190,22 @@ typedef struct SYSMGR_DOWNLOAD_FILE_PACKET_T
 	int taskID;//for file download, return the taskID so that client can check the progress
 }SYSMGR_DOWNLOAD_FILE_PACKET;
 /* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_GET_ASYNCTASK
+#define SYSMGR_RPC_ASYNCTASK_GET         "get_async_task"
+#define SYSMGR_RPC_ASYNCTASK_ARG         "task"
+#define SYSMGR_RPC_ASYNCTASK_ARG_TABL    {"brbox1","brbox2","unknown","none","\0"}
+typedef enum SYSMGR_ASYNCTASK_TYPE_T
+{
+	SYSMGR_ASYNCTASK_BRBOX1,
+	SYSMGR_ASYNCTASK_BRBOX2,
+	SYSMGR_ASYNCTASK_UNKNOWN,
+	SYSMGR_ASYNCTASK_NONE
+}SYSMGR_ASYNCTASK_TYPE;
+typedef struct SYSMGR_ASYNCTASK_PACKET_T
+{
+	SYSMGR_ASYNCTASK_TYPE task;
+}SYSMGR_ASYNCTASK_PACKET;
+/* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct SYSMGR_CMN_DATA_CACHE_T
 {
@@ -202,6 +216,13 @@ typedef struct SYSMGR_CMN_DATA_CACHE_T
 	char bkup_fmwver[100];//backup version
 	char krnl_fmwver[100];//kernel version
 	SYSMGR_BOOT_SYSTEM_TYPE bootsys;//brbox1/brbox2
+	EJSON_SYSMGR_RPC_TYPES AsyncCmdInProgress;
+
+	SYSMGR_CMN_DATA_CACHE_T()
+	{
+		AsyncCmdInProgress=EJSON_SYSMGR_RPC_NONE;
+	};//initialize variables here
+	~ SYSMGR_CMN_DATA_CACHE_T(){};
 }SYSMGR_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */
 #endif

@@ -11,6 +11,8 @@ class  SysRpc : public ADJsonRpcMgrConsumer, public ADCmnStringProcessor
 	bool krnl_fmwver_updated;
 	bool boot_system_updated;
 	SYSMGR_CMN_DATA_CACHE *pDataCache;
+	
+
 public:
 	 SysRpc(std::string rpcName,int myIndex,bool emu,bool log,SYSMGR_CMN_DATA_CACHE *pData);//getRpc,std::string setRpc);
 	~ SysRpc();
@@ -57,6 +59,11 @@ public:
 	int bin_to_json_download_file(JsonDataCommObj* pReq,EJSON_SYSMGR_RPC_TYPES command);
 	int process_download_file(JsonDataCommObj* pReq,EJSON_SYSMGR_RPC_TYPES command,ADJsonRpcMgrProducer* pObj);
 	RPC_SRV_RESULT process_async_download_file(SYSMGR_DOWNLOAD_FILE_PACKET* pPacket,EJSON_SYSMGR_RPC_TYPES command);
+
+	int json_to_bin_get_async_task_in_progress(JsonDataCommObj* pReq);
+	int bin_to_json_get_async_task_in_progress(JsonDataCommObj* pReq);
+	int process_get_async_task_in_progress(JsonDataCommObj* pReq);
+
 
 };
 /* ------------------------------------------------------------------------- */
