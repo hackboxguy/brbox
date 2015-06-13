@@ -32,7 +32,8 @@ SysmgrCltCmdline::SysmgrCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--ftget=srcURL,trgtpath    [download file from the ftp server to defined target_file_path]");
 	CmdlineHelper.insert_options_entry((char*)"tftget" ,optional_argument,EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP);
 	CmdlineHelper.insert_help_entry((char*)"--tftget=srvip,trgt,src    [download file from tftp server's(srvip) to target_file_path]");
-
+	CmdlineHelper.insert_options_entry((char*)"asynctasksts" ,optional_argument,EJSON_SYSMGR_RPC_GET_ASYNCTASK);
+	CmdlineHelper.insert_help_entry((char*)"--asynctasksts             [read async-task-in-progress if any]");
 }
 /* ------------------------------------------------------------------------- */
 SysmgrCltCmdline::~SysmgrCltCmdline()
@@ -103,6 +104,15 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADFTP:
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:
 			push_file_download(sub_arg,command);
+			break;
+		case EJSON_SYSMGR_RPC_GET_ASYNCTASK:
+			{
+			const char *table[]   = SYSMGR_RPC_ASYNCTASK_ARG_TABL;
+			CmdlineHelper.push_single_enum_get_set_command( EJSON_SYSMGR_RPC_GET_ASYNCTASK,
+			EJSON_SYSMGR_RPC_GET_ASYNCTASK,SYSMGR_RPC_ASYNCTASK_GET,
+			SYSMGR_RPC_ASYNCTASK_GET,&table[0],SYSMGR_ASYNCTASK_UNKNOWN,
+			(char*)SYSMGR_RPC_ASYNCTASK_ARG,sub_arg);
+			}
 			break;
 		default:
 			return 0;

@@ -69,7 +69,8 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&TftpGet);
 	SysRpc FtpGet(SYSMGR_RPC_DOWNLOADFTP_SET    ,EJSON_SYSMGR_RPC_SET_DOWNLOADFTP ,emulat,dbglog,&DataCache); 
 	RpcMgr.AttachRpc(&FtpGet);
-
+	SysRpc AsyncGet(SYSMGR_RPC_ASYNCTASK_GET    ,EJSON_SYSMGR_RPC_GET_ASYNCTASK   ,emulat,dbglog,&DataCache); 
+	RpcMgr.AttachRpc(&AsyncGet);
 
 
 	//start listening for rpc-commands

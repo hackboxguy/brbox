@@ -31,7 +31,7 @@ int SysRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_SET_FMWUPDATE   :return json_to_bin_set_fmwupdate(pReq);
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADFTP :return json_to_bin_download_file(pReq,EJSON_SYSMGR_RPC_SET_DOWNLOADFTP);
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:return json_to_bin_download_file(pReq,EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP);
-
+		case EJSON_SYSMGR_RPC_GET_ASYNCTASK   :return json_to_bin_get_async_task_in_progress(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -53,6 +53,7 @@ int SysRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_SET_FMWUPDATE   :return bin_to_json_set_fmwupdate(pReq);
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADFTP :return bin_to_json_download_file(pReq,EJSON_SYSMGR_RPC_SET_DOWNLOADFTP);
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:return bin_to_json_download_file(pReq,EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP);
+		case EJSON_SYSMGR_RPC_GET_ASYNCTASK   :return bin_to_json_get_async_task_in_progress(pReq);
 		default: break;
 	}
 	return -1;
@@ -74,14 +75,31 @@ int SysRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 		case EJSON_SYSMGR_RPC_SET_FMWUPDATE   :return process_set_fmwupdate(pReq,pObj);
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADFTP :return process_download_file(pReq,EJSON_SYSMGR_RPC_SET_DOWNLOADFTP,pObj);
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:return process_download_file(pReq,EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP,pObj);
-
+		case EJSON_SYSMGR_RPC_GET_ASYNCTASK   :return process_get_async_task_in_progress(pReq);
 		default:break;
 	}
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
+SYSMGR_ASYNCTASK_TYPE SysRpc::get_async_task_in_progress()
+{
+	//!!!!!!!important: when a new async task is added to ProcessWorkAsync(),
+	//ensure that it is also added in this function
+	SYSMGR_ASYNCTASK_TYPE task=SYSMGR_ASYNCTASK_UNKNOWN;
+	switch(pDataCache->AsyncCmdInProgress)
+	{
+		case EJSON_SYSMGR_RPC_SET_DEV_OP      :task=SYSMGR_ASYNCTASK_DEVOP;break;
+		case EJSON_SYSMGR_RPC_SET_FMWUPDATE   :task=SYSMGR_ASYNCTASK_FUPDATE;break;
+		case EJSON_SYSMGR_RPC_SET_DOWNLOADFTP :task=SYSMGR_ASYNCTASK_FTPDOWNLOAD;break;
+		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:task=SYSMGR_ASYNCTASK_TFTPDOWNLOAD;break;
+		default                               :break;
+	}
+	return task;
+}
 RPC_SRV_RESULT SysRpc::ProcessWorkAsync(int cmd,unsigned char* pWorkData)
 {
+	//!!!!!!!important: when a new async task is added in this function,
+	//ensure that it is also added in get_async_task_in_progress()
 	RPC_SRV_RESULT ret_val=RPC_SRV_RESULT_FAIL;
 	pDataCache->AsyncCmdInProgress=(EJSON_SYSMGR_RPC_TYPES)cmd;//To know which async command is in progress
 	switch(cmd)
@@ -653,51 +671,30 @@ RPC_SRV_RESULT SysRpc::process_async_download_file(SYSMGR_DOWNLOAD_FILE_PACKET* 
 /* ------------------------------------------------------------------------- */
 int SysRpc::json_to_bin_get_async_task_in_progress(JsonDataCommObj* pReq)
 {
-	//SDSMS_ASYNC_PROGRESS_PACKET* pPanelCmdObj=NULL;
-	//PREPARE_JSON_REQUEST(RPC_SRV_REQ,SDSMS_ASYNC_PROGRESS_PACKET,RPC_SRV_ACT_READ,EJSON_SDSMS_GET_ASYNC_TASK_IN_PROGRESS);
+	SYSMGR_ASYNCTASK_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_ASYNCTASK_PACKET,RPC_SRV_ACT_READ,EJSON_SYSMGR_RPC_GET_ASYNCTASK);
 	return 0;
 }
 int SysRpc::bin_to_json_get_async_task_in_progress(JsonDataCommObj* pReq)
 {
-//PREPARE_JSON_RESP_ENUM(RPC_SRV_REQ,SDSMS_ASYNC_PROGRESS_PACKET,SDSMS_RPC_ASYNC_TASK_ENUM_NAME,task,SDSMS_RPC_ASYNC_TASK_ENUM_TABL,SD_RPC_SMS_ASYNC_TASK_UNKNOWN);
+PREPARE_JSON_RESP_ENUM(RPC_SRV_REQ,SYSMGR_ASYNCTASK_PACKET,SYSMGR_RPC_ASYNCTASK_ARG,task,SYSMGR_RPC_ASYNCTASK_ARG_TABL,SYSMGR_ASYNCTASK_UNKNOWN);
 	return 0;
 }
 int SysRpc::process_get_async_task_in_progress(JsonDataCommObj* pReq)
 {
-	/*SDSMS_ASYNC_PROGRESS_PACKET* pPacket;
-	pPacket=(SDSMS_ASYNC_PROGRESS_PACKET*)pReq->dataRef;
-	if(pReq->action==RPC_SRV_ACT_READ)
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SYSMGR_ASYNCTASK_PACKET* pPacket;
+	pPacket=(SYSMGR_ASYNCTASK_PACKET*)pPanelReq->dataRef;
+	if(pPanelReq->action!=RPC_SRV_ACT_READ)
 	{
-		switch(AsyncCmdInProgress)
-		{
-			case EJSON_SDSMS_SET_FMW_UPDATE        :
-				if(CurrentModuleInProgress==SDSMS_FMW_MODULE_MERC_NIRO_MSTAR)
-					pPacket->task=SD_RPC_SMS_ASYNC_TASK_NIRO_UPDATE;
-				else if(CurrentModuleInProgress==SDSMS_FMW_MODULE_MERC_PS171)
-					pPacket->task=SD_RPC_SMS_ASYNC_TASK_FMW_UPDATE_PS171;
-				else if(CurrentModuleInProgress==SDSMS_FMW_MODULE_MERC_STDP)
-					pPacket->task=SD_RPC_SMS_ASYNC_TASK_FMW_UPDATE_STDP;
-				else
-					pPacket->task=SD_RPC_SMS_ASYNC_TASK_FMW_UPDATE;
-				break;
-			case EJSON_SDSMS_SET_DOWNLOAD_FTP_FILE :pPacket->task=SD_RPC_SMS_ASYNC_TASK_FTP_FILE_DOWNLOAD ;break;
-			case EJSON_SDSMS_SET_DOWNLOAD_TFTP_FILE:pPacket->task=SD_RPC_SMS_ASYNC_TASK_TFTP_FILE_DOWNLOAD;break;
-			case EJSON_SDSMS_UPLOAD_BARCO_GAMMA    :pPacket->task=SD_RPC_SMS_ASYNC_TASK_GAMMA_UPLOAD      ;break;
-			case EJSON_SDSMS_TRIGGER_AUTO_DIAGNOSIS:pPacket->task=SD_RPC_SMS_ASYNC_TASK_AUTO_DIAGNOSIS    ;break;
-
-			//new ones
-			case EJSON_SYSMGR_RPC_SET_DEV_OP:
-			case EJSON_SYSMGR_RPC_SET_FMWUPDATE:
-			case EJSON_SYSMGR_RPC_SET_DOWNLOADFTP:
-			case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:
-
-			default                                :pPacket->task=SD_RPC_SMS_ASYNC_TASK_UNKNOWN;break;
-		}
-		pReq->result=RPC_SRV_RESULT_SUCCESS;
+		pPanelReq->result=RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+		return 0;
 	}
-	else
-		pReq->result=RPC_SRV_RESULT_ACTION_NOT_ALLOWED;*/
+	pPacket->task=get_async_task_in_progress();
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 	return 0;
 }
+/* ------------------------------------------------------------------------- */
 
 

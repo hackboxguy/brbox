@@ -11,8 +11,7 @@ class  SysRpc : public ADJsonRpcMgrConsumer, public ADCmnStringProcessor
 	bool krnl_fmwver_updated;
 	bool boot_system_updated;
 	SYSMGR_CMN_DATA_CACHE *pDataCache;
-	
-
+	SYSMGR_ASYNCTASK_TYPE get_async_task_in_progress();
 public:
 	 SysRpc(std::string rpcName,int myIndex,bool emu,bool log,SYSMGR_CMN_DATA_CACHE *pData);//getRpc,std::string setRpc);
 	~ SysRpc();
