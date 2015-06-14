@@ -71,7 +71,8 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&FtpGet);
 	SysRpc AsyncGet(SYSMGR_RPC_ASYNCTASK_GET    ,EJSON_SYSMGR_RPC_GET_ASYNCTASK   ,emulat,dbglog,&DataCache); 
 	RpcMgr.AttachRpc(&AsyncGet);
-
+	SysRpc DevTypeGet(SYSMGR_RPC_DEVTYPE_GET    ,EJSON_SYSMGR_RPC_GET_DEVTYPE   ,emulat,dbglog,&DataCache); 
+	RpcMgr.AttachRpc(&DevTypeGet);
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr

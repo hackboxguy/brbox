@@ -63,7 +63,9 @@ public:
 	int bin_to_json_get_async_task_in_progress(JsonDataCommObj* pReq);
 	int process_get_async_task_in_progress(JsonDataCommObj* pReq);
 
-
+	int json_to_bin_get_devtype(JsonDataCommObj* pReq);
+	int bin_to_json_get_devtype(JsonDataCommObj* pReq);
+	int process_get_devtype(JsonDataCommObj* pReq);
 };
 /* ------------------------------------------------------------------------- */
 

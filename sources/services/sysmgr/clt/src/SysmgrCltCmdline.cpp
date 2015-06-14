@@ -5,14 +5,12 @@ using namespace std;
 SysmgrCltCmdline::SysmgrCltCmdline()
 {
 	CmdlineHelper.attach_helper(this);
-
 	CmdlineHelper.insert_options_entry((char*)"mac" ,optional_argument,EJSON_SYSMGR_RPC_GET_MAC_ADDR);
 	CmdlineHelper.insert_help_entry((char*)"--mac=ethN,<addr>          [get/set mac address]");
 	CmdlineHelper.insert_options_entry((char*)"ethcount" ,optional_argument,EJSON_SYSMGR_RPC_GET_ETH_COUNT);
 	CmdlineHelper.insert_help_entry((char*)"--ethcount                 [read total available eth interfaces]");
 	CmdlineHelper.insert_options_entry((char*)"ethname" ,optional_argument,EJSON_SYSMGR_RPC_GET_ETH_NAME);
 	CmdlineHelper.insert_help_entry((char*)"--ethname=index            [read ethname of a given zero-based-index]");
-
 	CmdlineHelper.insert_options_entry((char*)"loadinfo" ,optional_argument,EJSON_SYSMGR_RPC_GET_LOADINFO);
 	CmdlineHelper.insert_help_entry((char*)"--loadinfo                 [read system's load and uptime info]");
 	CmdlineHelper.insert_options_entry((char*)"meminfo" ,optional_argument,EJSON_SYSMGR_RPC_GET_MEMINFO);
@@ -27,13 +25,14 @@ SysmgrCltCmdline::SysmgrCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--bootdev                  [read currently booted system<brbox1/brbox2>]");
 	CmdlineHelper.insert_options_entry((char*)"fupdate" ,optional_argument,EJSON_SYSMGR_RPC_SET_FMWUPDATE);
 	CmdlineHelper.insert_help_entry((char*)"--fupdate=module,filepath  [trigger fmw update of defined module=<project>]");
-
 	CmdlineHelper.insert_options_entry((char*)"ftget" ,optional_argument,EJSON_SYSMGR_RPC_SET_DOWNLOADFTP);
 	CmdlineHelper.insert_help_entry((char*)"--ftget=srcURL,trgtpath    [download file from the ftp server to defined target_file_path]");
 	CmdlineHelper.insert_options_entry((char*)"tftget" ,optional_argument,EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP);
 	CmdlineHelper.insert_help_entry((char*)"--tftget=srvip,trgt,src    [download file from tftp server's(srvip) to target_file_path]");
 	CmdlineHelper.insert_options_entry((char*)"asynctasksts" ,optional_argument,EJSON_SYSMGR_RPC_GET_ASYNCTASK);
 	CmdlineHelper.insert_help_entry((char*)"--asynctasksts             [read async-task-in-progress if any]");
+	CmdlineHelper.insert_options_entry((char*)"devtype" ,optional_argument,EJSON_SYSMGR_RPC_GET_DEVTYPE);
+	CmdlineHelper.insert_help_entry((char*)"--devtype                  [read device type]");
 }
 /* ------------------------------------------------------------------------- */
 SysmgrCltCmdline::~SysmgrCltCmdline()
@@ -112,6 +111,15 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			EJSON_SYSMGR_RPC_GET_ASYNCTASK,SYSMGR_RPC_ASYNCTASK_GET,
 			SYSMGR_RPC_ASYNCTASK_GET,&table[0],SYSMGR_ASYNCTASK_UNKNOWN,
 			(char*)SYSMGR_RPC_ASYNCTASK_ARG,sub_arg);
+			}
+			break;
+		case EJSON_SYSMGR_RPC_GET_DEVTYPE:
+			{
+			const char *table[]   = SYSMGR_RPC_DEVTYPE_ARG_TABL;
+			CmdlineHelper.push_single_enum_get_set_command( EJSON_SYSMGR_RPC_GET_DEVTYPE,
+			EJSON_SYSMGR_RPC_GET_DEVTYPE,SYSMGR_RPC_DEVTYPE_GET,
+			SYSMGR_RPC_DEVTYPE_GET,&table[0],ADCMN_BOARD_TYPE_UNKNOWN,
+			(char*)SYSMGR_RPC_DEVTYPE_ARG,sub_arg);
 			}
 			break;
 		default:

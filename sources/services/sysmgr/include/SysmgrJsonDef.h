@@ -2,6 +2,7 @@
 #define __SYSMGR_JSON_DEF_H_
 /* ------------------------------------------------------------------------- */
 #include "ADCmnPortList.h"
+#include "ADCmnDevTypes.h"
 #define SYSMGR_JSON_PORT_NUMBER    ADCMN_PORT_SYSMGR
 /* ------------------------------------------------------------------------- */
 typedef enum EJSON_SYSMGR_RPC_TYPES_T
@@ -22,6 +23,7 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_SET_DOWNLOADFTP,
 	EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP,
 	EJSON_SYSMGR_RPC_GET_ASYNCTASK,
+	EJSON_SYSMGR_RPC_GET_DEVTYPE,    //read the board or device type
 	//get device type
 	//EJSON_SYSMGR_RPC_IDENTIFY_DEVICE,
 
@@ -207,6 +209,16 @@ typedef struct SYSMGR_ASYNCTASK_PACKET_T
 {
 	SYSMGR_ASYNCTASK_TYPE task;
 }SYSMGR_ASYNCTASK_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_GET_DEVTYPE
+#define SYSMGR_RPC_DEVTYPE_GET         "get_devtype"
+#define SYSMGR_RPC_DEVTYPE_ARG         "type"
+#define SYSMGR_RPC_DEVTYPE_ARG_TABL    ADCMN_BOARD_TYPE_TABLE
+typedef ADCMN_BOARD_TYPE SYSMGR_DEV_TYPE;
+typedef struct SYSMGR_DEVTYPE_PACKET_T
+{
+	SYSMGR_DEV_TYPE DevType;
+}SYSMGR_DEVTYPE_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct SYSMGR_CMN_DATA_CACHE_T

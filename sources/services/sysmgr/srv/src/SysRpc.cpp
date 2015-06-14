@@ -32,6 +32,7 @@ int SysRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADFTP :return json_to_bin_download_file(pReq,EJSON_SYSMGR_RPC_SET_DOWNLOADFTP);
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:return json_to_bin_download_file(pReq,EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP);
 		case EJSON_SYSMGR_RPC_GET_ASYNCTASK   :return json_to_bin_get_async_task_in_progress(pReq);
+		case EJSON_SYSMGR_RPC_GET_DEVTYPE     :return json_to_bin_get_devtype(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -54,6 +55,7 @@ int SysRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADFTP :return bin_to_json_download_file(pReq,EJSON_SYSMGR_RPC_SET_DOWNLOADFTP);
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:return bin_to_json_download_file(pReq,EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP);
 		case EJSON_SYSMGR_RPC_GET_ASYNCTASK   :return bin_to_json_get_async_task_in_progress(pReq);
+		case EJSON_SYSMGR_RPC_GET_DEVTYPE     :return bin_to_json_get_devtype(pReq);
 		default: break;
 	}
 	return -1;
@@ -76,6 +78,7 @@ int SysRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADFTP :return process_download_file(pReq,EJSON_SYSMGR_RPC_SET_DOWNLOADFTP,pObj);
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:return process_download_file(pReq,EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP,pObj);
 		case EJSON_SYSMGR_RPC_GET_ASYNCTASK   :return process_get_async_task_in_progress(pReq);
+		case EJSON_SYSMGR_RPC_GET_DEVTYPE     :return process_get_devtype(pReq);
 		default:break;
 	}
 	return 0;
@@ -696,5 +699,35 @@ int SysRpc::process_get_async_task_in_progress(JsonDataCommObj* pReq)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
+int SysRpc::json_to_bin_get_devtype(JsonDataCommObj* pReq)
+{
+	SYSMGR_DEVTYPE_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_DEVTYPE_PACKET,RPC_SRV_ACT_READ,EJSON_SYSMGR_RPC_GET_DEVTYPE);
+	return 0;
+}
+int SysRpc::bin_to_json_get_devtype(JsonDataCommObj* pReq)
+{
+PREPARE_JSON_RESP_ENUM(RPC_SRV_REQ,SYSMGR_DEVTYPE_PACKET,SYSMGR_RPC_DEVTYPE_ARG,DevType,SYSMGR_RPC_DEVTYPE_ARG_TABL,ADCMN_BOARD_TYPE_UNKNOWN);
+	return 0;
+}
+int SysRpc::process_get_devtype(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SYSMGR_DEVTYPE_PACKET* pPacket;
+	pPacket=(SYSMGR_DEVTYPE_PACKET*)pPanelReq->dataRef;
+	if(pPanelReq->action!=RPC_SRV_ACT_READ)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+		return 0;
+	}
 
+	ADCMN_DEV_INFO *pDev;
+	pDev=(ADCMN_DEV_INFO *)pDataCache->pDevInfo;
+	pPacket->DevType=pDev->BoardType;
+
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
 
