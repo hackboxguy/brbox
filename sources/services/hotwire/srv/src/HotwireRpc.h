@@ -1,7 +1,7 @@
 #ifndef __GPIOCTRL_RPC_H_
 #define __GPIOCTRL_RPC_H_
 #include "ADJsonRpcMgr.hpp"
-#include "GpioctlJsonDef.h"
+#include "HotwireJsonDef.h"
 #include "ADCmnStringProcessor.hpp"
 /* ------------------------------------------------------------------------- */
 class  GpioCtrlRpc : public ADJsonRpcMgrConsumer, public ADCmnStringProcessor

@@ -1,7 +1,7 @@
 #ifndef __GPIOCLT_CMDLINE_H_
 #define __GPIOCLT_CMDLINE_H_
 #include "ADCmdlineHelper.hpp"
-#include "GpioctlJsonDef.h"
+#include "HotwireJsonDef.h"
 #include "ADCmnStringProcessor.hpp"
 class GpioCltCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 {

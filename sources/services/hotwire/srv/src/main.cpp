@@ -8,8 +8,8 @@
 #include "ADTimer.hpp"
 
 /* ------------------------------------------------------------------------- */
-#include "GpioctlJsonDef.h"
-#include "GpioCtrlRpc.h"
+#include "HotwireJsonDef.h"
+#include "HotwireRpc.h"
 #define SERVER_JSON_PORT_NUM GPIOCTL_JSON_PORT_NUMBER
 /* ------------------------------------------------------------------------- */
 using namespace std;

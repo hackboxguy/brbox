@@ -11,7 +11,7 @@ set(LIB_ADCOMMN AdCmn)      #common library
 project(${COMPONENT_NAME})
 set(AUTO_SVN_VERSION    ON CACHE BOOL ON)  #by default include svn revision numbers
 set(INSTALL_MY_HEADERS  ON CACHE BOOL ON)  #by default install header files to target-install-directory
-set(STARTUP_SCRIPT GpioctlStartupScr)         #server startup script
+set(STARTUP_SCRIPT HotwireStartupScr)         #server startup script
 #set(STARTUP_SCRIPT_ALIAS S71GpioCtl)          #todo: automate numbering of startup scripts
 set(STARTNUM "75" CACHE STRING "75")       #init order number of the service
 file(GLOB SOURCES "src/*.cpp")

@@ -1,5 +1,4 @@
-#include "GpioCtrlRpc.h"
-#include "RaspiIo.h"
+#include "HotwireRpc.h"
 /* ------------------------------------------------------------------------- */
 GpioCtrlRpc:: GpioCtrlRpc(std::string rpcName,int myIndex,bool emu, bool log,GPIOCTL_CMN_DATA_CACHE *pData):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
 {
@@ -67,7 +66,7 @@ int GpioCtrlRpc::bin_to_json_gpio_get(JsonDataCommObj* pReq)
 }
 int GpioCtrlRpc::process_gpio_get(JsonDataCommObj* pReq)
 {
-	RaspiIo Raspi;
+	/*RaspiIo Raspi;
 	RPC_SRV_REQ *pPanelReq=NULL;
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	GPIOCTL_IO_ACCESS_PACKET* pPacket;
@@ -83,6 +82,7 @@ int GpioCtrlRpc::process_gpio_get(JsonDataCommObj* pReq)
 	//set debug logging flag
 	//ImgId.logflag=get_debug_log_flag();//get_debug_log_flag() is a function f parent class ADJsonRpcMgrConsumer
 	//pPanelReq->result=ImgId.IdentifyPattern(pPacket->pattern_type,pDataCache->StrImgIdDebugFile);
+	*/
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
@@ -106,10 +106,11 @@ int GpioCtrlRpc::process_gpio_set(JsonDataCommObj* pReq)
 	GPIOCTL_IO_ACCESS_PACKET* pPacket;
 	pPacket=(GPIOCTL_IO_ACCESS_PACKET*)pPanelReq->dataRef;
 
-	RaspiIo Raspi;
+	/*RaspiIo Raspi;
 	pPanelReq->result=Raspi.WriteGPIO(pPacket->addr,pPacket->data);
 	//pDataCache->tmpData=pPacket->data;
 	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	*/
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
