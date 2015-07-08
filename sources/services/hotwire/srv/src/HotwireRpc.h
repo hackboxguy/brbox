@@ -31,6 +31,7 @@ public:
 	int bin_to_json_omxact_set(JsonDataCommObj* pReq);
 	int process_omxact_set(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj);
 	RPC_SRV_RESULT process_omx_action(GPIOCTL_OMXACT_TYPE act);
+	bool is_omx_running();
 };
 /* ------------------------------------------------------------------------- */
 

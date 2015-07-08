@@ -216,8 +216,11 @@ RPC_SRV_RESULT GpioCtrlRpc::process_omx_action(GPIOCTL_OMXACT_TYPE act)
 	char command[1024];
 	if(pDataCache->ActType!=GPIOCTL_OMXACT_IDLE) //if not idle make it idle
 	{
-		sprintf(command,"echo -n q > /tmp/cmd");
-		system(command);
+		if(is_omx_running()==true)//stop only if omxplayer is already running
+		{
+			sprintf(command,"echo -n q > /tmp/cmd");
+			system(command);
+		}
 	}
 	switch(act)
 	{
@@ -258,6 +261,15 @@ RPC_SRV_RESULT GpioCtrlRpc::process_omx_action(GPIOCTL_OMXACT_TYPE act)
 			break;
 	}
 	return RPC_SRV_RESULT_SUCCESS;
+}
+bool GpioCtrlRpc::is_omx_running()
+{
+	char command[1024];
+	sprintf(command,"ps acux | grep omxplayer");
+	if (system(command)==0)
+		return true;
+	else
+		return false;
 }
 /* ------------------------------------------------------------------------- */
 
