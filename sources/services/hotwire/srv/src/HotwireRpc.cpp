@@ -214,7 +214,7 @@ int GpioCtrlRpc::process_omxact_set(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* 
 RPC_SRV_RESULT GpioCtrlRpc::process_omx_action(GPIOCTL_OMXACT_TYPE act)
 {
 	char command[1024];
-	if(pDataCache->ActType!=GPIOCTL_OMXACT_IDLE) //if not idle make it idle
+	//if(pDataCache->ActType!=GPIOCTL_OMXACT_IDLE) //if not idle make it idle
 	{
 		if(is_omx_running()==true)//stop only if omxplayer is already running
 		{
@@ -253,8 +253,11 @@ RPC_SRV_RESULT GpioCtrlRpc::process_omx_action(GPIOCTL_OMXACT_TYPE act)
 				break;
 		case GPIOCTL_OMXACT_WARN  : break;
 		case GPIOCTL_OMXACT_IDLE  :
-				sprintf(command,"echo -n q > /tmp/cmd");
-				system(command);
+				//if(is_omx_running()==true)
+				//{
+				//	sprintf(command,"echo -n q > /tmp/cmd");
+			//		system(command);
+				//}
 				pDataCache->ActType=GPIOCTL_OMXACT_IDLE;
 				break;
 		default:
