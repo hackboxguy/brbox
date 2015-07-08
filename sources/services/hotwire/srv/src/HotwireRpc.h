@@ -22,6 +22,15 @@ public:
 	int json_to_bin_gpio_set(JsonDataCommObj* pReq);
 	int bin_to_json_gpio_set(JsonDataCommObj* pReq);
 	int process_gpio_set(JsonDataCommObj* pReq);
+
+
+	int json_to_bin_omxact_get(JsonDataCommObj* pReq);
+	int bin_to_json_omxact_get(JsonDataCommObj* pReq);
+	int process_omxact_get(JsonDataCommObj* pReq);
+	int json_to_bin_omxact_set(JsonDataCommObj* pReq);
+	int bin_to_json_omxact_set(JsonDataCommObj* pReq);
+	int process_omxact_set(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj);
+	RPC_SRV_RESULT process_omx_action(GPIOCTL_OMXACT_TYPE act);
 };
 /* ------------------------------------------------------------------------- */
 

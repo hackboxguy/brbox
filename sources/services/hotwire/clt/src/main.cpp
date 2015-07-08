@@ -6,7 +6,7 @@
 using namespace std;
 int main(int argc, const char* argv[])
 {
-	//HotwireCltCmdline CmdLine;
-	//CmdLine.parse_cmdline_arguments(argc,(char**)argv);
+	GpioCltCmdline CmdLine;
+	CmdLine.parse_cmdline_arguments(argc,(char**)argv);
 	return 0;
 }

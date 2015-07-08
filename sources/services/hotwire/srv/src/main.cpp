@@ -39,11 +39,11 @@ int main(int argc, const char* argv[])
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 
 	/****************************RPC list*************************************/
-	GpioCtrlRpc GpioGet(GPIOCTL_RPC_IO_GET ,EJSON_GPIOCTL_RPC_IO_GET ,emulat,dbglog,&DataCache);
-	GpioCtrlRpc GpioSet(GPIOCTL_RPC_IO_SET ,EJSON_GPIOCTL_RPC_IO_SET ,emulat,dbglog,&DataCache);
+	GpioCtrlRpc OmxActGet(GPIOCTL_RPC_OMXACT_GET ,EJSON_GPIOCTL_RPC_OMXACT_GET ,emulat,dbglog,&DataCache);
+	GpioCtrlRpc OmxActSet(GPIOCTL_RPC_OMXACT_SET ,EJSON_GPIOCTL_RPC_OMXACT_SET ,emulat,dbglog,&DataCache);
 
-	RpcMgr.AttachRpc(&GpioGet);
-	RpcMgr.AttachRpc(&GpioSet);
+	RpcMgr.AttachRpc(&OmxActGet);
+	RpcMgr.AttachRpc(&OmxActSet);
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr
@@ -51,7 +51,6 @@ int main(int argc, const char* argv[])
 	RpcMgr.Start(CmdLine.get_port_number(),CmdLine.get_socket_log(),CmdLine.get_emulation_mode());
 	//server is ready to serve rpc's
 	RpcMgr.SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE_READY);
-
 
 	//wait for sigkill or sigterm signal
 	AppTimer.wait_for_exit_signal();//loop till KILL or TERM signal is received
