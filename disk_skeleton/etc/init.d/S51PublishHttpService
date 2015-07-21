@@ -1,0 +1,47 @@
+#!/bin/sh
+#
+#
+SED="/bin/sed"
+GREP="/bin/grep"
+PS="/bin/ps w"
+AVAHID="/usr/sbin/avahi-daemon"
+SKELETON="/usr/share/avahi_services/http.service.skeleton"
+TARGET="/etc/avahi/services/http.service"
+DEVTYPE=$(/bin/cat /tmp/BrBoxDevType.txt)
+if [ ! "$DEVTYPE" ]; then
+  DEVTYPE="Unknown"
+fi
+
+DEVIDENT=$(/bin/cat /tmp/BrBoxIdent.txt)
+if [ ! "$DEVIDENT" ]; then
+  DEVIDENT=$(/sbin/ifconfig |${GREP} HWaddr|${GREP} eth0|${SED} s/.*HWaddr\ //|${SED} s/\ *$//|${SED} s/\://g)
+fi
+
+publish() {
+	cat ${SKELETON}|${SED} s/DEVTYPE/${DEVTYPE}/g |${SED} s/DEVIDENT/${DEVIDENT}/g >${TARGET}
+	chmod 644 ${TARGET}
+#	$AVAHID -r
+}
+
+unpublish(){
+	rm ${TARGET}
+#	$AVAHID -r
+}
+case "$1" in
+    start)
+	publish
+	;;
+    stop)
+	unpublish
+	;;
+    restart|reload)
+	unpublish
+	publish
+	;;
+    *)
+	echo "Usage: i$0 {start|stop|reload}" >&2
+	exit 1
+	;;
+esac
+
+

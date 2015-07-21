@@ -24,7 +24,7 @@
 
 <service-group>
 
-  <name replace-wildcards="no">BrBox DEVTYP [DEVIDENT]</name>
+  <name replace-wildcards="no">BrBox DEVTYPE [DEVIDENT]</name>
 
   <service>
     <type>_http._tcp</type>
