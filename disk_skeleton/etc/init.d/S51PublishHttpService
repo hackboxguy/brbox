@@ -6,7 +6,7 @@ GREP="/bin/grep"
 PS="/bin/ps w"
 AVAHID="/usr/sbin/avahi-daemon"
 SKELETON="/usr/share/avahi_services/http.service.skeleton"
-TARGET="/etc/avahi/services/http.service"
+TARGET="/tmp/http.service"
 DEVTYPE=$(/bin/cat /tmp/BrBoxDevType.txt)
 if [ ! "$DEVTYPE" ]; then
   DEVTYPE="Unknown"
