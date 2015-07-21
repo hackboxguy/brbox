@@ -11,8 +11,7 @@ DEVTYPE=$(/bin/cat /tmp/BrBoxDevType.txt)
 if [ ! "$DEVTYPE" ]; then
   DEVTYPE="Unknown"
 fi
-
-DEVIDENT=$(/bin/cat /tmp/BrBoxIdent.txt)
+[ -f /tmp/BrBoxIdent.txt ] && DEVIDENT=$(/bin/cat /tmp/BrBoxIdent.txt)
 if [ ! "$DEVIDENT" ]; then
   DEVIDENT=$(/sbin/ifconfig |${GREP} HWaddr|${GREP} eth0|${SED} s/.*HWaddr\ //|${SED} s/\ *$//|${SED} s/\://g)
 fi
@@ -20,12 +19,12 @@ fi
 publish() {
 	cat ${SKELETON}|${SED} s/DEVTYPE/${DEVTYPE}/g |${SED} s/DEVIDENT/${DEVIDENT}/g >${TARGET}
 	chmod 644 ${TARGET}
-#	$AVAHID -r
+	$AVAHID -r
 }
 
 unpublish(){
 	rm ${TARGET}
-#	$AVAHID -r
+	$AVAHID -r
 }
 case "$1" in
     start)
