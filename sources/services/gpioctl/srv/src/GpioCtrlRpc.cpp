@@ -73,12 +73,15 @@ int GpioCtrlRpc::process_gpio_get(JsonDataCommObj* pReq)
 	GPIOCTL_IO_ACCESS_PACKET* pPacket;
 	pPacket=(GPIOCTL_IO_ACCESS_PACKET*)pPanelReq->dataRef;
 
-	//pPacket->data=pDataCache->tmpData;
-	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
-	pPanelReq->result=Raspi.ReadGPIO (pPacket->addr,pPacket->data);
-	//RPC_SRV_RESULT RaspiIo::WriteGPIO(unsigned int addr,unsigned int data)
+	if(pPacket->addr>=GPIOCTL_MAX_GPIO_PINS)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;//max allowed gpio pins or 0 to 63
+		return 0;
+	}
 
-
+	pPacket->data=pDataCache->gpio_data[pPacket->addr];
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	//pPanelReq->result=Raspi.ReadGPIO (pPacket->addr,pPacket->data);
 
 	//set debug logging flag
 	//ImgId.logflag=get_debug_log_flag();//get_debug_log_flag() is a function f parent class ADJsonRpcMgrConsumer
@@ -105,11 +108,15 @@ int GpioCtrlRpc::process_gpio_set(JsonDataCommObj* pReq)
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	GPIOCTL_IO_ACCESS_PACKET* pPacket;
 	pPacket=(GPIOCTL_IO_ACCESS_PACKET*)pPanelReq->dataRef;
-
+	if(pPacket->addr>=GPIOCTL_MAX_GPIO_PINS)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;//max allowed gpio pins or 0 to 63
+		return 0;
+	}
 	RaspiIo Raspi;
 	pPanelReq->result=Raspi.WriteGPIO(pPacket->addr,pPacket->data);
-	//pDataCache->tmpData=pPacket->data;
-	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	if(pPanelReq->result==RPC_SRV_RESULT_SUCCESS)
+		pDataCache->gpio_data[pPacket->addr]=pPacket->data;//store last set gpio value in my local-cache
 	return 0;
 }
 /* ------------------------------------------------------------------------- */

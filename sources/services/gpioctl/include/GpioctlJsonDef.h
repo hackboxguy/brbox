@@ -3,6 +3,7 @@
 /* ------------------------------------------------------------------------- */
 #include "ADCmnPortList.h"
 #define GPIOCTL_JSON_PORT_NUMBER    ADCMN_PORT_GPIOCTL
+#define GPIOCTL_MAX_GPIO_PINS       64
 /* ------------------------------------------------------------------------- */
 typedef enum EJSON_GPIOCTL_RPC_TYPES_T
 {
@@ -29,7 +30,7 @@ typedef struct GPIOCTL_IO_ACCESS_PACKET_T
 typedef struct GPIOCTL_CMN_DATA_CACHE_T
 {
 	void *pDevInfo;//device-info-struct(typecast in rpc handlers)
-	unsigned int tmpData;
+	unsigned int gpio_data[GPIOCTL_MAX_GPIO_PINS];//allow max 64gpio addresses(0 to 63)
 }GPIOCTL_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */
 
