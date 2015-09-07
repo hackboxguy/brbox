@@ -1,6 +1,6 @@
 #!/bin/bash
 #this script prepares the buildroot and dependencies
-BR_LAST_STABLE_VERSION=2015.05 #2015.02
+BR_LAST_STABLE_VERSION=2015.08.1 #2015.02
 BR_DOWNLOAD_FOLDER=dl
 ####################checkout buildroot#####################
 git clone git://git.buildroot.net/buildroot
