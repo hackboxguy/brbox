@@ -20,6 +20,15 @@ int ADTaskWorker::identify_chain_element(void* element,int ident,ADChainProducer
 		else
 			return -1;
 	}
+	else if(call_from == work_chain_id )
+	{
+		WORK_CMD_TASK* pPtr;
+		pPtr=(WORK_CMD_TASK*)element;
+		if(pPtr->taskID==ident)
+			return 0;
+		else
+			return -1;
+	}
 	else
 		return -1;
 }

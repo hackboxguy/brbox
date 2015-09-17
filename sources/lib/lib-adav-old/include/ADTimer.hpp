@@ -20,6 +20,7 @@ class ADTimerConsumer //observer
 {
 public:
 	int notify_custom_sig;
+	int custom_sig_num;
 	virtual int timer_notification()=0;
 	virtual int sigio_notification()=0;
 	virtual int custom_sig_notification(int signum)=0;
@@ -57,7 +58,7 @@ protected:
 		std::vector<ADTimerConsumer*>::iterator iter;
 		for(iter=subscribers.begin();iter != subscribers.end();++iter)
 		{
-			if( (*iter)->notify_custom_sig==1 ) //send only to those who requested it
+			if( (*iter)->notify_custom_sig==1 && (*iter)->custom_sig_num==signum ) //send only to those who requested it
 				(*iter)->custom_sig_notification(signum);
 		}
 	}

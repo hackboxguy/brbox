@@ -287,6 +287,11 @@ int ADNetServer::thread_callback_function(void* pUserData,ADThreadProducer* pObj
 	return 0;
 }
 /*****************************************************************************/
+#include <signal.h>
+void Ouch(int num) //just a dummy handler to avoid service exit
+{
+	LOG_ERR_MSG("ADNetServer:AdLib","Ouch!!! received SIGALRM");
+}
 ADNetServer::ADNetServer()
 {
 	receive_size_pending=0;
@@ -296,6 +301,7 @@ ADNetServer::ADNetServer()
 	end_server = AD_NETWORK_FALSE;
 	sock_type=ADLIB_TCP_SOCKET_TYPE_JSON;
 	initialize_helpers();//attach callbacks
+	signal(SIGALRM,Ouch);
 }
 /*****************************************************************************/
 ADNetServer::ADNetServer(int port)
@@ -307,6 +313,7 @@ ADNetServer::ADNetServer(int port)
 	end_server = AD_NETWORK_FALSE;
 	sock_type=ADLIB_TCP_SOCKET_TYPE_JSON;
 	initialize_helpers();//attach callbacks
+	signal(SIGALRM,Ouch);
 }
 /*****************************************************************************/
 ADNetServer::~ADNetServer()

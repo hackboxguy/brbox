@@ -143,6 +143,11 @@ int ADSerial::thread_callback_function(void* pUserData,ADThreadProducer* pObj)
 	return 0;	
 }
 /*****************************************************************************/
+#include <signal.h>
+void SIOHandler(int num) //just a dummy handler to avoid service exit
+{
+	LOG_ERR_MSG("ADSerial","Ouch!!! received SIGIO\n");
+}
 ADSerial::ADSerial()//:baud(115200)
 {
 	pthread_mutex_init(&multi_callback_lock,NULL);
@@ -154,6 +159,7 @@ ADSerial::ADSerial()//:baud(115200)
 	uartlog=0;
 	//calibModeActive=0;
 	initialize_helpers();
+	signal(SIGIO,SIOHandler);
 }
 ADSerial::ADSerial(int baud_rate,char* dev_node_name)
 {
@@ -167,6 +173,7 @@ ADSerial::ADSerial(int baud_rate,char* dev_node_name)
 	else
 		strcpy(dev_node,"/dev/ttyS0");
 	initialize_helpers();
+	signal(SIGIO,SIOHandler);
 }
 /*****************************************************************************/
 ADSerial::~ADSerial()

@@ -188,13 +188,13 @@ int ADTimer::wait_for_exit_signal()//forever-loop, blocks the main() app till ki
 		sig=sigwaitinfo(&sigset,&info);
 		switch(sig)
 		{
-			case SIGINT :LOG_ERR_MSG("SDSRV:AdLib","ADTimer received SIGINT");
+			case SIGINT :LOG_ERR_MSG("AdLib","ADTimer received SIGINT");
 					received_user_stop_sig=1;
 					break;
-			case SIGTERM:LOG_ERR_MSG("SDSRV:AdLib","ADTimer received SIGTERM");
+			case SIGTERM:LOG_ERR_MSG("AdLib","ADTimer received SIGTERM");
 					received_user_stop_sig=1;
 					break;
-			case SIGQUIT:LOG_ERR_MSG("SDSRV:AdLib","ADTimer received SIGQUIT");
+			case SIGQUIT:LOG_ERR_MSG("AdLib","ADTimer received SIGQUIT");
 					received_user_stop_sig=1;
 					break;
 			case SIGIO  :notify_sigio_to_subscribers();
@@ -204,11 +204,11 @@ int ADTimer::wait_for_exit_signal()//forever-loop, blocks the main() app till ki
 					TimerThread.wakeup_thread();
 					break;
 			case SIGSEGV :
-					LOG_ERR_MSG("SDSRV:AdLib","ADTimer received Sementation fault!!!!!!!!!!!!!!!!!!!!!!");
+					LOG_ERR_MSG("AdLib","ADTimer received Sementation fault!!!!!!!!!!!!!!!!!!!!!!");
 					break;
 			default     :
 					if(notify_registered_signals(sig,&info)!=0)
-						printf("SDSRV:AdLib","ADTimer received unknown sig = %d!!!!",sig);
+						LOG_ERR_MSG_WITH_ARG("AdLib","ADTimer received unknown sig = %d!!!!",sig);
 						//LOG_ERR_MSG_WITH_ARG("SDSRV:AdLib","ADTimer received unknown sig = %d!!!!",sig);
 					//printf("wait_for_exit_signal:notifying custom sig = %d info.si_int=%d\n",sig,info.si_int);
 				    //if(sig==custom_sig)
@@ -236,6 +236,7 @@ int ADTimer::register_custom_signal(int custom_sig_num,ADTimerConsumer* pConsume
 {
 //	struct sigaction action1;
 	pConsumer->notify_custom_sig=1;
+	pConsumer->custom_sig_num=custom_sig_num;
 //	action1.sa_flags = 0;
 //	action1.sa_flags = SA_SIGINFO ;//| SA_RESTART ;
 //	action1.sa_sigaction = ADTimer::custom_signal_handler;
@@ -261,6 +262,7 @@ int ADTimer::register_custom_signal_new(int custom_sig_num,ADTimerConsumer* pCon
 {
 //	struct sigaction action1;
 	pConsumer->notify_custom_sig=1;
+	pConsumer->custom_sig_num=custom_sig_num;
 //	action1.sa_flags = 0;
 //	action1.sa_flags = SA_SIGINFO ;//| SA_RESTART ;
 //	action1.sa_sigaction = ADTimer::custom_signal_handler_new;

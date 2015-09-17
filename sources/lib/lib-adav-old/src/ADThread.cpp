@@ -130,6 +130,7 @@ int ADThread::stop_thread()//thread* th)
 	
 	if(tid!=-1)//if thread was created successfully
 	{
+		pthread_cancel(thread);
 		//printf("waiting for thread %d to stop\n",th->tid);
 		if(pthread_join(thread, &status)!=0)
 			cout<<"unable to stop the thread"<<endl;
