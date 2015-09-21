@@ -48,7 +48,8 @@ int ADCmdlineHelper::init_myself()
 	settings[0]='\0';
 
 	//internal default arguments available for all the clients
-		strcpy(short_options,"hvpiegtdlnskwrabxzucf");//--help,--version,--ip,--autotest,--delay,--loopcount,--testnum, --settings
+		//abcdefghijklmn p rstuvwx z
+		strcpy(short_options,"hvpiegtdlnskwrabxzucfjm");//--help,--version,--ip,--autotest,--delay,--loopcount,--testnum, --settings
 		insert_options_entry((char*)"help"      ,optional_argument,'h',1);
 
 		insert_options_entry((char*)"version"   ,no_argument,'v',1);
@@ -97,6 +98,13 @@ int ADCmdlineHelper::init_myself()
 
 		insert_options_entry((char*)"logdebug" ,optional_argument,'c',1);
 		insert_help_entry((char*)"--logdebug=[enable/disable](read/write debug logging status of the service)");
+
+		insert_options_entry((char*)"storefactory" ,optional_argument,'j',1);
+		insert_help_entry((char*)"--storefactory             (trigger storing of factory settings)");
+
+		insert_options_entry((char*)"restorefactory" ,optional_argument,'m',1);
+		insert_help_entry((char*)"--restorefactory           (trigger restoring of factory settings)");
+
 	}
 	else if(my_mode==CMDLINE_HELPER_MODE_SERVER)
 	{

@@ -27,7 +27,9 @@ typedef enum EJSON_RPCGMGR_CMD_T
 	EJSON_RPCGMGR_GET_READY_STS=6,       //ready status of the service
 	EJSON_RPCGMGR_GET_DEBUG_LOG=7,       //read the  status of debug logging flag
 	EJSON_RPCGMGR_SET_DEBUG_LOG=8,       //enable/disable debug logging
-	//EJSON_RPCGMGR_GET_DEV_TYPE=9,        //read device type
+	//EJSON_RPCGMGR_GET_DEV_TYPE=9,      //read device type
+	EJSON_RPCGMGR_TRIGGER_FACTORY_STORE=9,   //read current rpc-cache-settings, and write to factory.data.file
+	EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE=10,//read factory.data.file and apply to current rpc-cache-settings
 	EJSON_RPCGMGR_CMD_END,
 	EJSON_RPCGMGR_CMD_NONE
 }EJSON_RPCGMGR_CMD;
@@ -117,6 +119,13 @@ typedef struct RPCMGR_DEV_TYPE_PACKET_T
 	//EJSON_RPCGMGR_READY_STATE status;
 	char status_str[512];
 }RPCMGR_DEV_TYPE_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_RPCGMGR_TRIGGER_FACTORY_STORE=9,   //read current rpc-cache-settings, and write to factory.data.file
+#define RPCMGR_RPC_TRIG_FACT_STORE           "trigger_factory_store"
+#define RPCMGR_RPC_TRIG_FACT_STORE_ARGID     RPCMGR_RPC_TASK_STS_ARGID
+//EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE=10,//read factory.data.file and apply to current rpc-cache-settings
+#define RPCMGR_RPC_TRIG_FACT_RESTORE         "trigger_factory_restore"
+#define RPCMGR_RPC_TRIG_FACT_RESTORE_ARGID   RPCMGR_RPC_TASK_STS_ARGID
 /* ------------------------------------------------------------------------- */
 //to understand this, read C++ subject observer pattern
 class ADJsonRpcMgrProducer; //subject
@@ -370,6 +379,16 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	int json_to_bin_set_debug_logging(JsonDataCommObj* pReq);
 	int process_set_debug_logging(RPC_SRV_REQ* pReq);
 	int bin_to_json_set_debug_logging(JsonDataCommObj* pReq);
+
+	//EJSON_RPCGMGR_TRIGGER_FACTORY_STORE=9
+	int json_to_bin_trigger_factory_store(JsonDataCommObj* pReq);
+	int process_trigger_factory_store(RPC_SRV_REQ* pReq);
+	int bin_to_json_trigger_factory_store(JsonDataCommObj* pReq);
+
+	//EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE=9
+	int json_to_bin_trigger_factory_restore(JsonDataCommObj* pReq);
+	int process_trigger_factory_restore(RPC_SRV_REQ* pReq);
+	int bin_to_json_trigger_factory_restore(JsonDataCommObj* pReq);
 
 public:
 	ADJsonRpcMgr(int ver,bool debuglog=false,ADCMN_DEV_INFO* pDev=NULL);

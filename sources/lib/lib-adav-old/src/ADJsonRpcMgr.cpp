@@ -55,6 +55,24 @@ RPC_SRV_RESULT ADJsonRpcMgr::run_work(int cmd,unsigned char* pWorkData,ADTaskWor
 					ret_val=RPC_SRV_RESULT_SUCCESS;//anway server is going to shutdown, result may not be necessary
 				}
 				break;
+			case EJSON_RPCGMGR_TRIGGER_FACTORY_STORE:
+				{
+					RPCMGR_TASK_STS_PACKET *pPacket;
+					pPacket=(RPCMGR_TASK_STS_PACKET *)pWorkData;
+					//myData->factory_store();TODO
+					OBJ_MEM_DELETE(pWorkData);
+					ret_val=RPC_SRV_RESULT_SUCCESS;
+				}
+				break;
+			case EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE:
+				{
+					RPCMGR_TASK_STS_PACKET *pPacket;
+					pPacket=(RPCMGR_TASK_STS_PACKET *)pWorkData;
+					//myData->factory_restore();TODO
+					OBJ_MEM_DELETE(pWorkData);
+					ret_val=RPC_SRV_RESULT_SUCCESS;
+				}
+				break;
 			default:
 				break;
 		}
@@ -179,15 +197,17 @@ int ADJsonRpcMgr::MyMapJsonToBinary(JsonDataCommObj* pReq)
 	EJSON_RPCGMGR_CMD rpc=(EJSON_RPCGMGR_CMD)pReq->cmd_index;
 	switch(rpc)
 	{
-		case EJSON_RPCGMGR_GET_TASK_STS       :result=json_to_bin_get_task_sts(pReq);break;
-		case EJSON_RPCGMGR_GET_RPC_SRV_VERSION:result=json_to_bin_get_rpc_srv_version(pReq);break;
-		case EJSON_RPCGMGR_TRIGGER_DATASAVE   :result=json_to_bin_trigger_datasave(pReq);break;
-		case EJSON_RPCGMGR_GET_SETTINGS_STS   :result=json_to_bin_get_settings_sts(pReq);break;
-		case EJSON_RPCGMGR_SHUTDOWN_SERVICE   :result=json_to_bin_shutdown_service(pReq);break;
-		case EJSON_RPCGMGR_RESET_TASK_STS     :result=json_to_bin_reset_task_sts(pReq);break;
-		case EJSON_RPCGMGR_GET_READY_STS      :result=json_to_bin_get_ready_sts(pReq);break;
-		case EJSON_RPCGMGR_GET_DEBUG_LOG      :result=json_to_bin_get_debug_logging(pReq);break;
-		case EJSON_RPCGMGR_SET_DEBUG_LOG      :result=json_to_bin_set_debug_logging(pReq);break;
+		case EJSON_RPCGMGR_GET_TASK_STS           :result=json_to_bin_get_task_sts(pReq);break;
+		case EJSON_RPCGMGR_GET_RPC_SRV_VERSION    :result=json_to_bin_get_rpc_srv_version(pReq);break;
+		case EJSON_RPCGMGR_TRIGGER_DATASAVE       :result=json_to_bin_trigger_datasave(pReq);break;
+		case EJSON_RPCGMGR_GET_SETTINGS_STS       :result=json_to_bin_get_settings_sts(pReq);break;
+		case EJSON_RPCGMGR_SHUTDOWN_SERVICE       :result=json_to_bin_shutdown_service(pReq);break;
+		case EJSON_RPCGMGR_RESET_TASK_STS         :result=json_to_bin_reset_task_sts(pReq);break;
+		case EJSON_RPCGMGR_GET_READY_STS          :result=json_to_bin_get_ready_sts(pReq);break;
+		case EJSON_RPCGMGR_GET_DEBUG_LOG          :result=json_to_bin_get_debug_logging(pReq);break;
+		case EJSON_RPCGMGR_SET_DEBUG_LOG          :result=json_to_bin_set_debug_logging(pReq);break;
+		case EJSON_RPCGMGR_TRIGGER_FACTORY_STORE  :result=json_to_bin_trigger_factory_store(pReq);break;
+		case EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE:result=json_to_bin_trigger_factory_restore(pReq);break;
 		default:break;
 	}
 	return result;
@@ -199,15 +219,17 @@ int ADJsonRpcMgr::MyMapBinaryToJson(JsonDataCommObj* pReq)
 	EJSON_RPCGMGR_CMD rpc=(EJSON_RPCGMGR_CMD)pReq->cmd_index;
 	switch(rpc)
 	{
-		case EJSON_RPCGMGR_GET_TASK_STS       :result=bin_to_json_get_task_sts(pReq);break;
-		case EJSON_RPCGMGR_GET_RPC_SRV_VERSION:result=bin_to_json_get_rpc_srv_version(pReq);break;
-		case EJSON_RPCGMGR_TRIGGER_DATASAVE   :result=bin_to_json_trigger_datasave(pReq);break;
-		case EJSON_RPCGMGR_GET_SETTINGS_STS   :result=bin_to_json_get_settings_sts(pReq);break;
-		case EJSON_RPCGMGR_SHUTDOWN_SERVICE   :result=bin_to_json_shutdown_service(pReq);break;
-		case EJSON_RPCGMGR_RESET_TASK_STS     :result=bin_to_json_reset_task_sts(pReq);break;
-		case EJSON_RPCGMGR_GET_READY_STS      :result=bin_to_json_get_ready_sts(pReq);break;
-		case EJSON_RPCGMGR_GET_DEBUG_LOG      :result=bin_to_json_get_debug_logging(pReq);break;
-		case EJSON_RPCGMGR_SET_DEBUG_LOG      :result=bin_to_json_set_debug_logging(pReq);break;
+		case EJSON_RPCGMGR_GET_TASK_STS           :result=bin_to_json_get_task_sts(pReq);break;
+		case EJSON_RPCGMGR_GET_RPC_SRV_VERSION    :result=bin_to_json_get_rpc_srv_version(pReq);break;
+		case EJSON_RPCGMGR_TRIGGER_DATASAVE       :result=bin_to_json_trigger_datasave(pReq);break;
+		case EJSON_RPCGMGR_GET_SETTINGS_STS       :result=bin_to_json_get_settings_sts(pReq);break;
+		case EJSON_RPCGMGR_SHUTDOWN_SERVICE       :result=bin_to_json_shutdown_service(pReq);break;
+		case EJSON_RPCGMGR_RESET_TASK_STS         :result=bin_to_json_reset_task_sts(pReq);break;
+		case EJSON_RPCGMGR_GET_READY_STS          :result=bin_to_json_get_ready_sts(pReq);break;
+		case EJSON_RPCGMGR_GET_DEBUG_LOG          :result=bin_to_json_get_debug_logging(pReq);break;
+		case EJSON_RPCGMGR_SET_DEBUG_LOG          :result=bin_to_json_set_debug_logging(pReq);break;
+		case EJSON_RPCGMGR_TRIGGER_FACTORY_STORE  :result=bin_to_json_trigger_factory_store(pReq);break;
+		case EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE:result=bin_to_json_trigger_factory_restore(pReq);break;
 		default:break;
 	}
 	return result;
@@ -221,15 +243,17 @@ int ADJsonRpcMgr::MyProcessWork(JsonDataCommObj* pReq)
 	EJSON_RPCGMGR_CMD rpc = (EJSON_RPCGMGR_CMD)pReq->cmd_index;
 	switch(rpc)
 	{
-		case EJSON_RPCGMGR_GET_TASK_STS       :return process_get_task_status(pPanelReq);break;
-		case EJSON_RPCGMGR_GET_RPC_SRV_VERSION:return process_rpc_server_version(pPanelReq);break;
-		case EJSON_RPCGMGR_TRIGGER_DATASAVE   :return process_trigger_datasave(pPanelReq);break;
-		case EJSON_RPCGMGR_GET_SETTINGS_STS   :return process_get_settings_status(pPanelReq);break;
-		case EJSON_RPCGMGR_SHUTDOWN_SERVICE   :return process_shutdown_service(pPanelReq);break;
-		case EJSON_RPCGMGR_RESET_TASK_STS     :return process_reset_task_sts(pPanelReq);break;
-		case EJSON_RPCGMGR_GET_READY_STS      :return process_get_ready_status(pPanelReq);break;
-		case EJSON_RPCGMGR_GET_DEBUG_LOG      :return process_get_debug_logging(pPanelReq);break;
-		case EJSON_RPCGMGR_SET_DEBUG_LOG      :return process_set_debug_logging(pPanelReq);break;
+		case EJSON_RPCGMGR_GET_TASK_STS           :return process_get_task_status(pPanelReq);break;
+		case EJSON_RPCGMGR_GET_RPC_SRV_VERSION    :return process_rpc_server_version(pPanelReq);break;
+		case EJSON_RPCGMGR_TRIGGER_DATASAVE       :return process_trigger_datasave(pPanelReq);break;
+		case EJSON_RPCGMGR_GET_SETTINGS_STS       :return process_get_settings_status(pPanelReq);break;
+		case EJSON_RPCGMGR_SHUTDOWN_SERVICE       :return process_shutdown_service(pPanelReq);break;
+		case EJSON_RPCGMGR_RESET_TASK_STS         :return process_reset_task_sts(pPanelReq);break;
+		case EJSON_RPCGMGR_GET_READY_STS          :return process_get_ready_status(pPanelReq);break;
+		case EJSON_RPCGMGR_GET_DEBUG_LOG          :return process_get_debug_logging(pPanelReq);break;
+		case EJSON_RPCGMGR_SET_DEBUG_LOG          :return process_set_debug_logging(pPanelReq);break;
+		case EJSON_RPCGMGR_TRIGGER_FACTORY_STORE  :return process_trigger_factory_store(pPanelReq);break;
+		case EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE:return process_trigger_factory_restore(pPanelReq);break;
 		default:break;
 	}
 	return -1;
@@ -458,6 +482,58 @@ int ADJsonRpcMgr::process_set_debug_logging(RPC_SRV_REQ* pReq)
 int ADJsonRpcMgr::bin_to_json_set_debug_logging(JsonDataCommObj* pReq)
 {
 	PREPARE_JSON_RESP(RPC_SRV_REQ,RPCMGR_DEBUG_LOG_PACKET);
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+//EJSON_RPCGMGR_TRIGGER_FACTORY_STORE (common rpc for all services)
+int ADJsonRpcMgr::json_to_bin_trigger_factory_store(JsonDataCommObj* pReq)
+{
+	RPCMGR_TASK_STS_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_TASK_STS_PACKET,RPC_SRV_ACT_WRITE,EJSON_RPCGMGR_TRIGGER_FACTORY_STORE);
+	return 0;
+}
+int ADJsonRpcMgr::process_trigger_factory_store(RPC_SRV_REQ* pReq)
+{
+	//pReq->result=RPC_SRV_RESULT_FEATURE_UNSUPPORTED;
+	RPCMGR_TASK_STS_PACKET* pPacket;
+	pPacket=(RPCMGR_TASK_STS_PACKET*)pReq->dataRef;
+	RPCMGR_TASK_STS_PACKET* pWorkData=NULL;
+	OBJECT_MEM_NEW(pWorkData,RPCMGR_TASK_STS_PACKET);//delete this object in run_work() callback function
+	if(AsyncTaskWorker.push_task(EJSON_RPCGMGR_TRIGGER_FACTORY_STORE,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_DELETE)==0)
+		pReq->result=RPC_SRV_RESULT_IN_PROG;
+	else
+		pReq->result=RPC_SRV_RESULT_FAIL;
+	return 0;
+}
+int ADJsonRpcMgr::bin_to_json_trigger_factory_store(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,RPCMGR_TASK_STS_PACKET,RPCMGR_RPC_TASK_STS_ARGSTS);
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+//EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE (common rpc for all services)
+int ADJsonRpcMgr::json_to_bin_trigger_factory_restore(JsonDataCommObj* pReq)
+{
+	RPCMGR_TASK_STS_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_TASK_STS_PACKET,RPC_SRV_ACT_WRITE,EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE);
+	return 0;
+}
+int ADJsonRpcMgr::process_trigger_factory_restore(RPC_SRV_REQ* pReq)
+{
+	//pReq->result=RPC_SRV_RESULT_FEATURE_UNSUPPORTED;
+	RPCMGR_TASK_STS_PACKET* pPacket;
+	pPacket=(RPCMGR_TASK_STS_PACKET*)pReq->dataRef;
+	RPCMGR_TASK_STS_PACKET* pWorkData=NULL;
+	OBJECT_MEM_NEW(pWorkData,RPCMGR_TASK_STS_PACKET);//delete this object in run_work() callback function
+	if(AsyncTaskWorker.push_task(EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_DELETE)==0)
+		pReq->result=RPC_SRV_RESULT_IN_PROG;
+	else
+		pReq->result=RPC_SRV_RESULT_FAIL;
+	return 0;
+}
+int ADJsonRpcMgr::bin_to_json_trigger_factory_restore(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,RPCMGR_TASK_STS_PACKET,RPCMGR_RPC_TASK_STS_ARGSTS);
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
