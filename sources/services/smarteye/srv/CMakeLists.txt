@@ -35,7 +35,7 @@ if(${INSTALL_MY_HEADERS})
 	install(FILES ${INCFILES} DESTINATION include)
 endif()
 if(CMAKE_HOST_UNIX)
-install(CODE "EXECUTE_PROCESS(WORKING_DIRECTORY \$ENV{TARGET_DIR}\${CMAKE_INSTALL_PREFIX}/etc/init.d COMMAND ln -sf ${STARTUP_SCRIPT}  ${STARTNUM}${STARTUP_SCRIPT})")
+install(CODE "EXECUTE_PROCESS(WORKING_DIRECTORY \$ENV{TARGET_DIR}\${CMAKE_INSTALL_PREFIX}/etc/init.d COMMAND ln -sf ${STARTUP_SCRIPT}  S${STARTNUM}${STARTUP_SCRIPT})")
 endif(CMAKE_HOST_UNIX)
 
 #automatically include svn revision to a headerfile which will be included in this component
