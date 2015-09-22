@@ -16,6 +16,7 @@ set(INC_ADCOMMN  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-adav-old/include"
 set(INC_SRVCOMMN "${CMAKE_CURRENT_SOURCE_DIR}/../include") #rpc server's cmn header file
 
 
+
 # Add #include path of all dependent components
 include_directories(${INC_ADSTTNG} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -30,12 +31,16 @@ install(TARGETS ${COMPONENT_NAME} DESTINATION bin)
 
 
 #automatically include svn revision to a headerfile which will be included in this component
-find_package(Subversion REQUIRED)
-if(SUBVERSION_FOUND)
-  Subversion_WC_INFO(${PROJECT_SOURCE_DIR} Project)
-  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SrcControlVersion.h "#define SRC_CONTROL_VERSION ${Project_WC_LAST_CHANGED_REV}\n")
+if(${AUTO_SVN_VERSION})
+	find_package(Subversion REQUIRED)
+	if(SUBVERSION_FOUND)
+	  Subversion_WC_INFO(${PROJECT_SOURCE_DIR} Project)
+	  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SrcControlVersion.h "#define SRC_CONTROL_VERSION ${Project_WC_LAST_CHANGED_REV}\n")
+	else()
+		message( FATAL_ERROR "unable to read sub-version Revision number, this is needed for embedding into this component" )
+	endif()
 else()
-	message( FATAL_ERROR "unable to read sub-version Revision number, this is needed for embedding into this component" )
+	FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SrcControlVersion.h "#define SRC_CONTROL_VERSION 0001\n")
 endif()
 
 #for cross compiling
