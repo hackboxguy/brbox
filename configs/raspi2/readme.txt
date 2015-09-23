@@ -114,4 +114,5 @@ sudo parted -s $LOOPDEVICE unit cyl mkpart extended -- 32 -2
 sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 32 38  
 sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 38 -2  
 
-
+#############in system linux update using sysmgrclt of multiple brboxes##############
+./bin/sysmgrclt --ip=ip.list --fversion=current --rsttasksts --tftget=192.168.1.193,/tmp/uBrbox.bin,uBrbox.bin --fupdate=project,/tmp/uBrbox.bin --devop=reboot
