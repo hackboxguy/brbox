@@ -86,7 +86,7 @@ if [ $IMAGE_ONLY = 0 ]; then
 	mkdir -p $BR_OUTPUT_FOLDER
 	echo $BR_BOARD_SYSTEM_CONFIG > $BR_OUTPUT_FOLDER/BoardConfig.txt #remember which build-config was triggered
 	cp configs/$BR_BOARD_SYSTEM_CONFIG/$BR_BOARD_CONFIG         $BR_FOLDER/configs/
-	cp configs/$BR_BOARD_SYSTEM_CONFIG/$BR_BOARD_LINUX_CONFIG   $BR_FOLDER/$BR_BOARD_LINUX_CONFIG_PATH/linux*
+	cp configs/$BR_BOARD_SYSTEM_CONFIG/$BR_BOARD_LINUX_CONFIG   $BR_FOLDER/$BR_BOARD_LINUX_CONFIG_PATH/
 	cp configs/$BR_BOARD_SYSTEM_CONFIG/busybox.config           $BR_FOLDER/package/busybox/
 	#TODO: configs/$BR_BOARD_SYSTEM_CONFIG/uclibc.config        $BR_FOLDER/package/uclibc/
 	pushd .
