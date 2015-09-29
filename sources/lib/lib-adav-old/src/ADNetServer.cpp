@@ -11,7 +11,12 @@ int ADNetProducer::IDGenerator = 0;//generate Unique ID for every ADNetServer ob
 //ADGenericChain callbacks
 int ADNetServer::identify_chain_element(void* element,int ident,ADChainProducer* pObj)
 {
-	return -1;
+	net_data_obj* pPtr;
+	pPtr=(net_data_obj*)element;
+	if(pPtr->ident==ident)
+		return 0;
+	else
+		return -1;
 }
 int ADNetServer::double_identify_chain_element(void* element,int ident1,int ident2,ADChainProducer* pObj)
 {
@@ -190,7 +195,7 @@ int ADNetServer::thread_callback_function(void* pUserData,ADThreadProducer* pObj
 						/* client connection,this is useful for       */
 						/* sending async notification                 */
 						/**********************************************/
-						print_client_info(&in_addr,in_len);
+						print_client_info(&in_addr,in_len,new_sd);
 
 						/**********************************************/
 						/* Add the new incoming connection to the     */
@@ -228,7 +233,7 @@ int ADNetServer::thread_callback_function(void* pUserData,ADThreadProducer* pObj
 						/* connection.                                */
 						/**********************************************/
 						rc = recv(i, receive_buffer, sizeof(receive_buffer), MSG_DONTWAIT);//0);
-						//printf("received %d bytes\n",rc);
+						//printf("[%06d]received %d bytes\n",i,rc);
 						if (rc < 0)
 						{
 							if (errno != EWOULDBLOCK)
@@ -244,7 +249,9 @@ int ADNetServer::thread_callback_function(void* pUserData,ADThreadProducer* pObj
 						/**********************************************/
 						if (rc == 0)
 						{
-							//printf("  Connection closed\n");
+							if(socketlog)
+								printf("[%06d]Connection closed\n",i);
+							deregister_client_info(i);//remove client ip/port info from chain
 							close_conn = AD_NETWORK_TRUE;
 							break;
 						}
@@ -424,7 +431,7 @@ int ADNetServer::stop_listening()
 
 	request_chain.remove_all();
 	response_chain.remove_all();
-
+	clientInfo_chain.remove_all();
 	for (int i=0; i <= max_sd; ++i)
 	{
 		if (FD_ISSET(i, &master_set))
@@ -441,7 +448,7 @@ int ADNetServer::initialize_helpers(void)
 	//id_response_chain=response_chain.attach_helper(this);
 	request_chain.attach_helper(this);
 	response_chain.attach_helper(this);
-	
+	clientInfo_chain.attach_helper(this);
 	//attach thread callback
 	id_listen_thread   = listen_thread.subscribe_thread_callback(this);
 	id_response_thread = response_thread.subscribe_thread_callback(this);
@@ -453,24 +460,56 @@ int ADNetServer::initialize_helpers(void)
 	return 0;
 }
 /*****************************************************************************/
-int ADNetServer::print_client_info(struct sockaddr *in_addr,socklen_t in_len)
+int ADNetServer::print_client_info(struct sockaddr *in_addr,socklen_t in_len,int sock_descr)
 {
+	int port;
 	int in_clt_info;
 	char hbuf[NI_MAXHOST],sbuf[NI_MAXSERV];
 	in_clt_info = getnameinfo (in_addr,in_len,hbuf,sizeof(hbuf),sbuf,sizeof(sbuf),NI_NUMERICHOST | NI_NUMERICSERV);
 	if(in_clt_info==0)
 	{
-//#ifdef SOCKET_DEBUG_MESSAGE
 		if(socketlog)
-			printf("accepted connection from clientip=%s, port=%s\n",hbuf,sbuf);
-//#endif
-		//;
+			printf("[%06d]Connection accepted: clientip=%s, port=%s\n",sock_descr,hbuf,sbuf);
+		port=atoi(sbuf);
+		register_client_info(sock_descr,port,hbuf);
 	}
 	else
 	{
 		if(socketlog)
 			printf("getnameinfo returned = %d\n",in_clt_info);
 	}
+	return 0;
+}
+int ADNetServer::register_client_info(int sock_descr,int clt_port,char* clt_ip)
+{
+	net_data_obj *resp_obj=NULL;
+	OBJECT_MEM_NEW(resp_obj,net_data_obj);
+	if(resp_obj==NULL)
+		return -1;//memory allocation error
+	resp_obj->ident          = sock_descr;//TODO create internal ident
+	resp_obj->sock_descriptor= sock_descr;
+	resp_obj->port           = clt_port;
+	resp_obj->data_buffer    = NULL;
+
+	int ip_len=strlen(clt_ip);
+	if(ip_len>0 && ip_len<1023)
+		strcpy(resp_obj->ip,clt_ip);
+	else
+		strcpy(resp_obj->ip,"");
+	if(clientInfo_chain.chain_put((void *)resp_obj)!=0)
+	{
+		printf("failed! unable to push client-info object to chain!\n");
+		OBJ_MEM_DELETE(resp_obj);
+		return -1;
+	}
+	return 0;
+}
+int ADNetServer::deregister_client_info(int sock_descr)
+{
+	net_data_obj *info_obj=NULL;
+	info_obj=(net_data_obj*)clientInfo_chain.chain_remove_by_ident(sock_descr);
+	if(info_obj!=NULL)
+		OBJ_MEM_DELETE(info_obj);
 	return 0;
 }
 /*****************************************************************************/

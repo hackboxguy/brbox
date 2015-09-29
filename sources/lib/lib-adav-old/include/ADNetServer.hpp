@@ -93,6 +93,8 @@ struct net_data_obj
 {
 	int ident;//reserved for future use
 	int sock_descriptor;//data belongs to this tcp connection
+	int port;//port number of the client
+	char ip[512];//ip address of the client
 	int data_buffer_len;//data_len
 	char* data_buffer;//data
 public:
@@ -127,6 +129,7 @@ class ADNetServer: public ADNetProducer, public ADChainConsumer, public ADThread
 
 	ADGenericChain request_chain;//incoming data from listener port
 	ADGenericChain response_chain;//outgoing_data to clients
+	ADGenericChain clientInfo_chain;//ip and port number of client connection
 
 	//ADGenericChain callbacks
 	virtual int identify_chain_element(void* element,int ident,ADChainProducer* pObj);
@@ -138,7 +141,9 @@ class ADNetServer: public ADNetProducer, public ADChainConsumer, public ADThread
 	virtual int thread_callback_function(void* pUserData,ADThreadProducer* pObj);
 
 	int initialize_helpers(void);
-	int print_client_info(struct sockaddr *in_addr,socklen_t in_len);
+	int print_client_info(struct sockaddr *in_addr,socklen_t in_len,int sock_descr);
+	int register_client_info(int sock_descr,int port,char* ip);
+	int deregister_client_info(int sock_descr);
 	int binary_receive_data_and_notify_consumer(int socket_descriptor,char *buf, int len);
 	int json_receive_data_and_notify_consumer(int socket_descriptor,char *buf, int len);
 	int segmented_json_object(int socket_descriptor,char* buf,int *len);
