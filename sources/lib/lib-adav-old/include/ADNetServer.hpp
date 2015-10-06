@@ -95,6 +95,7 @@ struct net_data_obj
 	int sock_descriptor;//data belongs to this tcp connection
 	int port;//port number of the client
 	char ip[512];//ip address of the client
+	int cltid;//corresponding identifier in the client-info chain
 	int data_buffer_len;//data_len
 	char* data_buffer;//data
 public:
@@ -144,6 +145,8 @@ class ADNetServer: public ADNetProducer, public ADChainConsumer, public ADThread
 	int print_client_info(struct sockaddr *in_addr,socklen_t in_len,int sock_descr);
 	int register_client_info(int sock_descr,int port,char* ip);
 	int deregister_client_info(int sock_descr);
+	int get_client_info(int sock_descr,char* cltip,int *cltport,int *cltid);
+
 	int binary_receive_data_and_notify_consumer(int socket_descriptor,char *buf, int len);
 	int json_receive_data_and_notify_consumer(int socket_descriptor,char *buf, int len);
 	int segmented_json_object(int socket_descriptor,char* buf,int *len);

@@ -13,14 +13,19 @@ int ADNetServer::identify_chain_element(void* element,int ident,ADChainProducer*
 {
 	net_data_obj* pPtr;
 	pPtr=(net_data_obj*)element;
-	if(pPtr->ident==ident)
+	if(pPtr->sock_descriptor==ident)
 		return 0;
 	else
 		return -1;
 }
 int ADNetServer::double_identify_chain_element(void* element,int ident1,int ident2,ADChainProducer* pObj)
 {
-	return -1;
+	net_data_obj* pPtr;
+	pPtr=(net_data_obj*)element;
+	if(pPtr->sock_descriptor==ident1 && pPtr->ident==ident2)
+		return 0;
+	else
+		return -1;
 }
 int ADNetServer::free_chain_element_data(void* element,ADChainProducer* pObj)
 {
@@ -462,6 +467,10 @@ int ADNetServer::initialize_helpers(void)
 /*****************************************************************************/
 int ADNetServer::print_client_info(struct sockaddr *in_addr,socklen_t in_len,int sock_descr)
 {
+	//http://stackoverflow.com/questions/3060950/how-to-get-ip-address-from-sock-structure-in-c
+	//printf("IP address is: %s\n", inet_ntoa(in_addr.sin_addr));
+	//printf("port is: %d\n", (int) ntohs(in_addr.sin_port));
+
 	int port;
 	int in_clt_info;
 	char hbuf[NI_MAXHOST],sbuf[NI_MAXSERV];
@@ -486,7 +495,7 @@ int ADNetServer::register_client_info(int sock_descr,int clt_port,char* clt_ip)
 	OBJECT_MEM_NEW(resp_obj,net_data_obj);
 	if(resp_obj==NULL)
 		return -1;//memory allocation error
-	resp_obj->ident          = sock_descr;//TODO create internal ident
+	resp_obj->ident          = clientInfo_chain.chain_generate_ident();
 	resp_obj->sock_descriptor= sock_descr;
 	resp_obj->port           = clt_port;
 	resp_obj->data_buffer    = NULL;
@@ -511,6 +520,22 @@ int ADNetServer::deregister_client_info(int sock_descr)
 	if(info_obj!=NULL)
 		OBJ_MEM_DELETE(info_obj);
 	return 0;
+}
+int ADNetServer::get_client_info(int sock_descr,char* cltip,int *cltport,int *cltid)
+{
+	net_data_obj *info_obj=NULL;
+	//clientInfo_chain.chain_lock();
+	info_obj=(net_data_obj*)clientInfo_chain.chain_get_by_ident(sock_descr);
+	if(info_obj!=NULL)
+	{
+		strcpy(cltip,info_obj->ip);
+		*cltport=info_obj->port;
+		*cltid=info_obj->ident;
+		return 0;
+	}
+	else
+		return -1;
+	//clientInfo_chain.chain_unlock();
 }
 /*****************************************************************************/
 int ADNetServer::schedule_response(int socket_descriptor,char *buf, int len)
@@ -573,6 +598,11 @@ int ADNetServer::schedule_response(int socket_descriptor,char *buf, int len)
 //and notify the consumer(the one who processes the data)
 int ADNetServer::binary_receive_data_and_notify_consumer(int socket_descriptor,char *buf, int len)
 {
+	//keep client-ip/port with every received binary packet
+	char cltip[512];int cltport=-1;int cltid=-1;
+	if(get_client_info(socket_descriptor,cltip,&cltport,&cltid)!=0)
+		cltip[0]='\0';
+
 	printf("receive_data_and_notify_consumer called\n");
 	net_data_obj *resp_obj=NULL;
 	OBJECT_MEM_NEW(resp_obj,net_data_obj);
@@ -580,6 +610,9 @@ int ADNetServer::binary_receive_data_and_notify_consumer(int socket_descriptor,c
 		return -1;//memory allocation error
 	resp_obj->ident=request_chain.chain_generate_ident();
 	resp_obj->sock_descriptor=socket_descriptor;
+	strcpy(resp_obj->ip,cltip);//client ipaddress
+	resp_obj->port=cltport;    //client port
+	resp_obj->cltid=cltid;     //client id
 	resp_obj->data_buffer_len=len;
 	ARRAY_MEM_NEW(resp_obj->data_buffer,(len+2));
 	if(resp_obj->data_buffer==NULL)
@@ -605,6 +638,12 @@ int ADNetServer::json_receive_data_and_notify_consumer(int socket_descriptor,cha
 {
 	int last_index=0;
 	char* pTemp=buf;
+
+	//keep client-ip/port with every received json request
+	char cltip[512];int cltport=-1;int cltid=-1;
+	if(get_client_info(socket_descriptor,cltip,&cltport,&cltid)!=0)
+		cltip[0]='\0';
+
 	//check if full json object has arrived, else wait for the remaining bytes to arrive
 	//if(segmented_json_object(socket_descriptor,buf,&len))
 	//	return 0;
@@ -621,6 +660,9 @@ int ADNetServer::json_receive_data_and_notify_consumer(int socket_descriptor,cha
 			}
 			resp_obj->ident=request_chain.chain_generate_ident();
 			resp_obj->sock_descriptor=socket_descriptor;
+			strcpy(resp_obj->ip,cltip);//client ipaddress
+			resp_obj->port=cltport;    //client port
+			resp_obj->cltid=cltid;     //client id
 			resp_obj->data_buffer_len=i-last_index+1;//len;
 			ARRAY_MEM_NEW(resp_obj->data_buffer,(i-last_index+3));
 			if(resp_obj->data_buffer==NULL)
@@ -654,6 +696,9 @@ int ADNetServer::json_receive_data_and_notify_consumer(int socket_descriptor,cha
 	}
 	resp_obj->ident=request_chain.chain_generate_ident();
 	resp_obj->sock_descriptor=socket_descriptor;
+	strcpy(resp_obj->ip,cltip);//client ipaddress
+	resp_obj->port=cltport;    //client port
+	resp_obj->cltid=cltid;     //client id
 	resp_obj->data_buffer_len=len-last_index;
 	ARRAY_MEM_NEW(resp_obj->data_buffer,(len-last_index)+2);////(len+2));
 	if(resp_obj->data_buffer==NULL)
