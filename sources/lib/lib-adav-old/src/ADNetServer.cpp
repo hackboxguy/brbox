@@ -610,8 +610,8 @@ int ADNetServer::binary_receive_data_and_notify_consumer(int socket_descriptor,c
 		return -1;//memory allocation error
 	resp_obj->ident=request_chain.chain_generate_ident();
 	resp_obj->sock_descriptor=socket_descriptor;
-	strcpy(resp_obj->ip,cltip);//client ipaddress
 	resp_obj->port=cltport;    //client port
+	strcpy(resp_obj->ip,cltip);//client ipaddress
 	resp_obj->cltid=cltid;     //client id
 	resp_obj->data_buffer_len=len;
 	ARRAY_MEM_NEW(resp_obj->data_buffer,(len+2));
@@ -660,8 +660,8 @@ int ADNetServer::json_receive_data_and_notify_consumer(int socket_descriptor,cha
 			}
 			resp_obj->ident=request_chain.chain_generate_ident();
 			resp_obj->sock_descriptor=socket_descriptor;
-			strcpy(resp_obj->ip,cltip);//client ipaddress
 			resp_obj->port=cltport;    //client port
+			strcpy(resp_obj->ip,cltip);//client ipaddress
 			resp_obj->cltid=cltid;     //client id
 			resp_obj->data_buffer_len=i-last_index+1;//len;
 			ARRAY_MEM_NEW(resp_obj->data_buffer,(i-last_index+3));
@@ -696,8 +696,8 @@ int ADNetServer::json_receive_data_and_notify_consumer(int socket_descriptor,cha
 	}
 	resp_obj->ident=request_chain.chain_generate_ident();
 	resp_obj->sock_descriptor=socket_descriptor;
-	strcpy(resp_obj->ip,cltip);//client ipaddress
 	resp_obj->port=cltport;    //client port
+	strcpy(resp_obj->ip,cltip);//client ipaddress
 	resp_obj->cltid=cltid;     //client id
 	resp_obj->data_buffer_len=len-last_index;
 	ARRAY_MEM_NEW(resp_obj->data_buffer,(len-last_index)+2);////(len+2));

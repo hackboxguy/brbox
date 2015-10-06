@@ -87,15 +87,20 @@ int ADJsonRpcMgr::Start(int port,int socket_log,int emulation)
 	//TODO:myCmdLine.get_emulation_mode()
 	Proxy.start_listening(port,socket_log);
 	//attach first 9 rpc's which are common to all services
-	JMapper.attach_rpc_method(EJSON_RPCGMGR_GET_TASK_STS       ,(char*)RPCMGR_RPC_TASK_STS_GET);
-	JMapper.attach_rpc_method(EJSON_RPCGMGR_GET_RPC_SRV_VERSION,(char*)RPCMGR_RPC_SER_VER_GET);
-	JMapper.attach_rpc_method(EJSON_RPCGMGR_TRIGGER_DATASAVE   ,(char*)RPCMGR_RPC_TRIG_SAVE);
-	JMapper.attach_rpc_method(EJSON_RPCGMGR_GET_SETTINGS_STS   ,(char*)RPCMGR_RPC_STTNG_STS_GET);
-	JMapper.attach_rpc_method(EJSON_RPCGMGR_SHUTDOWN_SERVICE   ,(char*)RPCMGR_RPC_TRIG_SHUTDOWN);
-	JMapper.attach_rpc_method(EJSON_RPCGMGR_RESET_TASK_STS     ,(char*)RPCMGR_RPC_RESET_TASKSTS);
-	JMapper.attach_rpc_method(EJSON_RPCGMGR_GET_READY_STS      ,(char*)RPCMGR_RPC_READY_STS_GET);
-	JMapper.attach_rpc_method(EJSON_RPCGMGR_GET_DEBUG_LOG      ,(char*)RPCMGR_RPC_DEBUG_LOG_GET);
-	JMapper.attach_rpc_method(EJSON_RPCGMGR_SET_DEBUG_LOG      ,(char*)RPCMGR_RPC_DEBUG_LOG_SET);
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_GET_TASK_STS           ,(char*)RPCMGR_RPC_TASK_STS_GET);
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_GET_RPC_SRV_VERSION    ,(char*)RPCMGR_RPC_SER_VER_GET);
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_TRIGGER_DATASAVE       ,(char*)RPCMGR_RPC_TRIG_SAVE);
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_GET_SETTINGS_STS       ,(char*)RPCMGR_RPC_STTNG_STS_GET);
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_SHUTDOWN_SERVICE       ,(char*)RPCMGR_RPC_TRIG_SHUTDOWN);
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_RESET_TASK_STS         ,(char*)RPCMGR_RPC_RESET_TASKSTS);
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_GET_READY_STS          ,(char*)RPCMGR_RPC_READY_STS_GET);
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_GET_DEBUG_LOG          ,(char*)RPCMGR_RPC_DEBUG_LOG_GET);
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_SET_DEBUG_LOG          ,(char*)RPCMGR_RPC_DEBUG_LOG_SET);
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_TRIGGER_FACTORY_STORE  ,(char*)RPCMGR_RPC_TRIG_FACT_STORE);
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE,(char*)RPCMGR_RPC_TRIG_FACT_RESTORE);
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_EVENT_SUBSCRIBE        ,(char*)RPCMGR_RPC_EVENT_SUBSCRIBE);
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_EVENT_UNSUBSCRIBE      ,(char*)RPCMGR_RPC_EVENT_UNSUBSCRIBE);
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_EVENT_NOTIFY           ,(char*)RPCMGR_RPC_EVENT_NOTIFY);
 	int total = get_total_attached_rpcs();
 	for(int i=0;i<total;i++) 
 	{
@@ -208,6 +213,9 @@ int ADJsonRpcMgr::MyMapJsonToBinary(JsonDataCommObj* pReq)
 		case EJSON_RPCGMGR_SET_DEBUG_LOG          :result=json_to_bin_set_debug_logging(pReq);break;
 		case EJSON_RPCGMGR_TRIGGER_FACTORY_STORE  :result=json_to_bin_trigger_factory_store(pReq);break;
 		case EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE:result=json_to_bin_trigger_factory_restore(pReq);break;
+		case EJSON_RPCGMGR_EVENT_SUBSCRIBE        :result=json_to_bin_event_subscribe(pReq);break;
+		case EJSON_RPCGMGR_EVENT_UNSUBSCRIBE      :result=json_to_bin_event_unsubscribe(pReq);break;
+		case EJSON_RPCGMGR_EVENT_NOTIFY           :result=json_to_bin_event_notify(pReq);break;
 		default:break;
 	}
 	return result;
@@ -230,10 +238,14 @@ int ADJsonRpcMgr::MyMapBinaryToJson(JsonDataCommObj* pReq)
 		case EJSON_RPCGMGR_SET_DEBUG_LOG          :result=bin_to_json_set_debug_logging(pReq);break;
 		case EJSON_RPCGMGR_TRIGGER_FACTORY_STORE  :result=bin_to_json_trigger_factory_store(pReq);break;
 		case EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE:result=bin_to_json_trigger_factory_restore(pReq);break;
+		case EJSON_RPCGMGR_EVENT_SUBSCRIBE        :result=bin_to_json_event_subscribe(pReq);break;
+		case EJSON_RPCGMGR_EVENT_UNSUBSCRIBE      :result=bin_to_json_event_unsubscribe(pReq);break;
+		case EJSON_RPCGMGR_EVENT_NOTIFY           :result=bin_to_json_event_notify(pReq);break;
 		default:break;
 	}
 	return result;
 }
+
 /* ------------------------------------------------------------------------- */
 int ADJsonRpcMgr::MyProcessWork(JsonDataCommObj* pReq)
 {
@@ -254,6 +266,9 @@ int ADJsonRpcMgr::MyProcessWork(JsonDataCommObj* pReq)
 		case EJSON_RPCGMGR_SET_DEBUG_LOG          :return process_set_debug_logging(pPanelReq);break;
 		case EJSON_RPCGMGR_TRIGGER_FACTORY_STORE  :return process_trigger_factory_store(pPanelReq);break;
 		case EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE:return process_trigger_factory_restore(pPanelReq);break;
+		case EJSON_RPCGMGR_EVENT_SUBSCRIBE        :return process_event_subscribe(pPanelReq);break;
+		case EJSON_RPCGMGR_EVENT_UNSUBSCRIBE      :return process_event_unsubscribe(pPanelReq);break;
+		case EJSON_RPCGMGR_EVENT_NOTIFY           :return process_event_notify(pPanelReq);break;
 		default:break;
 	}
 	return -1;
@@ -534,6 +549,45 @@ int ADJsonRpcMgr::process_trigger_factory_restore(RPC_SRV_REQ* pReq)
 int ADJsonRpcMgr::bin_to_json_trigger_factory_restore(JsonDataCommObj* pReq)
 {
 	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,RPCMGR_TASK_STS_PACKET,RPCMGR_RPC_TASK_STS_ARGSTS);
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int ADJsonRpcMgr::json_to_bin_event_subscribe(JsonDataCommObj* pReq)
+{
+	return 0;
+}
+int ADJsonRpcMgr::process_event_subscribe(RPC_SRV_REQ* pReq)
+{
+	return 0;
+}
+int ADJsonRpcMgr::bin_to_json_event_subscribe(JsonDataCommObj* pReq)
+{
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int ADJsonRpcMgr::json_to_bin_event_unsubscribe(JsonDataCommObj* pReq)
+{
+	return 0;
+}
+int ADJsonRpcMgr::process_event_unsubscribe(RPC_SRV_REQ* pReq)
+{
+	return 0;
+}
+int ADJsonRpcMgr::bin_to_json_event_unsubscribe(JsonDataCommObj* pReq)
+{
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int ADJsonRpcMgr::json_to_bin_event_notify(JsonDataCommObj* pReq)
+{
+	return 0;
+}
+int ADJsonRpcMgr::process_event_notify(RPC_SRV_REQ* pReq)
+{
+	return 0;
+}
+int ADJsonRpcMgr::bin_to_json_event_notify(JsonDataCommObj* pReq)
+{
 	return 0;
 }
 /* ------------------------------------------------------------------------- */

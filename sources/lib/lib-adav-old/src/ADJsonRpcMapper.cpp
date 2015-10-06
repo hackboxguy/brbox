@@ -35,6 +35,12 @@ int ADJsonRpcMapper::monoshot_callback_function(void* pUserData,ADThreadProducer
 	DataObj.dataObjLen                = 0;
 	DataObj.pDataObj                  = NULL;
 
+	//client connection info(port,ip,ident) - needed for eventing;
+	DataObj.cltport                   = pApiObj->pNetData->port ;//client info port
+	strcpy(DataObj.cltip,               pApiObj->pNetData->ip);//client info ip
+	DataObj.cltid                     = pApiObj->pNetData->cltid; //client connection's info chain-id
+
+
 	if(process_json_to_binary(&DataObj)!=0)
 	{
 		pApiObj->task_result   = DataObj.mapper_result;

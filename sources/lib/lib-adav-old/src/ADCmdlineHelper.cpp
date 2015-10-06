@@ -49,7 +49,7 @@ int ADCmdlineHelper::init_myself()
 
 	//internal default arguments available for all the clients
 		//abcdefghijklmn p rstuvwx z
-		strcpy(short_options,"hvpiegtdlnskwrabxzucfjm");//--help,--version,--ip,--autotest,--delay,--loopcount,--testnum, --settings
+		strcpy(short_options,"hvpiegtdlnskwrabxzucfjmoyq");//--help,--version,--ip,--autotest,--delay,--loopcount,--testnum, --settings
 		insert_options_entry((char*)"help"      ,optional_argument,'h',1);
 
 		insert_options_entry((char*)"version"   ,no_argument,'v',1);
@@ -104,6 +104,13 @@ int ADCmdlineHelper::init_myself()
 
 		insert_options_entry((char*)"restorefactory" ,optional_argument,'m',1);
 		insert_help_entry((char*)"--restorefactory           (trigger restoring of factory settings)");
+
+		insert_options_entry((char*)"evntscrb" ,optional_argument,'o',1);
+		insert_help_entry((char*)"--evntscrb                 (subscribe for event notification)");
+		insert_options_entry((char*)"evntunscrb" ,optional_argument,'y',1);
+		insert_help_entry((char*)"--evntunscrb               (unsubscribe for event notification)");
+		insert_options_entry((char*)"evntnotify" ,optional_argument,'q',1);
+		insert_help_entry((char*)"--evntnotify               (notify event)");
 
 	}
 	else if(my_mode==CMDLINE_HELPER_MODE_SERVER)
@@ -311,6 +318,11 @@ int ADCmdlineHelper::parse_cmdline_arguments(int argc, char **argv)
 			case 'f'://board-type
 				parse_board_type_opt(subarg);
 				break;
+			case 'j':break;//TODO:store factory
+			case 'm':break;//TODO:restore factory
+			case 'o':break;//TODO:subscribe event
+			case 'y':break;//TODO:unsubscribe event
+			case 'q':break;//TODO:notify event
 			default:if(parse_subscribers_cmdline((arg-CONSUMERS_OPTIONS_ARG_START_BOUNDARY),subarg)!=0) return -1;//remove the offset which was added by me
 				break;
 		}

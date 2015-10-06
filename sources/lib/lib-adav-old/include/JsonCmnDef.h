@@ -55,6 +55,9 @@ typedef struct JsonDataCommObj_t
 	//actual binary req obj(communication object)
 	int dataObjLen;
 	unsigned char *pDataObj;//[1024]; //for storing various objects
+	int cltport;//client info port
+	char cltip[512];//client info ip
+	int cltid; //client connection's info chain-id
 }JsonDataCommObj;
 
 //other common strings in rpc format

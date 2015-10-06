@@ -30,6 +30,9 @@ typedef enum EJSON_RPCGMGR_CMD_T
 	//EJSON_RPCGMGR_GET_DEV_TYPE=9,      //read device type
 	EJSON_RPCGMGR_TRIGGER_FACTORY_STORE=9,   //read current rpc-cache-settings, and write to factory.data.file
 	EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE=10,//read factory.data.file and apply to current rpc-cache-settings
+	EJSON_RPCGMGR_EVENT_SUBSCRIBE=11,    //subscribe for the event with service(on successfull subscription, an ident is returned)
+	EJSON_RPCGMGR_EVENT_UNSUBSCRIBE=12,  //unsubscribe the event notification from service(ident is required to unsubscribe)
+	EJSON_RPCGMGR_EVENT_NOTIFY=13,       //event notification to the service(from other service)
 	EJSON_RPCGMGR_CMD_END,
 	EJSON_RPCGMGR_CMD_NONE
 }EJSON_RPCGMGR_CMD;
@@ -126,6 +129,13 @@ typedef struct RPCMGR_DEV_TYPE_PACKET_T
 //EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE=10,//read factory.data.file and apply to current rpc-cache-settings
 #define RPCMGR_RPC_TRIG_FACT_RESTORE         "trigger_factory_restore"
 #define RPCMGR_RPC_TRIG_FACT_RESTORE_ARGID   RPCMGR_RPC_TASK_STS_ARGID
+/* ------------------------------------------------------------------------- */
+//EJSON_RPCGMGR_EVENT_SUBSCRIBE
+//EJSON_RPCGMGR_EVENT_UNSUBSCRIBE
+//EJSON_RPCGMGR_EVENT_NOTIFY
+#define RPCMGR_RPC_EVENT_SUBSCRIBE    "subscribe_event"
+#define RPCMGR_RPC_EVENT_UNSUBSCRIBE  "unsubscribe_event"
+#define RPCMGR_RPC_EVENT_NOTIFY       "notify_event"
 /* ------------------------------------------------------------------------- */
 //to understand this, read C++ subject observer pattern
 class ADJsonRpcMgrProducer; //subject
@@ -385,10 +395,25 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	int process_trigger_factory_store(RPC_SRV_REQ* pReq);
 	int bin_to_json_trigger_factory_store(JsonDataCommObj* pReq);
 
-	//EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE=9
+	//EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE=10
 	int json_to_bin_trigger_factory_restore(JsonDataCommObj* pReq);
 	int process_trigger_factory_restore(RPC_SRV_REQ* pReq);
 	int bin_to_json_trigger_factory_restore(JsonDataCommObj* pReq);
+
+	//EJSON_RPCGMGR_EVENT_SUBSCRIBE=11
+	int json_to_bin_event_subscribe(JsonDataCommObj* pReq);
+	int process_event_subscribe(RPC_SRV_REQ* pReq);
+	int bin_to_json_event_subscribe(JsonDataCommObj* pReq);
+
+	//EJSON_RPCGMGR_EVENT_UNSUBSCRIBE=12
+	int json_to_bin_event_unsubscribe(JsonDataCommObj* pReq);
+	int process_event_unsubscribe(RPC_SRV_REQ* pReq);
+	int bin_to_json_event_unsubscribe(JsonDataCommObj* pReq);
+
+	//EJSON_RPCGMGR_EVENT_NOTIFY=13
+	int json_to_bin_event_notify(JsonDataCommObj* pReq);
+	int process_event_notify(RPC_SRV_REQ* pReq);
+	int bin_to_json_event_notify(JsonDataCommObj* pReq);
 
 public:
 	ADJsonRpcMgr(int ver,bool debuglog=false,ADCMN_DEV_INFO* pDev=NULL);
