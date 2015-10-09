@@ -554,6 +554,29 @@ int ADJsonRpcMgr::bin_to_json_trigger_factory_restore(JsonDataCommObj* pReq)
 /* ------------------------------------------------------------------------- */
 int ADJsonRpcMgr::json_to_bin_event_subscribe(JsonDataCommObj* pReq)
 {
+	char temp_param[255];
+	RPCMGR_EVENT_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_EVENT_PACKET,RPC_SRV_ACT_WRITE,EJSON_RPCGMGR_EVENT_SUBSCRIBE);
+
+	//mandatory arg:
+	//this is the token from suscriber, while event notification, just send this token back to subscriber for his own book-keeping
+	JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG_RECVID,pPanelCmdObj->eventID);
+
+	//optional arg-port: client has passed the identify duration
+	if(find_single_param((char*)pReq->socket_data,(char*)RPCMGR_RPC_EVENT_ARG_PORT,temp_param)==0)
+	{
+		JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG_PORT,pPanelCmdObj->portNum);
+	}
+	else
+		pPanelCmdObj->portNum=-1;//send events on same connection
+
+	//optional arg-event_num: client can request for specific event to be notified,
+	if(find_single_param((char*)pReq->socket_data,(char*)RPCMGR_RPC_EVENT_ARG_EVENTNUM,temp_param)==0)
+	{
+		JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG_EVENTNUM,pPanelCmdObj->eventNum);
+	}
+	else
+		pPanelCmdObj->eventNum=-1;//subscriber wants to be notified of all events.
 	return 0;
 }
 int ADJsonRpcMgr::process_event_subscribe(RPC_SRV_REQ* pReq)
