@@ -320,8 +320,16 @@ int ADCmdlineHelper::parse_cmdline_arguments(int argc, char **argv)
 				break;
 			case 'j':break;//TODO:store factory
 			case 'm':break;//TODO:restore factory
-			case 'o':break;//TODO:subscribe event
-			case 'y':break;//TODO:unsubscribe event
+			case 'o':
+				push_single_int_get_set_command(EJSON_RPCGMGR_EVENT_SUBSCRIBE,EJSON_RPCGMGR_EVENT_SUBSCRIBE,
+					RPCMGR_RPC_EVENT_SUBSCRIBE,RPCMGR_RPC_EVENT_SUBSCRIBE,
+					(char*) RPCMGR_RPC_EVENT_ARG_CLTTOK,subarg,0);
+					break;//TODO:subscribe event
+			case 'y':
+				push_single_int_get_set_command(EJSON_RPCGMGR_EVENT_UNSUBSCRIBE,EJSON_RPCGMGR_EVENT_UNSUBSCRIBE,
+					RPCMGR_RPC_EVENT_UNSUBSCRIBE,RPCMGR_RPC_EVENT_UNSUBSCRIBE,
+					(char*) RPCMGR_RPC_EVENT_ARG_SRVTOK,subarg,0);
+				break;//TODO:unsubscribe event
 			case 'q':break;//TODO:notify event
 			default:if(parse_subscribers_cmdline((arg-CONSUMERS_OPTIONS_ARG_START_BOUNDARY),subarg)!=0) return -1;//remove the offset which was added by me
 				break;

@@ -401,7 +401,7 @@ do			\
 	if(pPanelReq->result==RPC_SRV_RESULT_SUCCESS || pPanelReq->result==RPC_SRV_RESULT_IN_PROG)\
 	{\
 		sprintf(pReq->custom_result_string,"%d",pPanelCmdObj->taskID);	\
-		prepare_result_string(pPanelReq->result,pReq,(char*)TID_NAME,pReq->custom_result_string);\
+		prepare_result_string(pPanelReq->result,pReq,(char*)TID_NAME,pPanelCmdObj->taskID);\
 	}		\
 	else\
 		prepare_result_string(pPanelReq->result,pReq);\
@@ -418,7 +418,7 @@ do			\
 	if(pPanelReq->result==RPC_SRV_RESULT_SUCCESS || pPanelReq->result==RPC_SRV_RESULT_IN_PROG)\
 	{\
 		sprintf(pReq->custom_result_string,"%d",pPanelCmdObj->INT_VALUE);	\
-		prepare_result_string(pPanelReq->result,pReq,(char*)INT_NAME,pReq->custom_result_string);\
+		prepare_result_string(pPanelReq->result,pReq,(char*)INT_NAME,pPanelCmdObj->INT_VALUE);\
 	}		\
 	else\
 		prepare_result_string(pPanelReq->result,pReq);\

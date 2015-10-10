@@ -42,13 +42,10 @@ typedef struct JsonDataCommObj_t
 	//CMD_TASK_RESULT mapper_text_to_bin_result;//result of the task mapper processing
 	//CMD_TASK_RESULT worker_result;//result of the actual worker
 	//CMD_TASK_RESULT mapper_bin_to_text_result;//result of the task mapper processing
-	
 	CMD_TASK_RESULT mapper_result;
 	RPC_SRV_RESULT  rpc_code;//as per unified error code b/w client and server
 	RPC_SRV_ACT     rpc_action;//as per unified error code b/w client and server
-
 	int worker_result;
-	
 	char* socket_data;//actual text data received on json-socket
 	json_object *json_resp_obj;   //for returning more than one value
 	char *custom_result_string;
@@ -56,8 +53,9 @@ typedef struct JsonDataCommObj_t
 	int dataObjLen;
 	unsigned char *pDataObj;//[1024]; //for storing various objects
 	int cltport;//client info port
-	char cltip[512];//client info ip
-	int cltid; //client connection's info chain-id
+	char ip[512];//client info ip
+	int sock_id;    //client connection's info chain-id
+	int sock_descr; //client connection's socket_descriptor
 }JsonDataCommObj;
 
 //other common strings in rpc format

@@ -37,9 +37,9 @@ int ADJsonRpcMapper::monoshot_callback_function(void* pUserData,ADThreadProducer
 
 	//client connection info(port,ip,ident) - needed for eventing;
 	DataObj.cltport                   = pApiObj->pNetData->port ;//client info port
-	strcpy(DataObj.cltip,               pApiObj->pNetData->ip);//client info ip
-	DataObj.cltid                     = pApiObj->pNetData->cltid; //client connection's info chain-id
-
+	strcpy(DataObj.ip,                  pApiObj->pNetData->ip);//client info ip
+	DataObj.sock_id                   = pApiObj->pNetData->cltid; //client connection's info chain-id
+	DataObj.sock_descr                = pApiObj->pNetData->sock_descriptor;//client connection socket descriptor
 
 	if(process_json_to_binary(&DataObj)!=0)
 	{

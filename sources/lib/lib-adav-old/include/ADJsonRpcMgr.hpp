@@ -12,7 +12,7 @@
 #include "ADTaskWorker.hpp"
 #include "ADCmnStringProcessor.hpp"
 #include "ADCmnDevTypes.h"
-
+#include "ADEvntMgr.hpp"
 using namespace std;
 /* ------------------------------------------------------------------------- */
 // following commands are common rpc's when a server uses this rpc-manager
@@ -136,16 +136,19 @@ typedef struct RPCMGR_DEV_TYPE_PACKET_T
 #define RPCMGR_RPC_EVENT_SUBSCRIBE    "subscribe_event"
 #define RPCMGR_RPC_EVENT_UNSUBSCRIBE  "unsubscribe_event"
 #define RPCMGR_RPC_EVENT_NOTIFY       "notify_event"
+#define RPCMGR_RPC_EVENT_ARG_CLTTOK   "cltToken" //sent from clt to srv, but srv will return this with events
 #define RPCMGR_RPC_EVENT_ARG_PORT     "port"
-#define RPCMGR_RPC_EVENT_ARG_EVENTNUM "evntnum"
-#define RPCMGR_RPC_EVENT_ARG_EVNTID   "evntID"
-#define RPCMGR_RPC_EVENT_ARG_RECVID   "recvID"
+#define RPCMGR_RPC_EVENT_ARG_EVENTNUM "evntnum"  //which of the events
+#define RPCMGR_RPC_EVENT_ARG_SRVTOK   "srvToken" //sent from server to client as a subscription token
 typedef struct RPCMGR_EVENT_PACKET_T
 {
-	int eventNum;//if event-num is -1=then, notify all events
-	int portNum; //port number where events to be sent.
-	int recvID;  //event receiver wants to know who sent the event
-	int eventID; //subscription id(every subscriber will get a token-number)
+	int cltToken; //event receiver wants to know who sent the event
+	int portNum;  //port number where events to be sent.
+	int eventNum; //if event-num is -1=then, notify all events
+	int srvToken; //subscription token(every subscriber will get a token-number)
+	int sock_descr;//socket descriptor(incase of event to be notified on same connection)
+	int sock_id;  //unique client connection ident(needed in case of client connection breaks)
+	char ip[512];
 }RPCMGR_EVENT_PACKET;
 /* ------------------------------------------------------------------------- */
 //to understand this, read C++ subject observer pattern
@@ -202,6 +205,7 @@ class ADJsonRpcMgrProducer
 	std::vector<ADJsonRpcMgrConsumer*> rpclist;
 protected:
 	ADTaskWorker AsyncTaskWorker;
+	ADEvntMgr EventMgr;
 
 	ADJsonRpcMgrConsumer* getRpcHandler(std::string rpcName) //based on rpc-name string, returns the object ptr
 	{

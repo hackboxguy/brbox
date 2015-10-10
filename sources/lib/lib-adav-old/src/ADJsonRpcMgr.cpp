@@ -393,7 +393,10 @@ int ADJsonRpcMgr::process_shutdown_service(RPC_SRV_REQ* pReq)
 		if(AsyncTaskWorker.push_task(EJSON_RPCGMGR_SHUTDOWN_SERVICE,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_DELETE)==0)
 			pReq->result=RPC_SRV_RESULT_IN_PROG;
 		else
+		{
+			OBJ_MEM_DELETE(pWorkData);
 			pReq->result=RPC_SRV_RESULT_FAIL;
+		}
 	}
 	else
 	{
@@ -517,7 +520,10 @@ int ADJsonRpcMgr::process_trigger_factory_store(RPC_SRV_REQ* pReq)
 	if(AsyncTaskWorker.push_task(EJSON_RPCGMGR_TRIGGER_FACTORY_STORE,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_DELETE)==0)
 		pReq->result=RPC_SRV_RESULT_IN_PROG;
 	else
+	{
+		OBJ_MEM_DELETE(pWorkData);
 		pReq->result=RPC_SRV_RESULT_FAIL;
+	}
 	return 0;
 }
 int ADJsonRpcMgr::bin_to_json_trigger_factory_store(JsonDataCommObj* pReq)
@@ -543,7 +549,10 @@ int ADJsonRpcMgr::process_trigger_factory_restore(RPC_SRV_REQ* pReq)
 	if(AsyncTaskWorker.push_task(EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_DELETE)==0)
 		pReq->result=RPC_SRV_RESULT_IN_PROG;
 	else
+	{
+		OBJ_MEM_DELETE(pWorkData);
 		pReq->result=RPC_SRV_RESULT_FAIL;
+	}
 	return 0;
 }
 int ADJsonRpcMgr::bin_to_json_trigger_factory_restore(JsonDataCommObj* pReq)
@@ -560,9 +569,9 @@ int ADJsonRpcMgr::json_to_bin_event_subscribe(JsonDataCommObj* pReq)
 
 	//mandatory arg:
 	//this is the token from suscriber, while event notification, just send this token back to subscriber for his own book-keeping
-	JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG_RECVID,pPanelCmdObj->eventID);
+	JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG_CLTTOK,pPanelCmdObj->cltToken);
 
-	//optional arg-port: client has passed the identify duration
+	//optional arg-port: client has passed the port number where even to be sent to(ip is auto read)
 	if(find_single_param((char*)pReq->socket_data,(char*)RPCMGR_RPC_EVENT_ARG_PORT,temp_param)==0)
 	{
 		JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG_PORT,pPanelCmdObj->portNum);
@@ -577,27 +586,73 @@ int ADJsonRpcMgr::json_to_bin_event_subscribe(JsonDataCommObj* pReq)
 	}
 	else
 		pPanelCmdObj->eventNum=-1;//subscriber wants to be notified of all events.
+	
+	pPanelCmdObj->sock_id   =pReq->sock_id;
+	pPanelCmdObj->sock_descr=pReq->sock_descr;
+	strcpy(pPanelCmdObj->ip,pReq->ip);
+
 	return 0;
 }
 int ADJsonRpcMgr::process_event_subscribe(RPC_SRV_REQ* pReq)
 {
+	RPCMGR_EVENT_PACKET* pPacket;
+	pPacket=(RPCMGR_EVENT_PACKET*)pReq->dataRef;
+
+	EventEntry* pEvent=NULL;
+	OBJECT_MEM_NEW(pEvent,EventEntry);
+	if(pEvent==NULL)
+		pReq->result=RPC_SRV_RESULT_FAIL;
+	else
+	{
+		pEvent->cltToken = pPacket->cltToken;
+		pEvent->portNum  = pPacket->portNum;
+		pEvent->eventNum = pPacket->eventNum;
+		pEvent->sock_id   =pPacket->sock_id;
+		pEvent->sock_descr=pPacket->sock_descr;
+		strcpy(pEvent->ip,pPacket->ip);
+		if(EventMgr.register_event_subscription(pEvent,&pPacket->srvToken)!=0)//on success, serverToken is returned
+		{
+			OBJ_MEM_DELETE(pEvent);
+			pReq->result=RPC_SRV_RESULT_FAIL;
+		}
+		else
+			pReq->result=RPC_SRV_RESULT_SUCCESS;
+	}
 	return 0;
 }
 int ADJsonRpcMgr::bin_to_json_event_subscribe(JsonDataCommObj* pReq)
 {
+	//on successful subscription, return a token
+	PREPARE_JSON_RESP_INT(RPC_SRV_REQ,RPCMGR_EVENT_PACKET,RPCMGR_RPC_EVENT_ARG_SRVTOK,srvToken);// return the serverToken to caller
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
 int ADJsonRpcMgr::json_to_bin_event_unsubscribe(JsonDataCommObj* pReq)
 {
+	char temp_param[255];
+	RPCMGR_EVENT_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_EVENT_PACKET,RPC_SRV_ACT_WRITE,EJSON_RPCGMGR_EVENT_UNSUBSCRIBE);
+	//mandatory arg:
+	//previously assigned server-token number while subscription
+	JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG_SRVTOK,pPanelCmdObj->srvToken);
 	return 0;
 }
 int ADJsonRpcMgr::process_event_unsubscribe(RPC_SRV_REQ* pReq)
 {
+	RPCMGR_EVENT_PACKET* pPacket;
+	pPacket=(RPCMGR_EVENT_PACKET*)pReq->dataRef;
+	int res = EventMgr.unregister_event_subscription(pPacket->srvToken);
+	if(res==0)
+		pReq->result=RPC_SRV_RESULT_SUCCESS;
+	else if(res==1)
+		pReq->result=RPC_SRV_RESULT_ITEM_NOT_FOUND;
+	else
+		pReq->result=RPC_SRV_RESULT_FAIL;
 	return 0;
 }
 int ADJsonRpcMgr::bin_to_json_event_unsubscribe(JsonDataCommObj* pReq)
 {
+	PREPARE_JSON_RESP(RPC_SRV_REQ,RPCMGR_EVENT_PACKET);
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
