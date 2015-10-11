@@ -32,7 +32,8 @@ typedef enum EJSON_RPCGMGR_CMD_T
 	EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE=10,//read factory.data.file and apply to current rpc-cache-settings
 	EJSON_RPCGMGR_EVENT_SUBSCRIBE=11,    //subscribe for the event with service(on successfull subscription, an ident is returned)
 	EJSON_RPCGMGR_EVENT_UNSUBSCRIBE=12,  //unsubscribe the event notification from service(ident is required to unsubscribe)
-	EJSON_RPCGMGR_EVENT_NOTIFY=13,       //event notification to the service(from other service)
+	EJSON_RPCGMGR_EVENT_NOTIFY=13,       //event notification; for self use within service as local-host rpc client caller
+	EJSON_RPCGMGR_EVENT_PROCESS=14,      //event reception and processing from other service
 	EJSON_RPCGMGR_CMD_END,
 	EJSON_RPCGMGR_CMD_NONE
 }EJSON_RPCGMGR_CMD;
@@ -133,12 +134,15 @@ typedef struct RPCMGR_DEV_TYPE_PACKET_T
 //EJSON_RPCGMGR_EVENT_SUBSCRIBE
 //EJSON_RPCGMGR_EVENT_UNSUBSCRIBE
 //EJSON_RPCGMGR_EVENT_NOTIFY
+//EJSON_RPCGMGR_EVENT_PROCESS
 #define RPCMGR_RPC_EVENT_SUBSCRIBE    "subscribe_event"
 #define RPCMGR_RPC_EVENT_UNSUBSCRIBE  "unsubscribe_event"
-#define RPCMGR_RPC_EVENT_NOTIFY       "notify_event"
+#define RPCMGR_RPC_EVENT_NOTIFY       "notify_event"  //for self calling within server
+#define RPCMGR_RPC_EVENT_PROCESS      "process_event" //notification from other services
+
 #define RPCMGR_RPC_EVENT_ARG_CLTTOK   "cltToken" //sent from clt to srv, but srv will return this with events
 #define RPCMGR_RPC_EVENT_ARG_PORT     "port"
-#define RPCMGR_RPC_EVENT_ARG_EVENTNUM "evntnum"  //which of the events
+#define RPCMGR_RPC_EVENT_ARG_EVENTNUM "evntNum"  //which of the events
 #define RPCMGR_RPC_EVENT_ARG_SRVTOK   "srvToken" //sent from server to client as a subscription token
 typedef struct RPCMGR_EVENT_PACKET_T
 {
@@ -429,6 +433,11 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	int json_to_bin_event_notify(JsonDataCommObj* pReq);
 	int process_event_notify(RPC_SRV_REQ* pReq);
 	int bin_to_json_event_notify(JsonDataCommObj* pReq);
+
+	//EJSON_RPCGMGR_EVENT_PROCESS=14
+	int json_to_bin_event_process(JsonDataCommObj* pReq);
+	int process_event_process(RPC_SRV_REQ* pReq);
+	int bin_to_json_event_process(JsonDataCommObj* pReq);
 
 public:
 	ADJsonRpcMgr(int ver,bool debuglog=false,ADCMN_DEV_INFO* pDev=NULL);

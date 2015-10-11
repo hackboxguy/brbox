@@ -105,12 +105,12 @@ int ADCmdlineHelper::init_myself()
 		insert_options_entry((char*)"restorefactory" ,optional_argument,'m',1);
 		insert_help_entry((char*)"--restorefactory           (trigger restoring of factory settings)");
 
-		insert_options_entry((char*)"evntscrb" ,optional_argument,'o',1);
-		insert_help_entry((char*)"--evntscrb                 (subscribe for event notification)");
-		insert_options_entry((char*)"evntunscrb" ,optional_argument,'y',1);
-		insert_help_entry((char*)"--evntunscrb               (unsubscribe for event notification)");
-		insert_options_entry((char*)"evntnotify" ,optional_argument,'q',1);
-		insert_help_entry((char*)"--evntnotify               (notify event)");
+		insert_options_entry((char*)"evSub" ,optional_argument,'o',1);
+		insert_help_entry((char*)"--evSub                    (subscribe for event notification)");
+		insert_options_entry((char*)"evUnsub" ,optional_argument,'y',1);
+		insert_help_entry((char*)"--evUnsub                  (unsubscribe for event notification)");
+		insert_options_entry((char*)"evNotify" ,optional_argument,'q',1);
+		insert_help_entry((char*)"--evNotify                 (notify event)");
 
 	}
 	else if(my_mode==CMDLINE_HELPER_MODE_SERVER)
@@ -329,8 +329,12 @@ int ADCmdlineHelper::parse_cmdline_arguments(int argc, char **argv)
 				push_single_int_get_set_command(EJSON_RPCGMGR_EVENT_UNSUBSCRIBE,EJSON_RPCGMGR_EVENT_UNSUBSCRIBE,
 					RPCMGR_RPC_EVENT_UNSUBSCRIBE,RPCMGR_RPC_EVENT_UNSUBSCRIBE,
 					(char*) RPCMGR_RPC_EVENT_ARG_SRVTOK,subarg,0);
-				break;//TODO:unsubscribe event
-			case 'q':break;//TODO:notify event
+				break;
+			case 'q':
+				push_single_int_get_set_command(EJSON_RPCGMGR_EVENT_NOTIFY,EJSON_RPCGMGR_EVENT_NOTIFY,
+					RPCMGR_RPC_EVENT_NOTIFY,RPCMGR_RPC_EVENT_NOTIFY,
+					(char*) RPCMGR_RPC_EVENT_ARG_EVENTNUM,subarg,0);
+				break;
 			default:if(parse_subscribers_cmdline((arg-CONSUMERS_OPTIONS_ARG_START_BOUNDARY),subarg)!=0) return -1;//remove the offset which was added by me
 				break;
 		}

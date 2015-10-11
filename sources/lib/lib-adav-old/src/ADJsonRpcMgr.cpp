@@ -101,6 +101,8 @@ int ADJsonRpcMgr::Start(int port,int socket_log,int emulation)
 	JMapper.attach_rpc_method(EJSON_RPCGMGR_EVENT_SUBSCRIBE        ,(char*)RPCMGR_RPC_EVENT_SUBSCRIBE);
 	JMapper.attach_rpc_method(EJSON_RPCGMGR_EVENT_UNSUBSCRIBE      ,(char*)RPCMGR_RPC_EVENT_UNSUBSCRIBE);
 	JMapper.attach_rpc_method(EJSON_RPCGMGR_EVENT_NOTIFY           ,(char*)RPCMGR_RPC_EVENT_NOTIFY);
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_EVENT_PROCESS          ,(char*)RPCMGR_RPC_EVENT_PROCESS);
+
 	int total = get_total_attached_rpcs();
 	for(int i=0;i<total;i++) 
 	{
@@ -216,6 +218,8 @@ int ADJsonRpcMgr::MyMapJsonToBinary(JsonDataCommObj* pReq)
 		case EJSON_RPCGMGR_EVENT_SUBSCRIBE        :result=json_to_bin_event_subscribe(pReq);break;
 		case EJSON_RPCGMGR_EVENT_UNSUBSCRIBE      :result=json_to_bin_event_unsubscribe(pReq);break;
 		case EJSON_RPCGMGR_EVENT_NOTIFY           :result=json_to_bin_event_notify(pReq);break;
+		case EJSON_RPCGMGR_EVENT_PROCESS          :result=json_to_bin_event_process(pReq);break;
+
 		default:break;
 	}
 	return result;
@@ -241,6 +245,7 @@ int ADJsonRpcMgr::MyMapBinaryToJson(JsonDataCommObj* pReq)
 		case EJSON_RPCGMGR_EVENT_SUBSCRIBE        :result=bin_to_json_event_subscribe(pReq);break;
 		case EJSON_RPCGMGR_EVENT_UNSUBSCRIBE      :result=bin_to_json_event_unsubscribe(pReq);break;
 		case EJSON_RPCGMGR_EVENT_NOTIFY           :result=bin_to_json_event_notify(pReq);break;
+		case EJSON_RPCGMGR_EVENT_PROCESS          :result=bin_to_json_event_process(pReq);break;
 		default:break;
 	}
 	return result;
@@ -269,6 +274,7 @@ int ADJsonRpcMgr::MyProcessWork(JsonDataCommObj* pReq)
 		case EJSON_RPCGMGR_EVENT_SUBSCRIBE        :return process_event_subscribe(pPanelReq);break;
 		case EJSON_RPCGMGR_EVENT_UNSUBSCRIBE      :return process_event_unsubscribe(pPanelReq);break;
 		case EJSON_RPCGMGR_EVENT_NOTIFY           :return process_event_notify(pPanelReq);break;
+		case EJSON_RPCGMGR_EVENT_PROCESS          :return process_event_process(pPanelReq);break;
 		default:break;
 	}
 	return -1;
@@ -627,9 +633,10 @@ int ADJsonRpcMgr::bin_to_json_event_subscribe(JsonDataCommObj* pReq)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
+//this rpc call has an integer arg which is the serverToken
 int ADJsonRpcMgr::json_to_bin_event_unsubscribe(JsonDataCommObj* pReq)
 {
-	char temp_param[255];
+	//char temp_param[255];
 	RPCMGR_EVENT_PACKET* pPanelCmdObj=NULL;
 	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_EVENT_PACKET,RPC_SRV_ACT_WRITE,EJSON_RPCGMGR_EVENT_UNSUBSCRIBE);
 	//mandatory arg:
@@ -656,16 +663,51 @@ int ADJsonRpcMgr::bin_to_json_event_unsubscribe(JsonDataCommObj* pReq)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
+//this rpc call has an integer arg which is the event number
 int ADJsonRpcMgr::json_to_bin_event_notify(JsonDataCommObj* pReq)
 {
+	RPCMGR_EVENT_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_EVENT_PACKET,RPC_SRV_ACT_WRITE,EJSON_RPCGMGR_EVENT_NOTIFY);
+	JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG_EVENTNUM,pPanelCmdObj->eventNum);//reuse existing eventNum in this object
 	return 0;
 }
 int ADJsonRpcMgr::process_event_notify(RPC_SRV_REQ* pReq)
 {
+	RPCMGR_EVENT_PACKET* pPacket;
+	pPacket=(RPCMGR_EVENT_PACKET*)pReq->dataRef;
+	int res = EventMgr.notify_event(pPacket->eventNum);
+	if(res==0)
+		pReq->result=RPC_SRV_RESULT_SUCCESS;
+	else
+		pReq->result=RPC_SRV_RESULT_FAIL;
 	return 0;
 }
 int ADJsonRpcMgr::bin_to_json_event_notify(JsonDataCommObj* pReq)
 {
+	PREPARE_JSON_RESP(RPC_SRV_REQ,RPCMGR_EVENT_PACKET);
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+//this rpc call has two integer args (cltToken+eventNum) for processing the events
+int ADJsonRpcMgr::json_to_bin_event_process(JsonDataCommObj* pReq)
+{
+	RPCMGR_EVENT_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_EVENT_PACKET,RPC_SRV_ACT_WRITE,EJSON_RPCGMGR_EVENT_PROCESS);
+	JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG_CLTTOK,pPanelCmdObj->cltToken);//who is sending this event?
+	JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG_EVENTNUM,pPanelCmdObj->eventNum);//what is the event number
+	return 0;
+}
+int ADJsonRpcMgr::process_event_process(RPC_SRV_REQ* pReq)
+{
+	RPCMGR_EVENT_PACKET* pPacket;
+	pPacket=(RPCMGR_EVENT_PACKET*)pReq->dataRef;
+	EventMgr.process_event(pPacket->cltToken,pPacket->eventNum);//actual return value not possible due to thread based de-coupling
+	pReq->result=RPC_SRV_RESULT_SUCCESS; //further processing is needed based on event-number(user callback??)
+	return 0;
+}
+int ADJsonRpcMgr::bin_to_json_event_process(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,RPCMGR_EVENT_PACKET);
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
