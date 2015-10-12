@@ -1,4 +1,6 @@
 #include "ADJsonRpcMgr.hpp"
+#include "ADCmnPortList.h"
+
 /* ------------------------------------------------------------------------- */
 ADJsonRpcMgr::ADJsonRpcMgr(int ver,bool debuglog,ADCMN_DEV_INFO* pDev)
 {
@@ -583,7 +585,7 @@ int ADJsonRpcMgr::json_to_bin_event_subscribe(JsonDataCommObj* pReq)
 		JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG_PORT,pPanelCmdObj->portNum);
 	}
 	else
-		pPanelCmdObj->portNum=-1;//send events on same connection
+		pPanelCmdObj->portNum=-1;//ADCMN_PORT_SYSMGR;//-1;//send events on same connection
 
 	//optional arg-event_num: client can request for specific event to be notified,
 	if(find_single_param((char*)pReq->socket_data,(char*)RPCMGR_RPC_EVENT_ARG_EVENTNUM,temp_param)==0)

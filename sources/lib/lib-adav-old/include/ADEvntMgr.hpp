@@ -5,6 +5,15 @@
 #include <deque>
 #include <iostream>
 using namespace std;
+#define RPCMGR_RPC_EVENT_SUBSCRIBE    "subscribe_event"
+#define RPCMGR_RPC_EVENT_UNSUBSCRIBE  "unsubscribe_event"
+#define RPCMGR_RPC_EVENT_NOTIFY       "notify_event"  //for self calling within server
+#define RPCMGR_RPC_EVENT_PROCESS      "process_event" //notification from other services
+
+#define RPCMGR_RPC_EVENT_ARG_CLTTOK   "cltToken" //sent from clt to srv, but srv will return this with events
+#define RPCMGR_RPC_EVENT_ARG_PORT     "port"
+#define RPCMGR_RPC_EVENT_ARG_EVENTNUM "evntNum"  //which of the events
+#define RPCMGR_RPC_EVENT_ARG_SRVTOK   "srvToken" //sent from server to client as a subscription token
 
 typedef struct EventEntry_t
 {
@@ -16,7 +25,11 @@ typedef struct EventEntry_t
 	int sock_id;   //unique client connection ident(needed in case of client connection breaks)
 	char ip[512];
 }EventEntry;
-
+//common set of events
+//1) 0 - Last inProgress command completed(send ident?)
+//2) 1 - ready notification?? to indicate service has restarted
+//3) 2 - shutting down event to to subscriber?
+// 
 struct EventProcEntry
 {
 	int cltToken;  //who sent the event
@@ -85,6 +98,8 @@ class ADEvntMgr : public ADThreadConsumer
 	//thread-callback functions
 	virtual int monoshot_callback_function(void* pUserData,ADThreadProducer* pObj);
 	virtual int thread_callback_function(void* pUserData,ADThreadProducer* pObj){return 0;};//we are not using this one..
+
+	int send_event(EventEntry *pEvent,int event_num);
 
 public:
 	ADEvntMgr();

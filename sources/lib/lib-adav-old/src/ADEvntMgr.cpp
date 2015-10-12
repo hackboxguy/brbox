@@ -1,4 +1,6 @@
 #include "ADEvntMgr.hpp"
+#include "ADJsonRpcClient.hpp"
+
 #include <algorithm>
 //#include <functional>
 //using namespace std;
@@ -30,10 +32,17 @@ int ADEvntMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj
 		//usleep(100000);usleep(100000);usleep(100000);usleep(100000);usleep(100000);
 		while (!notifyEvent.empty())
 		{
-			//if pEvent->eventNum==-1, then ignore event value and just notify
-			//if pEvent->eventNum>=0,  then check event value, if (pEvent->eventNum==event) then notify
 			//when notifying, check if connection is possible, if not, then remove the EventSubscription entry from my list
-			std::cout << "event_val = " << notifyEvent.front()<<endl;
+			//everytime after subscribing, if the subscriber goes aways(no listining on port), then notify entry will be removed
+			//in such case, subscriber has to subscribe again after restart
+			for(int i = 0; i < eventList.size(); ++i)
+			{
+				if(eventList[i]->eventNum==-1)//notify all events
+					send_event(eventList[i],notifyEvent.front());//TODO: if not success, remove entry from notifyEvent
+				else if(eventList[i]->eventNum == notifyEvent.front())//notify specific event number
+					send_event(eventList[i],notifyEvent.front());//TODO: if not success, remove entry from notifyEvent
+			}
+			//std::cout << "event_val = " << notifyEvent.front()<<endl;
 			notifyEvent.pop_front();
 		}
 	}
@@ -43,7 +52,7 @@ int ADEvntMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj
 		{
 			EventProcEntry entry = processEvent.front();
 			//TODO://callback of the subscriber.
-			std::cout << "clt_token = " <<entry.cltToken <<" evnt_num = "<<entry.eventNum <<endl;
+			std::cout << "process_event: clt_token = " <<entry.cltToken <<" evnt_num = "<<entry.eventNum <<endl;
 			processEvent.pop_front();
 		}
 	}
@@ -97,4 +106,14 @@ int ADEvntMgr::process_event(int clt_token,int event_num)
 	//after this context is de-coupled and later monoshot_callback_function will be called
 	return 0;
 }
-
+int ADEvntMgr::send_event(EventEntry *pEvent,int event_num)
+{
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(pEvent->ip,pEvent->portNum)!=0)
+		return -1;//RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	if(Client.set_integer_type_with_addr_para((char*)RPCMGR_RPC_EVENT_PROCESS,(char*)RPCMGR_RPC_EVENT_ARG_CLTTOK,pEvent->cltToken,
+							(char*)RPCMGR_RPC_EVENT_ARG_EVENTNUM,event_num)!=RPC_SRV_RESULT_SUCCESS)
+		;//TODO: unable to send event
+	Client.rpc_server_disconnect();
+	return 0;
+}

@@ -135,15 +135,7 @@ typedef struct RPCMGR_DEV_TYPE_PACKET_T
 //EJSON_RPCGMGR_EVENT_UNSUBSCRIBE
 //EJSON_RPCGMGR_EVENT_NOTIFY
 //EJSON_RPCGMGR_EVENT_PROCESS
-#define RPCMGR_RPC_EVENT_SUBSCRIBE    "subscribe_event"
-#define RPCMGR_RPC_EVENT_UNSUBSCRIBE  "unsubscribe_event"
-#define RPCMGR_RPC_EVENT_NOTIFY       "notify_event"  //for self calling within server
-#define RPCMGR_RPC_EVENT_PROCESS      "process_event" //notification from other services
-
-#define RPCMGR_RPC_EVENT_ARG_CLTTOK   "cltToken" //sent from clt to srv, but srv will return this with events
-#define RPCMGR_RPC_EVENT_ARG_PORT     "port"
-#define RPCMGR_RPC_EVENT_ARG_EVENTNUM "evntNum"  //which of the events
-#define RPCMGR_RPC_EVENT_ARG_SRVTOK   "srvToken" //sent from server to client as a subscription token
+//note: json string definition moved to ADEvntMgr.hpp
 typedef struct RPCMGR_EVENT_PACKET_T
 {
 	int cltToken; //event receiver wants to know who sent the event
