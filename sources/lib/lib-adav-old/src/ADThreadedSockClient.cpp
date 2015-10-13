@@ -75,6 +75,9 @@ int ADThreadedSockClient::thread_callback_function(void* pUserData,ADThreadProdu
 			case CLIENT_CMD_TYPE_STRING_GET_SET:
 				run_cmd_type_string_get_set(pCmdObj,&SrvSockConn,&output_msg_chain);
 				break;
+			case CLIENT_CMD_TYPE_DOUBLE_INT_SET:
+				run_cmd_type_double_int_set(pCmdObj,&SrvSockConn,&output_msg_chain);
+				break;
 			//case CLIENT_CMD_TYPE_USER_DEFINED:
 			//	run_subscribers_commands(pCmdObj,&SrvSockConn,&output_msg_chain);
 			//	break;

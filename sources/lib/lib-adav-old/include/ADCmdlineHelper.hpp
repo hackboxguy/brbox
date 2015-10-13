@@ -214,6 +214,7 @@ int push_get_task_progress_command(char* get_rpc_name,char* taskID_name,char*tas
 int push_get_task_progress_command_with_dev_addr(char* get_rpc_name,char *addr, int addr_val,char* taskID_name,char*taskSts_name,int command,char* subarg);
 	int push_string_get_set_with_enum_arg(int getcmd,int setcmd,const char* get_rpc,const char* set_rpc,
 			const char* enum_name,int enum_max,const char** enum_table, const char* string_name,char* subarg,RPC_SRV_ACT forced_act=RPC_SRV_ACT_READ_AND_WRITE);
+	int push_double_int_set_command(int setcmd,const char* set_rpc_name,char* param1_name, char* param2_name,char* subarg);
 
 	int  get_socket_log_opt();
 	bool get_debug_log_opt();

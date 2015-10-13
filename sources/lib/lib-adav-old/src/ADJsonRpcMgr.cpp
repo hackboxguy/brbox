@@ -618,13 +618,20 @@ int ADJsonRpcMgr::process_event_subscribe(RPC_SRV_REQ* pReq)
 		pEvent->sock_id   =pPacket->sock_id;
 		pEvent->sock_descr=pPacket->sock_descr;
 		strcpy(pEvent->ip,pPacket->ip);
-		if(EventMgr.register_event_subscription(pEvent,&pPacket->srvToken)!=0)//on success, serverToken is returned
+		pEvent->deleteFlag=false;//dont delete, its a fresh subscription(deleted by the worker thread in case of not socket connection)
+		int res = EventMgr.register_event_subscription(pEvent,&pPacket->srvToken);//!=0)//on success, serverToken is returned
+		if(res == 0)
+			pReq->result=RPC_SRV_RESULT_SUCCESS;
+		else if(res == -1)//duplicate entry found
 		{
 			OBJ_MEM_DELETE(pEvent);
-			pReq->result=RPC_SRV_RESULT_FAIL;
+			pReq->result=RPC_SRV_RESULT_ITEM_DUPLICATE_FOUND;//RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
 		}
 		else
-			pReq->result=RPC_SRV_RESULT_SUCCESS;
+		{
+			OBJ_MEM_DELETE(pEvent);
+			pReq->result=RPC_SRV_RESULT_FAIL;//RPC_SRV_RESULT_ACTION_NOT_ALLOWED
+		}
 	}
 	return 0;
 }
@@ -653,7 +660,7 @@ int ADJsonRpcMgr::process_event_unsubscribe(RPC_SRV_REQ* pReq)
 	int res = EventMgr.unregister_event_subscription(pPacket->srvToken);
 	if(res==0)
 		pReq->result=RPC_SRV_RESULT_SUCCESS;
-	else if(res==1)
+	else if(res==-1)
 		pReq->result=RPC_SRV_RESULT_ITEM_NOT_FOUND;
 	else
 		pReq->result=RPC_SRV_RESULT_FAIL;
@@ -668,16 +675,24 @@ int ADJsonRpcMgr::bin_to_json_event_unsubscribe(JsonDataCommObj* pReq)
 //this rpc call has an integer arg which is the event number
 int ADJsonRpcMgr::json_to_bin_event_notify(JsonDataCommObj* pReq)
 {
+	char temp_param[255];
 	RPCMGR_EVENT_PACKET* pPanelCmdObj=NULL;
 	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_EVENT_PACKET,RPC_SRV_ACT_WRITE,EJSON_RPCGMGR_EVENT_NOTIFY);
 	JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG_EVENTNUM,pPanelCmdObj->eventNum);//reuse existing eventNum in this object
+	//optional arg-port: client has passed the port number where even to be sent to(ip is auto read)
+	if(find_single_param((char*)pReq->socket_data,(char*)RPCMGR_RPC_EVENT_ARG_EXTRA,temp_param)==0)
+	{
+		JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG_EXTRA,pPanelCmdObj->eventArg);
+	}
+	else
+		pPanelCmdObj->eventArg=-1;//-1 indicates no extra arg sent with eventNum
 	return 0;
 }
 int ADJsonRpcMgr::process_event_notify(RPC_SRV_REQ* pReq)
 {
 	RPCMGR_EVENT_PACKET* pPacket;
 	pPacket=(RPCMGR_EVENT_PACKET*)pReq->dataRef;
-	int res = EventMgr.notify_event(pPacket->eventNum);
+	int res = EventMgr.notify_event(pPacket->eventNum,pPacket->eventArg);
 	if(res==0)
 		pReq->result=RPC_SRV_RESULT_SUCCESS;
 	else
@@ -693,23 +708,31 @@ int ADJsonRpcMgr::bin_to_json_event_notify(JsonDataCommObj* pReq)
 //this rpc call has two integer args (cltToken+eventNum) for processing the events
 int ADJsonRpcMgr::json_to_bin_event_process(JsonDataCommObj* pReq)
 {
+	char temp_param[255];
 	RPCMGR_EVENT_PACKET* pPanelCmdObj=NULL;
 	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_EVENT_PACKET,RPC_SRV_ACT_WRITE,EJSON_RPCGMGR_EVENT_PROCESS);
 	JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG_CLTTOK,pPanelCmdObj->cltToken);//who is sending this event?
-	JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG_EVENTNUM,pPanelCmdObj->eventNum);//what is the event number
+	JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG_EVENTNUM,pPanelCmdObj->eventNum);//event number
+	//optional arg-port: client has passed the port number where even to be sent to(ip is auto read)
+	if(find_single_param((char*)pReq->socket_data,(char*)RPCMGR_RPC_EVENT_ARG_EXTRA,temp_param)==0)
+	{
+		JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG_EXTRA,pPanelCmdObj->eventArg);
+	}
+	else
+		pPanelCmdObj->eventArg=-1;//-1 indicates no extra arg sent with eventNum
 	return 0;
 }
 int ADJsonRpcMgr::process_event_process(RPC_SRV_REQ* pReq)
 {
 	RPCMGR_EVENT_PACKET* pPacket;
 	pPacket=(RPCMGR_EVENT_PACKET*)pReq->dataRef;
-	EventMgr.process_event(pPacket->cltToken,pPacket->eventNum);//actual return value not possible due to thread based de-coupling
+	EventMgr.process_event(pPacket->eventNum,pPacket->eventArg,pPacket->cltToken);//actual return value not possible due to thread based de-coupling
 	pReq->result=RPC_SRV_RESULT_SUCCESS; //further processing is needed based on event-number(user callback??)
 	return 0;
 }
 int ADJsonRpcMgr::bin_to_json_event_process(JsonDataCommObj* pReq)
 {
-	PREPARE_JSON_RESP(RPC_SRV_REQ,RPCMGR_EVENT_PACKET);
+	PREPARE_JSON_RESP(RPC_SRV_REQ,RPCMGR_EVENT_PACKET);//tell event sender that event has been received(subscriber will take further action)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */

@@ -325,6 +325,21 @@ int ADCmnCltCmdProcessor::run_cmd_type_string_get_set_with_enum_para(CmdExecutio
 	return 0;
 }
 /*****************************************************************************/
+int ADCmnCltCmdProcessor::run_cmd_type_double_int_set(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList)
+{
+	if(pCmdObj->action == RPC_SRV_ACT_WRITE)
+	{
+		pCmdObj->result=pSrvSockConn->set_integer_type_with_addr_para(pCmdObj->set_rpc_name,pCmdObj->first_arg_param_name,pCmdObj->first_arg_param_int_value,pCmdObj->second_arg_param_name,pCmdObj->second_arg_param_int_value);
+		log_print_message(pSrvSockConn,pCmdObj->set_rpc_name,RPC_SRV_ACT_WRITE,pCmdObj->result,pOutMsgList,(char*)"");
+	}
+	else
+	{
+		log_print_message(pSrvSockConn,(char*)"run_cmd_type_double_int_set",RPC_SRV_ACT_UNKNOWN,(char*)CLIENT_CMD_RESULT_INVALID_ACT,pOutMsgList);
+		return -1;
+	}
+	return 0;
+}
+/*****************************************************************************/
 
 
 

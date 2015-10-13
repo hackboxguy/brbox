@@ -151,6 +151,30 @@ int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* name1,int va
 	json_object_put(param_object);
 	return 0;
 }
+int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* name1,int value1,char* name2, int value2,char* name3, int value3,char* result)
+{
+	json_object *main_object,*param_object;
+	main_object = json_object_new_object();
+	param_object= json_object_new_object();
+
+	json_object_object_add(main_object, "jsonrpc", json_object_new_string("2.0"));
+	json_object_object_add(main_object, "method" , json_object_new_string(method));
+
+	json_object_object_add(param_object, name1, json_object_new_int(value1));
+	json_object_object_add(param_object, name2, json_object_new_int(value2));
+	json_object_object_add(param_object, name3, json_object_new_int(value3));
+
+	json_object_object_add(main_object,"params", param_object);
+
+	json_object_object_add(main_object, "id", json_object_new_int(ID));
+	//printf("-->%s\n", json_object_to_json_string(main_object));
+	strcpy(result,json_object_to_json_string(main_object));
+	
+	json_object_put(main_object);
+	json_object_put(param_object);
+	return 0;
+}
+
 //for sdps with int-addr and string-value
 int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* name1,int value1,char* name2, char* value2,char* result)
 {
@@ -2636,6 +2660,17 @@ RPC_SRV_RESULT ADJsonRpcClient::get_integer_type_with_addr_para(char* method_nam
 	if(find_json_result_and_single_string_param(recv_buffer,(char*)RPC_NAME_ARG_RESULT_PARAM,return_string,resp_param_name,/*result_int_str*/result_string)!=0)
 		return RPC_SRV_RESULT_UNKNOWN;
 	return convert_string_to_server_result(return_string);
+}
+//get/set three integers (notify event)
+RPC_SRV_RESULT ADJsonRpcClient::set_three_int_type(char* method_name,char* int1Nm,int int1Vl,char* int2Nm,int int2Vl,char* int3Nm,int int3Vl)
+{
+	char result_string[255];
+	prepare_json_request(method_name,req_id++,int1Nm,int1Vl,int2Nm,int2Vl,int3Nm,int3Vl,send_buffer);
+	ClientSocket.send_data(send_buffer);
+	ClientSocket.receive_data_blocking(recv_buffer,sizeof(recv_buffer),4000);//6sec timeout
+	if(find_json_result(recv_buffer,(char*)RPC_NAME_ARG_RESULT_PARAM,result_string)!=0)
+		return RPC_SRV_RESULT_UNKNOWN;//return -1;
+	return convert_string_to_server_result(result_string);
 }
 /*****************************************************************************/
 //get/set enum type without extra device_address(for uart use case) parameter

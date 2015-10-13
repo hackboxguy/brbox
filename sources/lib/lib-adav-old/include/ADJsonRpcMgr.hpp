@@ -145,7 +145,9 @@ typedef struct RPCMGR_EVENT_PACKET_T
 	int sock_descr;//socket descriptor(incase of event to be notified on same connection)
 	int sock_id;  //unique client connection ident(needed in case of client connection breaks)
 	char ip[512];
+	int eventArg; //extra optional argument passed with eventNum(ex: sending inProg id)
 }RPCMGR_EVENT_PACKET;
+
 /* ------------------------------------------------------------------------- */
 //to understand this, read C++ subject observer pattern
 class ADJsonRpcMgrProducer; //subject

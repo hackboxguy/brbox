@@ -379,6 +379,8 @@ public:
 								    char* para5,int* para5val,
 								    char* para6,int* para6val);
 
+	RPC_SRV_RESULT set_three_int_type(char* method_name,char* int1Nm,int int1Vl,char* int2Nm,int int2Vl,char* int3Nm,int int3Vl);
+	int prepare_json_request(char* method,int ID,char* name1,int value1,char* name2, int value2,char* name3, int value3,char* result);
 
 };
 

@@ -29,6 +29,7 @@ typedef enum CLIENT_CMD_TYPE_T
 	CLIENT_CMD_TYPE_STRING_GET_SET,
 	CLIENT_CMD_TYPE_USER_DEFINED,
 	CLIENT_CMD_TYPE_GET_TASK_STATUS_WITH_DEV_ADDR,
+	CLIENT_CMD_TYPE_DOUBLE_INT_SET,
 	CLIENT_CMD_TYPE_UNKNOWN,
 	CLIENT_CMD_TYPE_NONE
 }CLIENT_CMD_TYPE;
@@ -175,5 +176,7 @@ public:
 
 	int log_print_message(ADJsonRpcClient *pSrvSockConn/*string ip*/,char* rpc_name,RPC_SRV_ACT action,char* result,ADGenericChain *pOutMsgList);
 	int log_print_message(ADJsonRpcClient *pSrvSockConn,char* rpc_method_name,RPC_SRV_ACT action,RPC_SRV_RESULT result,ADGenericChain *pOutMsgList,char* result_val);
+	int run_cmd_type_double_int_set(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList);
+
 };
 #endif

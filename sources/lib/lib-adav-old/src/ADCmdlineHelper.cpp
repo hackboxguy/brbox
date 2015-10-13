@@ -106,11 +106,11 @@ int ADCmdlineHelper::init_myself()
 		insert_help_entry((char*)"--restorefactory           (trigger restoring of factory settings)");
 
 		insert_options_entry((char*)"evSub" ,optional_argument,'o',1);
-		insert_help_entry((char*)"--evSub                    (subscribe for event notification)");
+		insert_help_entry((char*)"--evSub=cltToken,portNum   (subscribe for event notification)");
 		insert_options_entry((char*)"evUnsub" ,optional_argument,'y',1);
-		insert_help_entry((char*)"--evUnsub                  (unsubscribe for event notification)");
+		insert_help_entry((char*)"--evUnsub=srvToken         (unsubscribe for event notification)");
 		insert_options_entry((char*)"evNotify" ,optional_argument,'q',1);
-		insert_help_entry((char*)"--evNotify                 (notify event)");
+		insert_help_entry((char*)"--evNotify=evntNum,evntArg (notify event)");
 
 	}
 	else if(my_mode==CMDLINE_HELPER_MODE_SERVER)
@@ -321,19 +321,23 @@ int ADCmdlineHelper::parse_cmdline_arguments(int argc, char **argv)
 			case 'j':break;//TODO:store factory
 			case 'm':break;//TODO:restore factory
 			case 'o':
-				push_single_int_get_set_command(EJSON_RPCGMGR_EVENT_SUBSCRIBE,EJSON_RPCGMGR_EVENT_SUBSCRIBE,
-					RPCMGR_RPC_EVENT_SUBSCRIBE,RPCMGR_RPC_EVENT_SUBSCRIBE,
-					(char*) RPCMGR_RPC_EVENT_ARG_CLTTOK,subarg,0);
-					break;//TODO:subscribe event
+				//push_single_int_get_set_command(EJSON_RPCGMGR_EVENT_SUBSCRIBE,EJSON_RPCGMGR_EVENT_SUBSCRIBE,
+				//	RPCMGR_RPC_EVENT_SUBSCRIBE,RPCMGR_RPC_EVENT_SUBSCRIBE,
+				//	(char*) RPCMGR_RPC_EVENT_ARG_CLTTOK,subarg,0);
+				push_double_int_set_command(EJSON_RPCGMGR_EVENT_SUBSCRIBE,RPCMGR_RPC_EVENT_SUBSCRIBE,
+						(char*) RPCMGR_RPC_EVENT_ARG_CLTTOK, (char*) RPCMGR_RPC_EVENT_ARG_PORT,subarg);
+				break;//TODO:subscribe event
 			case 'y':
 				push_single_int_get_set_command(EJSON_RPCGMGR_EVENT_UNSUBSCRIBE,EJSON_RPCGMGR_EVENT_UNSUBSCRIBE,
 					RPCMGR_RPC_EVENT_UNSUBSCRIBE,RPCMGR_RPC_EVENT_UNSUBSCRIBE,
 					(char*) RPCMGR_RPC_EVENT_ARG_SRVTOK,subarg,0);
 				break;
 			case 'q':
-				push_single_int_get_set_command(EJSON_RPCGMGR_EVENT_NOTIFY,EJSON_RPCGMGR_EVENT_NOTIFY,
-					RPCMGR_RPC_EVENT_NOTIFY,RPCMGR_RPC_EVENT_NOTIFY,
-					(char*) RPCMGR_RPC_EVENT_ARG_EVENTNUM,subarg,0);
+				//push_single_int_get_set_command(EJSON_RPCGMGR_EVENT_NOTIFY,EJSON_RPCGMGR_EVENT_NOTIFY,
+				//	RPCMGR_RPC_EVENT_NOTIFY,RPCMGR_RPC_EVENT_NOTIFY,
+				//	(char*) RPCMGR_RPC_EVENT_ARG_EVENTNUM,subarg,0);
+				push_double_int_set_command(EJSON_RPCGMGR_EVENT_NOTIFY,RPCMGR_RPC_EVENT_NOTIFY,
+						(char*) RPCMGR_RPC_EVENT_ARG_EVENTNUM, (char*) RPCMGR_RPC_EVENT_ARG_EXTRA,subarg);
 				break;
 			default:if(parse_subscribers_cmdline((arg-CONSUMERS_OPTIONS_ARG_START_BOUNDARY),subarg)!=0) return -1;//remove the offset which was added by me
 				break;
@@ -1351,4 +1355,55 @@ int ADCmdlineHelper::push_string_get_set_command(int getcmd,int setcmd,const cha
 	return 0;
 }
 /*****************************************************************************/
+int ADCmdlineHelper::push_double_int_set_command(int setcmd,const char* set_rpc_name,char* param1_name, char* param2_name,char* subarg)
+{
+	CmdExecutionObj *pCmdObj=NULL;
+	OBJECT_MEM_NEW(pCmdObj,CmdExecutionObj);
+	if(pCmdObj==NULL)
+	{
+		printf("failed create pCmdObj!!!\n");
+		return -1;
+	}
+	//strcpy(pCmdObj->get_rpc_name,get_rpc_name);
+	strcpy(pCmdObj->set_rpc_name,set_rpc_name);
+
+	if(get_next_subargument(&subarg)==0)//user must specify first argument
+	{
+		OBJ_MEM_DELETE(pCmdObj);
+		printf("please specify first int argument!!!\n");
+		return -1;
+	}
+	else //write
+	{
+		pCmdObj->command=setcmd;
+		pCmdObj->cmd_int_val=atoi(subarg);
+		pCmdObj->first_arg_param_int_value=atoi(subarg);
+		strcpy(pCmdObj->first_arg_param_name,param1_name);//"action"
+		pCmdObj->action=RPC_SRV_ACT_WRITE;
+
+		if(get_next_subargument(&subarg)==0)//read
+		{
+			OBJ_MEM_DELETE(pCmdObj);
+			printf("please specify second int argument!!!\n");
+			return -1;
+		}
+		else
+		{
+			pCmdObj->second_arg_param_int_value=atoi(subarg);
+			strcpy(pCmdObj->second_arg_param_name,param2_name);
+		}
+
+	}
+	pCmdObj->cmd_type=CLIENT_CMD_TYPE_DOUBLE_INT_SET;
+	//put the request into chain
+	if(CmdChain.chain_put((void *)pCmdObj)!=0)
+	{
+		printf("push_double_int_set_command: failed! unable to push json-req-task-obj to chain!\n");
+		OBJ_MEM_DELETE(pCmdObj);
+		return -1;
+	}
+	return 0;
+}
+/*****************************************************************************/
+
 
