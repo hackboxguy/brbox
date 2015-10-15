@@ -77,9 +77,9 @@ int ADEvntMgr::register_event_subscription(EventEntry *pEvent,int *ack_token)
 		eventList.push_back(pEvent);
 		//Note: following lines are just for testing the container elements.
 		//after event subscription, print the whole event vector list(notice the use of functor object)
-		PrintEventEntries PrintEvent;
-		for_each (eventList.begin(), eventList.end(),PrintEvent);
-		cout<<"##############################################"<<endl;
+PrintEventEntries PrintEvent;
+for_each (eventList.begin(), eventList.end(),PrintEvent);
+cout<<"##############################################"<<endl;
 		return 0;
 	}
 	else
@@ -95,7 +95,7 @@ int ADEvntMgr::unregister_event_subscription(int srv_token)
 
 	//removed the element with srv_token from vector and delete it.(be careful, anyone can delete event notification)
 	eventList.erase(remove_if(eventList.begin(), eventList.end(), RemoveEventEntry(srv_token)) , eventList.end());
-
+cout<<"unsubscribe of srvToken = "<<srv_token<<" success"<<endl;
 	//following solution works when only entry needs to be deleted, not the entry-pointer
 	//http://stackoverflow.com/questions/991335/how-to-erase-delete-pointers-to-objects-stored-in-a-vector
 	//using functor object, delete the entry having srv_token

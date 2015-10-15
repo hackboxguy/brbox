@@ -6,6 +6,7 @@
 /* ------------------------------------------------------------------------- */
 class  EventHandler : public ADJsonRpcMgrConsumer, public ADCmnStringProcessor
 {
+	int srvToken;//=-1;
 	SYSMGR_CMN_DATA_CACHE *pDataCache;
 public:
 	 EventHandler(std::string rpcName,int myIndex,bool emu,bool log,SYSMGR_CMN_DATA_CACHE *pData);

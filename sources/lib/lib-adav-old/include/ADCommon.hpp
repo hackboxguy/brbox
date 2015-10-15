@@ -597,27 +597,44 @@ do			\
 	}\
 } while (0)
 
-#define SUBSCRIBE_EVENT(cltToken,evntNum,ip,myPort,srvToken)\
+#define SUBSCRIBE_EVENT(ip,destPort,srvToken,cltToken,evntNum,srcPort)\
 do			\
 {			\
 	ADJsonRpcClient Client;\
-	if(Client.rpc_server_connect(ip,cltToken)!=0)\
+	if(Client.rpc_server_connect(ip,destPort)!=0)\
 	{\
-		LOG_DEBUG_MSG_1_ARG(true,"BRBOX:SubscribeEvent","Unable connect on port = %d",cltToken);\
+		LOG_DEBUG_MSG_1_ARG(true,"BRBOX:SubscribeEvent","Unable connect on port = %d",destPort);\
 	}\
 	else\
 	{\
 		if(Client.set_three_int_get_one_int((char*)RPCMGR_RPC_EVENT_SUBSCRIBE,\
 					     (char*)RPCMGR_RPC_EVENT_ARG_CLTTOK,cltToken,\
-					     (char*)RPCMGR_RPC_EVENT_ARG_PORT,myPort,\
+					     (char*)RPCMGR_RPC_EVENT_ARG_PORT,srcPort,\
 					     (char*)RPCMGR_RPC_EVENT_ARG_EVENTNUM,evntNum,\
-					     (char*)RPCMGR_RPC_EVENT_ARG_SRVTOK,&srvToken)!=RPC_SRV_RESULT_SUCCESS)\
+					     (char*)RPCMGR_RPC_EVENT_ARG_SRVTOK,srvToken)!=RPC_SRV_RESULT_SUCCESS)\
 		{\
 			LOG_DEBUG_MSG_2_ARG(true,"BRBOX:SubscribeEvent","Unable subscribe event = %d on port = %d",evntNum,cltToken);\
 		}\
 		Client.rpc_server_disconnect();\
 	}\
 } while (0)
-
+#define UNSUBSCRIBE_EVENT(ip,destPort,srvToken)\
+do			\
+{			\
+	ADJsonRpcClient Client;\
+	if(Client.rpc_server_connect(ip,destPort)!=0)\
+	{\
+		LOG_DEBUG_MSG_1_ARG(true,"BRBOX:SubscribeEvent","Unable connect on port = %d",destPort);\
+	}\
+	else\
+	{\
+		if(Client.set_integer_type(  (char*)RPCMGR_RPC_EVENT_UNSUBSCRIBE,\
+					     (char*)RPCMGR_RPC_EVENT_ARG_SRVTOK,srvToken)!=RPC_SRV_RESULT_SUCCESS)\
+		{\
+			LOG_DEBUG_MSG_2_ARG(true,"BRBOX:SubscribeEvent","Unable unsubscribe srvToken = %d on port = %d",srvToken,destPort);\
+		}\
+		Client.rpc_server_disconnect();\
+	}\
+} while (0)
 
 #endif

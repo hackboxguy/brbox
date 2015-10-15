@@ -3,13 +3,15 @@
 /* ------------------------------------------------------------------------- */
 EventHandler:: EventHandler(std::string rpcName,int myIndex,bool emu,bool log,SYSMGR_CMN_DATA_CACHE *pData):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
 {
+	srvToken=-1;
 	pDataCache=pData;
-	int srvToken=-1;
-	SUBSCRIBE_EVENT(40002,-1,"127.0.0.1",40001,srvToken);
+	SUBSCRIBE_EVENT("127.0.0.1",40002,&srvToken,40002,-1,40001);
+	std::cout<<"srvToken = "<<srvToken<<endl;
 }
 /* ------------------------------------------------------------------------- */
 EventHandler::~ EventHandler()
 {
+	UNSUBSCRIBE_EVENT("127.0.0.1",40002,srvToken);
 }
 /* ------------------------------------------------------------------------- */
 void EventHandler::ReceiveEvent(int cltToken,int evntNum,int evntArg)
