@@ -7,6 +7,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "ADCommon.hpp"
+#include "ADJsonRpcClient.hpp"
 
 using namespace std;
 int ADTimer::received_user_stop_sig=0;
@@ -19,8 +20,9 @@ ADTimer::ADTimer():millisec_time(100),passive_mode(true)//by-default it is a pas
 }
 //this constructor is called when used passes the value of millisec_timer
 //it means, it is an active timer receiving all signals from OS
-ADTimer::ADTimer(int timer_millisec)
+ADTimer::ADTimer(int timer_millisec,int port)
 {
+	notifyPortNum=port;//event notification port number
 	passive_mode=false;
 	stoptimer=0;
 	pTmpTimer=this;//initialize global pTmpTimer
@@ -219,6 +221,8 @@ int ADTimer::wait_for_exit_signal()//forever-loop, blocks the main() app till ki
 		}
 	}
 	//printf("exiting program\n");
+	NOTIFY_EVENT(ADLIB_EVENT_NUM_SHUT_DOWN,-1,notifyPortNum);//send shutdown event notification before shutdown
+	usleep(100000);usleep(100000);usleep(100000);usleep(100000);usleep(100000);//wait 500ms for shutdown notification to be sent
 	return 0;
 }
 /*****************************************************************************/

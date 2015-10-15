@@ -59,8 +59,9 @@ int ADEvntMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj
 		while (!processEvent.empty())
 		{
 			EventProcEntry entry = processEvent.front();
-			//TODO://callback of the subscriber.
-	std::cout << "process_event: clt_token = " <<entry.cltToken<<" evnt_num = "<<entry.eventNum<<" evnt_arg = "<<entry.eventArg <<endl;
+			//callback of the subscriber(ADJsonRpcMgr).
+			notify_subscribers(entry.cltToken,entry.eventNum,entry.eventArg);
+	//std::cout << "process_event: clt_token = " <<entry.cltToken<<" evnt_num = "<<entry.eventNum<<" evnt_arg = "<<entry.eventArg <<endl;
 			processEvent.pop_front();
 		}
 	}

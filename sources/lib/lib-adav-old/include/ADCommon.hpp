@@ -70,6 +70,21 @@ typedef enum ADLIB_SERVICE_READY_STATE_T
 }ADLIB_SERVICE_READY_STATE;
 
 //subscribe event
+#define RPCMGR_RPC_EVENT_SUBSCRIBE    "subscribe_event"
+#define RPCMGR_RPC_EVENT_UNSUBSCRIBE  "unsubscribe_event"
+#define RPCMGR_RPC_EVENT_NOTIFY       "notify_event"  //for self calling within server
+#define RPCMGR_RPC_EVENT_PROCESS      "process_event" //notification from other services
+#define RPCMGR_RPC_EVENT_ARG_CLTTOK   "cltToken" //sent from clt to srv, but srv will return this with events
+#define RPCMGR_RPC_EVENT_ARG_PORT     "port"
+#define RPCMGR_RPC_EVENT_ARG_EVENTNUM "evntNum"  //which of the events
+#define RPCMGR_RPC_EVENT_ARG_SRVTOK   "srvToken" //sent from server to client as a subscription token
+#define RPCMGR_RPC_EVENT_ARG_EXTRA    "evntArg"  //optional extra argument sent with eventNum
+#define ADLIB_EVENT_NUM_INPROG_DONE 0
+#define ADLIB_EVENT_NUM_SHUT_DOWN   1
+#define ADLIB_EVENT_NUM_RESERVED1   2
+#define ADLIB_EVENT_NUM_RESERVED2   3
+#define ADLIB_EVENT_NUM_RESERVED3   4
+#define ADLIB_EVENT_NUM_END         5
 
 //unsubscribe event
 
@@ -559,6 +574,25 @@ do			\
 /*****************************************************************************/
 //common data objects for deviceTypes and variants
 /*****************************************************************************/
+#define NOTIFY_EVENT(evntNum,evntArg,selfPortNum)\
+do			\
+{			\
+	ADJsonRpcClient Client;\
+	if(Client.rpc_server_connect("127.0.0.1",selfPortNum)!=0)\
+	{\
+		LOG_DEBUG_MSG_1_ARG(true,"BRBOX:NotifySelf","Unable connect on port = %d",selfPortNum);\
+	}\
+	else\
+	{\
+		if(Client.set_integer_type_with_addr_para((char*)RPCMGR_RPC_EVENT_NOTIFY,\
+					     (char*)RPCMGR_RPC_EVENT_ARG_EVENTNUM,evntNum,\
+					     (char*)RPCMGR_RPC_EVENT_ARG_EXTRA,evntArg)!=RPC_SRV_RESULT_SUCCESS)\
+		{\
+			LOG_DEBUG_MSG_2_ARG(true,"BRBOX:NotifySelf","Unable send event = %d on port = %d",evntNum,selfPortNum);\
+		}\
+		Client.rpc_server_disconnect();\
+	}\
+} while (0)
 
 
 #endif

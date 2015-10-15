@@ -30,7 +30,7 @@ int main(int argc, const char* argv[])
 	bool emulat = CmdLine.get_emulation_mode();
 
 	//start 100ms timer
-	ADTimer AppTimer(100);//only one instance per application(or process) must exist
+	ADTimer AppTimer(100,CmdLine.get_port_number());//only one instance per application(or process) must exist
 	//create a common data Cache of the service
 	GPIOCTL_CMN_DATA_CACHE DataCache;
 	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type

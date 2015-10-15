@@ -1,6 +1,8 @@
 #include "ADTaskWorker.hpp"
 //#include <iostream>
 #include <stdio.h>
+#include "ADJsonRpcClient.hpp"
+
 //#include <string.h>
 //#include <stdlib.h>
 //using namespace std;
@@ -66,6 +68,7 @@ int ADTaskWorker::monoshot_callback_function(void* pUserData,ADThreadProducer* p
 				//TODO: work_inprog_obj->task_err_message;
 			}
 			work_inprog_chain.chain_unlock();
+			NOTIFY_EVENT(ADLIB_EVENT_NUM_INPROG_DONE,work_obj->taskID,notifyPortNum);//eventNum=0 for asyncTaskDone
 		}
 		else
 		{
@@ -81,8 +84,9 @@ int ADTaskWorker::monoshot_callback_function(void* pUserData,ADThreadProducer* p
 	return 0;
 }
 /*****************************************************************************/
-ADTaskWorker::ADTaskWorker()
+ADTaskWorker::ADTaskWorker()//int portNum):notifyPortNum(portNum)
 {
+	notifyPortNum=-1;
 	//initialize worker-thread and chain
 	work_inprog_chain_id = work_inprog_chain.attach_helper(this);
 	//work_done_chain_id   = work_done_chain.attach_helper(this);

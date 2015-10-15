@@ -195,15 +195,23 @@ public:
 	//virtual int WorkRpc(RPC_SRV_REQ *pPanelReq/*data-cache?*/)=0;
 	virtual int ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pObj)=0;
 	virtual RPC_SRV_RESULT ProcessWorkAsync(int index,unsigned char* pWorkData)=0;
+	virtual void ReceiveEvent(int cltToken,int evntNum,int evntArg)=0;
 
 };
 /* ------------------------------------------------------------------------- */
 class ADJsonRpcMgrProducer
 {
 	std::vector<ADJsonRpcMgrConsumer*> rpclist;
+	std::vector<ADJsonRpcMgrConsumer*> eventReceiver;
 protected:
 	ADTaskWorker AsyncTaskWorker;
 	ADEvntMgr EventMgr;
+	void notify_event_recevers(int cltToken,int evntNum,int evntArg)
+	{
+		std::vector<ADJsonRpcMgrConsumer*>::iterator iter;
+		for(iter=eventReceiver.begin();iter != eventReceiver.end();++iter)
+			(*iter)->ReceiveEvent(cltToken,evntNum,evntArg);
+	}
 
 	ADJsonRpcMgrConsumer* getRpcHandler(std::string rpcName) //based on rpc-name string, returns the object ptr
 	{
@@ -245,6 +253,11 @@ public:
 	{
 		rpclist.push_back(pRpc);
 	}
+	void AttachEventReceiver(ADJsonRpcMgrConsumer* pReceiver)
+	{
+		eventReceiver.push_back(pReceiver);
+	}
+
 	int get_total_attached_rpcs()
 	{
 		return rpclist.size();
@@ -321,10 +334,13 @@ public:
 			//pReq->result=RPC_SRV_RESULT_FAIL;
 			return RPC_SRV_RESULT_FAIL;
 	}
-
+	void TaskWorkerSetPortNumber(int port)
+	{
+		AsyncTaskWorker.notifyPortNum=port;
+	}
 };
 /* ------------------------------------------------------------------------- */
-class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, public ADTaskWorkerConsumer, public ADTimerConsumer, public ADCmnStringProcessor
+class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, public ADTaskWorkerConsumer, public ADTimerConsumer, public ADCmnStringProcessor, public ADEvntMgrConsumer
 {
 	ADTimer* myTimer;
 	ADJsonRpcProxy  Proxy;//json-net-proxy
@@ -350,6 +366,9 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	virtual int sigio_notification(){return 0;};
 	virtual int timer_notification(){return 0;};
 	virtual int custom_sig_notification(int signum){return 0;};
+
+	//ADEvntMgrConsumer override
+	virtual int receive_events(int cltToken,int evntNum,int evntArg);
 
 	int MyMapJsonToBinary(JsonDataCommObj* pReq);
 	int MyMapBinaryToJson(JsonDataCommObj* pReq);

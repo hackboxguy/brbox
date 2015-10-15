@@ -3,6 +3,7 @@
 #include "ADCommon.hpp"
 #include "ADGenericChain.hpp"
 #include "ADThread.hpp"
+
 //#include "DispPanelCmnDef.h"
 
 //what to do with chain-element after work is finished? to be deleted or to be preserved
@@ -79,7 +80,6 @@ public:
 class ADTaskWorker: public ADTaskWorkerProducer, public ADChainConsumer, public ADThreadConsumer
 {
 	//ADGenericChain PushTaskLock;//chain abused just for getting the sema-lock feature
-
 	ADThread work_thread;//thread for commands that needs longer execution time(ex: fmw-update)
 	ADGenericChain work_chain;//all the commands to be executed by work_thread are in this chain.
 	//ADGenericChain work_done_chain;
@@ -100,6 +100,7 @@ class ADTaskWorker: public ADTaskWorkerProducer, public ADChainConsumer, public 
 public:
 	ADTaskWorker();
 	~ADTaskWorker();
+	int notifyPortNum;
 	RPC_SRV_RESULT get_task_status(int taskID,int* taskSts,char* errMsg);
 	//EDISP_PANEL_RESULT get_panel_task_status(int taskID,int* taskSts,char* errMsg);
 	int is_command_in_progress(int cmd);

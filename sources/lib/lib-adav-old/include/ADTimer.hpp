@@ -97,6 +97,7 @@ private:
 	ADThread TimerThread,CustomSigThread;//worker threads
 	int TimerThreadID,CustomSigThreadID;
 	ADGenericChain SigInfoChain;
+	int notifyPortNum;
 
 	//thread-callback functions
 	virtual int monoshot_callback_function(void* pUserData,ADThreadProducer* pObj);
@@ -104,7 +105,7 @@ private:
 
 public:
 	ADTimer();
-	ADTimer(int timer_millisec);
+	ADTimer(int timer_millisec,int port);
 	~ADTimer();	
 	int test_print();
 	int restart_millisec_timer(int new_millisec);

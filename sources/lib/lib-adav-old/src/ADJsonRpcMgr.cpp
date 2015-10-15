@@ -11,6 +11,7 @@ ADJsonRpcMgr::ADJsonRpcMgr(int ver,bool debuglog,ADCMN_DEV_INFO* pDev)
 	JMapper.AttachMapper(this); //attach myself as mapper, jmapper shall call me back for mapper functions
 	JMapper.AttachWorker(this); //attach myself as worker
 	AsyncTaskWorker.attach_helper(this);
+	EventMgr.AttachReceiver(this);//attach myself for event-received-callback
 	shutdown_support=true;//by default support shutdown-rpc
 	ServiceReadyFlag=EJSON_RPCGMGR_READY_STATE_NOT_READY;
 }
@@ -38,6 +39,13 @@ int ADJsonRpcMgr::SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE sts)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
+//external event receiver function
+int ADJsonRpcMgr::receive_events(int cltToken,int evntNum,int evntArg)
+{
+	//std::cout << "receive_events: clt_token = " <<cltToken<<" evnt_num = "<<evntNum<<" evnt_arg = "<<evntArg <<endl;
+	notify_event_recevers(cltToken,evntNum,evntArg);
+	return 0;
+}
 RPC_SRV_RESULT ADJsonRpcMgr::run_work(int cmd,unsigned char* pWorkData,ADTaskWorkerProducer *pTaskWorker)
 {
 	RPC_SRV_RESULT ret_val=RPC_SRV_RESULT_FAIL;
@@ -88,6 +96,8 @@ int ADJsonRpcMgr::Start(int port,int socket_log,int emulation)
 	char rpc_name[1024];
 	//TODO:myCmdLine.get_emulation_mode()
 	Proxy.start_listening(port,socket_log);
+	TaskWorkerSetPortNumber(port);//for notifying asyTaskDone events
+
 	//attach first 9 rpc's which are common to all services
 	JMapper.attach_rpc_method(EJSON_RPCGMGR_GET_TASK_STS           ,(char*)RPCMGR_RPC_TASK_STS_GET);
 	JMapper.attach_rpc_method(EJSON_RPCGMGR_GET_RPC_SRV_VERSION    ,(char*)RPCMGR_RPC_SER_VER_GET);

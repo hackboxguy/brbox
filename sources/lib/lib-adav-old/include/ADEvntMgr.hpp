@@ -5,16 +5,6 @@
 #include <deque>
 #include <iostream>
 using namespace std;
-#define RPCMGR_RPC_EVENT_SUBSCRIBE    "subscribe_event"
-#define RPCMGR_RPC_EVENT_UNSUBSCRIBE  "unsubscribe_event"
-#define RPCMGR_RPC_EVENT_NOTIFY       "notify_event"  //for self calling within server
-#define RPCMGR_RPC_EVENT_PROCESS      "process_event" //notification from other services
-
-#define RPCMGR_RPC_EVENT_ARG_CLTTOK   "cltToken" //sent from clt to srv, but srv will return this with events
-#define RPCMGR_RPC_EVENT_ARG_PORT     "port"
-#define RPCMGR_RPC_EVENT_ARG_EVENTNUM "evntNum"  //which of the events
-#define RPCMGR_RPC_EVENT_ARG_SRVTOK   "srvToken" //sent from server to client as a subscription token
-#define RPCMGR_RPC_EVENT_ARG_EXTRA    "evntArg"  //optional extra argument sent with eventNum
 
 typedef struct EventEntry_t
 {
@@ -121,8 +111,39 @@ public:
 	}
 };
 
-
-class ADEvntMgr : public ADThreadConsumer
+/*****************************************************************************/
+//to understand this, read C++ subject observer pattern
+class ADEvntMgrProducer; //subject
+class ADEvntMgrConsumer //observer
+{
+public:
+//	int notify_custom_sig;
+//	int custom_sig_num;
+	virtual int receive_events(int cltToken,int evntNum,int evntArg)=0;
+	virtual ~ADEvntMgrConsumer(){};
+};
+/*****************************************************************************/
+class ADEvntMgrProducer
+{
+	std::vector<ADEvntMgrConsumer*> subscribers;
+protected:
+	void notify_subscribers(int cltToken,int evntNum,int evntArg)
+	{
+		std::vector<ADEvntMgrConsumer*>::iterator iter;
+		for(iter=subscribers.begin();iter != subscribers.end();++iter)
+			(*iter)->receive_events(cltToken,evntNum,evntArg);
+	}
+public:
+	virtual ~ADEvntMgrProducer(){};
+	void AttachReceiver(ADEvntMgrConsumer* pConsumer)
+	{
+		//pConsumer->notify_custom_sig=0;//by disabled custom sig notifier(whoever wants it will enable it)
+		//allow multiple subscribers(this will work if there is only one Producer Object, ex:one timer object per application)
+		subscribers.push_back(pConsumer);
+	}
+};
+/*****************************************************************************/
+class ADEvntMgr : public ADEvntMgrProducer, public ADThreadConsumer
 {
 //private:
 	int AckToken;
@@ -154,10 +175,11 @@ public:
 #endif
 
 //eventing todo;
+//Done:7)add a macro for sending events from within the rpc code
 //Done:3)ADEvntMgr.cpp: check if already there is an existing same subscription to avoid duplication.
 //1)client-cmd: evntSubscribe, shall support third arg for registering specific event(add library-function for event subscription).
 //2)client-cmd: evntSubscribe, shall print srvToken along with result.
 //4)reply on same connection
 //5)subscribe/unsubscribe/notification shall handle listContainer in a multi-thread safe way.
 //6)in processEvent: add callback to the attached objects
-//7)add a macro for sending events from within the rpc code
+//reserved default events: inProgComplete,ServiceShuttingDown
