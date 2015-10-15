@@ -10,6 +10,7 @@
 /* ------------------------------------------------------------------------- */
 #include "NetRpc.h"
 #include "SysRpc.h"
+#include "EventHandler.h"
 #define SERVER_JSON_PORT_NUM SYSMGR_JSON_PORT_NUMBER
 /* ------------------------------------------------------------------------- */
 using namespace std;
@@ -37,7 +38,10 @@ int main(int argc, const char* argv[])
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
- 
+
+ 	/****************Prepare event receiver to receive events*****************/
+	EventHandler EvntReceiver("dummy_rpc",0,emulat,dbglog,&DataCache);
+	RpcMgr.AttachEventReceiver(&EvntReceiver);
 	/****************************RPC list*************************************/
 	//network related rpc's
 	NetRpc MacGet  (SYSMGR_RPC_MAC_ADDR_GET ,EJSON_SYSMGR_RPC_GET_MAC_ADDR ,emulat,dbglog,&DataCache);  //network related rpc handler class

@@ -175,11 +175,13 @@ public:
 #endif
 
 //eventing todo;
+//Done:reserved default events: inProgComplete,ServiceShuttingDown
+//Done:6)in processEvent: add callback to the attached objects
 //Done:7)add a macro for sending events from within the rpc code
 //Done:3)ADEvntMgr.cpp: check if already there is an existing same subscription to avoid duplication.
 //1)client-cmd: evntSubscribe, shall support third arg for registering specific event(add library-function for event subscription).
 //2)client-cmd: evntSubscribe, shall print srvToken along with result.
 //4)reply on same connection
 //5)subscribe/unsubscribe/notification shall handle listContainer in a multi-thread safe way.
-//6)in processEvent: add callback to the attached objects
-//reserved default events: inProgComplete,ServiceShuttingDown
+//include event enum in service header
+//add macro for subscribing events

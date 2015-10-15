@@ -380,6 +380,9 @@ public:
 								    char* para6,int* para6val);
 
 	RPC_SRV_RESULT set_three_int_type(char* method_name,char* int1Nm,int int1Vl,char* int2Nm,int int2Vl,char* int3Nm,int int3Vl);
+	RPC_SRV_RESULT set_three_int_get_one_int(char* method_name,char* int1Nm,int int1Vl,char* int2Nm,int int2Vl,char* int3Nm,int int3Vl,char* int4Nm,int *int4Vl);
+	int find_json_result_and_single_string_param(char *json_string,char* result_name,char* result_value,char* param_name,int* param_value);
+
 	int prepare_json_request(char* method,int ID,char* name1,int value1,char* name2, int value2,char* name3, int value3,char* result);
 
 };

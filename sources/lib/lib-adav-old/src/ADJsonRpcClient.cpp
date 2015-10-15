@@ -814,6 +814,44 @@ int ADJsonRpcClient::find_json_result_and_single_string_param(char *json_string,
 	json_object_put(new_obj);
 	return 0;
 }
+int ADJsonRpcClient::find_json_result_and_single_string_param(char *json_string,char* result_name,char* result_value,char* param_name,int* param_value)
+{
+	struct json_object *new_obj=NULL;
+	new_obj = json_tokener_parse(json_string);
+	if(new_obj==NULL)
+		return -1;
+	
+	//first search for "result" string in response object
+	struct json_object *new_obj1 = json_object_object_get(new_obj, RPC_NAME_ARG_RESULT_OBJ);
+	if(json_object_get_string(new_obj1)==NULL)
+	{
+		json_object_put(new_obj);
+		return -1;
+	}
+
+	//search for "return" string in result object.
+	struct json_object *new_obj2 = json_object_object_get(new_obj1, result_name);
+	if(json_object_get_string(new_obj2)==NULL)
+	{
+		json_object_put(new_obj);
+		return -1;
+	}
+	sprintf(result_value,"%s",json_object_get_string(new_obj2));
+
+	//search for param_name string in result object.
+	struct json_object *new_obj3 = json_object_object_get(new_obj1, param_name);//para_value is still part of result object
+	if(json_object_get_string(new_obj3)==NULL)
+	{
+		//printf("para name %s not found\n",param_name);
+		json_object_put(new_obj);
+		return 0;//!!! dont return -1 here, atleast result string was found.
+	}
+	//sprintf(param_value,"%d",json_object_get_int(new_obj3));
+	*param_value=json_object_get_int(new_obj3);
+
+	json_object_put(new_obj);
+	return 0;
+}
 int ADJsonRpcClient::find_json_result_and_four_int_param(char *json_string,char* result_name,char* result_value,
 							    char* para1,int* para1val,
 							    char* para2,int* para2val,
@@ -2670,6 +2708,17 @@ RPC_SRV_RESULT ADJsonRpcClient::set_three_int_type(char* method_name,char* int1N
 	ClientSocket.receive_data_blocking(recv_buffer,sizeof(recv_buffer),4000);//6sec timeout
 	if(find_json_result(recv_buffer,(char*)RPC_NAME_ARG_RESULT_PARAM,result_string)!=0)
 		return RPC_SRV_RESULT_UNKNOWN;//return -1;
+	return convert_string_to_server_result(result_string);
+}
+//event subscription
+RPC_SRV_RESULT ADJsonRpcClient::set_three_int_get_one_int(char* method_name,char* int1Nm,int int1Vl,char* int2Nm,int int2Vl,char* int3Nm,int int3Vl,char* int4Nm,int *int4Vl)
+{
+	char result_string[255];
+	prepare_json_request(method_name,req_id++,int1Nm,int1Vl,int2Nm,int2Vl,int3Nm,int3Vl,send_buffer);
+	ClientSocket.send_data(send_buffer);
+	ClientSocket.receive_data_blocking(recv_buffer,sizeof(recv_buffer),4000);//6sec timeout
+	if(find_json_result_and_single_string_param(recv_buffer,(char*)RPC_NAME_ARG_RESULT_PARAM,result_string,int4Nm,int4Vl)!=0)
+		return RPC_SRV_RESULT_UNKNOWN;
 	return convert_string_to_server_result(result_string);
 }
 /*****************************************************************************/

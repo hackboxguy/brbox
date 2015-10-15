@@ -574,6 +574,9 @@ do			\
 /*****************************************************************************/
 //common data objects for deviceTypes and variants
 /*****************************************************************************/
+
+/*****************************************************************************/
+//eventing related macros
 #define NOTIFY_EVENT(evntNum,evntArg,selfPortNum)\
 do			\
 {			\
@@ -589,6 +592,28 @@ do			\
 					     (char*)RPCMGR_RPC_EVENT_ARG_EXTRA,evntArg)!=RPC_SRV_RESULT_SUCCESS)\
 		{\
 			LOG_DEBUG_MSG_2_ARG(true,"BRBOX:NotifySelf","Unable send event = %d on port = %d",evntNum,selfPortNum);\
+		}\
+		Client.rpc_server_disconnect();\
+	}\
+} while (0)
+
+#define SUBSCRIBE_EVENT(cltToken,evntNum,ip,myPort,srvToken)\
+do			\
+{			\
+	ADJsonRpcClient Client;\
+	if(Client.rpc_server_connect(ip,cltToken)!=0)\
+	{\
+		LOG_DEBUG_MSG_1_ARG(true,"BRBOX:SubscribeEvent","Unable connect on port = %d",cltToken);\
+	}\
+	else\
+	{\
+		if(Client.set_three_int_get_one_int((char*)RPCMGR_RPC_EVENT_SUBSCRIBE,\
+					     (char*)RPCMGR_RPC_EVENT_ARG_CLTTOK,cltToken,\
+					     (char*)RPCMGR_RPC_EVENT_ARG_PORT,myPort,\
+					     (char*)RPCMGR_RPC_EVENT_ARG_EVENTNUM,evntNum,\
+					     (char*)RPCMGR_RPC_EVENT_ARG_SRVTOK,&srvToken)!=RPC_SRV_RESULT_SUCCESS)\
+		{\
+			LOG_DEBUG_MSG_2_ARG(true,"BRBOX:SubscribeEvent","Unable subscribe event = %d on port = %d",evntNum,cltToken);\
 		}\
 		Client.rpc_server_disconnect();\
 	}\
