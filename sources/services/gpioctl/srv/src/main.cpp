@@ -6,11 +6,11 @@
 #include "MyCmdline.h"
 #include "SrcControlVersion.h"
 #include "ADTimer.hpp"
+#include "ADEvntNotifier.hpp"
 
 /* ------------------------------------------------------------------------- */
 #include "GpioctlJsonDef.h"
 #include "GpioCtrlRpc.h"
-#define SERVER_JSON_PORT_NUM GPIOCTL_JSON_PORT_NUMBER
 /* ------------------------------------------------------------------------- */
 using namespace std;
 int main(int argc, const char* argv[])
@@ -33,7 +33,9 @@ int main(int argc, const char* argv[])
 	ADTimer AppTimer(100,CmdLine.get_port_number());//only one instance per application(or process) must exist
 	//create a common data Cache of the service
 	GPIOCTL_CMN_DATA_CACHE DataCache;
+	ADEvntNotifier EventNotifier;//global event notification object
 	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
+	DataCache.pEventNotifier=(void*)&EventNotifier;
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler

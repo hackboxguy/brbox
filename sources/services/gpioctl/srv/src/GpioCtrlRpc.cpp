@@ -1,5 +1,6 @@
 #include "GpioCtrlRpc.h"
 #include "RaspiIo.h"
+#include "ADEvntNotifier.hpp"//for eventing
 /* ------------------------------------------------------------------------- */
 GpioCtrlRpc:: GpioCtrlRpc(std::string rpcName,int myIndex,bool emu, bool log,GPIOCTL_CMN_DATA_CACHE *pData):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
 {
@@ -114,9 +115,22 @@ int GpioCtrlRpc::process_gpio_set(JsonDataCommObj* pReq)
 		return 0;
 	}
 	RaspiIo Raspi;
-	pPanelReq->result=Raspi.WriteGPIO(pPacket->addr,pPacket->data);
+	if(get_emulation_flag())
+		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;//dummy write to memory
+	else
+		pPanelReq->result=Raspi.WriteGPIO(pPacket->addr,pPacket->data);
 	if(pPanelReq->result==RPC_SRV_RESULT_SUCCESS)
+	{
 		pDataCache->gpio_data[pPacket->addr]=pPacket->data;//store last set gpio value in my local-cache
+		if(pDataCache->gpio_data[pPacket->addr]!=pDataCache->gpio_data_prev[pPacket->addr])
+		{
+			pDataCache->gpio_data_prev[pPacket->addr]=pDataCache->gpio_data[pPacket->addr];
+			//gpio value changed, notify subscribers
+			ADEvntNotifier* pNotifier=(ADEvntNotifier*)pDataCache->pEventNotifier;
+			pNotifier->NotifyEvent(EGPIOCTL_EVENT_TYPE_OUTPUT_CHANGED,pPacket->addr,SERVER_JSON_PORT_NUM);
+			//NOTIFY_EVENT(EGPIOCTL_EVENT_TYPE_OUTPUT_CHANGED,pPacket->addr,SERVER_JSON_PORT_NUM);
+		}
+	}
 	return 0;
 }
 /* ------------------------------------------------------------------------- */

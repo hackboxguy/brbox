@@ -5,13 +5,13 @@ EventHandler:: EventHandler(std::string rpcName,int myIndex,bool emu,bool log,SY
 {
 	srvToken=-1;
 	pDataCache=pData;
-	SUBSCRIBE_EVENT("127.0.0.1",40002,&srvToken,40002,-1,40001);
+	SUBSCRIBE_EVENT("127.0.0.1",40003,&srvToken,40003,-1,40001);
 	std::cout<<"srvToken = "<<srvToken<<endl;
 }
 /* ------------------------------------------------------------------------- */
 EventHandler::~ EventHandler()
 {
-	UNSUBSCRIBE_EVENT("127.0.0.1",40002,srvToken);
+	UNSUBSCRIBE_EVENT("127.0.0.1",40003,srvToken);
 }
 /* ------------------------------------------------------------------------- */
 void EventHandler::ReceiveEvent(int cltToken,int evntNum,int evntArg)

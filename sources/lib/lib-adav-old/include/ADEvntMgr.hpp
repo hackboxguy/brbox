@@ -185,3 +185,6 @@ public:
 //5)subscribe/unsubscribe/notification shall handle listContainer in a multi-thread safe way.
 //include event enum in service header
 //add macro for subscribing events
+//event notifier class in cmnlib for context decoupled notification
+//in main.c, set globalready flag for rpc to start eventing.
+
