@@ -30,6 +30,7 @@ BOARD_TYPE_BTR="baytrail"                 #base-build
 BOARD_TYPE_BTR_MEDIA="baytrail-media"                 #base-build
 BOARD_TYPE_RP1="raspi1"                   #base-build
 BOARD_TYPE_RP1_SMSW="raspi1-smartsw"      #application-build
+BOARD_TYPE_RP1_SMS="raspi1-sms"          #application-build
 BOARD_TYPE_RP1_DSPT="raspi1-disptst"      #application-build
 BOARD_TYPE_RP2="raspi2"                   #base-build
 BOARD_TYPE_BBB="bbb"                      #base-build
@@ -54,6 +55,10 @@ if [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1" ]; then
 	BR_BOARD_LINUX_CONFIG_PATH=board/raspberrypi/
 	BOOT_IMG_SCRIPT=$(pwd)/scripts/raspi-bootdisk.sh
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1_SMSW" ]; then
+	BR_BOARD_CONFIG=raspberrypi_defconfig
+	BR_BOARD_LINUX_CONFIG_PATH=board/raspberrypi/
+	BOOT_IMG_SCRIPT=$(pwd)/scripts/raspi-bootdisk.sh
+elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1_SMS" ]; then
 	BR_BOARD_CONFIG=raspberrypi_defconfig
 	BR_BOARD_LINUX_CONFIG_PATH=board/raspberrypi/
 	BOOT_IMG_SCRIPT=$(pwd)/scripts/raspi-bootdisk.sh
@@ -108,6 +113,9 @@ if [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1" ]; then
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 	ROOTFS_TYPE=$ROOTFS_TYPE_RP1
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1_SMSW" ]; then
+	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
+	ROOTFS_TYPE=$ROOTFS_TYPE_RP1
+elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1_SMS" ]; then
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 	ROOTFS_TYPE=$ROOTFS_TYPE_RP1
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1_DSPT" ]; then
