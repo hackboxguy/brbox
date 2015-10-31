@@ -42,3 +42,8 @@ after ./build-image.sh is complete, you will see following files under /mnt/buil
 6. ```ssh root@ip-of-brbox (use root to login)```
 7. ```brdskmgr -v``` (verify if the version is as per the latest updated brbox)
 
+###Simplified steps to create BrBox based bootable sdcard for RaspberryPi-1 
+1. ```cd /home/user/sandbox/;svn co https://github.com/hackboxguy/brbox;cd brbox/trunk;ln -s /home/user/dl dl;./prepare-buildroot.sh;time ./build-image.sh -o /mnt/buildramdisk -v 00.01 -s my_sudo_pw -b raspi1```
+2. ```sudo sh -c "pv -tpreb /mnt/buildramdisk/00.01/images/bootable-usb-disk.img | dd bs=128k of=/dev/sdX conv=fdatasync"```
+3. Insert the sdcard and boot Raspi and login using root/brb0x
+
