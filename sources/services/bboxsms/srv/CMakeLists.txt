@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
-set(COMPONENT_NAME bboxsmsrv)  #set the name of the binary
+set(COMPONENT_NAME bboxsmsrv)           #server name
+set(STARTUP_SCRIPT BboxsmsStartupScr)   #server startup script
+set(STARTNUM "73" CACHE STRING "73")    #init order number of the service
 set(LIB_ADSTTNG AdSttngs)   #settings library
 set(LIB_ADCOMMN AdCmn)      #common library
 
@@ -11,9 +13,6 @@ set(LIB_ADCOMMN AdCmn)      #common library
 project(${COMPONENT_NAME})
 set(AUTO_SVN_VERSION    ON CACHE BOOL ON)  #by default include svn revision numbers
 set(INSTALL_MY_HEADERS  ON CACHE BOOL ON)  #by default install header files to target-install-directory
-set(STARTUP_SCRIPT BboxsmsStartupScr)         #server startup script
-#set(STARTUP_SCRIPT_ALIAS S72SmartEye)          #todo: automate numbering of startup scripts
-set(STARTNUM "73" CACHE STRING "73")       #init order number of the service
 file(GLOB SOURCES "src/*.cpp")
 add_executable(${COMPONENT_NAME} ${SOURCES})
 set(INC_ADSTTNG  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-settings/include")

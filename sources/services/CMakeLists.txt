@@ -5,6 +5,7 @@ add_subdirectory(sysmgr)
 add_subdirectory(smarteye)
 add_subdirectory(gpioctl)
 add_subdirectory(hotwire)
+add_subdirectory(bboxsms)
 
 
 #for cross compiling
