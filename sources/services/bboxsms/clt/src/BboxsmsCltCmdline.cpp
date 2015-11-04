@@ -11,6 +11,9 @@ BboxsmsCltCmdline::BboxsmsCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--delete=index             [delete an sms of a given index]");
 	CmdlineHelper.insert_options_entry((char*)"gettotal" ,optional_argument,EJSON_BBOXSMS_RPC_SMS_TOTAL_GET);
 	CmdlineHelper.insert_help_entry((char*)"--gettotal                 [check how many sms are available in sim]");
+	CmdlineHelper.insert_options_entry((char*)"getsms" ,optional_argument,EJSON_BBOXSMS_RPC_SMS_GET);
+	CmdlineHelper.insert_help_entry((char*)"--getsms=index             [read the sms of zero based index]");
+
 }
 /*****************************************************************************/
 BboxsmsCltCmdline::~BboxsmsCltCmdline()
@@ -43,6 +46,11 @@ int BboxsmsCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			//SMARTEYE_RPC_DEBUG_OUTFILE_GET,SMARTEYE_RPC_DEBUG_OUTFILE_SET,
 			//(char*)SMARTEYE_RPC_DEBUG_OUTFILE_ARG,sub_arg);
 			break;
+
+		case EJSON_BBOXSMS_RPC_SMS_GET:
+			push_get_indexed_msg_command(sub_arg,(char*)BBOXSMS_RPC_SMS_GET,EJSON_BBOXSMS_RPC_SMS_GET,
+						     (char*)BBOXSMS_RPC_SMS_ARG_INDX,(char*)BBOXSMS_RPC_SMS_ARG_MSG);
+			break;
 		default:
 			return 0;
 			break;	
@@ -54,6 +62,9 @@ int BboxsmsCltCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient 
 {
 	switch(pCmdObj->command)
 	{
+		case EJSON_BBOXSMS_RPC_SMS_GET:
+			run_get_indexed_msg_command(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
+			break;
 		default:return -1;
 			break;
 	}
@@ -81,4 +92,55 @@ int BboxsmsCltCmdline::parse_cmdline_arguments(int argc, char **argv)
 	return CmdlineHelper.parse_cmdline_arguments(argc,argv);
 }
 /*****************************************************************************/
+int BboxsmsCltCmdline::push_get_indexed_msg_command(char* subarg,char* rpc_name,int rpc_index,char* arg_name,char* result_name)
+{
+	CmdExecutionObj *pCmdObj=NULL;
+	OBJECT_MEM_NEW(pCmdObj,CmdExecutionObj);
+	if(pCmdObj==NULL)
+	{
+		printf("failed create pCmdObj!!!\n");
+		return -1;
+	}
+	strcpy(pCmdObj->get_rpc_name,rpc_name);
+	if(CmdlineHelper.get_next_subargument(&subarg)==0)//user must specify index number
+	{
+		OBJ_MEM_DELETE(pCmdObj);
+		printf("please specify correct msg index number\n");
+		return -1;
+	}
+	else 
+	{
+			strcpy(pCmdObj->first_arg_param_name,arg_name);
+			//strcpy(pCmdObj->first_arg_param_value,subarg);
+			pCmdObj->first_arg_param_int_value=atoi(subarg);
+			strcpy(pCmdObj->second_arg_param_name,result_name);
+			pCmdObj->command=rpc_index;
+			pCmdObj->action=RPC_SRV_ACT_READ;
+	}
+	pCmdObj->cmd_type=CLIENT_CMD_TYPE_USER_DEFINED;
+	//put the request into chain
+	if(CmdlineHelper.CmdChain.chain_put((void *)pCmdObj)!=0)
+	{
+		printf("push_get_indexed_msg_command: failed! unable to push json-req-task-obj to chain!\n");
+		OBJ_MEM_DELETE(pCmdObj);
+		return -1;
+	}
+	return 0;
+}
+int BboxsmsCltCmdline::run_get_indexed_msg_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker)
+{
+	ADThreadedSockClient *pOrig = (ADThreadedSockClient*)pWorker;
+	if(pCmdObj->action == RPC_SRV_ACT_READ)
+	{
+	//following command has different name for req_arg and for resp_arg.
+	pCmdObj->result=pSrvSockConn->get_int_type_with_string_para(pCmdObj->get_rpc_name,pCmdObj->first_arg_param_name,pCmdObj->first_arg_param_int_value,pCmdObj->second_arg_param_value,pCmdObj->second_arg_param_name);
+	pOrig->log_print_message(pSrvSockConn,pCmdObj->get_rpc_name,RPC_SRV_ACT_READ,pCmdObj->result,pOutMsgList,pCmdObj->second_arg_param_value);
+	}
+	else
+	{
+		pOrig->my_log_print_message(pSrvSockConn,(char*)"run_get_indexed_msg_command",RPC_SRV_ACT_UNKNOWN,(char*)CLIENT_CMD_RESULT_INVALID_ACT,pOutMsgList);
+		return -1;
+	}
+	return 0;
+}
 

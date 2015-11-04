@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "BboxsmsJsonDef.h"
-//#include "SmarteyeRpc.h"
+#include "SmsRpc.h"
 #include "ADJsonRpcMgr.hpp"
 #include "MyCmdline.h"
 #include "SrcControlVersion.h"
@@ -35,13 +35,17 @@ int main(int argc, const char* argv[])
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 
-	//SmarteyeRpc PatternGet(SMARTEYE_RPC_ID_PATTERN_CHECK ,EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN ,emulat,dbglog,&DataCache);
-	//SmarteyeRpc DbgFileGet(SMARTEYE_RPC_DEBUG_OUTFILE_GET,EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET,emulat,dbglog,&DataCache);
-	//SmarteyeRpc DbgFileSet(SMARTEYE_RPC_DEBUG_OUTFILE_SET,EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_SET,emulat,dbglog,&DataCache);
+	SmsRpc DeletAll(BBOXSMS_RPC_SMS_DELETE_ALL,EJSON_BBOXSMS_RPC_SMS_DELETE_ALL,emulat,dbglog,&DataCache);
+	SmsRpc Delete  (BBOXSMS_RPC_SMS_DELETE    ,EJSON_BBOXSMS_RPC_SMS_DELETE    ,emulat,dbglog,&DataCache);
+	SmsRpc TotalGet(BBOXSMS_RPC_SMS_TOTAL_GET ,EJSON_BBOXSMS_RPC_SMS_TOTAL_GET ,emulat,dbglog,&DataCache);
+	SmsRpc SmsGet  (BBOXSMS_RPC_SMS_GET       ,EJSON_BBOXSMS_RPC_SMS_GET       ,emulat,dbglog,&DataCache);
+	SmsRpc SmsSend (BBOXSMS_RPC_SMS_SEND      ,EJSON_BBOXSMS_RPC_SMS_SEND      ,emulat,dbglog,&DataCache);
 
-	//RpcMgr.AttachRpc(&PatternGet);
-	//RpcMgr.AttachRpc(&DbgFileGet);
-	//RpcMgr.AttachRpc(&DbgFileSet);
+	RpcMgr.AttachRpc(&DeletAll);
+	RpcMgr.AttachRpc(&Delete);
+	RpcMgr.AttachRpc(&TotalGet);
+	RpcMgr.AttachRpc(&SmsGet);
+	RpcMgr.AttachRpc(&SmsSend);
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr

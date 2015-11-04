@@ -385,6 +385,8 @@ public:
 
 	int prepare_json_request(char* method,int ID,char* name1,int value1,char* name2, int value2,char* name3, int value3,char* result);
 
+	RPC_SRV_RESULT get_int_type_with_string_para(char* method_name,char* str_para_name,int str_para_value,char* result_string,char* res_para_name);
+
 };
 
 #endif

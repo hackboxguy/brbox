@@ -2772,6 +2772,27 @@ RPC_SRV_RESULT ADJsonRpcClient::get_string_type_with_string_para(char* method_na
 	}	
 	return convert_string_to_server_result(return_string);
 }
+/*****************************************************************************/
+RPC_SRV_RESULT ADJsonRpcClient::get_int_type_with_string_para(char* method_name,char* str_para_name,int str_para_value,char* result_string,char* res_para_name)
+{
+	char return_string[255];
+	//-->{ "jsonrpc": "2.0", "method": "get_log_msg", "params": { "index": 0 }, "id": 11 }
+	prepare_json_request(method_name,req_id++,send_buffer,str_para_name,str_para_value);
+	ClientSocket.send_data(send_buffer);
+	ClientSocket.receive_data_blocking(recv_buffer,sizeof(recv_buffer),4000);//4sec timeout
+	sprintf(result_string,"unknown");
+	if(res_para_name!=NULL)//return string param name is different
+	{
+		if(find_json_result_and_single_string_param(recv_buffer,(char*)RPC_NAME_ARG_RESULT_PARAM,return_string,res_para_name,result_string)!=0)
+			return RPC_SRV_RESULT_UNKNOWN;
+	}
+	else
+	{
+		if(find_json_result_and_single_string_param(recv_buffer,(char*)RPC_NAME_ARG_RESULT_PARAM,return_string,str_para_name,result_string)!=0)
+			return RPC_SRV_RESULT_UNKNOWN;
+	}	
+	return convert_string_to_server_result(return_string);
+}
 
 //get/set just the string type with extra device_address(for uart use case) parameter
 

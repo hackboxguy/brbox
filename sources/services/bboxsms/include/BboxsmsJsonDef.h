@@ -22,12 +22,15 @@ typedef enum EJSON_BBOXSMS_RPC_TYPES_T
 #define BBOXSMS_RPC_SMS_DELETE        "delete_sms"
 #define BBOXSMS_RPC_SMS_TOTAL_GET     "get_total_sms"
 #define BBOXSMS_RPC_SMS_GET           "get_sms"
+#define BBOXSMS_RPC_SMS_ARG_INDX      "index"
+#define BBOXSMS_RPC_SMS_ARG_MSG       "message"
+
 #define BBOXSMS_RPC_SMS_SEND          "send_sms"
 typedef struct BBOXSMS_SMS_PACKET_T
 {
 	int total_sms;
 	int index;
-	char sms[512];
+	char sms[1024];
 }BBOXSMS_SMS_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
