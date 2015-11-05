@@ -9,6 +9,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 using namespace std;
+#define MODEM_DEV_NODE "/dev/ttyUSB0"
+#define MODEM_AT_CONN  "at19200"
+
 typedef enum SMS_ACCESS_TYPE_T
 {
 	SMS_ACCESS_UPDATE_LIST = 0,
@@ -53,7 +56,7 @@ public:
 	RPC_SRV_RESULT GetTotalSms(int *total);
 	int DetectSmsDevice();
 	int ReadSms(int indx);
-
+	int DeleteAllSMS(int foldernum);
 };
 #endif
 

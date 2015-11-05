@@ -97,7 +97,7 @@ int SmsMgr::DetectSmsDevice()
 {
 	GsmDevDetected=false;
 	GSM_StateMachine *s;
-	INI_Section *cfg;
+	//INI_Section *cfg;
 	GSM_Error error;
 	char buffer[100];
 
@@ -131,17 +131,26 @@ int SmsMgr::DetectSmsDevice()
 	 * Find configuration file (first command line parameter or
 	 * defaults)
 	 */
-	error = GSM_FindGammuRC(&cfg,NULL);// argc == 2 ? argv[1] : NULL);
-	if(error_handler(s,error)!=0)
-		return -1;
+//	error = GSM_FindGammuRC(&cfg,NULL);// argc == 2 ? argv[1] : NULL);
+//	if(error_handler(s,error)!=0)
+//		return -1;
 
 	/* Read it */
-	error = GSM_ReadConfig(cfg, GSM_GetConfig(s, 0), 0);
-	if(error_handler(s,error)!=0)
-		return -1;
+//	error = GSM_ReadConfig(cfg, GSM_GetConfig(s, 0), 0);
+//	if(error_handler(s,error)!=0)
+//		return -1;
 	/* Free config file structures */
-	INI_Free(cfg);
-
+//	INI_Free(cfg);
+	
+	//following lines are used when /home/user/.gammurc is not available
+	GSM_Config *cfg;
+	cfg = GSM_GetConfig(s, 0);
+	free(cfg->Device);
+	cfg->Device     = strdup(MODEM_DEV_NODE);//argv[1]);
+	free(cfg->Connection);
+	cfg->Connection = strdup(MODEM_AT_CONN);//argv[2]);
+	cfg->SyncTime   = TRUE;
+	//strcpy(cfg->Model, argv[3]);
 	/* We have one valid configuration */
 	GSM_SetConfigNum(s, 1);
 
@@ -181,7 +190,7 @@ int SmsMgr::DetectSmsDevice()
 	GSM_FreeStateMachine(s);
 
 	GsmDevDetected=true;//device detection is success
-	cout<<"DevManf : "<<GsmDevManf<<" Model : "<<GsmDevModel<<endl;
+	//cout<<"DevManf : "<<GsmDevManf<<" Model : "<<GsmDevModel<<endl;
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
@@ -191,7 +200,7 @@ int SmsMgr::ReadSms(int indx)
 	std::vector<MsgEntry> myList;
 
 	GSM_StateMachine *s;
-	INI_Section *cfg;
+	//INI_Section *cfg;
 	GSM_Error error;
 
 	GSM_Debug_Info *debug_info;
@@ -233,18 +242,23 @@ int SmsMgr::ReadSms(int indx)
 	 * Find configuration file (first command line parameter or
 	 * defaults)
 	 */
-	error = GSM_FindGammuRC(&cfg, NULL);//argc == 2 ? argv[1] : NULL);
-	if(error_handler(s,error)!=0)
-		return -1;
-
+//	error = GSM_FindGammuRC(&cfg, NULL);//argc == 2 ? argv[1] : NULL);
+//	if(error_handler(s,error)!=0)
+//		return -1;
 	/* Read it */
-	error = GSM_ReadConfig(cfg, GSM_GetConfig(s, 0), 0);
-	if(error_handler(s,error)!=0)
-		return -1;
-
+//	error = GSM_ReadConfig(cfg, GSM_GetConfig(s, 0), 0);
+//	if(error_handler(s,error)!=0)
+//		return -1;
 	/* Free config file structures */
-	INI_Free(cfg);
+//	INI_Free(cfg);
 
+	GSM_Config *cfg;
+	cfg = GSM_GetConfig(s, 0);
+	free(cfg->Device);
+	cfg->Device     = strdup(MODEM_DEV_NODE);//argv[1]);
+	free(cfg->Connection);
+	cfg->Connection = strdup(MODEM_AT_CONN);//argv[2]);
+	cfg->SyncTime   = TRUE;
 	/* We have one valid configuration */
 	GSM_SetConfigNum(s, 1);
 
@@ -312,11 +326,111 @@ int SmsMgr::ReadSms(int indx)
 	GetOrUpdateTotal(SMS_ACCESS_UPDATE_LIST,dummyTotal,0,msg,frm,myList);
 	return total_messages;//0;
 }
+int SmsMgr::DeleteAllSMS(int foldernum)
+//void DeleteAllSMS(int foldernum) //int argc, char *argv[])
+{
+	GSM_StateMachine *gsm;
 
+	GSM_MultiSMSMessage 	sms;
+	GSM_SMSFolders		folders;
+	//int			foldernum;
+	gboolean		start = TRUE;
+	GSM_Error error;
+
+	//GSM_Init(TRUE);
+	GSM_InitLocales(NULL);
+	/* disable global debugging to stderr */
+	//debug_info = GSM_GetGlobalDebug();
+	//GSM_SetDebugFileDescriptor(stderr, FALSE, debug_info);
+	//GSM_SetDebugLevel("textall", debug_info);
+	/* Allocates state machine */
+	gsm = GSM_AllocStateMachine();
+	if (gsm == NULL)
+		return -1;//3;
+
+	GSM_Config *cfg;
+	cfg = GSM_GetConfig(gsm, 0);
+	free(cfg->Device);
+	cfg->Device     = strdup(MODEM_DEV_NODE);//argv[1]);
+	free(cfg->Connection);
+	cfg->Connection = strdup(MODEM_AT_CONN);//argv[2]);
+	cfg->SyncTime   = TRUE;
+	/* We have one valid configuration */
+	GSM_SetConfigNum(gsm, 1);
+	/* Connect to phone */
+	/* 1 means number of replies you want to wait for */
+	error = GSM_InitConnection(gsm, 1);
+	if(error_handler(gsm,error)!=0)
+		return -1;
+
+
+
+	error=GSM_GetSMSFolders(gsm, &folders);
+	//Print_Error(error);
+
+	//GetStartStop(&foldernum, NULL, 2, argc, argv);
+
+	if (foldernum > folders.Number) 
+	{
+		//printf(_("Too high folder number (max. %i)\n"),folders.Number);
+		//fflush(stdout);
+		//GSM_Terminate();
+		//Terminate(2);
+		error = GSM_TerminateConnection(gsm);
+		if(error_handler(gsm,error)!=0)
+			return -1;
+		GSM_FreeStateMachine(gsm);
+		return -1;
+	}
+
+	//printf(_("Deleting SMS from \"%s\" folder: "),DecodeUnicodeConsole(folders.Folder[foldernum-1].Name));
+	//fflush(stdout);
+
+	while (error == ERR_NONE) 
+	{
+		sms.SMS[0].Folder=0x00;
+		error=GSM_GetNextSMS(gsm, &sms, start);
+		switch (error)
+		{
+			case ERR_EMPTY:
+				break;
+			case ERR_CORRUPTED:
+				//printf(stderr, "\n%s\n", _("Corrupted message, skipping"));
+				error = ERR_NONE;
+				continue;
+			default:
+				//Print_Error(error);
+				if (sms.SMS[0].Folder == foldernum) 
+				{
+					sms.SMS[0].Folder=0x00;
+					error=GSM_DeleteSMS(gsm, &sms.SMS[0]);
+					//Print_Error(error);
+					//printf("*");
+				}
+		}
+		start=FALSE;
+	}
+	//printf("\n");
+	//fflush(stdout);
+	//GSM_Terminate();
+
+	/* Terminate connection */
+	error = GSM_TerminateConnection(gsm);
+	if(error_handler(gsm,error)!=0)
+		return -1;
+
+	/* Free up used memory */
+	GSM_FreeStateMachine(gsm);
+	return 0;
+
+}
 //todo:
 //1)dont use /home/user/gammu.rc file, instead user your own file 
 //2)add sms-update-list rpc
 //3)add sms-delete rpc
+//4)get sms shall return msg + from (two strings)
+//5)add get-latest-sms rpc
+
 /*
 http://wammu.eu/docs/manual/c/examples.html
 

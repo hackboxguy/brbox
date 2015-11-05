@@ -1,10 +1,12 @@
 #include "BboxsmsCltCmdline.h"
-
+#include "ADJsonRpcMgr.hpp"
 using namespace std;
 /*****************************************************************************/
 BboxsmsCltCmdline::BboxsmsCltCmdline()
 {
 	CmdlineHelper.attach_helper(this);
+	CmdlineHelper.insert_options_entry((char*)"asynctasksts" ,optional_argument,EJSON_BBOXSMS_RPC_GET_ASYNCTASK);
+	CmdlineHelper.insert_help_entry((char*)"--asynctasksts             [read async-task-in-progress if any]");
 	CmdlineHelper.insert_options_entry((char*)"deleteall" ,optional_argument,EJSON_BBOXSMS_RPC_SMS_DELETE_ALL);
 	CmdlineHelper.insert_help_entry((char*)"--deleteall                [delete all sms]");
 	CmdlineHelper.insert_options_entry((char*)"delete" ,optional_argument,EJSON_BBOXSMS_RPC_SMS_DELETE);
@@ -13,7 +15,10 @@ BboxsmsCltCmdline::BboxsmsCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--gettotal                 [check how many sms are available in sim]");
 	CmdlineHelper.insert_options_entry((char*)"getsms" ,optional_argument,EJSON_BBOXSMS_RPC_SMS_GET);
 	CmdlineHelper.insert_help_entry((char*)"--getsms=index             [read the sms of zero based index]");
-
+	CmdlineHelper.insert_options_entry((char*)"updatelist" ,optional_argument,EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE);
+	CmdlineHelper.insert_help_entry((char*)"--updatelist               [check for any new messages and update sms inbox ]");
+	CmdlineHelper.insert_options_entry((char*)"devident" ,optional_argument,EJSON_BBOXSMS_RPC_SMS_IDENTIFY_DEV);
+	CmdlineHelper.insert_help_entry((char*)"--devident                 [identify if sms modem is accessible]");
 }
 /*****************************************************************************/
 BboxsmsCltCmdline::~BboxsmsCltCmdline()
@@ -26,15 +31,18 @@ int BboxsmsCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 	EJSON_BBOXSMS_RPC_TYPES command =(EJSON_BBOXSMS_RPC_TYPES)arg;
 	switch(command)
 	{
+		case EJSON_BBOXSMS_RPC_GET_ASYNCTASK:
+			{
+			const char *table[]   = BBOXSMS_RPC_ASYNCTASK_ARG_TABL;
+			CmdlineHelper.push_single_enum_get_set_command( EJSON_BBOXSMS_RPC_GET_ASYNCTASK,
+			EJSON_BBOXSMS_RPC_GET_ASYNCTASK,BBOXSMS_RPC_ASYNCTASK_GET,
+			BBOXSMS_RPC_ASYNCTASK_GET,&table[0],BBOXSMS_ASYNCTASK_UNKNOWN,
+			(char*)BBOXSMS_RPC_ASYNCTASK_ARG,sub_arg);
+			}
+			break;
 		case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL:
-			//{
-			//const char *table[]   = SMARTEYE_RPC_ID_PATTERN_CHECK_ARG_TABL;
-			//CmdlineHelper.push_single_enum_get_set_command(
-			//				EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN,EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN,
-			//				SMARTEYE_RPC_ID_PATTERN_CHECK,SMARTEYE_RPC_ID_PATTERN_CHECK,
-			//				&table[0],EJSON_SMARTEYE_IDPATTERN_UNKNOWN,
-			//				(char*)SMARTEYE_RPC_ID_PATTERN_CHECK_ARG,sub_arg);
-			//}
+			CmdlineHelper.push_action_type_noarg_command(EJSON_BBOXSMS_RPC_SMS_DELETE_ALL,
+				(char*)BBOXSMS_RPC_SMS_DELETE_ALL,(char*)RPCMGR_RPC_TASK_STS_ARGID);
 			break;
 		case EJSON_BBOXSMS_RPC_SMS_DELETE:
 			//CmdlineHelper.push_string_get_set_command(EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET,EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_SET,
@@ -48,6 +56,14 @@ int BboxsmsCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 		case EJSON_BBOXSMS_RPC_SMS_GET:
 			push_get_indexed_msg_command(sub_arg,(char*)BBOXSMS_RPC_SMS_GET,EJSON_BBOXSMS_RPC_SMS_GET,
 						     (char*)BBOXSMS_RPC_SMS_ARG_INDX,(char*)BBOXSMS_RPC_SMS_ARG_MSG);
+			break;
+		case EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE:
+			CmdlineHelper.push_action_type_noarg_command(EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE,(char*)BBOXSMS_RPC_SMS_LIST_UPDATE);
+			//no inprogress returned for above command
+			break;
+		case EJSON_BBOXSMS_RPC_SMS_IDENTIFY_DEV:
+			CmdlineHelper.push_action_type_noarg_command(EJSON_BBOXSMS_RPC_SMS_IDENTIFY_DEV,
+				(char*)BBOXSMS_RPC_SMS_IDENTIFY_DEV,(char*)RPCMGR_RPC_TASK_STS_ARGID);
 			break;
 		default:
 			return 0;
