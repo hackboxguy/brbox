@@ -24,7 +24,7 @@ typedef enum EJSON_BBOXSMS_RPC_TYPES_T
 #define BBOXSMS_RPC_SMS_GET           "get_sms"
 #define BBOXSMS_RPC_SMS_ARG_INDX      "index"
 #define BBOXSMS_RPC_SMS_ARG_MSG       "message"
-
+#define BBOXSMS_RPC_SMS_ARG_TOTAL     "msgcount"
 #define BBOXSMS_RPC_SMS_SEND          "send_sms"
 typedef struct BBOXSMS_SMS_PACKET_T
 {
@@ -38,6 +38,7 @@ typedef struct BBOXSMS_CMN_DATA_CACHE_T
 {
 	void *pDevInfo;//device-info-struct(typecast in rpc handlers)
 	std::string StrImgIdDebugFile;//pChar //Char //Int //pInt //Float //Enum
+	void *pSmsMgr;//sms processing object pointer needed by other rpc's
 }BBOXSMS_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */
 

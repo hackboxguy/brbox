@@ -8,6 +8,7 @@
 #include "MyCmdline.h"
 #include "SrcControlVersion.h"
 #include "ADTimer.hpp"
+#include "SmsMgr.h"
 /* ------------------------------------------------------------------------- */
 using namespace std;
 int main(int argc, const char* argv[])
@@ -30,7 +31,9 @@ int main(int argc, const char* argv[])
 	ADTimer AppTimer(100,CmdLine.get_port_number());//only one instance per application(or process) must exist
 	//create a common data Cache of the service
 	BBOXSMS_CMN_DATA_CACHE DataCache;
-	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
+	DataCache.pDevInfo=(void*)&DevInfo   ;//rpc's needs to know board or device type
+	SmsMgr SmsManager;//sms handler
+	DataCache.pSmsMgr =(void*)&SmsManager;//rpc's needs to know the object pointer of sms-handling-object
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler

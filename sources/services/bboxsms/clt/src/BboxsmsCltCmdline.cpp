@@ -42,11 +42,9 @@ int BboxsmsCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			//(char*)SMARTEYE_RPC_DEBUG_OUTFILE_ARG,sub_arg);
 			break;
 		case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET:
-			//CmdlineHelper.push_string_get_set_command(EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET,EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_SET,
-			//SMARTEYE_RPC_DEBUG_OUTFILE_GET,SMARTEYE_RPC_DEBUG_OUTFILE_SET,
-			//(char*)SMARTEYE_RPC_DEBUG_OUTFILE_ARG,sub_arg);
+			CmdlineHelper.push_single_int_get_set_command(EJSON_BBOXSMS_RPC_SMS_TOTAL_GET,EJSON_BBOXSMS_RPC_SMS_TOTAL_GET,
+					BBOXSMS_RPC_SMS_TOTAL_GET,BBOXSMS_RPC_SMS_TOTAL_GET,(char*)BBOXSMS_RPC_SMS_ARG_TOTAL,sub_arg,1);
 			break;
-
 		case EJSON_BBOXSMS_RPC_SMS_GET:
 			push_get_indexed_msg_command(sub_arg,(char*)BBOXSMS_RPC_SMS_GET,EJSON_BBOXSMS_RPC_SMS_GET,
 						     (char*)BBOXSMS_RPC_SMS_ARG_INDX,(char*)BBOXSMS_RPC_SMS_ARG_MSG);

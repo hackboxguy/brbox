@@ -1,4 +1,5 @@
 #include "SmsRpc.h"
+#include "SmsMgr.h"
 /* ------------------------------------------------------------------------- */
 SmsRpc:: SmsRpc(std::string rpcName,int myIndex,bool emu, bool log,BBOXSMS_CMN_DATA_CACHE *pData):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
 {
@@ -16,7 +17,7 @@ int SmsRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 	{
 		case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL:return json_to_bin_delete_all(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_DELETE    :break;
-		case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET :break;
+		case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET :return json_to_bin_get_total_sms(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_GET       :return json_to_bin_get_sms(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_SEND      :break;
 		default:break;
@@ -31,7 +32,7 @@ int SmsRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 	{
 		case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL:return bin_to_json_delete_all(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_DELETE    :break;
-		case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET :break;
+		case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET :return bin_to_json_get_total_sms(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_GET       :return bin_to_json_get_sms(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_SEND      :break;
 		default:break;
@@ -46,7 +47,7 @@ int SmsRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 	{
 		case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL:return process_delete_all(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_DELETE    :break;
-		case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET :break;
+		case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET :return process_get_total_sms(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_GET       :return process_get_sms(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_SEND      :break;
 		default:break;
@@ -105,8 +106,34 @@ int SmsRpc::process_get_sms(JsonDataCommObj* pReq)
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	BBOXSMS_SMS_PACKET* pPacket;
 	pPacket=(BBOXSMS_SMS_PACKET*)pPanelReq->dataRef;
-	strcpy(pPacket->sms,"testmsg1");
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	pPanelReq->result=pMgr->GetSms(pPacket->index,pPacket->sms);	
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int SmsRpc::json_to_bin_get_total_sms(JsonDataCommObj* pReq)
+{
+	BBOXSMS_SMS_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,BBOXSMS_SMS_PACKET,RPC_SRV_ACT_READ,EJSON_BBOXSMS_RPC_SMS_TOTAL_GET);
+	return 0;
+}
+int SmsRpc::bin_to_json_get_total_sms(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_INT(RPC_SRV_REQ,BBOXSMS_SMS_PACKET,BBOXSMS_RPC_SMS_ARG_TOTAL,total_sms);
+	return 0;
+}
+int SmsRpc::process_get_total_sms(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	BBOXSMS_SMS_PACKET* pPacket;
+	pPacket=(BBOXSMS_SMS_PACKET*)pPanelReq->dataRef;
+	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	pPanelReq->result=pMgr->GetTotalSms(&pPacket->total_sms);
+
+	//pPacket->total_sms=pMgr->ReadSms(0);
+	//pPacket->total_sms=pMgr->DetectSmsDevice();
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 	return 0;
 }
 /* ------------------------------------------------------------------------- */

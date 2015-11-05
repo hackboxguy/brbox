@@ -11,6 +11,8 @@ set(LIB_ADCOMMN AdCmn)      #common library
 
 
 project(${COMPONENT_NAME})
+set(CMAKE_CXX_FLAGS "-std=c++11")
+#set(TARGET ${COMPONENT_NAME} PROPERTY CXX_STANDARD 11)
 set(AUTO_SVN_VERSION    ON CACHE BOOL ON)  #by default include svn revision numbers
 set(INSTALL_MY_HEADERS  ON CACHE BOOL ON)  #by default install header files to target-install-directory
 file(GLOB SOURCES "src/*.cpp")
@@ -19,12 +21,12 @@ set(INC_ADSTTNG  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-settings/include"
 set(INC_ADCOMMN  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-adav-old/include")
 set(INC_SRVCOMMN "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 
-find_package( OpenCV REQUIRED ) #core imgproc highgui )
+#find_package( OpenCV REQUIRED ) #core imgproc highgui )
 # Add #include path of all dependent components
 include_directories(${INC_ADSTTNG} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${CMAKE_CURRENT_BINARY_DIR})
 
 # Specify component's dependency.
-target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt)
+target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt Gammu)
 
 #install the binary and server-rpc-headers to CMAKE_INSTALL_PREFIX destination
 file(GLOB  INCFILES "${INC_SRVCOMMN}/*.*")
@@ -50,13 +52,23 @@ else()
 	FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SrcControlVersion.h "#define SRC_CONTROL_VERSION 0001\n")
 endif()
 
-#find_package( OpenCV )
-#if (OPENCV_FOUND)
-#  include_directories(${OPENCV_INCLUDE_DIRS})
-#else()
-#	message( FATAL_ERROR "Error!!! Missing opencv library, try sudo apt-get install libopencv-dev" )
-#endif (OPENCV_FOUND)
+INCLUDE( FindPkgConfig )
+pkg_check_modules( GAMMU gammu )
+if( NOT GAMMU_FOUND )
+	message( FATAL_ERROR "ERROR: could not find gammu development files" )
+endif( NOT GAMMU_FOUND )
+include_directories( ${GAMMU_INCLUDE_DIR} )
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/3rd_party )
+include_directories( ${GAMMU_INCLUDE_DIRS} )
 
+
+#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/")
+#find_package (GAMMU)  #REQUIRED
+#if (GAMMU_FOUND)
+ # include_directories(${GAMMU_INCLUDE_DIRS})
+#else()
+#	message( FATAL_ERROR "Error!!! Missing gammu library, try sudo apt-get install libgammu-dev" )
+#endif (GAMMU_FOUND)
 
 #for cross compiling
 #cmake -H. -BOutput -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain-arm-backup.cmake -DCMAKE_INSTALL_PREFIX=/home/user/tmp/
