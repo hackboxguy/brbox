@@ -83,6 +83,15 @@ RPC_SRV_RESULT ADJsonRpcMgr::run_work(int cmd,unsigned char* pWorkData,ADTaskWor
 					ret_val=RPC_SRV_RESULT_SUCCESS;
 				}
 				break;
+			case EJSON_RPCGMGR_TRIGGER_RUN:
+				{
+					RPCMGR_TASK_STS_PACKET *pPacket;
+					pPacket=(RPCMGR_TASK_STS_PACKET *)pWorkData;
+					//myData->trigger_run();TODO
+					OBJ_MEM_DELETE(pWorkData);
+					ret_val=RPC_SRV_RESULT_SUCCESS;
+				}
+				break;
 			default:
 				break;
 		}
@@ -114,6 +123,7 @@ int ADJsonRpcMgr::Start(int port,int socket_log,int emulation)
 	JMapper.attach_rpc_method(EJSON_RPCGMGR_EVENT_UNSUBSCRIBE      ,(char*)RPCMGR_RPC_EVENT_UNSUBSCRIBE);
 	JMapper.attach_rpc_method(EJSON_RPCGMGR_EVENT_NOTIFY           ,(char*)RPCMGR_RPC_EVENT_NOTIFY);
 	JMapper.attach_rpc_method(EJSON_RPCGMGR_EVENT_PROCESS          ,(char*)RPCMGR_RPC_EVENT_PROCESS);
+	JMapper.attach_rpc_method(EJSON_RPCGMGR_TRIGGER_RUN            ,(char*)RPCMGR_RPC_TRIG_RUN);
 
 	int total = get_total_attached_rpcs();
 	for(int i=0;i<total;i++) 
@@ -231,7 +241,7 @@ int ADJsonRpcMgr::MyMapJsonToBinary(JsonDataCommObj* pReq)
 		case EJSON_RPCGMGR_EVENT_UNSUBSCRIBE      :result=json_to_bin_event_unsubscribe(pReq);break;
 		case EJSON_RPCGMGR_EVENT_NOTIFY           :result=json_to_bin_event_notify(pReq);break;
 		case EJSON_RPCGMGR_EVENT_PROCESS          :result=json_to_bin_event_process(pReq);break;
-
+		case EJSON_RPCGMGR_TRIGGER_RUN            :result=json_to_bin_trigger_run(pReq);break;
 		default:break;
 	}
 	return result;
@@ -258,6 +268,7 @@ int ADJsonRpcMgr::MyMapBinaryToJson(JsonDataCommObj* pReq)
 		case EJSON_RPCGMGR_EVENT_UNSUBSCRIBE      :result=bin_to_json_event_unsubscribe(pReq);break;
 		case EJSON_RPCGMGR_EVENT_NOTIFY           :result=bin_to_json_event_notify(pReq);break;
 		case EJSON_RPCGMGR_EVENT_PROCESS          :result=bin_to_json_event_process(pReq);break;
+		case EJSON_RPCGMGR_TRIGGER_RUN            :result=bin_to_json_trigger_run(pReq);break;
 		default:break;
 	}
 	return result;
@@ -287,6 +298,7 @@ int ADJsonRpcMgr::MyProcessWork(JsonDataCommObj* pReq)
 		case EJSON_RPCGMGR_EVENT_UNSUBSCRIBE      :return process_event_unsubscribe(pPanelReq);break;
 		case EJSON_RPCGMGR_EVENT_NOTIFY           :return process_event_notify(pPanelReq);break;
 		case EJSON_RPCGMGR_EVENT_PROCESS          :return process_event_process(pPanelReq);break;
+		case EJSON_RPCGMGR_TRIGGER_RUN            :return process_trigger_run(pPanelReq);break;
 		default:break;
 	}
 	return -1;
@@ -746,4 +758,33 @@ int ADJsonRpcMgr::bin_to_json_event_process(JsonDataCommObj* pReq)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
+//EJSON_RPCGMGR_TRIGGER_RUN (common rpc for all services)
+int ADJsonRpcMgr::json_to_bin_trigger_run(JsonDataCommObj* pReq)
+{
+	RPCMGR_TASK_STS_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_TASK_STS_PACKET,RPC_SRV_ACT_WRITE,EJSON_RPCGMGR_TRIGGER_RUN);
+	return 0;
+}
+int ADJsonRpcMgr::process_trigger_run(RPC_SRV_REQ* pReq)
+{
+	RPCMGR_TASK_STS_PACKET* pPacket;
+	pPacket=(RPCMGR_TASK_STS_PACKET*)pReq->dataRef;
+	RPCMGR_TASK_STS_PACKET* pWorkData=NULL;
+	OBJECT_MEM_NEW(pWorkData,RPCMGR_TASK_STS_PACKET);//delete this object in run_work() callback function
+	if(AsyncTaskWorker.push_task(EJSON_RPCGMGR_TRIGGER_RUN,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_DELETE)==0)
+		pReq->result=RPC_SRV_RESULT_IN_PROG;
+	else
+	{
+		OBJ_MEM_DELETE(pWorkData);
+		pReq->result=RPC_SRV_RESULT_FAIL;
+	}
+	return 0;
+}
+int ADJsonRpcMgr::bin_to_json_trigger_run(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,RPCMGR_TASK_STS_PACKET,RPCMGR_RPC_TASK_STS_ARGSTS);
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+
 

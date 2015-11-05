@@ -15,11 +15,12 @@ int SmsRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 	EJSON_BBOXSMS_RPC_TYPES command =(EJSON_BBOXSMS_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL:return json_to_bin_delete_all(pReq);
-		case EJSON_BBOXSMS_RPC_SMS_DELETE    :break;
-		case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET :return json_to_bin_get_total_sms(pReq);
-		case EJSON_BBOXSMS_RPC_SMS_GET       :return json_to_bin_get_sms(pReq);
-		case EJSON_BBOXSMS_RPC_SMS_SEND      :break;
+		case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL :return json_to_bin_delete_all(pReq);
+		case EJSON_BBOXSMS_RPC_SMS_DELETE     :break;
+		case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET  :return json_to_bin_get_total_sms(pReq);
+		case EJSON_BBOXSMS_RPC_SMS_GET        :return json_to_bin_get_sms(pReq);
+		case EJSON_BBOXSMS_RPC_SMS_SEND       :break;
+		case EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE:break;
 		default:break;
 	}
 	return -1;//0;
@@ -30,11 +31,12 @@ int SmsRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 	EJSON_BBOXSMS_RPC_TYPES command =(EJSON_BBOXSMS_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL:return bin_to_json_delete_all(pReq);
-		case EJSON_BBOXSMS_RPC_SMS_DELETE    :break;
-		case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET :return bin_to_json_get_total_sms(pReq);
-		case EJSON_BBOXSMS_RPC_SMS_GET       :return bin_to_json_get_sms(pReq);
-		case EJSON_BBOXSMS_RPC_SMS_SEND      :break;
+		case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL :return bin_to_json_delete_all(pReq);
+		case EJSON_BBOXSMS_RPC_SMS_DELETE     :break;
+		case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET  :return bin_to_json_get_total_sms(pReq);
+		case EJSON_BBOXSMS_RPC_SMS_GET        :return bin_to_json_get_sms(pReq);
+		case EJSON_BBOXSMS_RPC_SMS_SEND       :break;
+		case EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE:break;
 		default:break;
 	}
 	return -1;//0;
@@ -45,11 +47,12 @@ int SmsRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 	EJSON_BBOXSMS_RPC_TYPES command =(EJSON_BBOXSMS_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL:return process_delete_all(pReq);
-		case EJSON_BBOXSMS_RPC_SMS_DELETE    :break;
-		case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET :return process_get_total_sms(pReq);
-		case EJSON_BBOXSMS_RPC_SMS_GET       :return process_get_sms(pReq);
-		case EJSON_BBOXSMS_RPC_SMS_SEND      :break;
+		case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL :return process_delete_all(pReq);
+		case EJSON_BBOXSMS_RPC_SMS_DELETE     :break;
+		case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET  :return process_get_total_sms(pReq);
+		case EJSON_BBOXSMS_RPC_SMS_GET        :return process_get_sms(pReq);
+		case EJSON_BBOXSMS_RPC_SMS_SEND       :break;
+		case EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE:break;
 		default:break;
 	}
 	return 0;
@@ -57,6 +60,17 @@ int SmsRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 /* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT SmsRpc::ProcessWorkAsync(int index,unsigned char* pWorkData)
 {
+	EJSON_BBOXSMS_RPC_TYPES command =(EJSON_BBOXSMS_RPC_TYPES)index;
+	switch(command)
+	{
+		case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL :break;//return process_delete_all(pReq);
+		case EJSON_BBOXSMS_RPC_SMS_DELETE     :break;
+		case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET  :break;//return process_get_total_sms(pReq);
+		case EJSON_BBOXSMS_RPC_SMS_GET        :break;//return process_get_sms(pReq);
+		case EJSON_BBOXSMS_RPC_SMS_SEND       :break;
+		case EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE:break;
+		default:break;
+	}
 	RPC_SRV_RESULT ret_val=RPC_SRV_RESULT_FAIL;
 	return ret_val;
 }

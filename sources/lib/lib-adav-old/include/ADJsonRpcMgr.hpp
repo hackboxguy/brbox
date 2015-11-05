@@ -34,6 +34,7 @@ typedef enum EJSON_RPCGMGR_CMD_T
 	EJSON_RPCGMGR_EVENT_UNSUBSCRIBE=12,  //unsubscribe the event notification from service(ident is required to unsubscribe)
 	EJSON_RPCGMGR_EVENT_NOTIFY=13,       //event notification; for self use within service as local-host rpc client caller
 	EJSON_RPCGMGR_EVENT_PROCESS=14,      //event reception and processing from other service
+	EJSON_RPCGMGR_TRIGGER_RUN=15,        //call this rpc to let the server start full function including subscribing to event..etc
 	EJSON_RPCGMGR_CMD_END,
 	EJSON_RPCGMGR_CMD_NONE
 }EJSON_RPCGMGR_CMD;
@@ -147,7 +148,9 @@ typedef struct RPCMGR_EVENT_PACKET_T
 	char ip[512];
 	int eventArg; //extra optional argument passed with eventNum(ex: sending inProg id)
 }RPCMGR_EVENT_PACKET;
-
+/* ------------------------------------------------------------------------- */
+//EJSON_RPCGMGR_TRIGGER_RUN
+#define RPCMGR_RPC_TRIG_RUN            "run_now"
 /* ------------------------------------------------------------------------- */
 //to understand this, read C++ subject observer pattern
 class ADJsonRpcMgrProducer; //subject
@@ -451,6 +454,11 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	int json_to_bin_event_process(JsonDataCommObj* pReq);
 	int process_event_process(RPC_SRV_REQ* pReq);
 	int bin_to_json_event_process(JsonDataCommObj* pReq);
+
+	//EJSON_RPCGMGR_TRIGGER_RUN
+	int json_to_bin_trigger_run(JsonDataCommObj* pReq);
+	int process_trigger_run(RPC_SRV_REQ* pReq);
+	int bin_to_json_trigger_run(JsonDataCommObj* pReq);
 
 public:
 	ADJsonRpcMgr(int ver,bool debuglog=false,ADCMN_DEV_INFO* pDev=NULL);
