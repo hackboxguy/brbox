@@ -10,6 +10,8 @@ SmarteyeCltCmdline::SmarteyeCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--imgcheck=imgtype         [checks captured image against<ident/red/green/blue/white>]");
 	CmdlineHelper.insert_options_entry((char*)"debugimgfile" ,optional_argument,EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET);
 	CmdlineHelper.insert_help_entry((char*)"--debugimgfile=filepath    [read/write debug image file path]");
+	CmdlineHelper.insert_options_entry((char*)"capturejpg" ,optional_argument,EJSON_SMARTEYE_RPC_CAPTURE_JPG_IMG);
+	CmdlineHelper.insert_help_entry((char*)"--capturejpg=filepath      [capture camera frame and save it to filepath]");
 }
 /*****************************************************************************/
 SmarteyeCltCmdline::~SmarteyeCltCmdline()
@@ -36,6 +38,9 @@ int SmarteyeCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			CmdlineHelper.push_string_get_set_command(EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET,EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_SET,
 			SMARTEYE_RPC_DEBUG_OUTFILE_GET,SMARTEYE_RPC_DEBUG_OUTFILE_SET,
 			(char*)SMARTEYE_RPC_DEBUG_OUTFILE_ARG,sub_arg);
+			break;
+		case EJSON_SMARTEYE_RPC_CAPTURE_JPG_IMG:
+			CmdlineHelper.push_action_type_noarg_command(EJSON_SMARTEYE_RPC_CAPTURE_JPG_IMG,(char*)SMARTEYE_RPC_CAPTURE_JPG_IMG);
 			break;
 		default:
 			return 0;

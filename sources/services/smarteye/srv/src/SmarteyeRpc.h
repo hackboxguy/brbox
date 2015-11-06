@@ -28,6 +28,9 @@ public:
 	int bin_to_json_set_debug_outfile(JsonDataCommObj* pReq);
 	int process_set_debug_outfile(JsonDataCommObj* pReq);
 
+	int json_to_bin_capture_jpg_img(JsonDataCommObj* pReq);
+	int bin_to_json_capture_jpg_img(JsonDataCommObj* pReq);
+	int process_capture_jpg_img(JsonDataCommObj* pReq);
 };
 /* ------------------------------------------------------------------------- */
 

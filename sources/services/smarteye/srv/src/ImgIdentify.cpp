@@ -261,4 +261,16 @@ RPC_SRV_RESULT ImgIdentify::IdentifyPattern(EJSON_SMARTEYE_IFACE_TYPE pattern,st
 	return RPC_SRV_RESULT_FAIL;
 }
 /*---------------------------------------------------------------------------*/
+RPC_SRV_RESULT ImgIdentify::capture_jpg_image(std::string imgPath)
+{
+	Mat image;
+	RPC_SRV_RESULT res;
+	//capture image
+	res=capture_camera_image(0,1920,1080,image);
+	if(res!=RPC_SRV_RESULT_SUCCESS)
+		return res;
+	imwrite(imgPath,image);
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/*---------------------------------------------------------------------------*/
 
