@@ -36,7 +36,10 @@ done
 [ "$OUTPUT_DISK" = 0 ] && OUTPUT_DISK=$BR_OUTPUT_FOLDER/images/bootable-usb-disk.img
 
 BINARIES_DIR=$BR_OUTPUT_FOLDER/images
-#RPI_FMW_DIR=$BINARIES_DIR/rpi-firmware
+BBB_FMW_FL1=$BINARIES_DIR/MLO
+BBB_FMW_FL2=$BINARIES_DIR/u-boot.img
+BBB_FMW_FL3=$BINARIES_DIR/uEnv.txt
+BBB_FMW_FL4=$BINARIES_DIR/*.dtb
 BBB_KERNEL=$BINARIES_DIR/zImage
 IMAGENAME=$(mktemp)
 MKIMG_TIMESTAMP=$(date +%Y%m%d%H%M%S)
@@ -44,7 +47,7 @@ ROOTFS="$BINARIES_DIR/rootfs.tar.xz"
 BOOTMOUNTPOINT=$(mktemp -d)
 ROOTMOUNTPOINT=$(mktemp -d)
 ROOT2MOUNTPOINT=$(mktemp -d)
-RPI_CMDLINE_FILE=$(pwd)/sources/scripts/raspi2/boot/cmdline.txt #kernel cmdline args file 
+#RPI_CMDLINE_FILE=$(pwd)/sources/scripts/raspi2/boot/cmdline.txt #kernel cmdline args file 
 
 printf "creating image file ..................................... "
     fallocate -l "$IMAGESIZE" "$IMAGENAME" >/dev/null
@@ -99,9 +102,11 @@ printf "Mounting loopdevice root2 partition ..................... "
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "copying boot files - this may take some time ............ "
-    #$SUDO cp $RPI_FMW_DIR/* "$BOOTMOUNTPOINT" 1>/dev/null 2>/dev/null
-    $SUDO cp $BBB_KERNEL "$BOOTMOUNTPOINT"
-    #$SUDO cp $RPI_CMDLINE_FILE "$BOOTMOUNTPOINT"
+    $SUDO cp $BBB_FMW_FL1 "$BOOTMOUNTPOINT"
+    $SUDO cp $BBB_FMW_FL2 "$BOOTMOUNTPOINT"
+    $SUDO cp $BBB_FMW_FL3 "$BOOTMOUNTPOINT"
+    $SUDO cp $BBB_FMW_FL4 "$BOOTMOUNTPOINT"
+    $SUDO cp $BBB_KERNEL  "$BOOTMOUNTPOINT"
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "copying root1 files - this may take some time ........... "
