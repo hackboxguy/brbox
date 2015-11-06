@@ -35,15 +35,17 @@ int main(int argc, const char* argv[])
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 
-	SmarteyeRpc PatternGet (SMARTEYE_RPC_ID_PATTERN_CHECK ,EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN ,emulat,dbglog,&DataCache);
-	SmarteyeRpc DbgFileGet (SMARTEYE_RPC_DEBUG_OUTFILE_GET,EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET,emulat,dbglog,&DataCache);
-	SmarteyeRpc DbgFileSet (SMARTEYE_RPC_DEBUG_OUTFILE_SET,EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_SET,emulat,dbglog,&DataCache);
-	SmarteyeRpc CaptureFile(SMARTEYE_RPC_CAPTURE_JPG_IMG  ,EJSON_SMARTEYE_RPC_CAPTURE_JPG_IMG  ,emulat,dbglog,&DataCache);
+	SmarteyeRpc PatternGet (SMARTEYE_RPC_ID_PATTERN_CHECK      ,EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN ,emulat,dbglog,&DataCache);
+	SmarteyeRpc DbgFileGet (SMARTEYE_RPC_DEBUG_OUTFILE_GET     ,EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET,emulat,dbglog,&DataCache);
+	SmarteyeRpc DbgFileSet (SMARTEYE_RPC_DEBUG_OUTFILE_SET     ,EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_SET,emulat,dbglog,&DataCache);
+	SmarteyeRpc CaptureFile(SMARTEYE_RPC_CAPTURE_JPG_IMG       ,EJSON_SMARTEYE_RPC_CAPTURE_JPG_IMG  ,emulat,dbglog,&DataCache);
+	SmarteyeRpc SetCaptrRes(SMARTEYE_RPC_CAPTURE_RESOLUTION_SET,EJSON_SMARTEYE_RPC_CAPTURE_RESOLUTION_SET,emulat,dbglog,&DataCache);
 
 	RpcMgr.AttachRpc(&PatternGet);
 	RpcMgr.AttachRpc(&DbgFileGet);
 	RpcMgr.AttachRpc(&DbgFileSet);
 	RpcMgr.AttachRpc(&CaptureFile);
+	RpcMgr.AttachRpc(&SetCaptrRes);
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr

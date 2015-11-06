@@ -10,6 +10,7 @@ typedef enum EJSON_SMARTEYE_RPC_TYPES_T
 	EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET,
 	EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_SET,
 	EJSON_SMARTEYE_RPC_CAPTURE_JPG_IMG,
+	EJSON_SMARTEYE_RPC_CAPTURE_RESOLUTION_SET,
 	EJSON_SMARTEYE_RPC_END,
 	EJSON_SMARTEYE_RPC_NONE
 }EJSON_SMARTEYE_RPC_TYPES;
@@ -45,11 +46,30 @@ typedef struct SMARTEYE_DEBUG_OUTFILE_PACKET_T
 	char filepath[512];
 }SMARTEYE_DEBUG_OUTFILE_PACKET;
 /* ------------------------------------------------------------------------- */
+//EJSON_SMARTEYE_RPC_CAPTURE_RESOLUTION_SET
+#define SMARTEYE_RPC_CAPTURE_RESOLUTION_SET       "set_capture_resolution"
+#define SMARTEYE_RPC_CAPTURE_RESOLUTION_ARGH      "pixels"
+#define SMARTEYE_RPC_CAPTURE_RESOLUTION_ARGV      "lines"
+typedef struct SMARTEYE_CAPTURE_RESOLUTION_PACKET_T
+{
+	int pixels;
+	int lines;
+}SMARTEYE_CAPTURE_RESOLUTION_PACKET;
+/* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct SMARTEYE_CMN_DATA_CACHE_T
 {
 	void *pDevInfo;//device-info-struct(typecast in rpc handlers)
 	std::string StrImgIdDebugFile;//pChar //Char //Int //pInt //Float //Enum
+	SMARTEYE_CAPTURE_RESOLUTION_PACKET captureRes;//jpg image capture resolution
+
+	//initialize variables here
+	SMARTEYE_CMN_DATA_CACHE_T()
+	{
+		captureRes.pixels=1920;
+		captureRes.lines=1080;
+	};
+	~ SMARTEYE_CMN_DATA_CACHE_T(){};
 }SMARTEYE_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */
 

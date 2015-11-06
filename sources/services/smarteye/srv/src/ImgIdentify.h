@@ -29,7 +29,7 @@ public:
 	~ ImgIdentify();
 	RPC_SRV_RESULT IdentifyPattern(EJSON_SMARTEYE_IFACE_TYPE pattern,std::string imgPath);
 	RPC_SRV_RESULT identify_color_box(std::string imgPath,EJSON_SMARTEYE_IFACE_TYPE pattern);
-	RPC_SRV_RESULT capture_jpg_image(std::string imgPath);
+	RPC_SRV_RESULT capture_jpg_image(std::string imgPath,int resPix=1920,int resLines=1080);
 };
 /*---------------------------------------------------------------------------*/
 #endif

@@ -12,6 +12,8 @@ SmarteyeCltCmdline::SmarteyeCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--debugimgfile=filepath    [read/write debug image file path]");
 	CmdlineHelper.insert_options_entry((char*)"capturejpg" ,optional_argument,EJSON_SMARTEYE_RPC_CAPTURE_JPG_IMG);
 	CmdlineHelper.insert_help_entry((char*)"--capturejpg=filepath      [capture camera frame and save it to filepath]");
+	CmdlineHelper.insert_options_entry((char*)"captureRes" ,optional_argument,EJSON_SMARTEYE_RPC_CAPTURE_RESOLUTION_SET);
+	CmdlineHelper.insert_help_entry((char*)"--captureRes=pixels,lines  [set jpg image capture resolution]");
 }
 /*****************************************************************************/
 SmarteyeCltCmdline::~SmarteyeCltCmdline()
@@ -41,6 +43,14 @@ int SmarteyeCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			break;
 		case EJSON_SMARTEYE_RPC_CAPTURE_JPG_IMG:
 			CmdlineHelper.push_action_type_noarg_command(EJSON_SMARTEYE_RPC_CAPTURE_JPG_IMG,(char*)SMARTEYE_RPC_CAPTURE_JPG_IMG);
+			break;
+		case EJSON_SMARTEYE_RPC_CAPTURE_RESOLUTION_SET:
+			CmdlineHelper.push_int_get_set_with_dev_addr_arg_command(EJSON_SMARTEYE_RPC_CAPTURE_RESOLUTION_SET,
+						EJSON_SMARTEYE_RPC_CAPTURE_RESOLUTION_SET,
+						SMARTEYE_RPC_CAPTURE_RESOLUTION_SET,
+						SMARTEYE_RPC_CAPTURE_RESOLUTION_SET,
+						(char*)SMARTEYE_RPC_CAPTURE_RESOLUTION_ARGH,
+						(char*)SMARTEYE_RPC_CAPTURE_RESOLUTION_ARGV,-1,sub_arg);
 			break;
 		default:
 			return 0;
