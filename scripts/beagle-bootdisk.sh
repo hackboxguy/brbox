@@ -38,8 +38,9 @@ done
 BINARIES_DIR=$BR_OUTPUT_FOLDER/images
 BBB_FMW_FL1=$BINARIES_DIR/MLO
 BBB_FMW_FL2=$BINARIES_DIR/u-boot.img
-BBB_FMW_FL3=$BINARIES_DIR/uEnv.txt
-BBB_FMW_FL4=$BINARIES_DIR/*.dtb
+BBB_FMW_FL3=$BINARIES_DIR/*.dtb
+#BBB_FMW_FL4=$BINARIES_DIR/uEnv.txt
+BOOT_MARKER_BBB=$(pwd)/sources/scripts/bbb/boot/uEnv.txt #kernel cmdline args file 
 BBB_KERNEL=$BINARIES_DIR/zImage
 IMAGENAME=$(mktemp)
 MKIMG_TIMESTAMP=$(date +%Y%m%d%H%M%S)
@@ -105,7 +106,8 @@ printf "copying boot files - this may take some time ............ "
     $SUDO cp $BBB_FMW_FL1 "$BOOTMOUNTPOINT"
     $SUDO cp $BBB_FMW_FL2 "$BOOTMOUNTPOINT"
     $SUDO cp $BBB_FMW_FL3 "$BOOTMOUNTPOINT"
-    $SUDO cp $BBB_FMW_FL4 "$BOOTMOUNTPOINT"
+    #$SUDO cp $BBB_FMW_FL4 "$BOOTMOUNTPOINT"
+    $SUDO cp $BOOT_MARKER_BBB "$BOOTMOUNTPOINT"
     $SUDO cp $BBB_KERNEL  "$BOOTMOUNTPOINT"
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 

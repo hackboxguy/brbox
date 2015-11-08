@@ -44,7 +44,7 @@ ROOTFS="$BINARIES_DIR/rootfs.tar.xz"
 BOOTMOUNTPOINT=$(mktemp -d)
 ROOTMOUNTPOINT=$(mktemp -d)
 ROOT2MOUNTPOINT=$(mktemp -d)
-RPI_CMDLINE_FILE=$(pwd)/sources/scripts/raspi2/boot/cmdline.txt #kernel cmdline args file 
+BOOT_MARKER_RPI=$(pwd)/sources/scripts/raspi2/boot/cmdline.txt #kernel cmdline args file 
 
 printf "creating image file ..................................... "
     fallocate -l "$IMAGESIZE" "$IMAGENAME" >/dev/null
@@ -101,7 +101,7 @@ printf "Mounting loopdevice root2 partition ..................... "
 printf "copying boot files - this may take some time ............ "
     $SUDO cp $RPI_FMW_DIR/* "$BOOTMOUNTPOINT" 1>/dev/null 2>/dev/null
     $SUDO cp $RPI_KERNEL "$BOOTMOUNTPOINT"
-    $SUDO cp $RPI_CMDLINE_FILE "$BOOTMOUNTPOINT"
+    $SUDO cp $BOOT_MARKER_RPI "$BOOTMOUNTPOINT"
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "copying root1 files - this may take some time ........... "

@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BRBOX_BBB_UPDATE
+	bool "Update Script for beagle-bone-black based target"
+	default n
+	depends on BR2_TARGET_BRBOX_PACKAGES
+	help
+	  provides in-system failsafe upgrade feature for beagle-bone-black based boards.
+
