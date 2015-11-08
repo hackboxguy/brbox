@@ -10,6 +10,7 @@ BD_TYP_RASPI_BPLUS="RASPI_BPLUS"
 BD_TYP_RASPI_B2="RASPI_B2"
 BD_TYP_BAYTRAIL="BAYTRAIL"
 BD_TYP_BAYTRAIL_I210="BAYTRAIL_I210"
+BD_TYP_BBB="BBB"
 BD_TYP_DEFAULT="Unknown"
 ###############################################################################
 ReadRaspiType()
@@ -60,6 +61,12 @@ ReadBaytrailType()
 	return 0
 }
 ###############################################################################
+ReadBBBType()
+{
+	echo $BD_TYP_BBB
+	return 0
+}
+###############################################################################
 #look for raspi
 RESULT=$(cat /proc/cpuinfo | grep "CPU part" )
 if [ $? = "0" ]; then
@@ -78,6 +85,13 @@ if [ $? = "0" ]; then
 	ReadBaytrailType
 	return $?
 fi
+#look for bbb
+RESULT=$(cat /proc/cpuinfo | grep "Hardware" | grep "Generic AM33XX" )
+if [ $? = "0" ]; then
+	ReadBBBType
+	return $?
+fi
+
 echo $BD_TYP_DEFAULT
 return 1
 
