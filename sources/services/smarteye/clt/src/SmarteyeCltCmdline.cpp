@@ -13,7 +13,7 @@ SmarteyeCltCmdline::SmarteyeCltCmdline()
 	CmdlineHelper.insert_options_entry((char*)"capturejpg" ,optional_argument,EJSON_SMARTEYE_RPC_CAPTURE_JPG_IMG);
 	CmdlineHelper.insert_help_entry((char*)"--capturejpg=filepath      [capture camera frame and save it to filepath]");
 	CmdlineHelper.insert_options_entry((char*)"captureRes" ,optional_argument,EJSON_SMARTEYE_RPC_CAPTURE_RESOLUTION_SET);
-	CmdlineHelper.insert_help_entry((char*)"--captureRes=pixels,lines  [set jpg image capture resolution]");
+	CmdlineHelper.insert_help_entry((char*)"--captureRes=lines,pixels  [set jpg image capture resolution]");
 }
 /*****************************************************************************/
 SmarteyeCltCmdline::~SmarteyeCltCmdline()
