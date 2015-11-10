@@ -1,4 +1,5 @@
 mmcroot=/dev/mmcblk0p2 ro
 bootpart=0:1
 bootdir=
+bootfile=zImage
 uenvcmd=run loadimage;run loadramdisk;run findfdt;run loadfdt;run ramboot
