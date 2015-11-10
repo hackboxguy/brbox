@@ -255,8 +255,10 @@ fi
 printf "Copying zImage to $BRBOX_BOOT_PARTITION ........... "
 if [ "$CUR_BOOT" = "$ONE_BRBOX_NAME" ]; then
 	cp $TEMP_MOUNT_POINT/boot/zImage $TEMP_BOOT_MOUNT_POINT/zImage2
+	cp $TEMP_MOUNT_POINT/boot/*.dtb  $TEMP_BOOT_MOUNT_POINT/
 elif [ "$CUR_BOOT" = "$TWO_BRBOX_NAME" ]; then
 	cp $TEMP_MOUNT_POINT/boot/zImage $TEMP_BOOT_MOUNT_POINT/
+	cp $TEMP_MOUNT_POINT/boot/*.dtb  $TEMP_BOOT_MOUNT_POINT/
 else
 	echo "Error: Unknown boot system!!!" 
 	umount $BRBOX_PARTITION
