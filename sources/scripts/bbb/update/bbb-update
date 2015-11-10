@@ -22,6 +22,7 @@ BRBOX_STTNG="BrBoxSttng"  #settings partition
 BRBOX_USRDAT="BrBoxUsrDt" #user-data partition 
 BRBOX_ROOT_RP1="BrBoxRtRp1"    #rootfs
 BRBOX_ROOT_RP2="BrBoxRtRp2"    #rootfs
+BRBOX_ROOT_BBB="BrBoxRtBbb"    #rootfs
 #BOARD_TYPE_RP1="raspi1"
 #BOARD_TYPE_RP2="raspi2"
 BD_TYP_RASPI_A="RASPI_A"
@@ -29,6 +30,7 @@ BD_TYP_RASPI_APLUS="RASPI_APLUS"
 BD_TYP_RASPI_B="RASPI_B"
 BD_TYP_RASPI_BPLUS="RASPI_BPLUS"
 BD_TYP_RASPI_B2="RASPI_B2"
+BD_TYP_BBB="BBB"
 
 DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
 
@@ -106,6 +108,7 @@ ProcessImageType() #$1-inputfile $2=IMGTYPE $3=outputfile
 	[ "$BOARD_TYPE" = "$BD_TYP_RASPI_B"     ]  && BRBOX_ROOT=$BRBOX_ROOT_RP1
 	[ "$BOARD_TYPE" = "$BD_TYP_RASPI_BPLUS" ]  && BRBOX_ROOT=$BRBOX_ROOT_RP1
 	[ "$BOARD_TYPE" = "$BD_TYP_RASPI_B2"    ]  && BRBOX_ROOT=$BRBOX_ROOT_RP2
+	[ "$BOARD_TYPE" = "$BD_TYP_BBB"         ]  && BRBOX_ROOT=$BRBOX_ROOT_BBB
 
 	if [ "$2" = "$BRBOX_ROOT" ]; then
 		dd if=$1 bs=64 skip=1 of=$3 1>/dev/null 2>/dev/null #just strip 64byte mkheader and create rootfs.tar.xz
