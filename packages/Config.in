@@ -41,5 +41,5 @@ source "package/brbox/brbox_bbb_update/Config.in"
 source "package/brbox/brbox_bbb_mount/Config.in"
 source "package/brbox/brbox_gpiomgr/Config.in"
 source "package/brbox/brbox_smarteye/Config.in"
-
+source "package/brbox/brbox_bboxsms/Config.in"
 endmenu

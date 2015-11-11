@@ -1,0 +1,16 @@
+config BR2_PACKAGE_BRBOX_BBOXSMS
+	bool "Bbox-Sms-Service"
+	default n
+	select BR2_PACKAGE_BRBOX_LIBADCMNOLD
+	select BR2_PACKAGE_BRBOX_LIBGAMMU
+	help
+	  sms service for automated handling of gms messages
+
+config BR2_PACKAGE_BRBOX_BBOXSMS_INIT_ORDER
+        string "bboxsms init.d order"
+        default "73"
+        depends on BR2_PACKAGE_BRBOX_BBOXSMS
+        help
+          At which place in the init.d startup this service should be started. Needs to be a 2-digit integer.
+          Will be prefixed by "S" by buildroot, so e.g. "77" becomes "S77"
+
