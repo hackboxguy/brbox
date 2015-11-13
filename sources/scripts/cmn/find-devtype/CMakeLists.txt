@@ -6,6 +6,8 @@ cmake_minimum_required(VERSION 2.8.9)
 #set(BRDS_SCR baytrail-brdskmgr)  #script to be copied to target
 set(FINDDEV_SCR find-devtype)    #script to be copied to target
 set(FINDDEV_STARTUP S01FindDevType)    #/etc/fstab file
+set(SRC_HOSTNAME hostname)          #server startup script
+set(TARGT_HOSTNAME /mnt/settings/hostname)          #server startup script
 
 #project(${COMPONENT_NAME})
 #file(GLOB SOURCES "*.c")
@@ -19,13 +21,9 @@ file(GLOB  STARTUPFILES ${FINDDEV_STARTUP})
 install(PROGRAMS ${SCRIPTFILES} DESTINATION usr/sbin)
 install(PROGRAMS ${STARTUPFILES} DESTINATION etc/init.d)
 
-#if(CMAKE_HOST_UNIX)
-#install(CODE "EXECUTE_PROCESS(WORKING_DIRECTORY \$ENV{TARGET_DIR}\${CMAKE_INSTALL_PREFIX}/sbin COMMAND ln -sf ${BRDS_SCR} ${BRDISKNAME})")
-#install(CODE "EXECUTE_PROCESS(WORKING_DIRECTORY \$ENV{TARGET_DIR}\${CMAKE_INSTALL_PREFIX}/sbin COMMAND ln -sf ${UPDT_SCR} ${UPDATENAME})")
-#endif(CMAKE_HOST_UNIX)
-#install(PROGRAMS ${FSTABFILE} DESTINATION ../etc/init.d/) #copy to /target/usr/../etc/init.d : to be fixed in package file
-#MESSAGE( STATUS "OUTPUT_INSTALL_DIR: " ${CMAKE_INSTALL_PREFIX}/sbin )
-#DESTDIR
+if(CMAKE_HOST_UNIX)
+install(CODE "EXECUTE_PROCESS(WORKING_DIRECTORY \$ENV{TARGET_DIR}\${CMAKE_INSTALL_PREFIX}/etc COMMAND ln -sf ${TARGT_HOSTNAME} ${SRC_HOSTNAME})")
+endif(CMAKE_HOST_UNIX)
 
 #for cross compiling
 #cmake -H. -BOutput -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain-arm-backup.cmake -DCMAKE_INSTALL_PREFIX=/home/user/tmp/
