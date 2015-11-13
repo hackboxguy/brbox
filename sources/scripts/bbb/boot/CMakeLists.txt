@@ -11,7 +11,7 @@ set(MOUNTFILE fstab)    #/etc/init.d/S02MountSettings file
 #endif(CMAKE_HOST_UNIX)
 
 #install(PROGRAMS ${MOUNTFILE} DESTINATION init.d) #copy /etc/fstab file
-install(PROGRAMS ${MOUNTFILE} DESTINATION) #copy /etc/fstab file
+install(PROGRAMS ${MOUNTFILE} DESTINATION etc) #copy /etc/fstab file
 
 #MESSAGE( STATUS "OUTPUT_INSTALL_DIR: " ${CMAKE_INSTALL_PREFIX}/sbin )
 #DESTDIR
