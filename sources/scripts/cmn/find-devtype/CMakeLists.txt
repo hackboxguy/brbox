@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 2.8.9)
 set(FINDDEV_SCR find-devtype)    #script to be copied to target
 set(FINDDEV_STARTUP S01FindDevType)    #/etc/fstab file
 set(SRC_HOSTNAME hostname)          #server startup script
-set(TARGT_HOSTNAME /mnt/settings/hostname)          #server startup script
+set(TARGT_HOSTNAME /mnt/settings/etc/hostname)          #server startup script
 
 #project(${COMPONENT_NAME})
 #file(GLOB SOURCES "*.c")
