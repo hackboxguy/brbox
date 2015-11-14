@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# Start logging
+#
+STTNGS_PARTITION=/dev/mmcblk1p5
+start() {
+	echo -n "Mounting Settings Partition: "
+	mount $STTNGS_PARTITION /mnt/settings	
+	echo "OK"
+}
+
+stop() {
+	echo -n "Unmounting Settings Partition: "
+	umount /mnt/settings
+	echo "OK"
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	stop
+	start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
