@@ -1,4 +1,4 @@
-mmcroot=/dev/mmcblk1p2 ro
+mmcroot=/dev/mmcblk0p2 ro
 bootpart=1:1
 bootdir=
 bootfile=zImage
