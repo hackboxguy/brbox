@@ -1,12 +1,23 @@
 #include "MyCmdline.h"
 using namespace std;
 /*****************************************************************************/
+typedef enum XMPROXY_CMDLINE_OPT_T
+{
+	XMPROXY_CMDLINE_OPT_LOGIN_FILE = 100,
+	XMPROXY_CMDLINE_OPT_UNKNOWN,
+	XMPROXY_CMDLINE_OPT_NONE
+}XMPROXY_CMDLINE_OPT;
+#define XMPROXY_DEFAULT_LOGIN_FILE_PATH "/mnt/settings/etc/xmpp.login"
+/*****************************************************************************/
 MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_str):CmdlineHelper(cmdline_mode)
 {
 	port_number=portnum;
 	strcpy(version_number,version_str);
 	CmdlineHelper.attach_helper(this);
 	//note:"hviptdln" are already used by the producer class in library
+	CmdlineHelper.insert_options_entry((char*)"loginfile" ,optional_argument,XMPROXY_CMDLINE_OPT_LOGIN_FILE);
+	CmdlineHelper.insert_help_entry((char*)"--loginfile=filepath (path to the file having xmpp user/pw details)");
+	strcpy(LoginFilePath,XMPROXY_DEFAULT_LOGIN_FILE_PATH);
 }
 /*****************************************************************************/
 MyCmdline::~MyCmdline()
@@ -16,12 +27,29 @@ MyCmdline::~MyCmdline()
 //override virtual functions of ADGeneric Chain
 int MyCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 {
+	XMPROXY_CMDLINE_OPT command =(XMPROXY_CMDLINE_OPT)arg;
+	switch(command)
+	{
+		case XMPROXY_CMDLINE_OPT_LOGIN_FILE:
+			if(CmdlineHelper.get_next_subargument(&sub_arg)==0)//no login filepath passed by user
+				strcpy(LoginFilePath,XMPROXY_DEFAULT_LOGIN_FILE_PATH);
+			else
+				strcpy(LoginFilePath,sub_arg);
+			break;
+		default:return 0;break;	
+	}
 	return 0;
 }
 /*****************************************************************************/
 //following function will not be called for server_mode_cmdline_helper
 int MyCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker)
 {
+	switch(pCmdObj->command)
+	{
+		case XMPROXY_CMDLINE_OPT_LOGIN_FILE:break;
+		default:return -1;
+			break;
+	}
 	return 0;
 }
 /*****************************************************************************/
@@ -78,4 +106,12 @@ int MyCmdline::get_dev_info(ADCMN_DEV_INFO *pInfo)
 {
 	return CmdlineHelper.get_dev_info(pInfo);
 }
+/*****************************************************************************/
+int MyCmdline::get_login_filepath(char* filepath)
+{
+	strcpy(filepath,LoginFilePath);
+	return 0;
+}
+/*****************************************************************************/
+
 

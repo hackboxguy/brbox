@@ -4,10 +4,10 @@ using namespace std;
 /*****************************************************************************/
 XmproxyCltCmdline::XmproxyCltCmdline()
 {
-	/*CmdlineHelper.attach_helper(this);
-	CmdlineHelper.insert_options_entry((char*)"asynctasksts" ,optional_argument,EJSON_BBOXSMS_RPC_GET_ASYNCTASK);
+	CmdlineHelper.attach_helper(this);
+	CmdlineHelper.insert_options_entry((char*)"asynctasksts" ,optional_argument,EJSON_XMPROXY_RPC_GET_ASYNCTASK);
 	CmdlineHelper.insert_help_entry((char*)"--asynctasksts             [read async-task-in-progress if any]");
-	CmdlineHelper.insert_options_entry((char*)"deleteall" ,optional_argument,EJSON_BBOXSMS_RPC_SMS_DELETE_ALL);
+	/*CmdlineHelper.insert_options_entry((char*)"deleteall" ,optional_argument,EJSON_BBOXSMS_RPC_SMS_DELETE_ALL);
 	CmdlineHelper.insert_help_entry((char*)"--deleteall                [delete all sms]");
 	CmdlineHelper.insert_options_entry((char*)"delete" ,optional_argument,EJSON_BBOXSMS_RPC_SMS_DELETE);
 	CmdlineHelper.insert_help_entry((char*)"--delete=index             [delete an sms of a given index]");
@@ -19,7 +19,7 @@ XmproxyCltCmdline::XmproxyCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--updatelist               [check for any new messages and update sms inbox ]");
 	CmdlineHelper.insert_options_entry((char*)"devident" ,optional_argument,EJSON_BBOXSMS_RPC_SMS_IDENTIFY_DEV);
 	CmdlineHelper.insert_help_entry((char*)"--devident                 [identify if sms modem is accessible]");
-*/
+	*/
 }
 /*****************************************************************************/
 XmproxyCltCmdline::~XmproxyCltCmdline()
@@ -29,19 +29,19 @@ XmproxyCltCmdline::~XmproxyCltCmdline()
 //override virtual functions of ADGeneric Chain
 int XmproxyCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 {
-/*	EJSON_BBOXSMS_RPC_TYPES command =(EJSON_BBOXSMS_RPC_TYPES)arg;
+	EJSON_XMPROXY_RPC_TYPES command =(EJSON_XMPROXY_RPC_TYPES)arg;
 	switch(command)
 	{
-		case EJSON_BBOXSMS_RPC_GET_ASYNCTASK:
+		case EJSON_XMPROXY_RPC_GET_ASYNCTASK:
 			{
-			const char *table[]   = BBOXSMS_RPC_ASYNCTASK_ARG_TABL;
-			CmdlineHelper.push_single_enum_get_set_command( EJSON_BBOXSMS_RPC_GET_ASYNCTASK,
-			EJSON_BBOXSMS_RPC_GET_ASYNCTASK,BBOXSMS_RPC_ASYNCTASK_GET,
-			BBOXSMS_RPC_ASYNCTASK_GET,&table[0],BBOXSMS_ASYNCTASK_UNKNOWN,
-			(char*)BBOXSMS_RPC_ASYNCTASK_ARG,sub_arg);
+			const char *table[]   = XMPROXY_RPC_ASYNCTASK_ARG_TABL;
+			CmdlineHelper.push_single_enum_get_set_command( EJSON_XMPROXY_RPC_GET_ASYNCTASK,
+			EJSON_XMPROXY_RPC_GET_ASYNCTASK,XMPROXY_RPC_ASYNCTASK_GET,
+			XMPROXY_RPC_ASYNCTASK_GET,&table[0],XMPROXY_ASYNCTASK_UNKNOWN,
+			(char*)XMPROXY_RPC_ASYNCTASK_ARG,sub_arg);
 			}
 			break;
-		case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL:
+/*		case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL:
 			CmdlineHelper.push_action_type_noarg_command(EJSON_BBOXSMS_RPC_SMS_DELETE_ALL,
 				(char*)BBOXSMS_RPC_SMS_DELETE_ALL,(char*)RPCMGR_RPC_TASK_STS_ARGID);
 			break;
@@ -65,12 +65,12 @@ int XmproxyCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 		case EJSON_BBOXSMS_RPC_SMS_IDENTIFY_DEV:
 			CmdlineHelper.push_action_type_noarg_command(EJSON_BBOXSMS_RPC_SMS_IDENTIFY_DEV,
 				(char*)BBOXSMS_RPC_SMS_IDENTIFY_DEV,(char*)RPCMGR_RPC_TASK_STS_ARGID);
-			break;
+			break;*/
 		default:
 			return 0;
 			break;	
 	}
-*/	return 0;
+	return 0;
 }
 
 int XmproxyCltCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker)

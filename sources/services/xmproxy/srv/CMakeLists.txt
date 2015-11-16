@@ -26,7 +26,7 @@ set(INC_SRVCOMMN "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 include_directories(${INC_ADSTTNG} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${CMAKE_CURRENT_BINARY_DIR})
 
 # Specify component's dependency.
-target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt)
+target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt gloox)
 
 #install the binary and server-rpc-headers to CMAKE_INSTALL_PREFIX destination
 file(GLOB  INCFILES "${INC_SRVCOMMN}/*.*")
@@ -52,14 +52,14 @@ else()
 	FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SrcControlVersion.h "#define SRC_CONTROL_VERSION 0001\n")
 endif()
 
-#INCLUDE( FindPkgConfig )
-#pkg_check_modules( GAMMU gammu )
-#if( NOT GAMMU_FOUND )
-#	message( FATAL_ERROR "ERROR: could not find gammu development files" )
-#endif( NOT GAMMU_FOUND )
-#include_directories( ${GAMMU_INCLUDE_DIR} )
-#include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/3rd_party )
-#include_directories( ${GAMMU_INCLUDE_DIRS} )
+INCLUDE( FindPkgConfig )
+pkg_check_modules( GLOOX gloox )
+if( NOT GLOOX_FOUND )
+	message( FATAL_ERROR "ERROR: could not find gloox development files" )
+endif( NOT GLOOX_FOUND )
+include_directories( ${GLOOX_INCLUDE_DIR} )
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/3rd_party )
+include_directories( ${GLOOX_INCLUDE_DIRS} )
 
 
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/")

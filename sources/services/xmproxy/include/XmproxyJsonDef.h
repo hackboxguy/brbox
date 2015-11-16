@@ -61,9 +61,9 @@ typedef struct XMPROXY_CMN_DATA_CACHE_T
 {
 	void *pDevInfo;//device-info-struct(typecast in rpc handlers)
 	std::string StrImgIdDebugFile;//pChar //Char //Int //pInt //Float //Enum
-	void *pSmsMgr;//sms processing object pointer needed by other rpc's
+	void *pXmpMgr;//sms processing object pointer needed by other rpc's
 	EJSON_XMPROXY_RPC_TYPES AsyncCmdInProgress;
-	BBOXSMS_CMN_DATA_CACHE_T()
+	XMPROXY_CMN_DATA_CACHE_T()
 	{
 		AsyncCmdInProgress=EJSON_XMPROXY_RPC_NONE;
 	};//initialize variables here
