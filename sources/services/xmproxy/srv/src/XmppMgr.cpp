@@ -17,6 +17,8 @@
 XmppMgr::XmppMgr() //:AckToken(0)
 {
 	//GsmDevDetected=false;
+	bboxSmsServerAddr=BBOXSMS_SERVER_ADDR;
+
 	XmppProxy.attach_callback(this);
 	XmppClientThread.subscribe_thread_callback(this);
 	XmppClientThread.set_thread_properties(THREAD_TYPE_NOBLOCK,(void *)this);
@@ -71,7 +73,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 		{
 			case EXMPP_CMD_SMS_DELETE_ALL :res=proc_cmd_sms_deleteall(cmd.cmdMsg);break;
 			case EXMPP_CMD_SMS_DELETE     :res=proc_cmd_sms_delete(cmd.cmdMsg);break;
-			case EXMPP_CMD_SMS_GET        :res=proc_cmd_sms_get(cmd.cmdMsg);break;
+			case EXMPP_CMD_SMS_GET        :res=proc_cmd_sms_get(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_SMS_SEND       :res=proc_cmd_sms_send(cmd.cmdMsg);break;
 			case EXMPP_CMD_SMS_LIST_UPDATE:res=proc_cmd_sms_list_update(cmd.cmdMsg);break;
 			case EXMPP_CMD_SMS_GET_TOTAL  :res=proc_cmd_sms_get_total(cmd.cmdMsg,returnval);break;
@@ -163,46 +165,65 @@ RPC_SRV_RESULT XmppMgr::SendMessage(std::string msg)
 /* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT XmppMgr::proc_cmd_sms_deleteall(std::string msg)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;//RPC_SRV_RESULT_FAIL;
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_BBOXSMS)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result=Client.set_action_noarg_type((char*)"delete_all_sms");
+	Client.rpc_server_disconnect();
+	return result;
 }
 /* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT XmppMgr::proc_cmd_sms_delete(std::string msg)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;//RPC_SRV_RESULT_FAIL;
+	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
 }
 /* ------------------------------------------------------------------------- */
-RPC_SRV_RESULT XmppMgr::proc_cmd_sms_get(std::string msg)
+RPC_SRV_RESULT XmppMgr::proc_cmd_sms_get(std::string msg,std::string &returnval)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;//RPC_SRV_RESULT_FAIL;
+	std::string cmd,cmdArg;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	msgstream >> cmdArg;
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0)
+		return RPC_SRV_RESULT_ARG_ERROR;
+
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_BBOXSMS)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	int msgIndex=atoi(cmdArg.c_str());
+	char returnmsg[1024];returnmsg[0]='\0';
+	RPC_SRV_RESULT result=Client.get_int_type_with_string_para((char*)"get_sms",(char*)"index",msgIndex,returnmsg,(char*)"message");
+	returnval=returnmsg;
+	Client.rpc_server_disconnect();
+	return result;
 }
 /* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT XmppMgr::proc_cmd_sms_send(std::string msg)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;//RPC_SRV_RESULT_FAIL;
+	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
 }
 /* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT XmppMgr::proc_cmd_sms_list_update(std::string msg)
 {
 	ADJsonRpcClient Client;
-	if(Client.rpc_server_connect("192.168.178.47",ADCMN_PORT_BBOXSMS)!=0)
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_BBOXSMS)!=0)
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
-	RPC_SRV_RESULT result=Client.set_action_noarg_type((char*)"delete_all_sms");//SDCS_RPC_NAME_FORCE_ORIG_FACTORY_CALIB);
+	RPC_SRV_RESULT result=Client.set_action_noarg_type((char*)"update_sms_list");
 	Client.rpc_server_disconnect();
 	return result;
-	//return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;//RPC_SRV_RESULT_FAIL;
 }
 /* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT XmppMgr::proc_cmd_sms_get_total(std::string msg,std::string &returnval)
 {
 	char temp_str[255];
 	ADJsonRpcClient Client;
-	if(Client.rpc_server_connect("192.168.178.47",ADCMN_PORT_BBOXSMS)!=0)
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_BBOXSMS)!=0)
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
-	//RPC_SRV_RESULT result=Client.set_action_noarg_type((char*)"get_total_sms");//SDCS_RPC_NAME_FORCE_ORIG_FACTORY_CALIB);
 	RPC_SRV_RESULT result = Client.get_integer_type((char*)"get_total_sms",(char*)"msgcount",temp_str);
 	Client.rpc_server_disconnect();
-	//printf("");
-	returnval = "5";//atoi(temp_str);
+	returnval=temp_str;
 	return result;
 }
 /* ------------------------------------------------------------------------- */

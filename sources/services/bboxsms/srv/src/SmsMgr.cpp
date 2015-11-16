@@ -43,6 +43,13 @@ RPC_SRV_RESULT SmsMgr::GetTotalSms(int *total)
 	*total=tot;
 	return res;//RPC_SRV_RESULT_SUCCESS;
 }
+RPC_SRV_RESULT SmsMgr::EmptySmsList()
+{
+	int index;
+	int tot;std::string message,frm;std::vector<MsgEntry> dummyList;
+	RPC_SRV_RESULT res=GetOrUpdateTotal(SMS_ACCESS_EMPTY_LIST,tot,index,message,frm,dummyList);
+	return res;
+}
 //RAII function, used for reading total messages or updating the msgList from different threads
 RPC_SRV_RESULT SmsMgr::GetOrUpdateTotal(SMS_ACCESS_TYPE access,int &total,int indx,std::string &msg,std::string &from,std::vector<MsgEntry> &newList) 
 {
@@ -76,6 +83,10 @@ RPC_SRV_RESULT SmsMgr::GetOrUpdateTotal(SMS_ACCESS_TYPE access,int &total,int in
 			from = msgList[indx].From;
 			break;//read the sms from index(Nth sms from 0)
 		case SMS_ACCESS_COUNT_LIST :total=msgList.size();break;
+		case SMS_ACCESS_EMPTY_LIST:
+			if (!msgList.empty())
+				msgList.clear();
+			break;
 		default                    :return RPC_SRV_RESULT_ARG_ERROR;
 	}
 	return RPC_SRV_RESULT_SUCCESS;

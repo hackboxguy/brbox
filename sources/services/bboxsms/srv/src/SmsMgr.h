@@ -18,6 +18,7 @@ typedef enum SMS_ACCESS_TYPE_T
 	SMS_ACCESS_READ_LAST,
 	SMS_ACCESS_READ_INDEX,
 	SMS_ACCESS_COUNT_LIST,
+	SMS_ACCESS_EMPTY_LIST,
 	SMS_ACCESS_UNKNOWN,
 	SMS_ACCESS_NONE
 }SMS_ACCESS_TYPE;
@@ -53,6 +54,7 @@ public:
 	SmsMgr();
 	~SmsMgr();
 	RPC_SRV_RESULT GetSms(int index,char* msg);
+	RPC_SRV_RESULT EmptySmsList();
 	RPC_SRV_RESULT GetTotalSms(int *total);
 	int DetectSmsDevice();
 	int ReadSms(int indx);

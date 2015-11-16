@@ -6,8 +6,8 @@
 #include "ADCommon.hpp"
 #include "ADThread.hpp"
 using namespace std;
-
-#define EXMPP_CMD_TABL    {"Deleteall","Delete","Get","Send","Listupdate","Gettotal","Unknown","none","\0"}
+#define BBOXSMS_SERVER_ADDR "127.0.0.1"
+#define EXMPP_CMD_TABL    {"Smsdeleteall","Smsdelete","Smsget","Smssend","Smsupdate","Smstotal","Unknown","none","\0"}
 typedef enum EXMPP_CMD_TYPES_T
 {
 	EXMPP_CMD_SMS_DELETE_ALL=0,
@@ -30,6 +30,7 @@ public:
 
 class XmppMgr : public ADXmppConsumer, public ADThreadConsumer
 {
+	std::string bboxSmsServerAddr;
 	std::deque<XmppCmdEntry> processCmd;//fifo for processing xmpp messages
 
 	std::string XmppUserName;
@@ -45,7 +46,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer
 	EXMPP_CMD_TYPES ResolveCmdStr(std::string cmd);
 	RPC_SRV_RESULT proc_cmd_sms_deleteall(std::string msg);
 	RPC_SRV_RESULT proc_cmd_sms_delete(std::string msg);
-	RPC_SRV_RESULT proc_cmd_sms_get(std::string msg);
+	RPC_SRV_RESULT proc_cmd_sms_get(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_sms_send(std::string msg);
 	RPC_SRV_RESULT proc_cmd_sms_list_update(std::string msg);
 	RPC_SRV_RESULT proc_cmd_sms_get_total(std::string msg,std::string &returnval);

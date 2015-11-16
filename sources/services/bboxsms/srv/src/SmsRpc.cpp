@@ -107,6 +107,9 @@ RPC_SRV_RESULT SmsRpc::ProcessWorkAsync(int cmd,unsigned char* pWorkData)
 				BBOXSMS_SMS_PACKET *pPacket;
 				pPacket=(BBOXSMS_SMS_PACKET*)pWorkData;
 				ret_val=process_async_delete_all(pPacket);
+				//after deleting sms from sim-card, empty my local cache list
+				SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+				pMgr->EmptySmsList();	
 				OBJ_MEM_DELETE(pWorkData);
 			}
 			break;
