@@ -4,10 +4,11 @@
 #
 SERVER_NAME=/opt/fmw/bin/bboxsmsrv
 DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
+XMPP_LOGIN_ACCOUNT_FILE=/mnt/settings/etc/xmpp.login
 start() {
 	echo -n "Starting $SERVER_NAME Service: "
 	DEV_TYPE=$(cat $DEV_TYPE_FILE)
-	$SERVER_NAME --boardtype=$DEV_TYPE &
+	$SERVER_NAME --boardtype=$DEV_TYPE --loginfile=$XMPP_LOGIN_ACCOUNT_FILE &
 	echo "OK"
 }
 
