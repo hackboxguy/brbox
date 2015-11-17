@@ -30,9 +30,9 @@ int ADXmppProxy::connect(char* user,char* password)
 	j->disco()->setVersion( "messageTest", GLOOX_VERSION, "Linux" );
 	j->disco()->setIdentity( "client", "jsonbot" );
 	j->disco()->addFeature( XMLNS_CHAT_STATES );
-	StringList ca;
-	ca.push_back( "./cacert.crt" );
-	j->setCACerts( ca );
+	//StringList ca;
+	//ca.push_back( "./cacert.crt" );
+	//j->setCACerts( ca );
 
 	j->logInstance().registerLogHandler( LogLevelDebug, LogAreaAll, this );
 
@@ -42,9 +42,9 @@ int ADXmppProxy::connect(char* user,char* password)
 		while( ce == ConnNoError )
 		{
 			ce = j->recv();
-			//printf("messaged arrived\n");
+			printf("messaged arrived\n");
 		}
-		//printf( "ce: %d\n", ce );
+		printf( "ce: %d\n", ce );
 	}
 	delete( j );
 	return 0;
@@ -52,7 +52,7 @@ int ADXmppProxy::connect(char* user,char* password)
 /*****************************************************************************/
 void ADXmppProxy::onConnect()
 {
-	//printf( "connected!!!\n" );
+	printf( "connected!!!\n" );
 	connected=true;
 }
 /*****************************************************************************/
@@ -61,6 +61,7 @@ void ADXmppProxy::onDisconnect( ConnectionError e )
 	if( e == ConnAuthenticationFailed )
 	{
 		failed_authorization=true;
+		cout<<"ADXmppProxy::disconnected due to failed authrization"<<endl;
 	}
 	connected=false;
 	cout<<"ADXmppProxy::disconnected"<<endl;
@@ -99,17 +100,17 @@ int ADXmppProxy::send_reply(std::string reply)
 /*****************************************************************************/
 void ADXmppProxy::handleMessageEvent( const JID& from, MessageEventType event )
 {
-	//printf( "received event: %d from: %s\n", event, from.full().c_str() );
+	printf( "received event: %d from: %s\n", event, from.full().c_str() );
 }
 /*****************************************************************************/
 void ADXmppProxy::handleChatState( const JID& from, ChatStateType state)
 {
-	//printf( "received state: %d from: %s\n", state, from.full().c_str() );
+	printf( "received state: %d from: %s\n", state, from.full().c_str() );
 }
 /*****************************************************************************/
 void ADXmppProxy::handleMessageSession( MessageSession *session )
 {
-	//printf( "got new session\n");
+	printf( "got new session\n");
 	// this example can handle only one session. so we get rid of the old session
 	j->disposeMessageSession( m_session );
 	m_session = session;
@@ -122,7 +123,7 @@ void ADXmppProxy::handleMessageSession( MessageSession *session )
 /*****************************************************************************/
 void ADXmppProxy::handleLog( LogLevel level, LogArea area, const std::string& message )
 {
-	//printf("log: level: %d, area: %d, %s\n", level, area, message.c_str() );
+	printf("log: level: %d, area: %d, %s\n", level, area, message.c_str() );
 }
 /*****************************************************************************/
 
