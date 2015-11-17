@@ -30,6 +30,7 @@ public:
 
 class XmppMgr : public ADXmppConsumer, public ADThreadConsumer
 {
+	bool DebugLog;
 	std::string bboxSmsServerAddr;
 	std::deque<XmppCmdEntry> processCmd;//fifo for processing xmpp messages
 
@@ -57,6 +58,7 @@ public:
 	RPC_SRV_RESULT Start(std::string accountFilePath);
 	RPC_SRV_RESULT Stop();
 	RPC_SRV_RESULT SendMessage(std::string msg);
+	void SetDebugLog(bool log);
 };
 #endif
 

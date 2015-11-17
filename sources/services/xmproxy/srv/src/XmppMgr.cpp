@@ -16,6 +16,7 @@
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
 {
+	DebugLog=false;
 	//GsmDevDetected=false;
 	bboxSmsServerAddr=BBOXSMS_SERVER_ADDR;
 
@@ -38,6 +39,11 @@ XmppMgr::~XmppMgr()
 	}*/
 	//XmppClientThread.stop_thread();
 	XmppCmdProcessThread.stop_thread();
+}
+void XmppMgr::SetDebugLog(bool log)
+{
+	DebugLog=log;
+	XmppProxy.SetDebugLog(log);
 }
 /* ------------------------------------------------------------------------- */
 int XmppMgr::onXmppMessage(std::string msg,ADXmppProducer* pObj)
@@ -133,8 +139,11 @@ RPC_SRV_RESULT XmppMgr::Start(std::string accountFilePath)
 	if(XmppUserPw.size()<=0)
 		return RPC_SRV_RESULT_FAIL;
 
-	//cout<<"user: "<<XmppUserName<<endl;
-	//cout<<"pw  : "<<XmppUserPw<<endl;
+	if(DebugLog)
+	{
+		cout<<"XmppMgr::Start:user: "<<XmppUserName<<endl;
+		cout<<"XmppMgr::Start:pw  : "<<XmppUserPw<<endl;
+	}
 
 	XmppClientThread.start_thread();
 	return RPC_SRV_RESULT_SUCCESS;

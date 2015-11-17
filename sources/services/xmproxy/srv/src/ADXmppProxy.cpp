@@ -7,6 +7,7 @@ int ADXmppProducer::IDGenerator = 0;//generate Unique ID for every ADXmppProxy o
 /*****************************************************************************/
 ADXmppProxy::ADXmppProxy()
 {
+	DebugLog=false;
 	failed_authorization=false;
 	connected=false;
 	m_session=0;
@@ -42,17 +43,25 @@ int ADXmppProxy::connect(char* user,char* password)
 		while( ce == ConnNoError )
 		{
 			ce = j->recv();
-			printf("messaged arrived\n");
+			if(DebugLog)
+				cout<<"ADXmppProxy::connect:Message Arrived!!!"<<endl;
 		}
-		printf( "ce: %d\n", ce );
+		if(DebugLog)
+			printf( "ce: %d\n", ce );
 	}
 	delete( j );
 	return 0;
 }
 /*****************************************************************************/
+void ADXmppProxy::SetDebugLog(bool log)
+{
+	DebugLog=log;
+}
+/*****************************************************************************/
 void ADXmppProxy::onConnect()
 {
-	printf( "connected!!!\n" );
+	if(DebugLog)
+		cout<<"ADXmppProxy::onConnect:connected!!!"<<endl;
 	connected=true;
 }
 /*****************************************************************************/
@@ -61,10 +70,12 @@ void ADXmppProxy::onDisconnect( ConnectionError e )
 	if( e == ConnAuthenticationFailed )
 	{
 		failed_authorization=true;
-		cout<<"ADXmppProxy::disconnected due to failed authrization"<<endl;
+		if(DebugLog)
+			cout<<"ADXmppProxy::onDisconnect:disconnected due to failed authrization"<<endl;
 	}
 	connected=false;
-	cout<<"ADXmppProxy::disconnected"<<endl;
+	if(DebugLog)
+		cout<<"ADXmppProxy::onDisconnect:disconnected"<<endl;
 }
 /*****************************************************************************/
 bool ADXmppProxy::onTLSConnect( const CertInfo& info )
@@ -82,6 +93,8 @@ void ADXmppProxy::handleMessage( const Message& msg, MessageSession * /*session*
 int ADXmppProxy::receive_request(std::string req)
 {
 	//printf("%s\n",req.c_str());
+	if(DebugLog)
+		cout<<"ADXmppProxy::receive_request:received msg = "<<req<<endl;
 	onXmppMessage(req);//callback to the attached msg-processing-object
 	return 0;
 }
@@ -95,22 +108,27 @@ int ADXmppProxy::send_reply(std::string reply)
 	m_messageEventFilter->raiseMessageEvent( MessageEventComposing );
 	m_chatStateFilter->setChatState( ChatStateComposing );
 	m_session->send( reply, sub );//after reply from json-rpc-server, call send reply
+	if(DebugLog)
+		cout<<"ADXmppProxy::send_reply:sending msg = "<<reply<<endl;
 	return 0;
 }
 /*****************************************************************************/
 void ADXmppProxy::handleMessageEvent( const JID& from, MessageEventType event )
 {
-	printf( "received event: %d from: %s\n", event, from.full().c_str() );
+	if(DebugLog)
+		printf( "received event: %d from: %s\n", event, from.full().c_str() );
 }
 /*****************************************************************************/
 void ADXmppProxy::handleChatState( const JID& from, ChatStateType state)
 {
-	printf( "received state: %d from: %s\n", state, from.full().c_str() );
+	if(DebugLog)
+		printf( "received state: %d from: %s\n", state, from.full().c_str() );
 }
 /*****************************************************************************/
 void ADXmppProxy::handleMessageSession( MessageSession *session )
 {
-	printf( "got new session\n");
+	if(DebugLog)
+		printf( "got new session\n");
 	// this example can handle only one session. so we get rid of the old session
 	j->disposeMessageSession( m_session );
 	m_session = session;
@@ -123,7 +141,8 @@ void ADXmppProxy::handleMessageSession( MessageSession *session )
 /*****************************************************************************/
 void ADXmppProxy::handleLog( LogLevel level, LogArea area, const std::string& message )
 {
-	printf("log: level: %d, area: %d, %s\n", level, area, message.c_str() );
+	if(DebugLog)
+		printf("log: level: %d, area: %d, %s\n", level, area, message.c_str() );
 }
 /*****************************************************************************/
 

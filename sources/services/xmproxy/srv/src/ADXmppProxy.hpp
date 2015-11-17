@@ -70,6 +70,7 @@ public:
 	int send_reply(std::string reply);
 	int receive_request(std::string request);
 	bool get_connect_sts(){return connected;};
+	void SetDebugLog(bool log);
 
 	virtual void onConnect();
 	virtual void onDisconnect( ConnectionError e );
@@ -80,6 +81,7 @@ public:
 	virtual void handleMessageSession( MessageSession *session );
 	virtual void handleLog( LogLevel level, LogArea area, const std::string& message );
 private:
+	bool DebugLog;
 	bool failed_authorization;
 	bool connected;
 	Client *j;

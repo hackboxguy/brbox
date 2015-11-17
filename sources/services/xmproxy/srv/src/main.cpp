@@ -36,7 +36,7 @@ int main(int argc, const char* argv[])
 	//ADXmppProxy XmpManager;//xmpp handler
 	XmppMgr XmpManager;
 	DataCache.pXmpMgr =(void*)&XmpManager;//rpc's needs to know the object pointer of xmpp-handling-object
-
+	XmpManager.SetDebugLog(dbglog);
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 
