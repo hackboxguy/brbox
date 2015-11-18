@@ -107,6 +107,9 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			case EXMPP_CMD_SMS_SEND       :res=proc_cmd_sms_send(cmd.cmdMsg);break;
 			case EXMPP_CMD_SMS_LIST_UPDATE:res=proc_cmd_sms_list_update(cmd.cmdMsg);break;
 			case EXMPP_CMD_SMS_GET_TOTAL  :res=proc_cmd_sms_get_total(cmd.cmdMsg,returnval);break;
+			case EXMPP_CMD_FMW_GET_VERSION:res=proc_cmd_fmw_get_version(cmd.cmdMsg,returnval);break;
+			case EXMPP_CMD_FMW_UPDATE     :res=proc_cmd_fmw_update(cmd.cmdMsg);break;
+			case EXMPP_CMD_FMW_REBOOT     :res=proc_cmd_fmw_reboot(cmd.cmdMsg);break;
 			default                       :break;
 		}
 		processCmd.pop_front();//after processing delete the entry
@@ -260,5 +263,47 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sms_get_total(std::string msg,std::string &retu
 	return result;
 }
 /* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_get_version(std::string msg,std::string &returnval)
+{
+//01:39:17.322-->{ "jsonrpc": "2.0", "method": "get_fmw_version", "params": { "module": "current" }, "id": 0 }
+//01:39:17.408<--{ "jsonrpc": "2.0", "result": { "return": "Success", "version": "00.01.00341" }, "id": 0 }
+	char temp_str[255];
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result = Client.get_string_type_with_string_para((char*)"get_fmw_version",(char*)"module",(char*)"current",temp_str,(char*)"version");
+	Client.rpc_server_disconnect();
+	returnval=temp_str;
+	return result;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg) //
+{
+	/*char temp_str[255];
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result = Client.get_integer_type((char*)"get_total_sms",(char*)"msgcount",temp_str);
+	Client.rpc_server_disconnect();
+	returnval=temp_str;
+	return result;*/
+	//this works: wget -O /tmp/uBrBox.uimg http://github.com/hackboxguy/downloads/raw/master/bbbmmcRbox/readme.txt
+	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_reboot(std::string msg)
+{
+//01:39:52.718-->{ "jsonrpc": "2.0", "method": "set_device_operation", "params": { "operation": "reboot" }, "id": 0 }
+//01:39:52.726<--{ "jsonrpc": "2.0", "result": { "return": "InProgress", "taskId": 1 }, "id": 0 }
+	char temp_str[255];
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result = Client.set_single_string_type((char*)"set_device_operation",(char*)"operation",(char*)"reboot");
+	Client.rpc_server_disconnect();
+	return result;
+}
+/* ------------------------------------------------------------------------- */
+
 
 
