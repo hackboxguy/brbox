@@ -1,5 +1,7 @@
 #include "SysRpc.h"
 #include "ADSysInfo.hpp"
+#include <iostream>
+#include <fstream>
 //#include "SysmgrJsonDef.h"
 /* ------------------------------------------------------------------------- */
 SysRpc:: SysRpc(std::string rpcName,int myIndex,bool emu,bool log,SYSMGR_CMN_DATA_CACHE *pData):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
@@ -33,6 +35,8 @@ int SysRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:return json_to_bin_download_file(pReq,EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP);
 		case EJSON_SYSMGR_RPC_GET_ASYNCTASK   :return json_to_bin_get_async_task_in_progress(pReq);
 		case EJSON_SYSMGR_RPC_GET_DEVTYPE     :return json_to_bin_get_devtype(pReq);
+		case EJSON_SYSMGR_RPC_GET_HOSTNAME    :return json_to_bin_get_hostname(pReq);
+		case EJSON_SYSMGR_RPC_SET_HOSTNAME    :return json_to_bin_set_hostname(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -56,6 +60,8 @@ int SysRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:return bin_to_json_download_file(pReq,EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP);
 		case EJSON_SYSMGR_RPC_GET_ASYNCTASK   :return bin_to_json_get_async_task_in_progress(pReq);
 		case EJSON_SYSMGR_RPC_GET_DEVTYPE     :return bin_to_json_get_devtype(pReq);
+		case EJSON_SYSMGR_RPC_GET_HOSTNAME    :return bin_to_json_get_hostname(pReq);
+		case EJSON_SYSMGR_RPC_SET_HOSTNAME    :return bin_to_json_set_hostname(pReq);
 		default: break;
 	}
 	return -1;
@@ -79,6 +85,8 @@ int SysRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:return process_download_file(pReq,EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP,pObj);
 		case EJSON_SYSMGR_RPC_GET_ASYNCTASK   :return process_get_async_task_in_progress(pReq);
 		case EJSON_SYSMGR_RPC_GET_DEVTYPE     :return process_get_devtype(pReq);
+		case EJSON_SYSMGR_RPC_GET_HOSTNAME    :return process_get_hostname(pReq);
+		case EJSON_SYSMGR_RPC_SET_HOSTNAME    :return process_set_hostname(pReq);
 		default:break;
 	}
 	return 0;
@@ -730,4 +738,75 @@ int SysRpc::process_get_devtype(JsonDataCommObj* pReq)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_GET_HOSTNAME
+int SysRpc::json_to_bin_get_hostname(JsonDataCommObj* pReq)
+{
+	SYSMGR_HOSTNAME_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_HOSTNAME_PACKET,RPC_SRV_ACT_READ,EJSON_SYSMGR_RPC_GET_HOSTNAME);
+	return 0;
+}
+int SysRpc::bin_to_json_get_hostname(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_STRING(RPC_SRV_REQ,SYSMGR_HOSTNAME_PACKET,SYSMGR_RPC_HOSTNAME_ARG,hostname);
+	return 0;
+}
+int SysRpc::process_get_hostname(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SYSMGR_HOSTNAME_PACKET* pPacket;
+	pPacket=(SYSMGR_HOSTNAME_PACKET*)pPanelReq->dataRef;
+	if(pPanelReq->action!=RPC_SRV_ACT_READ)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+		return 0;
+	}
+	std::string name;
+	ifstream hostNameFile(HOST_NAME_FILE_PATH);
+	if (hostNameFile.is_open())
+	{
+		hostNameFile >> name; 
+		hostNameFile.close();
+		strcpy(pPacket->hostname,name.c_str());
+		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	}
+	else 
+		pPanelReq->result=RPC_SRV_RESULT_FILE_OPEN_ERR;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_SET_HOSTNAME
+int SysRpc::json_to_bin_set_hostname(JsonDataCommObj* pReq)
+{
+	SYSMGR_HOSTNAME_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_HOSTNAME_PACKET,RPC_SRV_ACT_WRITE,EJSON_SYSMGR_RPC_SET_HOSTNAME);
+	JSON_STRING_TO_STRING(SYSMGR_RPC_HOSTNAME_ARG,pPanelCmdObj->hostname);
+	return 0;
+}
+int SysRpc::bin_to_json_set_hostname(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,SYSMGR_HOSTNAME_PACKET);
+	return 0;
+}
+int SysRpc::process_set_hostname(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SYSMGR_HOSTNAME_PACKET* pPacket;
+	pPacket=(SYSMGR_HOSTNAME_PACKET*)pPanelReq->dataRef;
+	// writing on a text file
+	ofstream hostNameFile;
+	hostNameFile.open(HOST_NAME_FILE_PATH, ios::out | ios::trunc );
+	if (hostNameFile.is_open())
+	{
+		hostNameFile << pPacket->hostname;
+		hostNameFile.close();
+		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	}
+	else 
+		pPanelReq->result=RPC_SRV_RESULT_FILE_OPEN_ERR;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+
 

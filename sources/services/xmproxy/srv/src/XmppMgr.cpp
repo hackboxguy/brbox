@@ -128,13 +128,14 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			case EXMPP_CMD_FMW_UPDATE_STS :res=proc_cmd_fmw_update_sts(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_FMW_UPDATE_RES :res=proc_cmd_fmw_update_res(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_FMW_REBOOT     :res=proc_cmd_fmw_reboot(cmd.cmdMsg);break;
+			case EXMPP_CMD_FMW_UPTIME     :res=proc_cmd_fmw_uptime(cmd.cmdMsg,returnval);break;
 			default                       :break;
 		}
 		processCmd.pop_front();//after processing delete the entry
 	}
 	const char *resTbl[] = STR_RPC_SRV_RESULT_STRING_TABLE;
 	std::string result   = resTbl[res];
-	std::string response = result +":"+returnval;
+	std::string response = result +" : "+returnval;
 	XmppProxy.send_reply(response);//result+":"+returnval);
 	return 0;
 }
@@ -386,6 +387,24 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update_res(std::string msg,std::string &ret
 						tRes,(char*)"taskStatus");
 	Client.rpc_server_disconnect();
 	returnval=tRes;
+	return result;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_uptime(std::string msg,std::string &returnval)
+{
+//01:42:50.068-->{ "jsonrpc": "2.0", "method": "get_load_info", "id": 0 }
+//01:42:50.078<--{ "jsonrpc": "2.0", "result": { "return": "Success", "current": "0", "average": "0", "uptime": "2632" }, "id": 0 }
+	char str_cur[255];str_cur[0]='\0';
+	char str_avg[255];str_avg[0]='\0';
+	char str_uptm[255];str_uptm[0]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result = Client.get_three_string_type(   (char*)"get_load_info",(char*)"current",str_cur,
+								(char*)"average",str_avg,(char*)"uptime",str_uptm);
+	Client.rpc_server_disconnect();
+	returnval=str_uptm;
+	returnval+=" Sec";
 	return result;
 }
 /* ------------------------------------------------------------------------- */

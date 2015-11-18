@@ -67,6 +67,14 @@ public:
 	int json_to_bin_get_devtype(JsonDataCommObj* pReq);
 	int bin_to_json_get_devtype(JsonDataCommObj* pReq);
 	int process_get_devtype(JsonDataCommObj* pReq);
+
+	int json_to_bin_get_hostname(JsonDataCommObj* pReq);
+	int bin_to_json_get_hostname(JsonDataCommObj* pReq);
+	int process_get_hostname(JsonDataCommObj* pReq);
+
+	int json_to_bin_set_hostname(JsonDataCommObj* pReq);
+	int bin_to_json_set_hostname(JsonDataCommObj* pReq);
+	int process_set_hostname(JsonDataCommObj* pReq);
 };
 /* ------------------------------------------------------------------------- */
 

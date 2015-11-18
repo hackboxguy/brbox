@@ -24,6 +24,9 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP,
 	EJSON_SYSMGR_RPC_GET_ASYNCTASK,
 	EJSON_SYSMGR_RPC_GET_DEVTYPE,    //read the board or device type
+	EJSON_SYSMGR_RPC_GET_HOSTNAME,
+	EJSON_SYSMGR_RPC_SET_HOSTNAME,
+
 	//get device type
 	//EJSON_SYSMGR_RPC_IDENTIFY_DEVICE,
 
@@ -219,6 +222,17 @@ typedef struct SYSMGR_DEVTYPE_PACKET_T
 {
 	SYSMGR_DEV_TYPE DevType;
 }SYSMGR_DEVTYPE_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_GET_HOSTNAME,
+//EJSON_SYSMGR_RPC_SET_HOSTNAME,
+#define SYSMGR_RPC_HOSTNAME_GET        "get_hostname"
+#define SYSMGR_RPC_HOSTNAME_SET        "set_hostname"
+#define SYSMGR_RPC_HOSTNAME_ARG        "hostname"
+#define HOST_NAME_FILE_PATH            "/mnt/settings/etc/hostname"
+typedef struct SYSMGR_HOSTNAME_PACKET_T
+{
+	char hostname[1024];
+}SYSMGR_HOSTNAME_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct SYSMGR_CMN_DATA_CACHE_T

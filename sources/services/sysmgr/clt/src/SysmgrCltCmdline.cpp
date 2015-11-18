@@ -33,6 +33,8 @@ SysmgrCltCmdline::SysmgrCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--asynctasksts             [read async-task-in-progress if any]");
 	CmdlineHelper.insert_options_entry((char*)"devtype" ,optional_argument,EJSON_SYSMGR_RPC_GET_DEVTYPE);
 	CmdlineHelper.insert_help_entry((char*)"--devtype                  [read device type]");
+	CmdlineHelper.insert_options_entry((char*)"hostname" ,optional_argument,EJSON_SYSMGR_RPC_GET_HOSTNAME);
+	CmdlineHelper.insert_help_entry((char*)"--hostname                 [read/write hostname]");
 }
 /* ------------------------------------------------------------------------- */
 SysmgrCltCmdline::~SysmgrCltCmdline()
@@ -121,6 +123,10 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			SYSMGR_RPC_DEVTYPE_GET,&table[0],ADCMN_BOARD_TYPE_UNKNOWN,
 			(char*)SYSMGR_RPC_DEVTYPE_ARG,sub_arg);
 			}
+			break;
+		case EJSON_SYSMGR_RPC_GET_HOSTNAME:
+			CmdlineHelper.push_string_get_set_command(EJSON_SYSMGR_RPC_GET_HOSTNAME,EJSON_SYSMGR_RPC_SET_HOSTNAME,
+			SYSMGR_RPC_HOSTNAME_GET,SYSMGR_RPC_HOSTNAME_SET,(char*)SYSMGR_RPC_HOSTNAME_ARG,sub_arg);
 			break;
 		default:
 			return 0;
