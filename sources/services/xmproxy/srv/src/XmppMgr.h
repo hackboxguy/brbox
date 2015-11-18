@@ -12,7 +12,7 @@ using namespace std;
 #define GITHUB_FMW_DOWNLOAD_FOLDER "http://github.com/hackboxguy/downloads/raw/master/"
 
 #define BBOXSMS_SERVER_ADDR "127.0.0.1"
-#define EXMPP_CMD_TABL    {"Smsdeleteall","Smsdelete","Smsget","Smssend","Smsupdate","Smstotal","Fversion","Fmwupdate","Fmwupsts","Reboot","Unknown","none","\0"}
+#define EXMPP_CMD_TABL    {"Smsdeleteall","Smsdelete","Smsget","Smssend","Smsupdate","Smstotal","Fmwver","Fmwupdate","Fmwupsts","Reboot","Unknown","none","\0"}
 typedef enum EXMPP_CMD_TYPES_T
 {
 	EXMPP_CMD_SMS_DELETE_ALL=0,

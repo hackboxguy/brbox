@@ -344,6 +344,9 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update_sts(std::string msg,std::string &ret
 	//return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
 }
 /* ------------------------------------------------------------------------- */
+//todo: add Help command response
+//ignore capitle letters in command
+//after file download, trigger fupdate
 
 
 
