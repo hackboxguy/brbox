@@ -12,7 +12,9 @@ using namespace std;
 #define GITHUB_FMW_DOWNLOAD_FOLDER "http://github.com/hackboxguy/downloads/raw/master/"
 
 #define BBOXSMS_SERVER_ADDR "127.0.0.1"
-#define EXMPP_CMD_TABL    {"Smsdeleteall","Smsdelete","Smsget","Smssend","Smsupdate","Smstotal","Fmwver","Fmwupdate","Fmwupsts","Reboot","Unknown","none","\0"}
+#define EXMPP_CMD_TABL    {"smsdeleteall","smsdelete","smsget","smssend","smsupdate","smstotal","fmwver","fmwupdt","fmwupsts","fmwupres","reboot","unknown","none","\0"}
+#define EXMPP_CMD_TABL_HELP    {"","","<index>","<phone-num> <msg>","","","","<filename>","","","","unknown","none","\0"}
+
 typedef enum EXMPP_CMD_TYPES_T
 {
 	EXMPP_CMD_SMS_DELETE_ALL=0,
@@ -24,6 +26,7 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_FMW_GET_VERSION,
 	EXMPP_CMD_FMW_UPDATE,
 	EXMPP_CMD_FMW_UPDATE_STS,
+	EXMPP_CMD_FMW_UPDATE_RES, //result of the last fmw update command
 	EXMPP_CMD_FMW_REBOOT,
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
@@ -42,6 +45,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	int heartbeat_ms;
 	int event_period_ms;//
 	int CyclicTime_ms;//60sec cycle counter
+	int LastFmwUpdateTaskID;
 
 	ADTimer* pMyTimer;
 	bool DebugLog;
@@ -74,6 +78,8 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_fmw_update(std::string msg);
 	RPC_SRV_RESULT proc_cmd_fmw_reboot(std::string msg);
 	RPC_SRV_RESULT proc_cmd_fmw_update_sts(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_fmw_update_res(std::string msg,std::string &returnval);
+	std::string print_help();
 
 public:
 	XmppMgr();

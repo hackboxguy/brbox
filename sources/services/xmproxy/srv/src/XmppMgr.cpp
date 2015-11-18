@@ -1,5 +1,5 @@
 #include "XmppMgr.h"
-//#include <algorithm>
+#include <algorithm>
 //#include <string>
 //#include <mutex>
 //#include <iostream>
@@ -20,6 +20,7 @@ XmppMgr::XmppMgr() //:AckToken(0)
 	event_period_ms=0;
 	heartbeat_ms=100;
 	pMyTimer=NULL;
+	LastFmwUpdateTaskID=0;
 
 	DebugLog=false;
 	//GsmDevDetected=false;
@@ -70,12 +71,27 @@ void XmppMgr::SetDebugLog(bool log)
 	XmppProxy.SetDebugLog(log);
 }
 /* ------------------------------------------------------------------------- */
+std::string XmppMgr::print_help()
+{
+	std::string help="",cmd,cmdhlp;
+	const char *cmdTbl[]     = EXMPP_CMD_TABL;
+	const char *cmdTblHelp[] = EXMPP_CMD_TABL_HELP;
+	for(int i=0;i<EXMPP_CMD_UNKNOWN;i++)
+	{
+		cmd=cmdTbl[i];cmdhlp=cmdTblHelp[i];
+		help+=cmd+" "+cmdhlp+"\n";
+	}
+	return help;
+}
+/* ------------------------------------------------------------------------- */
 int XmppMgr::onXmppMessage(std::string msg,ADXmppProducer* pObj)
 {
 	//process the messages
 	//cout<<"msg arrived: "<<msg<<endl;
-	if(msg=="Echo") //for checking if client is alive
+	if(msg=="Echo" || msg=="echo") //for checking if client is alive
 		XmppProxy.send_reply(msg);
+	else if(msg=="Help" || msg=="help") //print help
+		XmppProxy.send_reply(print_help());
 	else
 	{
 		processCmd.push_back(XmppCmdEntry(msg));
@@ -110,6 +126,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			case EXMPP_CMD_FMW_GET_VERSION:res=proc_cmd_fmw_get_version(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_FMW_UPDATE     :res=proc_cmd_fmw_update(cmd.cmdMsg);break;
 			case EXMPP_CMD_FMW_UPDATE_STS :res=proc_cmd_fmw_update_sts(cmd.cmdMsg,returnval);break;
+			case EXMPP_CMD_FMW_UPDATE_RES :res=proc_cmd_fmw_update_res(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_FMW_REBOOT     :res=proc_cmd_fmw_reboot(cmd.cmdMsg);break;
 			default                       :break;
 		}
@@ -132,6 +149,10 @@ EXMPP_CMD_TYPES XmppMgr::ResolveCmdStr(std::string msg)
 	std::string cmd;
 	mstream >> cmd;
 	//cout<<mstream.str();//remaining message
+
+	//------------function to convert string into lowercase---------------
+	transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	//--------------------------------------------------------------------
 
 	xmpcmd = (EXMPP_CMD_TYPES)string_proc.string_to_enum(cmdTbl,(char*)cmd.c_str(),EXMPP_CMD_UNKNOWN);
 	if(xmpcmd>=EXMPP_CMD_UNKNOWN)
@@ -282,7 +303,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg)
 {
 	//00:06:05.434-->{ "jsonrpc": "2.0", "method": "download_ftp_file", "params": { "srcaddr": "http:\/\/github.com\/hackboxguy\/downloads\/raw\/master\/bbbmmcRbox\/readme.txt", "targetpath": "\/tmp\/readme.txt" }, "id": 0 }
 	//00:06:05.454<--{ "jsonrpc": "2.0", "result": { "return": "InProgress", "taskId": 1 }, "id": 0 }
-	//this works: wget -O /tmp/uBrBox.uimg http://github.com/hackboxguy/downloads/raw/master/README.md
+	//github-file-download-cmd: wget -O /tmp/uBrBox.uimg http://github.com/hackboxguy/downloads/raw/master/README.md
 
 	std::string cmd,cmdArg,URLPath;
 	stringstream msgstream(msg);
@@ -299,11 +320,22 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg)
 	ADJsonRpcClient Client;
 	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	//file download rpc call
 	RPC_SRV_RESULT result = Client.set_double_string_get_single_string_type((char*)"download_ftp_file",
 					(char*)"srcaddr",(char*)URLPath.c_str(),
 					(char*)"targetpath",(char*)"/tmp/uBrBoxRoot.uimg",
-					(char*)"taskID",temp_str);
-	//TODO: if resuls is inprog, issue fupdate command as well
+					(char*)"taskId",temp_str);
+
+	//fmw update rpc call
+//01:19:27.440-->{ "jsonrpc": "2.0", "method": "firmware_update", "params": { "module": "project", "filepath": "\/tmp\/messages" }, "id": 0 }
+//01:19:27.449<--{ "jsonrpc": "2.0", "result": { "return": "InProgress", "taskId": 4 }, "id": 0 }
+	if(result==RPC_SRV_RESULT_IN_PROG)
+	{	
+		result=Client.set_double_string_get_single_string_type((char*)"firmware_update",(char*)"module",(char*)"project",
+									(char*)"filepath",(char*)"/tmp/uBrBoxRoot.uimg",
+									(char*)"taskId",temp_str);
+		LastFmwUpdateTaskID=atoi(temp_str);
+	}
 	Client.rpc_server_disconnect();
 	return result;
 }
@@ -321,8 +353,6 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_reboot(std::string msg)
 	return result;
 }
 /* ------------------------------------------------------------------------- */
-//get-enum-type:(get-async-task-inprog)	RPC_SRV_RESULT res = Client.get_string_type(rpc_name,enum_arg_name,temp_str);
-//case EXMPP_CMD_FMW_UPDATE_STS :res=proc_cmd_fmw_update_sts(cmd.cmdMsg,returnval);break;
 RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update_sts(std::string msg,std::string &returnval)
 {
 	//00:40:37.476-->{ "jsonrpc": "2.0", "method": "get_async_task", "id": 0 }
@@ -341,12 +371,23 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update_sts(std::string msg,std::string &ret
 	else
 		returnval="Busy";
 	return result;
-	//return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
 }
 /* ------------------------------------------------------------------------- */
-//todo: add Help command response
-//ignore capitle letters in command
-//after file download, trigger fupdate
-
+RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update_res(std::string msg,std::string &returnval)
+{
+	//01:02:29.609-->{ "jsonrpc": "2.0", "method": "get_rpc_req_status", "params": { "taskId": "1" }, "id": 0 }
+	//01:02:29.615<--{ "jsonrpc": "2.0", "result": { "return": "Success", "taskStatus": "taskIDNotFound" }, "id": 0 }
+	char tRes[255];tRes[0]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	char tID[255];sprintf(tID,"%d",LastFmwUpdateTaskID);
+	RPC_SRV_RESULT result = Client.get_string_type_with_string_para((char*)"get_rpc_req_status",(char*)"taskId",tID,
+						tRes,(char*)"taskStatus");
+	Client.rpc_server_disconnect();
+	returnval=tRes;
+	return result;
+}
+/* ------------------------------------------------------------------------- */
 
 
