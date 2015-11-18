@@ -9,9 +9,10 @@
 
 using namespace std;
 #define CLIENT_ALIVE_PING_DURATION_MS 60000;//60seconds
+#define GITHUB_FMW_DOWNLOAD_FOLDER "http://github.com/hackboxguy/downloads/raw/master/"
 
 #define BBOXSMS_SERVER_ADDR "127.0.0.1"
-#define EXMPP_CMD_TABL    {"Smsdeleteall","Smsdelete","Smsget","Smssend","Smsupdate","Smstotal","Fversion","Fupdate","Reboot","Unknown","none","\0"}
+#define EXMPP_CMD_TABL    {"Smsdeleteall","Smsdelete","Smsget","Smssend","Smsupdate","Smstotal","Fversion","Fmwupdate","Fmwupsts","Reboot","Unknown","none","\0"}
 typedef enum EXMPP_CMD_TYPES_T
 {
 	EXMPP_CMD_SMS_DELETE_ALL=0,
@@ -22,6 +23,7 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_SMS_GET_TOTAL,
 	EXMPP_CMD_FMW_GET_VERSION,
 	EXMPP_CMD_FMW_UPDATE,
+	EXMPP_CMD_FMW_UPDATE_STS,
 	EXMPP_CMD_FMW_REBOOT,
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
@@ -71,6 +73,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_fmw_get_version(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_update(std::string msg);
 	RPC_SRV_RESULT proc_cmd_fmw_reboot(std::string msg);
+	RPC_SRV_RESULT proc_cmd_fmw_update_sts(std::string msg,std::string &returnval);
 
 public:
 	XmppMgr();
