@@ -16,6 +16,11 @@
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
 {
+	CyclicTime_ms=CLIENT_ALIVE_PING_DURATION_MS;//60000;//60seconds
+	event_period_ms=0;
+	heartbeat_ms=100;
+	pMyTimer=NULL;
+
 	DebugLog=false;
 	//GsmDevDetected=false;
 	bboxSmsServerAddr=BBOXSMS_SERVER_ADDR;
@@ -40,6 +45,25 @@ XmppMgr::~XmppMgr()
 	//XmppClientThread.stop_thread();
 	XmppCmdProcessThread.stop_thread();
 }
+/* ------------------------------------------------------------------------- */
+int XmppMgr::AttachHeartBeat(ADTimer* pTimer)
+{
+	//give 100ms heartbeat to ADDisplayMgr
+	//this is needed for detecting 3sec timeout for uart communication	
+	pTimer->subscribe_timer_notification(this);
+	pMyTimer=pTimer;
+	return 0;
+}
+int XmppMgr::timer_notification()
+{
+	event_period_ms+=heartbeat_ms;
+	if(event_period_ms<CyclicTime_ms) //typically 60seconds of WhiteSpacePingTime
+		return 0;
+	event_period_ms=0;
+	XmppProxy.send_client_alive_ping();//every 60sec send whitespacePing to xmpp-server to be online always
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
 void XmppMgr::SetDebugLog(bool log)
 {
 	DebugLog=log;

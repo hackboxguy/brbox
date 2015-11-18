@@ -5,7 +5,11 @@
 #include <deque>
 #include "ADCommon.hpp"
 #include "ADThread.hpp"
+#include "ADTimer.hpp"
+
 using namespace std;
+#define CLIENT_ALIVE_PING_DURATION_MS 60000;//60seconds
+
 #define BBOXSMS_SERVER_ADDR "127.0.0.1"
 #define EXMPP_CMD_TABL    {"Smsdeleteall","Smsdelete","Smsget","Smssend","Smsupdate","Smstotal","Unknown","none","\0"}
 typedef enum EXMPP_CMD_TYPES_T
@@ -28,8 +32,13 @@ public:
 };
 
 
-class XmppMgr : public ADXmppConsumer, public ADThreadConsumer
+class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerConsumer
 {
+	int heartbeat_ms;
+	int event_period_ms;//
+	int CyclicTime_ms;//60sec cycle counter
+
+	ADTimer* pMyTimer;
 	bool DebugLog;
 	std::string bboxSmsServerAddr;
 	std::deque<XmppCmdEntry> processCmd;//fifo for processing xmpp messages
@@ -43,6 +52,11 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer
 	ADThread XmppClientThread,XmppCmdProcessThread;//thread for xmpp client connection
 	virtual int monoshot_callback_function(void* pUserData,ADThreadProducer* pObj);//{return 0;};
 	virtual int thread_callback_function(void* pUserData,ADThreadProducer* pObj);//{return 0;};//we are not using this one..
+
+	//ADTimerConsumer overrides: 100ms timer and sigio 
+	virtual int sigio_notification(){return 0;};
+	virtual int timer_notification();//{return 0;};
+	virtual int custom_sig_notification(int signum){return 0;};
 
 	EXMPP_CMD_TYPES ResolveCmdStr(std::string cmd);
 	RPC_SRV_RESULT proc_cmd_sms_deleteall(std::string msg);
@@ -59,6 +73,8 @@ public:
 	RPC_SRV_RESULT Stop();
 	RPC_SRV_RESULT SendMessage(std::string msg);
 	void SetDebugLog(bool log);
+	int AttachHeartBeat(ADTimer* pTimer);
+
 };
 #endif
 

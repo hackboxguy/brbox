@@ -67,6 +67,8 @@ int main(int argc, const char* argv[])
 	char filepath[512];CmdLine.get_login_filepath(filepath);
 	std::string XmpAccountAuthFilePath(filepath);
 	XmpManager.Start(XmpAccountAuthFilePath);//connect the xmpp server
+	XmpManager.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to xmpp client manager for sending white-space-ping-to-server
+
 	//server is ready to serve rpc's
 	RpcMgr.SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE_READY);
 	//wait for sigkill or sigterm signal

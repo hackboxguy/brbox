@@ -2,6 +2,8 @@
 #include <iostream>
 using namespace std;
 #include <stdio.h>
+#include <time.h>
+#include <string>
 /*****************************************************************************/
 int ADXmppProducer::IDGenerator = 0;//generate Unique ID for every ADXmppProxy object
 /*****************************************************************************/
@@ -143,6 +145,24 @@ void ADXmppProxy::handleLog( LogLevel level, LogArea area, const std::string& me
 {
 	if(DebugLog)
 		printf("log: level: %d, area: %d, %s\n", level, area, message.c_str() );
+}
+/*****************************************************************************/
+// Get current date/time, format is YYYY-MM-DD.HH:mm:ss
+const std::string ADXmppProxy::currentDateTime() 
+{
+	time_t     now = time(0);
+	struct tm  tstruct;
+	char       buf[80];
+	tstruct = *localtime(&now);
+	strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+	return buf;
+}
+void ADXmppProxy::send_client_alive_ping()
+{
+	if(connected)
+		j->whitespacePing();
+	if(DebugLog)
+		cout<<"ADXmppProxy::send_client_alive_ping:"<<currentDateTime()<<" connSts="<<connected<<endl;
 }
 /*****************************************************************************/
 

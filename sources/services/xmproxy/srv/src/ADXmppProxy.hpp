@@ -71,6 +71,8 @@ public:
 	int receive_request(std::string request);
 	bool get_connect_sts(){return connected;};
 	void SetDebugLog(bool log);
+	void send_client_alive_ping();
+	const std::string currentDateTime();
 
 	virtual void onConnect();
 	virtual void onDisconnect( ConnectionError e );
