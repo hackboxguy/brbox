@@ -11,9 +11,9 @@ using namespace std;
 #define CLIENT_ALIVE_PING_DURATION_MS 60000;//60seconds
 #define GITHUB_FMW_DOWNLOAD_FOLDER "http://github.com/hackboxguy/downloads/raw/master/"
 
-#define BBOXSMS_SERVER_ADDR "192.168.178.56" //"127.0.0.1"
-#define EXMPP_CMD_TABL    {"smsdeleteall","smsdelete","smsget","smssend","smsupdate","smstotal","fmwver","fmwupdt","fmwupsts","fmwupres","reboot","uptime","unknown","none","\0"}
-#define EXMPP_CMD_TABL_HELP    {"","<zero_based_index>","<zero_based_index>","<phone-num> <msg>","","","","<filename>","","","","","unknown","none","\0"}
+#define BBOXSMS_SERVER_ADDR "127.0.0.1"
+#define EXMPP_CMD_TABL    {"smsdeleteall","smsdelete","smsget","smssend","smsupdate","smstotal","fmwver","fmwupdt","fmwupsts","fmwupres","reboot","uptime","hostnameget","hostnameset","unknown","none","\0"}
+#define EXMPP_CMD_TABL_HELP    {"","<zero_based_index>","<zero_based_index>","<phone-num> <msg>","","","","<filename>","","","","","","<hostname>","unknown","none","\0"}
 
 typedef enum EXMPP_CMD_TYPES_T
 {
@@ -29,6 +29,8 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_FMW_UPDATE_RES, //result of the last fmw update command
 	EXMPP_CMD_FMW_REBOOT,
 	EXMPP_CMD_FMW_UPTIME,
+	EXMPP_CMD_FMW_GET_HOSTNAME,
+	EXMPP_CMD_FMW_SET_HOSTNAME,
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -81,6 +83,8 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_fmw_update_sts(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_update_res(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_uptime(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_fmw_get_hostname(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_fmw_set_hostname(std::string msg);
 
 	std::string print_help();
 

@@ -117,18 +117,20 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 		XmppCmdEntry cmd = processCmd.front();
 		switch(ResolveCmdStr(cmd.cmdMsg))
 		{
-			case EXMPP_CMD_SMS_DELETE_ALL :res=proc_cmd_sms_deleteall(cmd.cmdMsg);break;
-			case EXMPP_CMD_SMS_DELETE     :res=proc_cmd_sms_delete(cmd.cmdMsg);break;
-			case EXMPP_CMD_SMS_GET        :res=proc_cmd_sms_get(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_SMS_SEND       :res=proc_cmd_sms_send(cmd.cmdMsg);break;
-			case EXMPP_CMD_SMS_LIST_UPDATE:res=proc_cmd_sms_list_update(cmd.cmdMsg);break;
-			case EXMPP_CMD_SMS_GET_TOTAL  :res=proc_cmd_sms_get_total(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_FMW_GET_VERSION:res=proc_cmd_fmw_get_version(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_FMW_UPDATE     :res=proc_cmd_fmw_update(cmd.cmdMsg);break;
-			case EXMPP_CMD_FMW_UPDATE_STS :res=proc_cmd_fmw_update_sts(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_FMW_UPDATE_RES :res=proc_cmd_fmw_update_res(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_FMW_REBOOT     :res=proc_cmd_fmw_reboot(cmd.cmdMsg);break;
-			case EXMPP_CMD_FMW_UPTIME     :res=proc_cmd_fmw_uptime(cmd.cmdMsg,returnval);break;
+			case EXMPP_CMD_SMS_DELETE_ALL  :res=proc_cmd_sms_deleteall(cmd.cmdMsg);break;
+			case EXMPP_CMD_SMS_DELETE      :res=proc_cmd_sms_delete(cmd.cmdMsg);break;
+			case EXMPP_CMD_SMS_GET         :res=proc_cmd_sms_get(cmd.cmdMsg,returnval);break;
+			case EXMPP_CMD_SMS_SEND        :res=proc_cmd_sms_send(cmd.cmdMsg);break;
+			case EXMPP_CMD_SMS_LIST_UPDATE :res=proc_cmd_sms_list_update(cmd.cmdMsg);break;
+			case EXMPP_CMD_SMS_GET_TOTAL   :res=proc_cmd_sms_get_total(cmd.cmdMsg,returnval);break;
+			case EXMPP_CMD_FMW_GET_VERSION :res=proc_cmd_fmw_get_version(cmd.cmdMsg,returnval);break;
+			case EXMPP_CMD_FMW_UPDATE      :res=proc_cmd_fmw_update(cmd.cmdMsg);break;
+			case EXMPP_CMD_FMW_UPDATE_STS  :res=proc_cmd_fmw_update_sts(cmd.cmdMsg,returnval);break;
+			case EXMPP_CMD_FMW_UPDATE_RES  :res=proc_cmd_fmw_update_res(cmd.cmdMsg,returnval);break;
+			case EXMPP_CMD_FMW_REBOOT      :res=proc_cmd_fmw_reboot(cmd.cmdMsg);break;
+			case EXMPP_CMD_FMW_UPTIME      :res=proc_cmd_fmw_uptime(cmd.cmdMsg,returnval);break;
+			case EXMPP_CMD_FMW_GET_HOSTNAME:res=proc_cmd_fmw_get_hostname(cmd.cmdMsg,returnval);break;
+			case EXMPP_CMD_FMW_SET_HOSTNAME:res=proc_cmd_fmw_set_hostname(cmd.cmdMsg);break;
 			default                       :break;
 		}
 		processCmd.pop_front();//after processing delete the entry
@@ -408,5 +410,13 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_uptime(std::string msg,std::string &returnv
 	return result;
 }
 /* ------------------------------------------------------------------------- */
-
+RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_get_hostname(std::string msg,std::string &returnval)
+{
+	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+}
+RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_set_hostname(std::string msg)
+{
+	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+}
+/* ------------------------------------------------------------------------- */
 
