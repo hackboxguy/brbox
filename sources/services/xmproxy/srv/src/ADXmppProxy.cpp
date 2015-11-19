@@ -142,11 +142,11 @@ bool ADXmppProxy::onTLSConnect( const CertInfo& info )
 void ADXmppProxy::handleMessage( const Message& msg, MessageSession * /*session*/ )
 {
 	if(DebugLog)
-		cout<<"ADXmppProxy::handleMessage:arrived"<<endl;
-
-	receive_request(msg.body());
-//	std::string reply("i didnt understand");
-//	send_reply(reply);
+		cout<<"ADXmppProxy::handleMessage:arrived:msg:"<<msg.body()<<":len:"<<msg.body().size()<<endl;
+	if(msg.body().size()>0)
+		receive_request(msg.body());
+	//else 
+		//ignore-the-message
 }
 /*****************************************************************************/
 int ADXmppProxy::receive_request(std::string req)
