@@ -77,6 +77,10 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&AsyncGet);
 	SysRpc DevTypeGet(SYSMGR_RPC_DEVTYPE_GET    ,EJSON_SYSMGR_RPC_GET_DEVTYPE   ,emulat,dbglog,&DataCache); 
 	RpcMgr.AttachRpc(&DevTypeGet);
+	SysRpc HostnameGet(SYSMGR_RPC_HOSTNAME_GET    ,EJSON_SYSMGR_RPC_GET_HOSTNAME   ,emulat,dbglog,&DataCache); 
+	RpcMgr.AttachRpc(&HostnameGet);
+	SysRpc HostnameSet(SYSMGR_RPC_HOSTNAME_SET    ,EJSON_SYSMGR_RPC_SET_HOSTNAME   ,emulat,dbglog,&DataCache); 
+	RpcMgr.AttachRpc(&HostnameSet);
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr
