@@ -2,6 +2,7 @@
 #
 # Start/stop server script
 #
+CLIENT_NAME=/opt/fmw/bin/xmproxyclt
 SERVER_NAME=/opt/fmw/bin/xmproxysrv
 DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
 XMPP_LOGIN_DATA=/mnt/settings/etc/xmpp.login
@@ -14,7 +15,8 @@ start() {
 
 stop() {
 	echo -n "Stopping $SERVER_NAME Service:  "
-	killall $SERVER_NAME
+	$CLIENT_NAME --shutdown
+	sleep 1
 	echo "OK"
 }
 
