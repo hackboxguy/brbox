@@ -8,7 +8,7 @@
 #include "ADTimer.hpp"
 
 using namespace std;
-#define CLIENT_ALIVE_PING_DURATION_MS 10000;//10seconds
+#define CLIENT_ALIVE_PING_DURATION_MS 60000;//60seconds
 #define GITHUB_FMW_DOWNLOAD_FOLDER "http://github.com/hackboxguy/downloads/raw/master/"
 
 #define BBOXSMS_SERVER_ADDR "127.0.0.1"
