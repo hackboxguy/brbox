@@ -103,7 +103,22 @@ int XmppMgr::onXmppMessage(std::string msg,ADXmppProducer* pObj)
 int XmppMgr::thread_callback_function(void* pUserData,ADThreadProducer* pObj)
 {
 	//cout<<"going to connect"<<endl;
-	XmppProxy.connect((char*)XmppUserName.c_str(),(char*)XmppUserPw.c_str());
+	while(1)
+	{
+		//cout<<"XmppMgr::thread_callback_function: entering xmpp connect"<<endl;
+		XmppProxy.connect((char*)XmppUserName.c_str(),(char*)XmppUserPw.c_str());
+		//cout<<"XmppMgr::thread_callback_function: exited xmpp connect"<<endl;
+		//XmppProxy.disconnect();
+		if(XmppProxy.getForcedDisconnect())break;
+		
+		//before retrying wait 5sec
+		usleep(800000);if(XmppProxy.getForcedDisconnect())break;
+		usleep(800000);if(XmppProxy.getForcedDisconnect())break;
+		usleep(800000);if(XmppProxy.getForcedDisconnect())break;
+		usleep(800000);if(XmppProxy.getForcedDisconnect())break;
+		usleep(800000);if(XmppProxy.getForcedDisconnect())break;
+		//check why disconneted, if forced disconnect, then break the loop, else try to connect again
+	}
 	//cout<<"exiting after connect"<<endl;
 	return 0;
 }
@@ -204,6 +219,7 @@ RPC_SRV_RESULT XmppMgr::Stop()
 {
 	//XmppProxy.disconnect();
 	int MaxTime=0;
+	XmppProxy.setForcedDisconnect();
 	XmppProxy.disconnect();
 	//while(XmppProxy.get_connect_sts()==true && MaxTime++<50) //max 5sec wait
 	//{
@@ -412,11 +428,37 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_uptime(std::string msg,std::string &returnv
 /* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_get_hostname(std::string msg,std::string &returnval)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+//14:52:09.440-->{ "jsonrpc": "2.0", "method": "get_debug_outfile", "id": 0 }
+//14:52:09.440<--{ "jsonrpc": "2.0", "result": { "return": "Success", "filepath": "" }, "id": 0 }
+	char temp_str[255];temp_str[0]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result = Client.get_string_type((char*)"get_hostname",(char*)"hostname",temp_str);
+	Client.rpc_server_disconnect();
+	returnval=temp_str;
+	return result;
 }
+/* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_set_hostname(std::string msg)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+//14:52:21.336-->{ "jsonrpc": "2.0", "method": "set_debug_outfile", "params": { "filepath": "\/home\/adav\/tmp" }, "id": 0 }
+//14:52:21.336<--{ "jsonrpc": "2.0", "result": { "return": "Success" }, "id": 0 }
+	std::string cmd,cmdArg;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	msgstream >> cmdArg;
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0)
+		return RPC_SRV_RESULT_ARG_ERROR;
+	//char temp_str[255];temp_str[0]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result = Client.set_single_string_type((char*)"set_hostname",(char*)"hostname",(char*)cmdArg.c_str());
+	Client.rpc_server_disconnect();
+	return result;
 }
 /* ------------------------------------------------------------------------- */
 

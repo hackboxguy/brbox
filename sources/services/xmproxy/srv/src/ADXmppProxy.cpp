@@ -4,6 +4,8 @@ using namespace std;
 #include <stdio.h>
 #include <time.h>
 #include <string>
+#include <unistd.h>
+
 /*****************************************************************************/
 int ADXmppProducer::IDGenerator = 0;//generate Unique ID for every ADXmppProxy object
 /*****************************************************************************/
@@ -12,22 +14,54 @@ ADXmppProxy::ADXmppProxy()
 	DebugLog=false;
 	failed_authorization=false;
 	connected=false;
+	HeartBeat=0;
+	DisconnectNow=false;
 	m_session=0;
 	m_messageEventFilter=0;
 	m_chatStateFilter=0;
+	j=NULL;
+
+	PingThread.subscribe_thread_callback(this);
+	PingThread.set_thread_properties(THREAD_TYPE_MONOSHOT,(void *)this);
+	PingThread.start_thread();
+}
+ADXmppProxy::~ADXmppProxy()
+{
+	PingThread.stop_thread();
 }
 /*****************************************************************************/
 int ADXmppProxy::disconnect()
 {
-	if(connected)
-		j->disconnect();
+	//if(connected)
+	if(j!=NULL)
+	{
+		j->disconnect();//ConnNotConnected
+		while(connected)
+			usleep(100000);
+		//delete( j );
+		//j=NULL;
+		//connected=false;
+		//if(DebugLog)
+		//	cout<<"ADXmppProxy::disconnect: Deleted Client!!!!! disconnected"<<endl;
+	}
 	return 0;
 }
 /*****************************************************************************/
 int ADXmppProxy::connect(char* user,char* password)
 {
+	//if(connected==true)
+	//	return 0;
+	if(j!=NULL)
+		return 0;
+
+	if(DebugLog)
+		cout<<"ADXmppProxy::connect: Entering===>"<<endl;
+
 	JID jid( user);
+	//myJid=jid;
 	j = new Client( jid,password);
+	connected=true;//after creation of Client object, make this flag true
+
 	j->registerConnectionListener( this );
 	j->registerMessageSessionHandler( this, 0 );
 	j->disco()->setVersion( "messageTest", GLOOX_VERSION, "Linux" );
@@ -37,11 +71,14 @@ int ADXmppProxy::connect(char* user,char* password)
 	//ca.push_back( "./cacert.crt" );
 	//j->setCACerts( ca );
 
-	j->logInstance().registerLogHandler( LogLevelDebug, LogAreaAll, this );
+	//LogLevelDebug
+	j->logInstance().registerLogHandler( LogLevelWarning, LogAreaAll, this );
 
+	HeartBeat=0;
+
+	ConnectionError ce = ConnNoError;
 	if( j->connect( false ) )
 	{
-		ConnectionError ce = ConnNoError;
 		while( ce == ConnNoError )
 		{
 			ce = j->recv();
@@ -51,7 +88,17 @@ int ADXmppProxy::connect(char* user,char* password)
 		if(DebugLog)
 			printf( "ce: %d\n", ce );
 	}
+
+	usleep(100000);
+
 	delete( j );
+	j=NULL;
+	
+	connected=false;
+
+	if(DebugLog)
+		cout<<"ADXmppProxy::connect: exiting<==="<<endl;
+
 	return 0;
 }
 /*****************************************************************************/
@@ -64,7 +111,7 @@ void ADXmppProxy::onConnect()
 {
 	if(DebugLog)
 		cout<<"ADXmppProxy::onConnect:connected!!!"<<endl;
-	connected=true;
+	//connected=true;
 }
 /*****************************************************************************/
 void ADXmppProxy::onDisconnect( ConnectionError e )
@@ -75,9 +122,16 @@ void ADXmppProxy::onDisconnect( ConnectionError e )
 		if(DebugLog)
 			cout<<"ADXmppProxy::onDisconnect:disconnected due to failed authrization"<<endl;
 	}
-	connected=false;
+	//connected=false;
 	if(DebugLog)
 		cout<<"ADXmppProxy::onDisconnect:disconnected"<<endl;
+
+	//if(j!=NULL)
+	//{
+	//	delete( j );
+	//	j=NULL;
+	//	connected=false;
+	//}
 }
 /*****************************************************************************/
 bool ADXmppProxy::onTLSConnect( const CertInfo& info )
@@ -87,6 +141,9 @@ bool ADXmppProxy::onTLSConnect( const CertInfo& info )
 /*****************************************************************************/
 void ADXmppProxy::handleMessage( const Message& msg, MessageSession * /*session*/ )
 {
+	if(DebugLog)
+		cout<<"ADXmppProxy::handleMessage:arrived"<<endl;
+
 	receive_request(msg.body());
 //	std::string reply("i didnt understand");
 //	send_reply(reply);
@@ -102,8 +159,11 @@ int ADXmppProxy::receive_request(std::string req)
 }
 int ADXmppProxy::send_reply(std::string reply)
 {
-	if(!connected)
-		return -1;//if no connection, then dont send data
+	if(j==NULL)
+		return -1;
+
+//	if(!connected)
+	//	return -1;//if no connection, then dont send data
 	std::string sub;
 	//send response
 	m_messageEventFilter->raiseMessageEvent( MessageEventDisplayed );
@@ -129,6 +189,8 @@ void ADXmppProxy::handleChatState( const JID& from, ChatStateType state)
 /*****************************************************************************/
 void ADXmppProxy::handleMessageSession( MessageSession *session )
 {
+	if(j==NULL)
+		return;
 	if(DebugLog)
 		printf( "got new session\n");
 	// this example can handle only one session. so we get rid of the old session
@@ -159,11 +221,76 @@ const std::string ADXmppProxy::currentDateTime()
 }
 void ADXmppProxy::send_client_alive_ping()
 {
-	if(connected)
-		j->whitespacePing();
+	//if(connected)
+		//j->whitespacePing();
+	/*if(j!=NULL)
+	{
+		j->xmppPing(j->jid(),this);//,this->handleEvent);
+		if(++HeartBeat > 3)//MAX_RESPONSE_TIME_OUT)
+		{
+			if(DebugLog)
+				cout<<"ADXmppProxy::send_client_alive_ping:going to disconnect"<<endl;
+			//j->disconnect();//ConnNotConnected);//ConnTlsFailed);// fake disconnect reason so that no </stream:stream> is sent
+			disconnect();
+
+			if(DebugLog)
+				cout<<"ADXmppProxy::send_client_alive_ping:disconnected"<<endl;
+		}
+	}
 	if(DebugLog)
-		cout<<"ADXmppProxy::send_client_alive_ping:"<<currentDateTime()<<" connSts="<<connected<<endl;
+		cout<<"ADXmppProxy::send_client_alive_ping:"<<currentDateTime()<<" connSts="<<connected<<endl;*/
+
+	//if ping-thread is already blocked, then dont push for more ping requests, just return.
+	if(PingPipe.empty())
+	{
+		PingPipe.push_back(0);//push test-integer0 value
+		PingThread.wakeup_thread();//tell the worker to start working
+	}
 }
 /*****************************************************************************/
+int ADXmppProxy::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
+{
+	while (!PingPipe.empty())
+	{
+		int pingsample = PingPipe.front();
 
+		if(j!=NULL)
+		{
+			j->xmppPing(j->jid(),this);//,this->handleEvent);
+			if(++HeartBeat > 3)//MAX_RESPONSE_TIME_OUT)
+			{
+				if(DebugLog)
+					cout<<"ADXmppProxy::send_client_alive_ping:going to disconnect"<<endl;
+			//j->disconnect();//ConnNotConnected);//ConnTlsFailed);// fake disconnect reason so that no </stream:stream> is sent
+				disconnect();
+				if(DebugLog)
+					cout<<"ADXmppProxy::send_client_alive_ping:disconnected"<<endl;
+			}
+		}
+		if(DebugLog)
+			cout<<"ADXmppProxy::send_client_alive_ping:"<<currentDateTime()<<" connSts="<<connected<<endl;
+
+		PingPipe.pop_front();//after processing delete the entry
+	}
+
+	return 0;
+}
+/*****************************************************************************/
+void ADXmppProxy::handleEvent( const Event& event )
+{
+	switch(event.eventType())
+	{
+		case Event::PingPing:
+			break;
+		case Event::PingPong:
+			--HeartBeat;
+			break;
+		case Event::PingError:
+			break;
+		default:
+			break;
+	}
+	//cout<<"handleEvent::pong received"<<endl;
+}
+/*****************************************************************************/
 

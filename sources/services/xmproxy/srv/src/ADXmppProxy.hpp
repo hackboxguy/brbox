@@ -3,6 +3,9 @@
 #ifndef __ADXMPP_PROXY_H_
 #define __ADXMPP_PROXY_H_
 
+#define CLIENT_TEST
+#define CLIENTBASE_TEST
+
 #include <gloox/client.h>
 #include <gloox/messagesessionhandler.h>
 #include <gloox/messageeventhandler.h>
@@ -20,6 +23,10 @@
 #include <gloox/connectionsocks5proxy.h>
 #include <gloox/connectionhttpproxy.h>
 #include <gloox/messagehandler.h>
+#include <gloox/eventhandler.h>
+#include "ADThread.hpp"
+#include <deque>
+
 using namespace gloox;
 /* ------------------------------------------------------------------------- */
 class ADXmppProducer; //subject
@@ -60,11 +67,11 @@ public:
 };
 /* ------------------------------------------------------------------------- */
 class ADXmppProxy : public MessageSessionHandler, ConnectionListener, LogHandler,
-                    MessageEventHandler, MessageHandler, ChatStateHandler, public ADXmppProducer
+                    MessageEventHandler, MessageHandler, ChatStateHandler,EventHandler, public ADXmppProducer,public ADThreadConsumer
 {
 public:
 	ADXmppProxy();
-	~ADXmppProxy(){}
+	~ADXmppProxy();//{}
 	int disconnect();
 	int connect(char* user,char* password);
 	int send_reply(std::string reply);
@@ -73,7 +80,10 @@ public:
 	void SetDebugLog(bool log);
 	void send_client_alive_ping();
 	const std::string currentDateTime();
+	bool getForcedDisconnect(){return DisconnectNow;}
+	void setForcedDisconnect(){DisconnectNow=true;}
 
+	virtual void handleEvent( const Event& event );// = 0;
 	virtual void onConnect();
 	virtual void onDisconnect( ConnectionError e );
 	virtual bool onTLSConnect( const CertInfo& info );
@@ -82,10 +92,19 @@ public:
 	virtual void handleChatState( const JID& from, ChatStateType state );
 	virtual void handleMessageSession( MessageSession *session );
 	virtual void handleLog( LogLevel level, LogArea area, const std::string& message );
+
+	std::deque<int> PingPipe;//fifo for processing xmpp ping requests
+	ADThread PingThread;
+	virtual int monoshot_callback_function(void* pUserData,ADThreadProducer* pObj);//{return 0;};
+	virtual int thread_callback_function(void* pUserData,ADThreadProducer* pObj){return 0;};
+
 private:
+	bool DisconnectNow;
 	bool DebugLog;
 	bool failed_authorization;
 	bool connected;
+	int  HeartBeat;
+	//JID myJid;
 	Client *j;
 	MessageSession *m_session;
 	MessageEventFilter *m_messageEventFilter;
