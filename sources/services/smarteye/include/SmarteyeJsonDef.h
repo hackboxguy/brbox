@@ -22,7 +22,7 @@ typedef enum EJSON_SMARTEYE_RPC_TYPES_T
 //EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN
 #define SMARTEYE_RPC_ID_PATTERN_CHECK           "check_id_pattern" //checks if id pattern exists
 #define SMARTEYE_RPC_ID_PATTERN_CHECK_ARG       "pattern"
-#define SMARTEYE_RPC_ID_PATTERN_CHECK_ARG_TABL  {"ident","red","green","blue","white","unknown","none","\0"}
+#define SMARTEYE_RPC_ID_PATTERN_CHECK_ARG_TABL  {"ident","red","green","blue","white","chkwall","unknown","none","\0"}
 typedef enum EJSON_SMARTEYE_IFACE_TYPE_T
 {
 	EJSON_SMARTEYE_IDPATTERN_IDENT,

@@ -15,11 +15,15 @@ int SmarteyeRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 	EJSON_SMARTEYE_RPC_TYPES command =(EJSON_SMARTEYE_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN      :return json_to_bin_check_id_pattern(pReq);
-		case EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET     :return json_to_bin_get_debug_outfile(pReq);
-		case EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_SET     :return json_to_bin_set_debug_outfile(pReq);
-		case EJSON_SMARTEYE_RPC_CAPTURE_JPG_IMG       :return json_to_bin_capture_jpg_img(pReq);
-		case EJSON_SMARTEYE_RPC_CAPTURE_RESOLUTION_SET:return json_to_bin_set_capture_resolution(pReq);
+		case EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN       :return json_to_bin_check_id_pattern(pReq);
+		case EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET      :return json_to_bin_get_debug_outfile(pReq);
+		case EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_SET      :return json_to_bin_set_debug_outfile(pReq);
+		case EJSON_SMARTEYE_RPC_CAPTURE_JPG_IMG        :return json_to_bin_capture_jpg_img(pReq);
+		case EJSON_SMARTEYE_RPC_CAPTURE_RESOLUTION_SET :return json_to_bin_set_capture_resolution(pReq);
+		case EJSON_SMARTEYE_RPC_CHECKWALL_FILE_GET     :return json_to_bin_get_checkwall_file(pReq);
+		case EJSON_SMARTEYE_RPC_CHECKWALL_FILE_SET     :return json_to_bin_set_checkwall_file(pReq);
+		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET:return json_to_bin_get_checkwallbase_file(pReq);
+		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET:return json_to_bin_set_checkwallbase_file(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -30,11 +34,15 @@ int SmarteyeRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 	EJSON_SMARTEYE_RPC_TYPES command =(EJSON_SMARTEYE_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN      :return bin_to_json_check_id_pattern(pReq);
-		case EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET     :return bin_to_json_get_debug_outfile(pReq);
-		case EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_SET     :return bin_to_json_set_debug_outfile(pReq);
-		case EJSON_SMARTEYE_RPC_CAPTURE_JPG_IMG       :return bin_to_json_capture_jpg_img(pReq);
-		case EJSON_SMARTEYE_RPC_CAPTURE_RESOLUTION_SET:return bin_to_json_set_capture_resolution(pReq);
+		case EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN       :return bin_to_json_check_id_pattern(pReq);
+		case EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET      :return bin_to_json_get_debug_outfile(pReq);
+		case EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_SET      :return bin_to_json_set_debug_outfile(pReq);
+		case EJSON_SMARTEYE_RPC_CAPTURE_JPG_IMG        :return bin_to_json_capture_jpg_img(pReq);
+		case EJSON_SMARTEYE_RPC_CAPTURE_RESOLUTION_SET :return bin_to_json_set_capture_resolution(pReq);
+		case EJSON_SMARTEYE_RPC_CHECKWALL_FILE_GET     :return bin_to_json_get_checkwall_file(pReq);
+		case EJSON_SMARTEYE_RPC_CHECKWALL_FILE_SET     :return bin_to_json_set_checkwall_file(pReq);
+		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET:return bin_to_json_get_checkwallbase_file(pReq);
+		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET:return bin_to_json_set_checkwallbase_file(pReq);
 		default:break;
 	}
 	return -1;
@@ -45,11 +53,15 @@ int SmarteyeRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProduce
 	EJSON_SMARTEYE_RPC_TYPES command =(EJSON_SMARTEYE_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN      :return process_check_id_pattern(pReq);
-		case EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET     :return process_get_debug_outfile(pReq);
-		case EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_SET     :return process_set_debug_outfile(pReq);
-		case EJSON_SMARTEYE_RPC_CAPTURE_JPG_IMG       :return process_capture_jpg_img(pReq);
-		case EJSON_SMARTEYE_RPC_CAPTURE_RESOLUTION_SET:return process_set_capture_resolution(pReq);
+		case EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN       :return process_check_id_pattern(pReq);
+		case EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET      :return process_get_debug_outfile(pReq);
+		case EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_SET      :return process_set_debug_outfile(pReq);
+		case EJSON_SMARTEYE_RPC_CAPTURE_JPG_IMG        :return process_capture_jpg_img(pReq);
+		case EJSON_SMARTEYE_RPC_CAPTURE_RESOLUTION_SET :return process_set_capture_resolution(pReq);
+		case EJSON_SMARTEYE_RPC_CHECKWALL_FILE_GET     :return process_get_checkwall_file(pReq);
+		case EJSON_SMARTEYE_RPC_CHECKWALL_FILE_SET     :return process_set_checkwall_file(pReq);
+		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET:return process_get_checkwallbase_file(pReq);
+		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET:return process_set_checkwallbase_file(pReq);
 		default:break;
 	}
 	return 0;
@@ -85,7 +97,7 @@ int SmarteyeRpc::process_check_id_pattern(JsonDataCommObj* pReq)
 	//set debug logging flag
 	ImgId.logflag=get_debug_log_flag();//get_debug_log_flag() is a function f parent class ADJsonRpcMgrConsumer
 
-	pPanelReq->result=ImgId.IdentifyPattern(pPacket->pattern_type,pDataCache->StrImgIdDebugFile);
+	pPanelReq->result=ImgId.IdentifyPattern(pPacket->pattern_type,pDataCache->StrImgIdDebugFile,pDataCache->StrImgIdCheckWallFile,pDataCache->StrImgIdCheckWallBaseFile);
 	return 0;
 }
 /* ------------------------------------------------------------------------- */

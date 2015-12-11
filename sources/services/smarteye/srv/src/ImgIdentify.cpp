@@ -156,6 +156,79 @@ int ImgIdentify::apply_threshold(Mat& src_gray,int trsh,RNG &rng,Mat& drawing, v
 	return 0;
 }
 /*---------------------------------------------------------------------------*/
+int ImgIdentify::identifyBlackPanel(std::string &baseImagePath, string &testImagePath, int thresholdPixelCount, int minThresholdForBaseImage, int maxThresholdForBaseImage, int minThresFactorForTestImage, bool debug)
+{
+	Mat baseImg = imread(baseImagePath.c_str());
+	if (baseImg.empty())
+	{
+		cout << "Cannot load image " << baseImagePath << endl;
+		return -1;
+	}
+
+	std::size_t found = baseImagePath.find(".jpg");
+
+	Mat  mask(baseImg.size(), CV_8UC1, Scalar::all(0));
+	cvtColor(baseImg, mask, CV_BGR2GRAY);
+	string imageNameTobeSaved;
+	if (debug)
+	{
+		imageNameTobeSaved = baseImagePath;
+		imageNameTobeSaved = imageNameTobeSaved.insert(found, "_gray");
+		imwrite(imageNameTobeSaved.c_str(), mask);
+	}
+
+	threshold(mask, mask, minThresholdForBaseImage, maxThresholdForBaseImage, THRESH_BINARY);
+	if (debug)
+	{
+		imageNameTobeSaved = baseImagePath;
+		imageNameTobeSaved = imageNameTobeSaved.insert(found, "_threshold");
+		imwrite(imageNameTobeSaved.c_str(), mask);
+	}
+
+	int count_white = countNonZero(mask);
+	//cout << "Number of white pixels in base image = " << count_white << endl;
+	//cout << endl;
+
+	Mat  grayImg(mask.size(), CV_8UC1, Scalar::all(0));
+	Mat  masked_Img(mask.size(), CV_8UC1, Scalar::all(0));
+
+	Mat testImg = imread(testImagePath.c_str());
+	if (testImg.empty())
+	{
+		cout << "Cannot load image " << testImagePath << endl;
+		return -1;
+	}
+
+	cvtColor(testImg, grayImg, CV_BGR2GRAY);
+	grayImg.copyTo(masked_Img, mask);
+
+	found = testImagePath.find(".jpg");
+	if (debug)
+	{
+		imageNameTobeSaved = testImagePath;
+		imageNameTobeSaved = imageNameTobeSaved.insert(found, "_mask");
+		imwrite(imageNameTobeSaved.c_str(), masked_Img);
+	}
+
+	threshold(masked_Img, masked_Img, minThresFactorForTestImage, maxThresholdForBaseImage, THRESH_BINARY);
+	int count_white_new = countNonZero(masked_Img);
+	if (debug)
+	{
+		string imageNameTobeSaved = testImagePath;
+		imageNameTobeSaved = imageNameTobeSaved.insert(found, "_threshold");
+		imwrite(imageNameTobeSaved.c_str(), masked_Img);
+	}
+
+	//cout << "Number of white pixels in " << testImagePath << " = " << count_white_new << "." << endl;
+	//cout << "Number of white pixels reduced by " << to_string(count_white - count_white_new) << " pixels." << endl;
+	if ((count_white - count_white_new) > thresholdPixelCount)
+		return 1;
+	else
+		return 0;
+	
+	return 0;
+}
+/*---------------------------------------------------------------------------*/
 int ImgIdentify::scale_image(Mat& image, const float imgScaleFactor)
 {
 	cv::resize(image, image, cvSize(0, 0),imgScaleFactor,imgScaleFactor);
@@ -243,11 +316,26 @@ RPC_SRV_RESULT ImgIdentify::identify_image_box(std::string imgPath)
 /*---------------------------------------------------------------------------*/
 RPC_SRV_RESULT ImgIdentify::identify_color_box(std::string imgPath,EJSON_SMARTEYE_IFACE_TYPE pattern)
 {
-
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*---------------------------------------------------------------------------*/
-RPC_SRV_RESULT ImgIdentify::IdentifyPattern(EJSON_SMARTEYE_IFACE_TYPE pattern,std::string imgPath)
+RPC_SRV_RESULT ImgIdentify::identify_if_all_tiles_on(std::string inputFile,std::string baseMaskImgFile)
+{
+	string baseImgPath = "base.jpg";
+	//string testImagePath = "/home/adav/embedded/opencv/check-wall/test2.jpg";
+	int thresholdPixelCount = 14000;		//width*height of top left panel is 14935 so we take 13000 pixel as minimum number of pixels which would be change if panel is off
+	int minThresholdForBaseImage = 200;		//this will used to create mask for base image
+	int maxThresholdForBaseImage = 255;		//this will used to create mask for base image
+	int minThresFactorForTestImage = 100;	//this will used to create mask for test images
+
+	int result = identifyBlackPanel(baseMaskImgFile, inputFile, thresholdPixelCount, minThresholdForBaseImage, maxThresholdForBaseImage, minThresFactorForTestImage, false);
+	if(result==0)
+		return RPC_SRV_RESULT_SUCCESS;
+	else
+		return RPC_SRV_RESULT_FAIL;
+}
+/*---------------------------------------------------------------------------*/
+RPC_SRV_RESULT ImgIdentify::IdentifyPattern(EJSON_SMARTEYE_IFACE_TYPE pattern,std::string imgPath,std::string chkWallFile,std::string chkWallBaseFile)
 {
 	switch(pattern)
 	{
@@ -256,6 +344,7 @@ RPC_SRV_RESULT ImgIdentify::IdentifyPattern(EJSON_SMARTEYE_IFACE_TYPE pattern,st
 		case EJSON_SMARTEYE_IDPATTERN_GREEN:
 		case EJSON_SMARTEYE_IDPATTERN_BLUE :
 		case EJSON_SMARTEYE_IDPATTERN_WHITE:
+		case EJSON_SMARTEYE_IDPATTERN_CHECK_WALL:return identify_if_all_tiles_on(chkWallFile,chkWallBaseFile);
 		default:break;
 	}
 	return RPC_SRV_RESULT_FAIL;
