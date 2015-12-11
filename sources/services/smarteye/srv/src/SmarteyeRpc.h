@@ -36,6 +36,20 @@ public:
 	int bin_to_json_set_capture_resolution(JsonDataCommObj* pReq);
 	int process_set_capture_resolution(JsonDataCommObj* pReq);
 
+	int json_to_bin_get_checkwall_file(JsonDataCommObj* pReq);
+	int bin_to_json_get_checkwall_file(JsonDataCommObj* pReq);
+	int process_get_checkwall_file(JsonDataCommObj* pReq);
+	int json_to_bin_set_checkwall_file(JsonDataCommObj* pReq);
+	int bin_to_json_set_checkwall_file(JsonDataCommObj* pReq);
+	int process_set_checkwall_file(JsonDataCommObj* pReq);
+
+	int json_to_bin_get_checkwallbase_file(JsonDataCommObj* pReq);
+	int bin_to_json_get_checkwallbase_file(JsonDataCommObj* pReq);
+	int process_get_checkwallbase_file(JsonDataCommObj* pReq);
+	int json_to_bin_set_checkwallbase_file(JsonDataCommObj* pReq);
+	int bin_to_json_set_checkwallbase_file(JsonDataCommObj* pReq);
+	int process_set_checkwallbase_file(JsonDataCommObj* pReq);
+
 };
 /* ------------------------------------------------------------------------- */
 

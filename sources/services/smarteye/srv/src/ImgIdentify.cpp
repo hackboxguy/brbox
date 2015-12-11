@@ -17,7 +17,7 @@ double ImgIdentify::angle(Point pt1, Point pt2, Point pt0)
     return (dx1*dx2 + dy1*dy2)/sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2) + 1e-10);
 }
 /*---------------------------------------------------------------------------*/
-//finds the smaller square-box with reference to biggest_square, the relation is given by the multifying factor "scale_factor"
+//finds the smaller square-box with reference to biggest_square, the relation is given by the multiplying factor "scale_factor"
 //this logic works for a pattern which has 3 times bigger rectangle when compared to inner rectangle, hence scale factor to be used is 3
 int ImgIdentify::find_relative_square(const vector<vector <Point> >& squares, vector<Point> biggest_square,vector<Point>& relative_square,int scale_factor,int tolerence) 
 {

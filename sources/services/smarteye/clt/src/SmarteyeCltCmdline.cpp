@@ -14,6 +14,10 @@ SmarteyeCltCmdline::SmarteyeCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--capturejpg=filepath      [capture camera frame and save it to filepath]");
 	CmdlineHelper.insert_options_entry((char*)"captureRes" ,optional_argument,EJSON_SMARTEYE_RPC_CAPTURE_RESOLUTION_SET);
 	CmdlineHelper.insert_help_entry((char*)"--captureRes=lines,pixels  [set jpg image capture resolution]");
+	CmdlineHelper.insert_options_entry((char*)"chkwallfile",optional_argument,EJSON_SMARTEYE_RPC_CHECKWALL_FILE_GET);
+	CmdlineHelper.insert_help_entry((char*)"--chkwallfile=filepath     [read/write check wall file path]");
+	CmdlineHelper.insert_options_entry((char*)"chkwallbasefile" ,optional_argument,EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET);
+	CmdlineHelper.insert_help_entry((char*)"--chkwallbasefile=filepath [read/write check wall base file path]");
 }
 /*****************************************************************************/
 SmarteyeCltCmdline::~SmarteyeCltCmdline()
@@ -51,6 +55,16 @@ int SmarteyeCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 						SMARTEYE_RPC_CAPTURE_RESOLUTION_SET,
 						(char*)SMARTEYE_RPC_CAPTURE_RESOLUTION_ARGH,
 						(char*)SMARTEYE_RPC_CAPTURE_RESOLUTION_ARGV,-1,sub_arg);
+			break;
+		case EJSON_SMARTEYE_RPC_CHECKWALL_FILE_GET:
+			CmdlineHelper.push_string_get_set_command(EJSON_SMARTEYE_RPC_CHECKWALL_FILE_GET,EJSON_SMARTEYE_RPC_CHECKWALL_FILE_SET,
+			SMARTEYE_RPC_CHECKWALL_FILE_GET,SMARTEYE_RPC_CHECKWALL_FILE_SET,
+			(char*)SMARTEYE_RPC_DEBUG_OUTFILE_ARG,sub_arg);
+			break;
+		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET:
+			CmdlineHelper.push_string_get_set_command(EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET,EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET,
+			SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET,SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET,
+			(char*)SMARTEYE_RPC_DEBUG_OUTFILE_ARG,sub_arg);
 			break;
 		default:
 			return 0;

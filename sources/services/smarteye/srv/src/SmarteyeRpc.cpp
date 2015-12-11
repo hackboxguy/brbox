@@ -187,6 +187,106 @@ int SmarteyeRpc::process_set_capture_resolution(JsonDataCommObj* pReq)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
+int SmarteyeRpc::json_to_bin_get_checkwall_file(JsonDataCommObj* pReq)
+{
+	SMARTEYE_DEBUG_OUTFILE_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SMARTEYE_DEBUG_OUTFILE_PACKET,RPC_SRV_ACT_READ,EJSON_SMARTEYE_RPC_CHECKWALL_FILE_GET);
+	return 0;
+}
+int SmarteyeRpc::bin_to_json_get_checkwall_file(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_STRING(RPC_SRV_REQ,SMARTEYE_DEBUG_OUTFILE_PACKET,SMARTEYE_RPC_DEBUG_OUTFILE_ARG,filepath);
+	return 0;
+}
+int SmarteyeRpc::process_get_checkwall_file(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SMARTEYE_DEBUG_OUTFILE_PACKET* pPacket;
+	pPacket=(SMARTEYE_DEBUG_OUTFILE_PACKET*)pPanelReq->dataRef;
+	strcpy(pPacket->filepath,pDataCache->StrImgIdCheckWallFile.c_str());
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+int SmarteyeRpc::json_to_bin_set_checkwall_file(JsonDataCommObj* pReq)
+{
+	SMARTEYE_DEBUG_OUTFILE_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SMARTEYE_DEBUG_OUTFILE_PACKET,RPC_SRV_ACT_WRITE,EJSON_SMARTEYE_RPC_CHECKWALL_FILE_SET);
+	JSON_STRING_TO_STRING(SMARTEYE_RPC_DEBUG_OUTFILE_ARG,pPanelCmdObj->filepath);
+	return 0;
+}
+int SmarteyeRpc::bin_to_json_set_checkwall_file(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,SMARTEYE_DEBUG_OUTFILE_PACKET);
+	return 0;
+}
+int SmarteyeRpc::process_set_checkwall_file(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SMARTEYE_DEBUG_OUTFILE_PACKET* pPacket;
+	pPacket=(SMARTEYE_DEBUG_OUTFILE_PACKET*)pPanelReq->dataRef;
+	pDataCache->StrImgIdCheckWallFile="";///tmp/test.txt";
+	pDataCache->StrImgIdCheckWallFile.append(pPacket->filepath);
+	if(pDataCache->StrImgIdCheckWallFile==" ") //dont accept empty file
+		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;
+	else if(pDataCache->StrImgIdCheckWallFile=="") //dont accept empty file
+		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;
+	else
+		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int SmarteyeRpc::json_to_bin_get_checkwallbase_file(JsonDataCommObj* pReq)
+{
+	SMARTEYE_DEBUG_OUTFILE_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SMARTEYE_DEBUG_OUTFILE_PACKET,RPC_SRV_ACT_READ,EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET);
+	return 0;
+}
+int SmarteyeRpc::bin_to_json_get_checkwallbase_file(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_STRING(RPC_SRV_REQ,SMARTEYE_DEBUG_OUTFILE_PACKET,SMARTEYE_RPC_DEBUG_OUTFILE_ARG,filepath);
+	return 0;
+}
+int SmarteyeRpc::process_get_checkwallbase_file(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SMARTEYE_DEBUG_OUTFILE_PACKET* pPacket;
+	pPacket=(SMARTEYE_DEBUG_OUTFILE_PACKET*)pPanelReq->dataRef;
+	strcpy(pPacket->filepath,pDataCache->StrImgIdCheckWallBaseFile.c_str());
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+int SmarteyeRpc::json_to_bin_set_checkwallbase_file(JsonDataCommObj* pReq)
+{
+	SMARTEYE_DEBUG_OUTFILE_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SMARTEYE_DEBUG_OUTFILE_PACKET,RPC_SRV_ACT_WRITE,EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET);
+	JSON_STRING_TO_STRING(SMARTEYE_RPC_DEBUG_OUTFILE_ARG,pPanelCmdObj->filepath);
+	return 0;
+}
+int SmarteyeRpc::bin_to_json_set_checkwallbase_file(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,SMARTEYE_DEBUG_OUTFILE_PACKET);
+	return 0;
+}
+int SmarteyeRpc::process_set_checkwallbase_file(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SMARTEYE_DEBUG_OUTFILE_PACKET* pPacket;
+	pPacket=(SMARTEYE_DEBUG_OUTFILE_PACKET*)pPanelReq->dataRef;
+	pDataCache->StrImgIdCheckWallBaseFile="";///tmp/test.txt";
+	pDataCache->StrImgIdCheckWallBaseFile.append(pPacket->filepath);
+	if(pDataCache->StrImgIdCheckWallBaseFile==" ") //dont accept empty file
+		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;
+	else if(pDataCache->StrImgIdCheckWallBaseFile=="") //dont accept empty file
+		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;
+	else
+		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
 
 
 
