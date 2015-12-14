@@ -26,6 +26,7 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_GET_DEVTYPE,    //read the board or device type
 	EJSON_SYSMGR_RPC_GET_HOSTNAME,
 	EJSON_SYSMGR_RPC_SET_HOSTNAME,
+	EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP, //internet ip
 
 	//get device type
 	//EJSON_SYSMGR_RPC_IDENTIFY_DEVICE,
@@ -233,6 +234,14 @@ typedef struct SYSMGR_HOSTNAME_PACKET_T
 {
 	char hostname[1024];
 }SYSMGR_HOSTNAME_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP
+#define SYSMGR_RPC_MY_PUBLIC_IP_GET    "get_my_public_ip"
+#define SYSMGR_RPC_MY_PUBLIC_IP_ARG    "ip"
+typedef struct SYSMGR_MY_PUBLIC_IP_PACKET_T
+{
+	char ip[1024];
+}SYSMGR_MY_PUBLIC_IP_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct SYSMGR_CMN_DATA_CACHE_T

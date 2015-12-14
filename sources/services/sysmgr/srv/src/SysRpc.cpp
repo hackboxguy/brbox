@@ -37,6 +37,8 @@ int SysRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_GET_DEVTYPE     :return json_to_bin_get_devtype(pReq);
 		case EJSON_SYSMGR_RPC_GET_HOSTNAME    :return json_to_bin_get_hostname(pReq);
 		case EJSON_SYSMGR_RPC_SET_HOSTNAME    :return json_to_bin_set_hostname(pReq);
+		case EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP:return json_to_bin_get_myip(pReq);
+
 		default:break;
 	}
 	return -1;//0;
@@ -62,6 +64,7 @@ int SysRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_GET_DEVTYPE     :return bin_to_json_get_devtype(pReq);
 		case EJSON_SYSMGR_RPC_GET_HOSTNAME    :return bin_to_json_get_hostname(pReq);
 		case EJSON_SYSMGR_RPC_SET_HOSTNAME    :return bin_to_json_set_hostname(pReq);
+		case EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP:return bin_to_json_get_myip(pReq);
 		default: break;
 	}
 	return -1;
@@ -87,6 +90,7 @@ int SysRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 		case EJSON_SYSMGR_RPC_GET_DEVTYPE     :return process_get_devtype(pReq);
 		case EJSON_SYSMGR_RPC_GET_HOSTNAME    :return process_get_hostname(pReq);
 		case EJSON_SYSMGR_RPC_SET_HOSTNAME    :return process_set_hostname(pReq);
+		case EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP:return process_get_myip(pReq);
 		default:break;
 	}
 	return 0;
@@ -805,6 +809,48 @@ int SysRpc::process_set_hostname(JsonDataCommObj* pReq)
 	}
 	else 
 		pPanelReq->result=RPC_SRV_RESULT_FILE_OPEN_ERR;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_GET_HOSTNAME
+int SysRpc::json_to_bin_get_myip(JsonDataCommObj* pReq)
+{
+	SYSMGR_MY_PUBLIC_IP_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_MY_PUBLIC_IP_PACKET,RPC_SRV_ACT_READ,EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP);
+	return 0;
+}
+int SysRpc::bin_to_json_get_myip(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_STRING(RPC_SRV_REQ,SYSMGR_MY_PUBLIC_IP_PACKET,SYSMGR_RPC_MY_PUBLIC_IP_ARG,ip);
+	return 0;
+}
+int SysRpc::process_get_myip(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SYSMGR_MY_PUBLIC_IP_PACKET* pPacket;
+	pPacket=(SYSMGR_MY_PUBLIC_IP_PACKET*)pPanelReq->dataRef;
+	
+	/*if(pPanelReq->action!=RPC_SRV_ACT_READ)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+		return 0;
+	}
+	std::string name;
+	ifstream hostNameFile(HOST_NAME_FILE_PATH);
+	if (hostNameFile.is_open())
+	{
+		hostNameFile >> name; 
+		hostNameFile.close();
+		strcpy(pPacket->hostname,name.c_str());
+		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	}
+	else 
+		pPanelReq->result=RPC_SRV_RESULT_FILE_OPEN_ERR;*/
+
+	strcpy(pPacket->ip,"192.168.1.1");
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	//wget http://ipinfo.io/ip -qO -
 	return 0;
 }
 /* ------------------------------------------------------------------------- */

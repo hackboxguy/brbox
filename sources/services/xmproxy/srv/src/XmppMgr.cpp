@@ -144,8 +144,10 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			case EXMPP_CMD_FMW_UPDATE_RES  :res=proc_cmd_fmw_update_res(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_FMW_REBOOT      :res=proc_cmd_fmw_reboot(cmd.cmdMsg);break;
 			case EXMPP_CMD_FMW_UPTIME      :res=proc_cmd_fmw_uptime(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_FMW_GET_HOSTNAME:res=proc_cmd_fmw_get_hostname(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_FMW_SET_HOSTNAME:res=proc_cmd_fmw_set_hostname(cmd.cmdMsg);break;
+			//case EXMPP_CMD_FMW_GET_HOSTNAME:res=proc_cmd_fmw_get_hostname(cmd.cmdMsg,returnval);break;
+			//case EXMPP_CMD_FMW_SET_HOSTNAME:res=proc_cmd_fmw_set_hostname(cmd.cmdMsg);break;
+			case EXMPP_CMD_FMW_HOSTNAME    :res=proc_cmd_fmw_hostname(cmd.cmdMsg,returnval);break;
+			case EXMPP_CMD_FMW_GET_MYIP    :res=proc_cmd_fmw_get_myip(cmd.cmdMsg,returnval);break;
 			default                       :break;
 		}
 		processCmd.pop_front();//after processing delete the entry
@@ -458,6 +460,34 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_set_hostname(std::string msg)
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
 	RPC_SRV_RESULT result = Client.set_single_string_type((char*)"set_hostname",(char*)"hostname",(char*)cmdArg.c_str());
 	Client.rpc_server_disconnect();
+	return result;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_hostname(std::string msg,std::string &returnval)
+{
+	std::string cmd,cmdArg;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	msgstream >> cmdArg;
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0)//get-hostname-cmd
+		return proc_cmd_fmw_get_hostname(msg,returnval);
+	else
+		return proc_cmd_fmw_set_hostname(msg);
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_get_myip(std::string msg,std::string &returnval)
+{
+//14:52:09.440-->{ "jsonrpc": "2.0", "method": "get_debug_outfile", "id": 0 }
+//14:52:09.440<--{ "jsonrpc": "2.0", "result": { "return": "Success", "filepath": "" }, "id": 0 }
+	char temp_str[255];temp_str[0]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result = Client.get_string_type((char*)"get_my_public_ip",(char*)"ip",temp_str);
+	Client.rpc_server_disconnect();
+	returnval=temp_str;
 	return result;
 }
 /* ------------------------------------------------------------------------- */
