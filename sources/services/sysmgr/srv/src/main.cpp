@@ -81,6 +81,8 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&HostnameGet);
 	SysRpc HostnameSet(SYSMGR_RPC_HOSTNAME_SET    ,EJSON_SYSMGR_RPC_SET_HOSTNAME   ,emulat,dbglog,&DataCache); 
 	RpcMgr.AttachRpc(&HostnameSet);
+	SysRpc MyIp(SYSMGR_RPC_MY_PUBLIC_IP_GET    ,EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP   ,emulat,dbglog,&DataCache); 
+	RpcMgr.AttachRpc(&MyIp);
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr
