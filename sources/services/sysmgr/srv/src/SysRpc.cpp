@@ -848,8 +848,13 @@ int SysRpc::process_get_myip(JsonDataCommObj* pReq)
 	else 
 		pPanelReq->result=RPC_SRV_RESULT_FILE_OPEN_ERR;*/
 
-	strcpy(pPacket->ip,"192.168.1.1");
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	char cmdline[512];
+	ADSysInfo SysInfo;
+	//RPC_SRV_RESULT ret_val=RPC_SRV_RESULT_ARG_ERROR;
+	sprintf(cmdline,"wget http://ipinfo.io/ip -qO -");
+	pPanelReq->result=SysInfo.run_shell_script(cmdline,pPacket->ip,get_emulation_flag());
+	//strcpy(pPacket->ip,"192.168.1.1");
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 	//wget http://ipinfo.io/ip -qO -
 	return 0;
 }

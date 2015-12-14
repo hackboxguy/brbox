@@ -491,4 +491,23 @@ RPC_SRV_RESULT ADSysInfo::run_shell_script(char* script,bool emulation)
 	}
 	return RPC_SRV_RESULT_SUCCESS;
 }
+//run shell-script and return the output
+RPC_SRV_RESULT ADSysInfo::run_shell_script(char* cmd,char*ret_val,bool emulation)
+{
+	char temp_str[256];
+	FILE *shell;
+	shell= popen(cmd,"r");
+	if(shell == NULL)
+		return RPC_SRV_RESULT_FILE_OPEN_ERR;
+
+	if(fgets(temp_str,250,shell)!=NULL)
+	{
+		temp_str[255]='\0';
+		temp_str[strlen(temp_str)-1]='\0';//remove trailing '/n' nextline character
+		strcpy(ret_val,temp_str);
+	}
+	pclose(shell);
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/*****************************************************************************/
 
