@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+# Start/stop server script
+#
+CLIENT_NAME=/opt/fmw/bin/apiclt
+SERVER_NAME=/opt/fmw/bin/apisrv
+DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
+HTTP_PORT=8080
+start() {
+	echo -n "Starting $SERVER_NAME Service: "
+	DEV_TYPE=$(cat $DEV_TYPE_FILE)
+	$SERVER_NAME --boardtype=$DEV_TYPE --httpport=$HTTP_PORT &
+	echo "OK"
+}
+
+stop() {
+	echo -n "Stopping $SERVER_NAME Service:  "
+	$CLIENT_NAME --shutdown
+	sleep 1
+	echo "OK"
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	stop
+	start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
