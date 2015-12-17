@@ -62,7 +62,7 @@ int main(int argc, const char* argv[])
 	HttpSrv.StartServer();
 
 	//wait for sigkill or sigterm signal
-	AppTimer.wait_for_exit_signal();//loop till KILL or TERM signal is received
+//	AppTimer.wait_for_exit_signal();//loop till KILL or TERM signal is received
 //	XmpManager.Stop();//disconnect the xmpp server
 	AppTimer.stop_timer();//stop sending heart-beats to other objects
 	//XmpManager.Stop();//disconnect the xmpp server
