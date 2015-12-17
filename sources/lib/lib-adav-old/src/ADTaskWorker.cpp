@@ -72,7 +72,8 @@ int ADTaskWorker::monoshot_callback_function(void* pUserData,ADThreadProducer* p
 		}
 		else
 		{
-			work_inprog_obj=(WORK_CMD_TASK_IN_PROG *)work_inprog_chain.chain_get();
+			work_inprog_obj=(WORK_CMD_TASK_IN_PROG *)work_inprog_chain.chain_remove_by_ident(work_obj->taskID);
+			//work_inprog_obj=(WORK_CMD_TASK_IN_PROG *)work_inprog_chain.chain_get();
 			if(work_inprog_obj!=NULL)//requested doent want to know result, hence just delete this object
 			{
 				//printf("ADTaskWorker::monoshot_callback_function->user doesnt want to know result, deleting object\n");
