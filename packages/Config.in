@@ -29,6 +29,7 @@ source "package/brbox/brbox_finddevtype/Config.in"
 source "package/brbox/brbox_huawei_e173udevrule/Config.in"
 source "package/brbox/brbox_libgammu/Config.in"
 source "package/brbox/brbox_libgloox/Config.in"
+source "package/brbox/brbox_libonion/Config.in"
 endmenu
 endif
 
