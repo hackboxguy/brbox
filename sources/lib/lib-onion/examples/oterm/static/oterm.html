@@ -1,0 +1,176 @@
+<!--
+	Onion HTTP terminal
+	Copyright (C) 2010 David Moreno Montero
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Affero General Public License as
+	published by the Free Software Foundation, either version 3 of the
+	License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Affero General Public License for more details.
+
+	You should have received a copy of the GNU Affero General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<html>
+ <head>
+  <title>Oterm -- Onion based terminal emulator over HTTP</title>
+  <script src="/static/jquery-1.4.3.min.js"></script>
+  <script src="/static/oterm.js"></script>
+  <script src="/static/oterm_termfunctions.js"></script>
+  <script src="/static/oterm_input.js"></script>
+  <script src="/static/oterm_parser.js"></script>
+  <script src="/static/oterm_data.js"></script>
+<style>
+body{
+	margin: 0px;
+	padding: 0px;
+	background: #222;
+	color: white;
+	font-family: Fixed, monospace;
+}
+
+div#term p{
+	margin: 0px;
+	padding: 0px;
+	border: 0px;
+}
+
+span#cursor{
+	position: absolute;
+	opacity: 0.6;
+	left: 3em;
+	top: 1em;
+	width: 0.5em;
+	height: 1em;
+	background: white;
+}
+
+div#term p{
+	height: 1em;
+}
+
+span#msg{
+	font-family: sans-serif;
+	position: fixed;
+	top: 2em;
+	right: 2em;
+	vertical-align: center;
+	text-align: center;
+
+	background: #66a;
+	font-weight: bold;
+	color: white;
+	border: 0px;
+	padding: 1em;
+	border-radius: 5px;
+	cursor: pointer;
+  box-shadow: 0 2px 10px rgba(255,255,255, 0.5);
+}
+
+.current_line{
+	background: #333;
+}
+
+/** style attrs */
+div#term span.bright{
+	font-weight: bold;
+}
+
+div#term span.dim{
+	font-weight: light;
+}
+div#term span.underline{
+	text-decoration: underline;
+}
+div#term span.blink{
+	text-decoration: blink;
+}
+
+/** foreground */
+div#term span.black{
+	color: #555; /* actually grey, idea from konsole */
+}
+div#term span.red{
+	color: red;
+}
+div#term span.green{
+	color: #4DEA4D;
+}
+div#term span.yellow{
+	color: yellow;
+}
+div#term span.blue{
+	color: #5454FF;
+}
+div#term span.magenta{
+	color: #FF54FF;
+}
+div#term span.cyan{
+	color: cyan;
+}
+div#term span.white{
+	color: white;
+}
+/* background */
+div#term span.bg-black{
+	background-color: black;
+}
+div#term span.bg-red{
+	background-color: red;
+}
+div#term span.bg-green{
+	background-color: #4DEA4D;
+}
+div#term span.bg-yellow{
+	background-color: yellow;
+}
+div#term span.bg-blue{
+	background-color: #5454FF;
+}
+div#term span.bg-magenta{
+	background-color: #FF54FF;
+}
+div#term span.bg-cyan{
+	background-color: cyan;
+}
+div#term span.bg-white{
+	background-color: white;
+}
+
+#spacer{
+	height: 32px;
+}
+
+#header{
+  background: white;
+  text-align: center;
+}
+
+#header a{
+  background: #eee;
+  border-radius: 3px;
+  color: #55f;
+  font-weight: bold;
+}
+
+#header a:hover{
+  background: yellow;
+}
+
+</style>
+ </head>
+ <body>
+<!--<div id="header"><a id="url" href="http://localhost:8080/">http://localhost:8080/</a></div>-->
+<span id="msg">Loading...</span>
+<span id="cursor">&nbsp;</span>
+   <div id="term">
+    <p><span>Connecting...</span></p>
+   </div>
+	<div id="spacer">&nbsp;</div>
+ </body>
+</html>

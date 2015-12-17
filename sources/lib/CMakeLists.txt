@@ -3,6 +3,7 @@ set(PROJECT_NAME AdLibraries)
 project(${PROJECT_NAME})
 add_subdirectory(lib-settings)
 add_subdirectory(lib-adav-old)
+add_subdirectory(lib-onion)
 
 #for cross compiling
 #cmake -H. -BOutput -DCMAKE_TOOLCHAIN_FILE=toolchain-arm-backup.cmake
