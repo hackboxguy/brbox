@@ -5,6 +5,8 @@
 #include "ADJsonRpcProxy.hpp"
 //#include "SdpsJsonDef.h"
 #include "ADCmnStringProcessor.hpp"
+#define MAX_RECV_BUFFER_SIZE 1400
+#define MAX_SEND_BUFFER_SIZE 1400
 
 class ADJsonRpcClient: public ADCmnStringProcessor
 {
@@ -12,14 +14,16 @@ class ADJsonRpcClient: public ADCmnStringProcessor
 public:
 	bool connected;
 	ADNetClient ClientSocket;
-	char send_buffer[1400];//limit to MTU size
-	char recv_buffer[1400];//limit to MTU size
+	char send_buffer[MAX_SEND_BUFFER_SIZE];//limit to MTU size
+	char recv_buffer[MAX_RECV_BUFFER_SIZE];//limit to MTU size
 
 	ADJsonRpcClient();
 	~ADJsonRpcClient();
 	string get_ip_addr();//returns the ip addr of the server(to connect or to be connected).
 	int rpc_server_connect(string ip_addr,int port_num);
 	int rpc_server_disconnect(void);
+	char* send_raw_data_and_receive_resp(char* tx_buffer);
+
 
 	int prepare_json_request(char* method,int ID,char* result);
 	int prepare_json_request(char* method,int ID,char* result,char* name,char* value);//,char* result);

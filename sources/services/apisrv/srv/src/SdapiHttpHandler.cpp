@@ -4,16 +4,8 @@ using namespace std;
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
-#include <onion/onion.h>
-#include <onion/dict.h>
-#include <onion/block.h>
-#include <onion/request.h>
-#include <onion/response.h>
-#include <onion/url.h>
-#include <onion/low.h>
-#include <onion/log.h>
-#include "ADCommon.hpp"
-#include <iostream>
+using namespace Onion;
+
 /// Same as strcmp, but also checks for NULL values.
 bool safe_strcmp(const char *a, const char *b)
 {
@@ -121,24 +113,102 @@ SdapiHttpHandler::~SdapiHttpHandler()
 {
 }
 /*****************************************************************************/
+onion_connection_status SdapiHttpHandler::handle_symgr(Request &req, Response &res)
+{
+	cout<<"cpp:sysmgr : path = "<<onion_request_get_path(req.c_handler())<<endl;
+	Dict data;
+	data.add("jsonrpc","2.0");
+	data.add("result","xmproxy");
+	data.add("id","5");
+	res<<data.toJSON();
+	return OCS_PROCESSED;
+}
+onion_connection_status SdapiHttpHandler::handle_gpiosrv(Request &req, Response &res)
+{
+	if (onion_request_get_flags(req.c_handler())&OR_POST)
+	{
+		const onion_block *dreq=onion_request_get_data(req.c_handler());
+		cout<<onion_block_data( dreq )<<endl;
+		onion_response_write( res.c_handler(),  onion_block_data( dreq ), onion_block_size( dreq ) );
+	}
+	else
+	{
+		cout<<"GET :gpiosrv: path = "<<onion_request_get_path(req.c_handler())<<endl;
+		Dict data;
+		data.add("jsonrpc","2.0");
+		data.add("result","GET");
+		data.add("id","5");
+		res<<data.toJSON();
+	}
+	return OCS_PROCESSED;
+}
+#include "ADJsonRpcClient.hpp"
+onion_connection_status SdapiHttpHandler::handle_request(Request &req, Response &res)
+{
+	char url[1024];strcpy(url,onion_request_get_path(req.c_handler()));
+	char* port=url;//(char*)&url[0];
+	if (onion_request_get_flags(req.c_handler())&OR_POST)
+	{
+		const onion_block *dreq=onion_request_get_data(req.c_handler());
+		int rpc_port=atoi(port);
+		//cout<<"port="<<atoi(port)<<endl;
+		ADJsonRpcClient Client;
+		if(Client.rpc_server_connect("127.0.0.1",rpc_port)!=0)
+		{
+			const char *errmsg="{\"jsonrpc\": \"2.0\", \"error\": {\"code\": -32700, \"message\": \"Rpc Comm error\"}, \"id\": null}\n";
+			onion_response_write(res.c_handler(),errmsg,strlen(errmsg));
+			return OCS_PROCESSED;
+		}
+		char* rpc_resp=Client.send_raw_data_and_receive_resp((char*)onion_block_data(dreq));
+		Client.rpc_server_disconnect();
+		//cout<<onion_block_data( dreq )<<endl;
+		onion_response_write( res.c_handler(),  rpc_resp, strlen(rpc_resp));
+	}
+	else
+	{
+		cout<<"GET :gpiosrv: path = "<<url<<endl;//onion_request_get_path(req.c_handler())<<endl;
+		Dict data;
+		data.add("jsonrpc","2.0");
+		data.add("result","GET method called");
+		data.add("id","5");
+		res<<data.toJSON();
+	}
+	return OCS_PROCESSED;
+}
+
 int SdapiHttpHandler::StartServer()
 {
-	onion *o=onion_new(O_THREADED);//0);
+/*	onion *o=onion_new(O_THREADED);
 	onion_url *url=onion_root_url(o);
-	//onion_url_add(url, "sdapi/temps", (void*)strip_rpc);
 	onion_url_add(url, "^rpcapi/sysmgr", (void*)sysmgr_handler);
 	onion_url_add(url, "^rpcapi/xmproxysrv", (void*)xmproxysrv_handler);
 	onion_url_add(url, "^rpcapi/gpiosrv", (void*)gpiosrv_handler);
-
-
 	char port[512];sprintf(port,"%d",http_port);
 	onion_set_port(o, port);
-//	CFLOG_PANEL_INFO << "sdapi::Listening on http port ="<< http_port<<CFLOG_ENDL;
+	//CFLOG_PANEL_INFO << "sdapi::Listening on http port ="<< http_port<<CFLOG_ENDL;
 	//onion_log_flags|=OF_NOINFO;//disables log output prints (logFlags: OF_INIT/OF_NOCOLOR/OF_SYSLOGINIT/OF_NOINFO/OF_NODEBUG)
 	//log levels = O_DEBUG0/O_DEBUG/O_INFO/O_WARNING/O_ERROR
 	//onion_log=onion_log_stderr; //re-directs the log to stderr
 	//onion_log=onion_log_syslog; //re-directs the log to syslog
-	onion_listen(o);
+	onion_listen(o);*/
+
+
+	onion_log_flags|=OF_NOINFO;
+	Onion::Onion server(O_THREADED);
+	Onion::Url root(&server);
+	//root.add("^rpcapi/sysmgr", "Some static text", HTTP_OK );
+	//root.add("", "Some static text", HTTP_OK );
+	//root.add("lambda", [](Onion::Request &req, Onion::Response &res){
+	//	res<<"Lambda handler";
+	//	return OCS_PROCESSED;
+	//});
+
+	//root.add("^rpcapi/sysmgr" ,this, &SdapiHttpHandler::handle_symgr);
+	//root.add("^rpcapi/gpiosrv",this, &SdapiHttpHandler::handle_gpiosrv);
+	root.add("^rpcapi/" ,this, &SdapiHttpHandler::handle_request);
+
+	server.setPort(http_port);
+	server.listen();
 	return 0;
 }
 /*****************************************************************************/

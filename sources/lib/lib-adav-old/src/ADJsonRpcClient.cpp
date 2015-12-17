@@ -2636,6 +2636,15 @@ int ADJsonRpcClient::find_json_result_and_three_string_param(char *json_string,c
 	return 0;
 }
 /*****************************************************************************/
+char* ADJsonRpcClient::send_raw_data_and_receive_resp(char* tx_buffer)
+{
+	recv_buffer[0]='\0';
+	ClientSocket.send_data(tx_buffer);//send_buffer);
+	ClientSocket.receive_data_blocking(recv_buffer,sizeof(recv_buffer),4000);//4sec timeout
+	recv_buffer[MAX_RECV_BUFFER_SIZE-1]='\0';
+	return recv_buffer;
+}
+/*****************************************************************************/
 RPC_SRV_RESULT ADJsonRpcClient::set_integer_type(char* method_name,char* method_param_name,int method_param_value)
 {
 	char result_string[255];

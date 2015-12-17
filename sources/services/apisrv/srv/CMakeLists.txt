@@ -5,13 +5,13 @@ set(STARTNUM "79" CACHE STRING "79")    #init order number of the service
 set(LIB_ADSTTNG AdSttngs)   #settings library
 set(LIB_ADCOMMN AdCmn)      #common library
 set(LIB_ADONION onion)      #onion http library
-
+set(LIB_ADONIONCPP onioncpp) #onioncpp http library
 
 
 
 
 project(${COMPONENT_NAME})
-#set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_FLAGS "-std=c++11")
 #set(TARGET ${COMPONENT_NAME} PROPERTY CXX_STANDARD 11)
 set(AUTO_SVN_VERSION    ON CACHE BOOL ON)  #by default include svn revision numbers
 set(INSTALL_MY_HEADERS  ON CACHE BOOL ON)  #by default install header files to target-install-directory
@@ -20,13 +20,14 @@ add_executable(${COMPONENT_NAME} ${SOURCES})
 set(INC_ADSTTNG  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-settings/include")
 set(INC_ADCOMMN  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-adav-old/include")
 set(INC_ADONION  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-onion/src")
+set(INC_ADONIONCPP "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-onion/src/bindings/cpp")
 set(INC_SRVCOMMN "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 #find_package( OpenCV REQUIRED ) #core imgproc highgui )
 # Add #include path of all dependent components
-include_directories(${INC_ADSTTNG} ${INC_ADONION} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${INC_ADSTTNG} ${INC_ADONION} ${INC_ADONIONCPP} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${CMAKE_CURRENT_BINARY_DIR})
 
 # Specify component's dependency.
-target_link_libraries(${COMPONENT_NAME} ${LIB_ADONION} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt)
+target_link_libraries(${COMPONENT_NAME} ${LIB_ADONION} ${LIB_ADONIONCPP} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt)
 
 #install the binary and server-rpc-headers to CMAKE_INSTALL_PREFIX destination
 file(GLOB  INCFILES "${INC_SRVCOMMN}/*.*")

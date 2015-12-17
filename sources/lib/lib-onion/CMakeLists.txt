@@ -14,7 +14,7 @@ SET(ONION_USE_SQLITE3 false CACHE BOOL "Adds support for sqlite3 sessions")
 SET(ONION_USE_GC false CACHE BOOL "Compile Boehm GC examples")
 SET(ONION_USE_TESTS false CACHE BOOL "Compile the tests")
 SET(ONION_EXAMPLES false CACHE BOOL "Compile the examples")
-SET(ONION_USE_BINDINGS_CPP false CACHE BOOL "Compile the CPP bindings")
+SET(ONION_USE_BINDINGS_CPP true CACHE BOOL "Compile the CPP bindings")
 SET(ONION_POLLER default CACHE string "Default poller to use: default | epoll | libev | libevent")
 ########
 
