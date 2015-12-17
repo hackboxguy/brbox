@@ -2,13 +2,15 @@
 #define __MY_CMDLINE_H_
 #include "ADCmdlineHelper.hpp"
 #include "ADCmnStringProcessor.hpp"
+#define APISRV_DEFAULT_HTTP_PORT 8080
 
 class MyCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 {
+	int http_port;
 	int port_number;
 	char version_number[255];
 	ADCmdlineHelper CmdlineHelper;
-	char LoginFilePath[512];
+	//char LoginFilePath[512];
 
 
 	//Chain-callback functions	
@@ -27,7 +29,8 @@ public:
 	bool get_debug_log();
 	int get_port_number();
 	int get_dev_info(ADCMN_DEV_INFO *pInfo);
-	int get_login_filepath(char* filepath);
+	//int get_login_filepath(char* filepath);
+	int get_http_port();
 	//service specific part
 };
 #endif

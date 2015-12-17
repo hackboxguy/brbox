@@ -23,10 +23,10 @@ set(INC_ADONION  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-onion/src")
 set(INC_SRVCOMMN "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 #find_package( OpenCV REQUIRED ) #core imgproc highgui )
 # Add #include path of all dependent components
-include_directories(${INC_ADSTTNG} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${INC_ADONION} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${INC_ADSTTNG} ${INC_ADONION} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${CMAKE_CURRENT_BINARY_DIR})
 
 # Specify component's dependency.
-target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} ${LIB_ADONION} json-c pthread rt)
+target_link_libraries(${COMPONENT_NAME} ${LIB_ADONION} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt)
 
 #install the binary and server-rpc-headers to CMAKE_INSTALL_PREFIX destination
 file(GLOB  INCFILES "${INC_SRVCOMMN}/*.*")

@@ -8,6 +8,7 @@
 #include "MyCmdline.h"
 #include "SrcControlVersion.h"
 #include "ADTimer.hpp"
+#include "SdapiHttpHandler.h"
 //#include "XmppMgr.h" //ADXmppProxy.hpp"
 /* ------------------------------------------------------------------------- */
 using namespace std;
@@ -55,6 +56,11 @@ int main(int argc, const char* argv[])
 
 	//server is ready to serve rpc's
 	RpcMgr.SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE_READY);
+
+	//hear starts the http server
+	SdapiHttpHandler HttpSrv(CmdLine.get_http_port());
+	HttpSrv.StartServer();
+
 	//wait for sigkill or sigterm signal
 	AppTimer.wait_for_exit_signal();//loop till KILL or TERM signal is received
 //	XmpManager.Stop();//disconnect the xmpp server

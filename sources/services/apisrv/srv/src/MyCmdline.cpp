@@ -3,7 +3,7 @@ using namespace std;
 /*****************************************************************************/
 typedef enum APISRV_CMDLINE_OPT_T
 {
-	APISRV_CMDLINE_OPT_LOGIN_FILE = 100,
+	APISRV_CMDLINE_OPT_HTTPPORT = 100,
 	APISRV_CMDLINE_OPT_UNKNOWN,
 	APISRV_CMDLINE_OPT_NONE
 }APISRV_CMDLINE_OPT;
@@ -11,6 +11,7 @@ typedef enum APISRV_CMDLINE_OPT_T
 /*****************************************************************************/
 MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_str):CmdlineHelper(cmdline_mode)
 {
+	http_port  =APISRV_DEFAULT_HTTP_PORT;
 	port_number=portnum;
 	strcpy(version_number,version_str);
 	CmdlineHelper.attach_helper(this);
@@ -18,6 +19,9 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 //	CmdlineHelper.insert_options_entry((char*)"loginfile" ,optional_argument,XMPROXY_CMDLINE_OPT_LOGIN_FILE);
 //	CmdlineHelper.insert_help_entry((char*)"--loginfile=filepath (path to the file having xmpp user/pw details)");
 //	strcpy(LoginFilePath,XMPROXY_DEFAULT_LOGIN_FILE_PATH);
+	CmdlineHelper.insert_options_entry((char*)"httpport" ,optional_argument,APISRV_CMDLINE_OPT_HTTPPORT);
+	CmdlineHelper.insert_help_entry((char*)"--httpport=port             (Http listening port number)");
+
 }
 /*****************************************************************************/
 MyCmdline::~MyCmdline()
@@ -27,15 +31,15 @@ MyCmdline::~MyCmdline()
 //override virtual functions of ADGeneric Chain
 int MyCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 {
-	XMPROXY_CMDLINE_OPT command =(XMPROXY_CMDLINE_OPT)arg;
+	APISRV_CMDLINE_OPT command =(APISRV_CMDLINE_OPT)arg;
 	switch(command)
 	{
-		//case XMPROXY_CMDLINE_OPT_LOGIN_FILE:
-		//	if(CmdlineHelper.get_next_subargument(&sub_arg)==0)//no login filepath passed by user
-		//		strcpy(LoginFilePath,XMPROXY_DEFAULT_LOGIN_FILE_PATH);
-		//	else
-		//		strcpy(LoginFilePath,sub_arg);
-		//	break;
+		case APISRV_CMDLINE_OPT_HTTPPORT:
+			if(CmdlineHelper.get_next_subargument(&sub_arg)==0)//no /dev/tty option passed by user
+				http_port=APISRV_DEFAULT_HTTP_PORT;
+			else
+				http_port=atoi(sub_arg);
+			break;
 		default:return 0;break;	
 	}
 	return 0;
@@ -107,11 +111,17 @@ int MyCmdline::get_dev_info(ADCMN_DEV_INFO *pInfo)
 	return CmdlineHelper.get_dev_info(pInfo);
 }
 /*****************************************************************************/
-int MyCmdline::get_login_filepath(char* filepath)
+/*int MyCmdline::get_login_filepath(char* filepath)
 {
 	strcpy(filepath,LoginFilePath);
 	return 0;
+}*/
+/*****************************************************************************/
+int MyCmdline::get_http_port()
+{
+	return http_port;
 }
 /*****************************************************************************/
+
 
 
