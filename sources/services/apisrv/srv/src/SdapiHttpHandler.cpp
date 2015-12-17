@@ -13,7 +13,7 @@ using namespace std;
 #include <onion/low.h>
 #include <onion/log.h>
 #include "ADCommon.hpp"
-
+#include <iostream>
 /// Same as strcmp, but also checks for NULL values.
 bool safe_strcmp(const char *a, const char *b)
 {
@@ -28,6 +28,9 @@ bool safe_strcmp(const char *a, const char *b)
 
 onion_connection_status strip_rpc(void *_, onion_request *req, onion_response *res)
 {
+	cout<<"onion path     = "<<onion_request_get_path(req)<<endl;
+	cout<<"onion fullpath = "<<onion_request_get_fullpath(req)<<endl;
+
 	const onion_block *dreq=onion_request_get_data(req);
 	onion_dict *jreq=NULL;
 	if (dreq)
@@ -77,9 +80,37 @@ onion_connection_status strip_rpc(void *_, onion_request *req, onion_response *r
 	}
 	else
 	{
-		onion_response_write0(res, "This is a JSON rpc service. Please send jsonrpc requests.\n");
+		//onion_response_write0(res, "This is a JSON rpc service. Please send jsonrpc requests.\n");
+		//return OCS_PROCESSED;
+
+		/// Prepare message
+		onion_dict *jres=onion_dict_new();
+		onion_dict_add(jres, "jsonrpc", "2.0", 0);
+		onion_dict_add(jres, "result", "hello", OD_DUP_VALUE);
+		onion_dict_add(jres, "id", "5", 0);
+		/// Write
+		onion_block *jresb=onion_dict_to_json(jres);
+		onion_response_write( res,  onion_block_data( jresb ), onion_block_size( jresb ) );
 		return OCS_PROCESSED;
 	}
+}
+/*****************************************************************************/
+onion_connection_status sysmgr_handler(void *_, onion_request *req, onion_response *res)
+{
+	cout<<"sysmgr :onion path     = "<<onion_request_get_path(req)<<endl;
+	return OCS_PROCESSED;
+}
+/*****************************************************************************/
+onion_connection_status xmproxysrv_handler(void *_, onion_request *req, onion_response *res)
+{
+	cout<<"xmproxy:onion path     = "<<onion_request_get_path(req)<<endl;
+	return OCS_PROCESSED;
+}
+/*****************************************************************************/
+onion_connection_status gpiosrv_handler(void *_, onion_request *req, onion_response *res)
+{
+	cout<<"gpiosrv:onion path     = "<<onion_request_get_path(req)<<endl;
+	return OCS_PROCESSED;
 }
 /*****************************************************************************/
 SdapiHttpHandler::SdapiHttpHandler(int port):http_port(port)
@@ -94,7 +125,12 @@ int SdapiHttpHandler::StartServer()
 {
 	onion *o=onion_new(O_THREADED);//0);
 	onion_url *url=onion_root_url(o);
-	onion_url_add(url, "sdapi/temps", (void*)strip_rpc);
+	//onion_url_add(url, "sdapi/temps", (void*)strip_rpc);
+	onion_url_add(url, "^rpcapi/sysmgr", (void*)sysmgr_handler);
+	onion_url_add(url, "^rpcapi/xmproxysrv", (void*)xmproxysrv_handler);
+	onion_url_add(url, "^rpcapi/gpiosrv", (void*)gpiosrv_handler);
+
+
 	char port[512];sprintf(port,"%d",http_port);
 	onion_set_port(o, port);
 //	CFLOG_PANEL_INFO << "sdapi::Listening on http port ="<< http_port<<CFLOG_ENDL;
