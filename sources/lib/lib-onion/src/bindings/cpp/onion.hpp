@@ -119,15 +119,15 @@ namespace Onion{
 		* Normally user dont set this handler manually, but use the Onion::Url constructor to set a Url handler as
 		* the root one.
 		*/
-		void setRootHandler(Handler *handler){
-			onion_set_root_handler(ptr, handler->c_handler());
+		void setRootHandler(Handler handler){
+			onion_set_root_handler(ptr, onion_handler_cpp_to_c(std::move(handler)));
 		}
 		
 		/**
 		* @short Sets the internal error handler, to be called in case of internal errors, not found and so on.
 		*/
-		void setInternalErrorHandler(Handler *handler){
-			onion_set_internal_error_handler(ptr, handler->c_handler());
+		void setInternalErrorHandler(Handler handler){
+			onion_set_internal_error_handler(ptr, onion_handler_cpp_to_c(std::move(handler)));
 		}
 		
 		/**
@@ -155,6 +155,17 @@ namespace Onion{
 		*/
 		void setHostname(const std::string &hostname){
 			onion_set_hostname(ptr, hostname.c_str());      
+		}
+		
+		/**
+		 * @short Sets the HTTPS certificates
+		 */
+		bool setCertificate(onion_ssl_certificate_type type, const char *filename, ...){
+			va_list va;
+			va_start(va, filename);
+			int r=onion_set_certificate_va(ptr, type, filename, va);
+			va_end(va);
+			return r;
 		}
 		
 		/**

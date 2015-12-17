@@ -33,6 +33,7 @@
 #include <fcntl.h>
 
 #include "types_internal.h"
+#include "low.h"
 #include "log.h"
 #include "poller.h"
 #include "request.h"
@@ -44,7 +45,7 @@
 #endif
 
 #ifdef HAVE_SYSTEMD
-#include "sd-daemon.h"
+#include <systemd/sd-daemon.h>
 #endif
 
 
@@ -60,7 +61,7 @@ static int onion_listen_point_read_ready(onion_request *req);
  * @returns An alloc'ed onion_listen_point pointer
  */
 onion_listen_point *onion_listen_point_new(){
-	onion_listen_point *ret=calloc(1,sizeof(onion_listen_point));
+	onion_listen_point *ret=onion_low_calloc(1,sizeof(onion_listen_point));
 	return ret;
 }
 
@@ -78,10 +79,10 @@ void onion_listen_point_free(onion_listen_point *op){
 	if (op->free_user_data)
 		op->free_user_data(op);
 	if (op->hostname)
-		free(op->hostname);
+		onion_low_free(op->hostname);
 	if (op->port)
-		free(op->port);
-	free(op);
+		onion_low_free(op->port);
+	onion_low_free(op);
 }
 
 
@@ -97,7 +98,7 @@ void onion_listen_point_free(onion_listen_point *op){
  * from the poller.
  * 
  * @param op The listen point from where the request must be built
- * @returns 1 always. 
+ * @returns 1 always. The poller needs one to keep listening for connections.
  */
 int onion_listen_point_accept(onion_listen_point *op){
 	onion_request *req=onion_request_new(op);
@@ -111,9 +112,10 @@ int onion_listen_point_accept(onion_listen_point *op){
 			onion_poller_add(req->connection.listen_point->server->poller, slot);
 			return 1;
 		}
-		if (req->connection.fd<0)
-			ONION_ERROR("Error creating connection");
-		// else, no need for fd... no use case yet.
+		// No fd. This could mean error, or not fd based. Normally error would not return a req.
+		onion_request_free(req);
+		ONION_ERROR("Error creating connection");
+		return 1;
 	}
 
 	return 1;

@@ -27,9 +27,8 @@
 #include "request.h"
 #include "response.h"
 #include "handler.h"
-#include "url.h"
-
 #include "types.h"
+#include "url.h"
 
 #ifdef __cplusplus
 extern "C"{
@@ -38,13 +37,19 @@ extern "C"{
 /// Creates the onion structure to fill with the server data, and later do the onion_listen()
 onion *onion_new(int flags);
 
+/// set a client data in the onion, freeing the previous one if it exists.  Thread-safe.
+void onion_set_client_data (onion*server, void*data, onion_client_data_free_sig* data_free);
+
+/// Retrieve the client data in the onion server.  Thread-safe.
+void* onion_client_data (onion*server);
+
 /// Performs the listening with the given mode
 int onion_listen(onion *server);
 
 /// Stops the listening
 void onion_listen_stop(onion *server);
 
-/// Removes the allocated data
+/// Removes the allocated data (also free the client data, if one was given).
 void onion_free(onion *onion);
 
 /// Sets the root handler
@@ -64,6 +69,9 @@ void onion_set_hostname(onion *server, const char *hostname);
 
 /// Set a certificate for use in the connection
 int onion_set_certificate(onion *onion, onion_ssl_certificate_type type, const char *filename, ...);
+
+/// Set a certificate for use in the connection. va_list version.
+int onion_set_certificate_va(onion *onion, onion_ssl_certificate_type type, const char *filename, va_list va);
 
 /// Adds a listen point, a listening address and port with a given protocol.
 int onion_add_listen_point(onion *server, const char *hostname, const char *port, onion_listen_point *protocol);
@@ -91,6 +99,19 @@ onion_poller *onion_get_poller(onion *server);
 
 /// Set the maximum post size
 void onion_set_max_post_size(onion *server, size_t max_size);
+
+/// Set the maximum post FILE size
+void onion_set_max_file_size(onion *server, size_t max_size);
+
+/// Set a new session backend
+void onion_set_session_backend(onion *server, onion_sessions *sessions_backend);
+
+#ifdef HAVE_PTHREADS
+// Gives the number of listening threads created.
+long onion_count_listen_threads(void);
+// Gives the number of poller threads created
+long onion_count_poller_threads(void);
+#endif /*HAVE_PTHREADS*/
 
 #ifdef __cplusplus
 }

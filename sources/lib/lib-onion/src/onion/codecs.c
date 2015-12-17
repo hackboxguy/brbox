@@ -1,25 +1,25 @@
-/*
-	Onion HTTP server library
-	Copyright (C) 2010-2014 David Moreno Montero and othes
+/***
+      Onion HTTP server library
+      Copyright (C) 2010-2015 David Moreno Montero and others
 
-	This library is free software; you can redistribute it and/or
-	modify it under the terms of, at your choice:
-	
-	a. the Apache License Version 2.0. 
-	
-	b. the GNU General Public License as published by the 
-		Free Software Foundation; either version 2.0 of the License, 
-		or (at your option) any later version.
-	 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+      This library is free software; you can redistribute it and/or
+      modify it under the terms of, at your choice:
 
-	You should have received a copy of both libraries, if not see 
-	<http://www.gnu.org/licenses/> and 
-	<http://www.apache.org/licenses/LICENSE-2.0>.
-	*/
+      a. the Apache License Version 2.0.
+
+      b. the GNU General Public License as published by the
+              Free Software Foundation; either version 2.0 of the License,
+              or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of both libraries, if not see
+      <http://www.gnu.org/licenses/> and
+      <http://www.apache.org/licenses/LICENSE-2.0>.
+***/
 
 #include <string.h>
 #include <stdlib.h>
@@ -30,6 +30,7 @@
 #include <gnutls/crypto.h>
 #endif
 
+#include "low.h"
 #include "log.h"
 #include "codecs.h"
 
@@ -45,7 +46,7 @@ static const char db64[]={ // 16 bytes each line, 8 lines. Only 128 registers
 	41,42,43,44,     45,46,47,48,     49,50,51,255,    255,255,255,255   // 128
 };
 
-/// Coding table. 
+/// Coding table.
 static const char cb64[]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 void printf_bin(const char c, int n){
@@ -70,11 +71,11 @@ char *onion_base64_decode(const char *orig, int *length){
 	int ol=strlen(orig)-1;
 	while ((ol>=3) && (orig[ol]=='\n' || orig[ol]=='\r' || orig[ol]=='\0')) ol--; // go to real end, and set to next. Order of the && is important.
 	ol++;
-	
+
 	//fprintf(stderr,"ol %d\n",ol);
 	int l=ol*3/4;
-	char *ret=malloc(l+1);
-	
+	char *ret=onion_low_scalar_malloc(l+1);
+
 	if (ol<4){ // Not even a block
 		if (length)
 			*length=0;
@@ -82,7 +83,7 @@ char *onion_base64_decode(const char *orig, int *length){
 		return ret;
 	}
 
-	
+
 	int i,j;
 	char c=0; // Always used properly, but gcc -O2 -Wall thinks it may get used not initialized.
 	for (i=0,j=0;i<ol;i+=4,j+=3){
@@ -93,7 +94,7 @@ char *onion_base64_decode(const char *orig, int *length){
 			//fprintf(stderr,"%c ",orig[i+k]);
 			o[k]=c;
 		}
-		
+
 		ret[j]  =((o[0]&0x3F)<<2)+((o[1]&0x30)>>4);
 		ret[j+1]=((o[1]&0x0F)<<4)+((o[2]&0x3C)>>2);
 		ret[j+2]=((o[2]&0x03)<<6)+(o[3]);
@@ -124,7 +125,7 @@ char *onion_base64_decode(const char *orig, int *length){
 		ret[j]=0;*/
 	else
 		ret[j]=0;
-	
+
 	return ret;
 }
 
@@ -136,12 +137,12 @@ char *onion_base64_encode(const char *orig, int length){
 	if (orig==NULL)
 		return NULL;
 	/// that chars + \n one per every 57 + \n\0 at end, and maybe two '='
-	char *ret=malloc(((length*4)/3) + (length/57) + 2 + 3 );
+	char *ret=onion_low_malloc(((length*4)/3) + (length/57) + 2 + 3 );
 	if (length==0){ // easy case.. here.
 		ret[0]='\0';
 		return ret;
 	}
-	
+
 	int i,j, I,J;
 	// First many lines,  I hope the compiler unloops properly...
 	for (I=0,J=0;I<length-57;I+=57,J+=77){ // 57 chars are 76 chars in base64. Just a place to set the new line.
@@ -151,7 +152,7 @@ char *onion_base64_encode(const char *orig, int length){
 			char a=o[i];
 			char b=o[i+1];
 			char c=o[i+2];
-			
+
 			r[j]=(a>>2)&0x3F;
 			r[j+1]=((a<<4)&0x30) + ((b>>4)&0x0F);
 			r[j+2]=((b<<2)&0x3C) + ((c>>6)&0x03);
@@ -172,7 +173,7 @@ char *onion_base64_encode(const char *orig, int length){
 			char a=o[i];
 			char b=o[i+1];
 			char c=o[i+2];
-			
+
 			r[j]=(a>>2)&0x3F;
 			r[j+1]=((a<<4)&0x30) + ((b>>4)&0x0F);
 			r[j+2]=((b<<2)&0x3C) + ((c>>6)&0x03);
@@ -183,7 +184,7 @@ char *onion_base64_encode(const char *orig, int length){
 			char a=(i<maxel) ? o[i] : 0;
 			char b=((i+1)<maxel) ? o[i+1] : 0;
 			char c=((i+2)<maxel) ? o[i+2] : 0;
-			
+
 			r[j]=(a>>2)&0x3F;
 			r[j+1]=((a<<4)&0x30) + ((b>>4)&0x0F);
 			r[j+2]=((b<<2)&0x3C) + ((c>>6)&0x03);
@@ -262,7 +263,7 @@ char *onion_quote_new(const char *str){
 			nl++;
 	}
 	// Now do the quotation part
-	char *ret=malloc(nl);
+	char *ret=onion_low_scalar_malloc(nl);
 	onion_quote(str, ret, nl);
 	return ret;
 }
@@ -299,7 +300,7 @@ char *onion_c_quote_new(const char *str){
 	char *ret;
 	int l=3; // The quotes + \0
 	const unsigned char *p=(const unsigned char *)str;
-	while( *p != '\0'){ 
+	while( *p != '\0'){
 		if (*p=='\r' || *p=='"' || *p=='\\' || *p=='\t')
 			l++;
 		else if (*p=='\n')
@@ -308,7 +309,7 @@ char *onion_c_quote_new(const char *str){
 			l+=4;
 		l++; p++;
 	}
-	ret=malloc(l);
+	ret=onion_low_scalar_malloc(l);
 	onion_c_quote(str, ret, l);
 	return ret;
 }
@@ -319,37 +320,37 @@ char *onion_c_quote(const char *str, char *ret, int l){
 	char *r=ret;
 	*r++='"';
 	l-=3; // both " at start and end, and \0
-	while( *p != '\0'){ 
-		if (*p=='\n'){ 
-			*r='\\'; 
-			r++; 
-			*r='n'; 
-			r++; 
-			*r='"'; 
-			r++; 
-			*r='\n'; 
-			r++; 
-			*r='"'; 
-		} 
+	while( *p != '\0'){
+		if (*p=='\n'){
+			*r='\\';
+			r++;
+			*r='n';
+			r++;
+			*r='"';
+			r++;
+			*r='\n';
+			r++;
+			*r='"';
+		}
 		else if (*p=='\r'){
-			*r='\\'; 
-			r++; 
-			*r='n'; 
+			*r='\\';
+			r++;
+			*r='n';
 		}
 		else if (*p=='"'){
-			*r='\\'; 
-			r++; 
-			*r='"'; 
+			*r='\\';
+			r++;
+			*r='"';
 		}
 		else if (*p=='\\'){
-			*r='\\'; 
-			r++; 
-			*r='\\'; 
+			*r='\\';
+			r++;
+			*r='\\';
 		}
 		else if (*p=='\t'){
-			*r='\\'; 
-			r++; 
-			*r='t'; 
+			*r='\\';
+			r++;
+			*r='t';
 		}
 		else if (*p>127){
 			int c=*p;
@@ -368,7 +369,7 @@ char *onion_c_quote(const char *str, char *ret, int l){
 		else{
 			*r=*p;
 		}
-		r++; p++; 
+		r++; p++;
 		l--;
 		if (l<=0){
 			*r='\0';
@@ -377,7 +378,7 @@ char *onion_c_quote(const char *str, char *ret, int l){
 	}
 	*r++='"';
 	*r++='\0';
-	
+
 	return ret;
 }
 
@@ -389,7 +390,7 @@ void onion_sha1(const char *data, int length, char *result){
 	ONION_ERROR("Cant calculate SHA1 if gnutls is not compiled in! Aborting now");
 	exit(1);
 #else
-	gnutls_hash_fast(GNUTLS_DIG_SHA1, data, length, result); 
+	gnutls_hash_fast(GNUTLS_DIG_SHA1, data, length, result);
 #endif
 }
 
@@ -416,6 +417,13 @@ char *onion_html_add_enc(char c, char *p){
 			*p++='t';
 			*p++=';';
 			break;
+		case '&':
+			*p++='&';
+			*p++='a';
+			*p++='m';
+			*p++='p';
+			*p++=';';
+			break;
 		case '\'':
 			*p++='&';
 			*p++='#';
@@ -436,6 +444,8 @@ int onion_html_encoding_size(char c){
 			return 4;
 		case '>':
 			return 4;
+		case '&':
+			return 4;
 		case '"':
 			return 6;
 		case '\'':
@@ -446,7 +456,7 @@ int onion_html_encoding_size(char c){
 
 /**
  * @short Calculates the HTML encoding of a given string
- * 
+ *
  * If needs encoding returns a new string that should be deallocated, if not, returns NULL.
  */
 char *onion_html_quote(const char *str){
@@ -459,7 +469,8 @@ char *onion_html_quote(const char *str){
 	}
 	if (size==(p-str))
 		return NULL;
-	char *ret=calloc(1,size+1);
+	char *ret=onion_low_scalar_malloc(size+1);
+	memset (ret, 0, size+1);
 	p=str;
 	char *t=ret;
 	while( (*p) ){
@@ -470,3 +481,20 @@ char *onion_html_quote(const char *str){
 	return ret;
 }
 
+/**
+ * @short Calculates as a freshly allocated string the HTML encoding
+ * of a given string
+ *
+ * Returns a new string that should be freed, or else NULL when given
+ * a null argument.
+ */
+const char*
+onion_html_quote_dup (const char* str) {
+  if (!str)
+    return NULL;
+  const char* quostr = onion_html_quote (str);
+  if (quostr != NULL)
+    return quostr;
+  else
+    return onion_low_strdup(quostr);
+}

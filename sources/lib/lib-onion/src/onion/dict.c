@@ -26,12 +26,14 @@
 #include <unistd.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #include "log.h"
 #include "dict.h"
 #include "types_internal.h"
 #include "codecs.h"
 #include "block.h"
+#include "low.h"
 
 /// @private
 typedef struct onion_dict_node_data_t{
@@ -62,7 +64,7 @@ static onion_dict_node *onion_dict_node_new(const char *key, const void *value, 
  * Initializes the basic tree with all the structure in place, but empty.
  */
 onion_dict *onion_dict_new(){
-	onion_dict *dict=calloc(1, sizeof(onion_dict));
+	onion_dict *dict=onion_low_calloc(1, sizeof(onion_dict));
 #ifdef HAVE_PTHREADS
 	pthread_rwlock_init(&dict->lock, NULL);
 	pthread_mutex_init(&dict->refmutex, NULL);
@@ -84,7 +86,22 @@ void onion_dict_set_flags(onion_dict *dict, int flags){
   }
 }
 
+/// Sameas onion_dict_add, but ensures duplicates all. Necesary to ensure consistency.
+static void onion_dict_add_merge(onion_dict *me, const char *key, void *value, int flags){
+	onion_dict_add(me, key, value, flags | OD_DUP_ALL);
+}
 
+/**
+ * @short memberof onion_dict_t
+ * 
+ * Meres the contents of other dictionary intro me.
+ * 
+ * @param me The current dictionary where keys: vlaues will be added
+ * @param other Dictionary with keys to add to me
+ */
+void onion_dict_merge(onion_dict *me, const onion_dict *other){
+	onion_dict_preorder(other, onion_dict_add_merge, me);
+}
 
 /**
  * @short Creates a duplicate of the dict
@@ -140,7 +157,7 @@ static void onion_dict_node_free(onion_dict_node *node){
 		onion_dict_node_free(node->right);
 
 	onion_dict_node_data_free(&node->data);
-	free(node);
+	onion_low_free(node);
 }
 
 /**
@@ -148,6 +165,8 @@ static void onion_dict_node_free(onion_dict_node *node){
  * @memberof onion_dict_t
  */
 void onion_dict_free(onion_dict *dict){
+	if (!dict) // No free NULL
+		return;
 	ONION_DEBUG0("Free %p", dict);
 #ifdef HAVE_PTHREADS
 	pthread_mutex_lock(&dict->refmutex);
@@ -165,7 +184,7 @@ void onion_dict_free(onion_dict *dict){
 #endif
 		if (dict->root)
 			onion_dict_node_free(dict->root);
-		free(dict);
+		onion_low_free(dict);
 	}
 }
 	
@@ -186,15 +205,14 @@ static const onion_dict_node *onion_dict_find_node(const onion_dict *d, const on
 	if (parent) *parent=current;
 	if (cmp<0)
 		return onion_dict_find_node(d, current->left, key, parent);
-	if (cmp>0)
+	else // if (cmp>0)
 		return onion_dict_find_node(d, current->right, key, parent);
-	return NULL;
 }
 
 
 /// Allocates a new node data, and sets the data itself.
 static onion_dict_node *onion_dict_node_new(const char *key, const void *value, int flags){
-	onion_dict_node *node=malloc(sizeof(onion_dict_node));
+	onion_dict_node *node=onion_low_malloc(sizeof(onion_dict_node));
 
 	onion_dict_set_node_data(&node->data, key, value, flags);
 	
@@ -208,14 +226,14 @@ static onion_dict_node *onion_dict_node_new(const char *key, const void *value, 
 static void onion_dict_set_node_data(onion_dict_node_data *data, const char *key, const void *value, int flags){
 	//ONION_DEBUG("Set data %02X",flags);
 	if ((flags&OD_DUP_KEY)==OD_DUP_KEY) // not enought with flag, as its a multiple bit flag, with FREE included
-		data->key=strdup(key);
+		data->key=onion_low_strdup(key);
 	else
 		data->key=key;
 	if ((flags&OD_DUP_VALUE)==OD_DUP_VALUE){
 		if (flags&OD_DICT)
 			data->value=onion_dict_hard_dup((onion_dict*)value);
 		else
-			data->value=strdup(value);
+			data->value=onion_low_strdup(value);
 	}
 	else
 		data->value=value;
@@ -281,7 +299,7 @@ static onion_dict_node  *onion_dict_node_add(onion_dict *d, onion_dict_node *nod
 		//ONION_DEBUG("Replace %s with %s", node->data.key, nnode->data.key);
 		onion_dict_node_data_free(&node->data);
 		memcpy(&node->data, &nnode->data, sizeof(onion_dict_node_data));
-		free(nnode);
+		onion_low_free(nnode);
 		return node;
 	}
 	else if (cmp<0){
@@ -319,14 +337,14 @@ void onion_dict_add(onion_dict *dict, const char *key, const void *value, int fl
 /// Frees the memory, if necesary of key and value
 static void onion_dict_node_data_free(onion_dict_node_data *data){
 	if (data->flags&OD_FREE_KEY){
-		free((char*)data->key);
+		onion_low_free((char*)data->key);
 	}
 	if (data->flags&OD_FREE_VALUE){
 		if (data->flags&OD_DICT){
 			onion_dict_free((onion_dict*)data->value);
 		}
 		else
-			free((char*)data->value);
+			onion_low_free((char*)data->value);
 	}
 }
 
@@ -347,7 +365,7 @@ static onion_dict_node *onion_dict_node_remove(const onion_dict *d, onion_dict_n
 		//ONION_DEBUG("Remove here %p", node);
 		onion_dict_node_data_free(&node->data);
 		if (node->left==NULL && node->right==NULL){
-			free(node);
+			onion_low_free(node);
 			return NULL;
 		}
 		if (node->left==NULL){
@@ -399,6 +417,8 @@ int onion_dict_remove(onion_dict *dict, const char *key){
  * @memberof onion_dict_t
  */
 const char *onion_dict_get(const onion_dict *dict, const char *key){
+	if (!dict) // Get from null dicts, returns null data.
+		return NULL;
 	const onion_dict_node *r;
 	r=onion_dict_find_node(dict, dict->root, key, NULL);
 	if (r && !(r->data.flags&OD_DICT))
@@ -533,7 +553,7 @@ static void onion_dict_json_preorder(onion_block *block, const char *key, const 
 		return;
 	}
 	onion_block_add_str(block, s);
-	free(s);
+	onion_low_free(s);
 	onion_block_add_char(block, ':');
 	if (flags&OD_DICT){
 		onion_block *tmp;
@@ -552,7 +572,7 @@ static void onion_dict_json_preorder(onion_block *block, const char *key, const 
 			return;
 		}
 		onion_block_add_str(block, s);
-		free(s);
+		onion_low_free(s);
 	}
 	onion_block_add_data(block, ", ",2);
 }
@@ -575,7 +595,7 @@ onion_block *onion_dict_to_json(onion_dict *dict){
 
 	int s=onion_block_size(block);
 	if (s==0){ // Error.
-		onion_block_clear(block);
+		onion_block_free(block);
 		return NULL;
 	}
 	if (s!=1) // To remove a final ", "
@@ -641,5 +661,143 @@ onion_dict *onion_dict_rget_dict(const onion_dict *dict, const char *key, ...){
 		}
 	}
 	va_end(va);
+	return NULL;
+}
+
+static onion_dict *onion_dict_from_json_(const char **data);
+
+/**
+ * @short Creates a dict from a json
+ * 
+ * Onion dicts do not support full json semantics, soit will do the translations as possible; 
+ * sometimes information may be lost.
+ * 
+ * Anyway dicts created by onion are ensured to be readable by onion.
+ * 
+ * If the data is invalid NULL is returned.
+ */
+onion_dict *onion_dict_from_json(const char *data){
+	if (!data)
+		return NULL;
+	const char *_data[1]={ data };
+	onion_dict *ret=onion_dict_from_json_(_data);
+	while (isspace(*_data[0]))
+		++_data[0];
+	if (*_data[0]){
+		ONION_DEBUG("Invalid JSON, not ends at end");
+		onion_dict_free(ret);
+		return NULL;
+	}
+	return ret;
+}
+
+onion_dict *onion_dict_from_json_(const char **_data){
+	const char *data=*_data;
+	ONION_DEBUG("Parse %s", *_data);
+	while (isspace(*data))
+		++data;
+	if (*data!='{')
+		return NULL;
+	++data;
+	
+	while (isspace(*data))
+		++data;
+	;
+	onion_dict *ret=onion_dict_new();
+	onion_block *key=onion_block_new();
+	onion_block *value=onion_block_new();
+	while (*data!='}'){
+		// Get Key
+		if (*data!='"'){ // Includes \0
+			ONION_DEBUG("Expected \" got %c", *data);
+			goto error;
+		}
+		++data;
+		while (*data!='"'){
+			if (!*data){ // \0
+				ONION_DEBUG("Expected \" got eof");
+				goto error;
+			}
+			onion_block_add_char(key, *data);
+			++data;
+		}
+		++data;
+		while (isspace(*data))
+			++data;
+
+		/// Get :
+		if (*data!=':'){ // Includes \0
+			ONION_DEBUG("Expected : got %c", *data);
+			goto error;
+		}
+		++data;
+		while (isspace(*data))
+			++data;
+
+		/// Get Value
+		if (*data=='{'){ // Includes \0
+			*_data=data;
+
+			onion_dict *sub=onion_dict_from_json_(_data);
+			if (!sub){
+				goto error;
+			}
+			onion_dict_add(ret, onion_block_data(key), sub, OD_DUP_KEY|OD_DICT|OD_FREE_VALUE);
+			data=*_data;
+		}
+		else if (isdigit(*data)){
+			while(isdigit(*data)){
+				onion_block_add_char(value, *data);
+				++data;
+			}
+			onion_dict_add(ret, onion_block_data(key), onion_block_data(value), OD_DUP_ALL);
+		}
+		else if (*data=='"'){
+			++data;
+			while (*data!='"'){
+				if (!*data){ // \0
+					ONION_DEBUG("Expected \" got eof");
+					goto error;
+				}
+				onion_block_add_char(value, *data);
+				++data;
+			}
+			++data;
+
+			onion_dict_add(ret, onion_block_data(key), onion_block_data(value), OD_DUP_ALL);
+			onion_block_clear(value);
+		}
+		else { // Includes \0
+			ONION_DEBUG("Expected \" got %c", *data);
+			goto error;
+		}
+		onion_block_clear(key);
+		
+		while (isspace(*data))
+			++data;
+		if (*data=='}'){
+			++data;
+			*_data=data;
+			onion_block_free(key);
+			onion_block_free(value);
+			return ret;
+		}
+		if (*data!=','){
+			ONION_DEBUG("Expected , got %c", *data);
+			goto error;
+		}
+		++data;
+		while (isspace(*data))
+			++data;
+	}
+	++data;
+	*_data=data;
+	onion_block_free(key);
+	onion_block_free(value);
+	return ret;
+error:
+	onion_block_free(key);
+	onion_block_free(value);
+	onion_dict_free(ret);
 	return NULL;
 }

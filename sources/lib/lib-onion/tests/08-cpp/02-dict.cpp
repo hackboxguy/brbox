@@ -187,13 +187,30 @@ void t05_context(){
 void t06_tomap(){
 	INIT_LOCAL();
 	
+#if __cplusplus > 199711L
 	std::map<std::string, std::string> orig{{"Hello","World"}};
+#else
+	std::map<std::string, std::string> orig;
+	orig.insert(std::pair< std::string, std::string>("Hello","World"));
+#endif
 	Onion::Dict d(orig);
 	
 	std::map<std::string, std::string> dup=d;
 	
 	FAIL_IF_NOT_EQUAL_STRING(dup["Hello"],"World");
 	
+	END_LOCAL();
+}
+
+void t07_from_initializer_list(){
+	INIT_LOCAL();
+#if __cplusplus > 199711L
+	Onion::Dict b;
+	b.add("test", {{"test", "init by initializer list"},{"test2", "Should work"}});
+	
+	FAIL_IF_NOT_EQUAL_STRING(b.getDict("test").get("test"), "init by initializer list");
+	FAIL_IF_NOT_EQUAL_STRING(b.getDict("test").get("test2"), "Should work");
+#endif
 	END_LOCAL();
 }
 
@@ -206,6 +223,7 @@ int main(int argc, char **argv){
 	t04_langtest();
 	t05_context();
 	t06_tomap();
+	t07_from_initializer_list();
 	
 	END();
 }

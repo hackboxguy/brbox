@@ -28,6 +28,7 @@
 
 #include <string>
 #include <onion/request.h>
+#include <onion/low.h>
 
 namespace Onion{
 	/**
@@ -66,12 +67,34 @@ namespace Onion{
 				return Dict();
 		}
 		/**
+		 * @short Get a key from post
+		 * 
+		 * If no dictionary or not at dictionary, it returns an empty string.
+		 */
+		const std::string post(const std::string &key, const std::string &def=std::string()) const{
+			auto r=onion_request_get_post(ptr, key.c_str());
+			if (!r)
+				return def;
+			return r;
+		}
+		/**
 		 * @short Returns the query dictionary, AKA get dictionary.
 		 * 
 		 * Contains all elements encoded in the URL (?a=b&c=d...)
 		 */
 		const Dict query() const{
 			return Dict(onion_request_get_query_dict(ptr));
+		}
+		/**
+		 * @short Get a key from get query
+		 * 
+		 * If no dictionary or not at dictionary, it returns an empty string.
+		 */
+		const std::string query(const std::string &key, const std::string &def=std::string()) const{
+			auto r=onion_request_get_query(ptr, key.c_str());
+			if (!r)
+				return def;
+			return r;
 		}
 		/**
 		 * @short Returns the dictionary of the session.
@@ -83,6 +106,24 @@ namespace Onion{
 			else
 				return Dict();
 		}
+		/**
+		 * @short Get a key from session
+		 * 
+		 * If no dictionary or not at dictionary, it returns an empty string.
+		 */
+		const std::string session(const std::string &key, const std::string &def=std::string()) const{
+			auto r=onion_request_get_session(ptr, key.c_str());
+			if (!r)
+				return def;
+			return r;
+		}
+		/**
+		 * @short Removes current session
+		 */
+		void removeSession(){
+			onion_request_session_free(ptr);
+		}
+		
 		/**
 		 * @short Returns a dictionary with the files. 
 		 * 
@@ -120,7 +161,59 @@ namespace Onion{
 		std::string fullpath() const{
 			return onion_request_get_fullpath(ptr);
 		}
-		
+
+		/**
+		 * @short Returns the request flags
+		 */
+		onion_request_flags flags() const{
+			return onion_request_get_flags(ptr);
+		}
+
+		/**
+		 * @short Returns the cookies
+		 */
+		Dict cookies() const{
+			onion_dict* d = onion_request_get_cookies_dict(ptr);
+			return Dict(d);
+		}
+
+		/**
+		 * @short Get a cookie
+		 *
+		 * If no cookie or not a dictonary, it returns an empty string.
+		 */
+		const std::string cookies(const std::string &key, const std::string &def=std::string()) const{
+			auto r=onion_request_get_cookie(ptr, key.c_str());
+			if (!r)
+				return def;
+			return r;
+		}
+
+		/**
+		 * @short Returns a string with the client description
+		 */
+		const std::string clientDescription() const{
+			return onion_request_get_client_description(ptr);
+		}
+
+		/**
+		 * @short Returns the language code for the current request.
+                 * If none, returns "C".
+                 *
+                 * Language code is short code, no localization at this time.
+		 */
+		const std::string languageCode() const{
+                        /* This has code smell, but according to docs from
+                         * onion/request.c, the returned value must be freed.
+                         * So, initialize a new string which copies the data,
+                         * free the returned value, and return the new string.
+                         */
+			const char* r = onion_request_get_language_code(ptr);
+			std::string retval(r);
+			free(const_cast<char*>(r));
+			return retval;
+		}
+
 		/**
 		 * @short Returns the C handler, to use C functions.
 		 */

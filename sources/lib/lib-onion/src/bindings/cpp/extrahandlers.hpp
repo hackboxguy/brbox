@@ -33,46 +33,16 @@
 #include "response.hpp"
 
 namespace Onion{
-	class HandlerCBridge : public Handler{
-	public:
-		typedef void (*free_t)(void *data);
-		typedef onion_connection_status (*f_t)(void *data, onion_request *req, onion_response *res);
-		
-		HandlerCBridge(f_t c_handler_f) : f(c_handler_f), ud(NULL), fud(NULL) {};
-		HandlerCBridge(f_t c_handler_f, void *userdata, free_t free_userdata=NULL) : f(c_handler_f), ud(userdata), fud(free_userdata){};
-		virtual ~HandlerCBridge(){
-			if (fud)
-				fud(ud);
-		}
-		virtual onion_connection_status operator()(Request &req, Response &res){
-			return f(ud, req.c_handler(), res.c_handler());
-		}
-	private:
-		f_t f;
-		void *ud;
-		free_t fud;
+
+	namespace Shortcuts{
+		Handler static_file(const std::string &path);
+		Handler internal_redirect(const std::string &uri);
+		Handler redirect(const std::string &uri);
 	};
-	
-	class StaticHandler : public Handler{
-		std::string path;
-	public:
-		StaticHandler(const std::string &path);
-		virtual ~StaticHandler();
-		
-		virtual onion_connection_status operator()(Request& , Response& );
-	};
-	
-	class InternalRedirectHandler : public HandlerCBridge{
-	public:
-		InternalRedirectHandler(const std::string &uri) : HandlerCBridge(f_t(onion_shortcut_internal_redirect), (void*)strdup(uri.c_str()), free_t(free)){}
-		InternalRedirectHandler(const char *uri) : HandlerCBridge(f_t(onion_shortcut_internal_redirect), (void*)uri){}
-	};
-	
-	class RedirectHandler : public HandlerCBridge{
-	public:
-		RedirectHandler(const std::string &uri) : HandlerCBridge(f_t(onion_shortcut_redirect), (void*)strdup(uri.c_str()), free_t(free)){}
-		RedirectHandler(const char *uri) : HandlerCBridge(f_t(onion_shortcut_redirect), (void*)uri){}
-	};
+
+	Handler StaticHandler(const std::string &path);
+	Handler InternalRedirectHandler(const std::string &uri);
+	Handler RedirectHandler(const std::string &uri);
 };
 
 #endif

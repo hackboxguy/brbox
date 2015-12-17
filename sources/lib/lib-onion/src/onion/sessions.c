@@ -28,6 +28,8 @@
 #include "dict.h"
 #include "log.h"
 #include "random.h"
+#include "sessions_mem.h"
+#include "low.h"
 
 /**
  * @short Generates a unique id.
@@ -42,7 +44,7 @@
 char *onion_sessions_generate_id(){
 	char allowed_chars[]="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 	
-	char *ret=malloc(33);
+	char *ret=onion_low_scalar_malloc(33);
 	onion_random_generate(ret,32);
 	int i;
 	for (i=0;i<32;i++){
@@ -59,16 +61,7 @@ char *onion_sessions_generate_id(){
  * TODO: Make it also to allow persistent storage: for example if sqlite is available.
  */
 onion_sessions *onion_sessions_new(){
-	onion_random_init();
-	
-	onion_sessions *ret=malloc(sizeof(onion_sessions));
-	ret->sessions=onion_dict_new();
-	return ret;
-}
-
-/// Helper to remove all dicts inside session. Called with onion_dict_preorder
-static void onion_sessions_free_helper(void *data, const char *key, onion_dict *value, int flags){
-	onion_dict_free(value);
+	return onion_sessions_mem_new();
 }
 
 /**
@@ -76,10 +69,9 @@ static void onion_sessions_free_helper(void *data, const char *key, onion_dict *
  * @memberof onion_sessions_t
  */
 void onion_sessions_free(onion_sessions* sessions){
-	onion_dict_preorder(sessions->sessions, (void*)onion_sessions_free_helper, NULL);
-	onion_dict_free(sessions->sessions);
-	free(sessions);
-
+	if (!sessions)
+		return;
+	sessions->free(sessions);
 	onion_random_free();
 }
 
@@ -91,9 +83,12 @@ void onion_sessions_free(onion_sessions* sessions){
  * @returns the name. Must be freed by user.
  */
 char *onion_sessions_create(onion_sessions *sessions){
+	if (!sessions)
+		return NULL;
 	char *sessionId=onion_sessions_generate_id();
 	onion_dict *data=onion_dict_new();
-	onion_dict_add(sessions->sessions, sessionId, data, OD_DUP_KEY|OD_DICT);
+	sessions->save(sessions, sessionId, data);
+	onion_dict_free(data);
 	ONION_DEBUG("Created the session '%s'",sessionId);
 	return sessionId;
 }
@@ -116,13 +111,9 @@ char *onion_sessions_create(onion_sessions *sessions){
  * @returns The session for that id, or NULL if none.
  */
 onion_dict *onion_sessions_get(onion_sessions *sessions, const char *sessionId){
-	ONION_DEBUG0("Accessing session '%s'",sessionId);
-	onion_dict *sess=onion_dict_get_dict(sessions->sessions, sessionId);
-	if (!sess){
-		ONION_DEBUG0("Unknown session '%s'.", sessionId);
+	if (!sessions)
 		return NULL;
-	}
-	return onion_dict_dup(sess);
+	return sessions->get(sessions, sessionId);
 }
 
 /**
@@ -130,9 +121,18 @@ onion_dict *onion_sessions_get(onion_sessions *sessions, const char *sessionId){
  * @memberof onion_sessions_t
  */
 void onion_sessions_remove(onion_sessions *sessions, const char *sessionId){
-	onion_dict *data=onion_dict_get_dict(sessions->sessions, sessionId);
-	if (data){
-		onion_dict_free(data);
-		onion_dict_remove(sessions->sessions, sessionId);
-	}
+	if (!sessions)
+		return;
+	sessions->save(sessions, sessionId, NULL);
+}
+
+/**
+ * @short Ensures the content of the dict is saved to that session
+ * 
+ * On memory backend does nothing, on other backends may do the marshalling.
+ */
+void onion_sessions_save(onion_sessions *sessions, const char *sessionId, onion_dict *data){
+	if (!sessions)
+		return;
+	sessions->save(sessions, sessionId, data);
 }

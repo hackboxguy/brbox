@@ -21,19 +21,20 @@
 #include "url.hpp"
 #include "request.hpp"
 #include "response.hpp"
+#include "shortcuts.hpp"
 
 void t01_url(){
 	INIT_LOCAL();
 	
 	Onion::Onion o;
 
-	// Create an empty url handler
+	// Create an empty url handler. These are not directly used by onion, and must me freed.
 	Onion::Url url;
 	Onion::Url more_url;
 	Onion::Url more_url2;
 	
 	// Set the main handler, does nothing if not called as ?go, if so, uses the url handler.
-	o.setRootHandler(new Onion::HandlerFunction([&url](Onion::Request &req, Onion::Response &res) -> onion_connection_status{
+	o.setRootHandler(Onion::Handler::make<Onion::HandlerFunction>([&url](Onion::Request &req, Onion::Response &res) -> onion_connection_status{
 		if (req.query().has("go"))
 			return url(req, res);
 		res<<"<html><body>Go to <a href=\"?go\">?go</a>";
@@ -60,7 +61,7 @@ void t01_url(){
 		return OCS_PROCESSED;
 	});
 	
-	url.add("^less/", more_url2);
+	url.add("^less/", std::move(more_url2));
 	
 	more_url2.add("more", std::string("Yes, the saying is that <a href=\"http://bit.ly/1fdCbP0\">Less is more</a>"));
 	
@@ -69,6 +70,10 @@ void t01_url(){
 	// /more (at url -> more_url)
 	// /more/less (at url -> more_url)
 	// /less/more (at url -> more_url2)
+	
+	// from BUG #105. 
+	auto onionlocalwebdir=Onion::ExportLocal(".");
+  url.add("^webdir/", std::move(onionlocalwebdir));
 	
 	o.listen();
 	

@@ -42,6 +42,9 @@ char *onion_sessions_create(onion_sessions *sessions);
 /// Returns the session object.
 onion_dict *onion_sessions_get(onion_sessions *sessions, const char *sessionId);
 
+/// Store session
+void onion_sessions_save(onion_sessions *sessions, const char *sessionId, onion_dict *data);
+
 /// Removes a session from the storage.
 void onion_sessions_remove(onion_sessions *sessions, const char *sessionId);
 

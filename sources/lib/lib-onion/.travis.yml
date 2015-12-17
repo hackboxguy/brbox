@@ -1,0 +1,41 @@
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+sudo: false
+
+git:
+  depth: 1
+
+addons:
+  apt:
+    sources:
+      - llvm-toolchain-precise-3.7
+      - ubuntu-toolchain-r-test
+    packages:
+      - clang-3.7
+      - g++-5
+      - gcc-5
+
+install:
+  # install some packages from Ubuntu's default sources
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+  - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
+
+script:
+  # make distcheck still does not work on travis
+  - mkdir build
+    && cd build
+    && cmake ..
+       -DCMAKE_C_FLAGS="-Werror"
+       -DCMAKE_CXX_FLAGS="-Werror"
+    && make VERBOSE=1
+    && (make test || true)
+
+after_script:
+  - if test -f ./Testing/Temporary/LastTest.log; then
+      echo "cat test logs:";
+      cat  ./Testing/Temporary/LastTest.log;
+    fi
