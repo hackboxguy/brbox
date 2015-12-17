@@ -10,7 +10,7 @@ using namespace std;
 #include <onion/request.h>
 #include <onion/response.h>
 #include <onion/url.h>
-//#include <onion/low.h>
+#include <onion/low.h>
 #include <onion/log.h>
 #include "ADCommon.hpp"
 
@@ -30,7 +30,7 @@ onion_connection_status strip_rpc(void *_, onion_request *req, onion_response *r
 {
 	const onion_block *dreq=onion_request_get_data(req);
 	onion_dict *jreq=NULL;
-/*	if (dreq)
+	if (dreq)
 		jreq=onion_dict_from_json( onion_block_data( dreq ) );
 	if (jreq)
 	{ 
@@ -49,7 +49,7 @@ onion_connection_status strip_rpc(void *_, onion_request *req, onion_response *r
 			onion_dict_get(jreq,"id"));
 			return OCS_PROCESSED;
 		}
-		char *str=onion_low_strdup( onion_dict_rget(jreq,"params", "str", NULL) );//TODO
+		char *str=onion_low_strdup( onion_dict_rget(jreq,"params", "str", NULL) );
 		/// check real start and end. To prepare to write back the stripped string.
 		int start=0, end=strlen(str);
 		while(start<end && isspace(str[start])) start++;
@@ -71,11 +71,11 @@ onion_connection_status strip_rpc(void *_, onion_request *req, onion_response *r
 		/// Clean up.
 		onion_block_free(jresb);
 		onion_dict_free(jres);
-		onion_low_free(str);//TODO
+		onion_low_free(str);
 		onion_dict_free(jreq);
 		return OCS_PROCESSED;
 	}
-	else*/
+	else
 	{
 		onion_response_write0(res, "This is a JSON rpc service. Please send jsonrpc requests.\n");
 		return OCS_PROCESSED;
