@@ -1,0 +1,9 @@
+diff -urN brbox_libonion-HEAD/CMakeLists.txt brbox_libonion-HEAD.copy/CMakeLists.txt
+--- brbox_libonion-HEAD/CMakeLists.txt	2015-12-15 03:47:09.000000000 +0100
++++ brbox_libonion-HEAD.copy/CMakeLists.txt	2015-12-18 15:46:26.932263853 +0100
+@@ -237,4 +237,4 @@
+ 	enable_testing()
+ endif(${ONION_USE_TESTS})
+ 
+-add_subdirectory(tests)
++#add_subdirectory(tests)

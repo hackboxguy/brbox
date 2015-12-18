@@ -20,7 +20,7 @@ add_executable(${COMPONENT_NAME} ${SOURCES})
 set(INC_ADSTTNG  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-settings/include")
 set(INC_ADCOMMN  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-adav-old/include")
 set(INC_ADONION  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-onion/src")
-set(INC_ADONIONCPP "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-onion/src/bindings/cpp")
+set(INC_ADONIONCPP "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-onion/src/bindings/")
 set(INC_SRVCOMMN "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 #find_package( OpenCV REQUIRED ) #core imgproc highgui )
 # Add #include path of all dependent components

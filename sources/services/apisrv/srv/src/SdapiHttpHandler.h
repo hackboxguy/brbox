@@ -12,11 +12,11 @@
 #include <onion/log.h>
 #include "ADCommon.hpp"
 #include <iostream>
-#include <onion.hpp>
-#include <response.hpp>
-#include <request.hpp>
-#include <url.hpp>
-#include <dict.hpp>
+#include <onion/onion.hpp>
+#include <onion/response.hpp>
+#include <onion/request.hpp>
+#include <onion/url.hpp>
+#include <onion/dict.hpp>
 
 class SdapiHttpHandler //:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 {
