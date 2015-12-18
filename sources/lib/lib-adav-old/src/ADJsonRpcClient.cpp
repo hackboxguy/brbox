@@ -2640,7 +2640,9 @@ char* ADJsonRpcClient::send_raw_data_and_receive_resp(char* tx_buffer)
 {
 	recv_buffer[0]='\0';
 	ClientSocket.send_data(tx_buffer);//send_buffer);
-	ClientSocket.receive_data_blocking(recv_buffer,sizeof(recv_buffer),4000);//4sec timeout
+	int received=ClientSocket.receive_data_blocking(recv_buffer,sizeof(recv_buffer),4000);//4sec timeout
+	if(received>=0)
+		recv_buffer[received]='\0';//null terminate the string
 	recv_buffer[MAX_RECV_BUFFER_SIZE-1]='\0';
 	return recv_buffer;
 }
