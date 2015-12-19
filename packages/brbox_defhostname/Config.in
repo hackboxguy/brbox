@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BRBOX_DEFHOSTNAME
+	bool "Default hostname startup-script for brbox platform"
+	default y
+	depends on BR2_TARGET_BRBOX_PACKAGES
+	help
+	  provides detection and creation of hostname on startup for brbox based boards.
+

@@ -1,0 +1,55 @@
+#!/bin/sh
+#note: if /mnt/settings/hostname doesnt exist         ==> default-hostname will be written to this file
+#note: if /mnt/settings/hostname exists but empty     ==> default-hostname will be written to this file
+#note: if /mnt/settings/hostname exists and has value ==> /mnt/settings/hostname will not be touched
+#note: if /mnt/settings/hostname exists and has value and force flag is yes ==> default-hostname will be written to this file
+##################################################
+USAGE="script for checking and setting default hostname"
+USAGE1="usage:$0 -l <hostname-filepath> -f <force-default[y/n]>"
+FILE_PATH="/mnt/settings/etc/hostname"
+FORCE_DEFAULT="n"
+##################################################
+GetDefaultHostname()
+{
+	#TODO:based on MAC id, create "brbox-AABBCCDDEEFF
+	echo "defhostname"
+	return 0
+}
+##################################################
+#start
+if [ $# -lt 1  ]; then 
+	echo $USAGE
+	echo $USAGE1
+	exit 1
+fi
+
+while getopts l:f: f
+do
+    case $f in
+	l) FILE_PATH=$OPTARG;;       #hostname filepath
+	f) FORCE_DEFAULT=$OPTARG;;   #force setting of default hostname
+    esac
+done
+
+
+_file="$FILE_PATH"  
+#[ $# -eq 0 ] && { echo "Usage: $0 filename"; exit 1; }
+if [ ! -f "$_file" ]; then #&& { echo "Error: $_file file not found."; exit 2; }
+	#hostname file doesnt exist, create default hostname
+	DEFHOST=$(GetDefaultHostname)
+	echo "$DEFHOST" > $_file
+fi 
+
+if [ -s "$_file" ]; then
+	#forced overwrite of hostname with default hostname
+	if [ $FORCE_DEFAULT = "y" ]; then
+		DEFHOST=$(GetDefaultHostname)
+		echo "$DEFHOST" > $_file
+	fi
+	#else, not forced, and file seems to have valid hostname	
+else  
+	#file exists but empty, so overwrite with default hostname
+	DEFHOST=$(GetDefaultHostname)
+	echo "$DEFHOST" > $_file
+fi  
+
