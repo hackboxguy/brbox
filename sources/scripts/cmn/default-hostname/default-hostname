@@ -11,8 +11,15 @@ FORCE_DEFAULT="n"
 ##################################################
 GetDefaultHostname()
 {
-	#TODO:based on MAC id, create "brbox-AABBCCDDEEFF
-	echo "defhostname"
+	#echo "defhostname"
+	RES=$(ifconfig | sed '1,1!d' | sed 's/.*HWaddr //' | sed 's/\ .*//' | sed -e 's/://g')
+	LEN=$(echo $RES | wc -L)
+	if [ $LEN = 12 ]; then
+		echo "brbox-$RES"
+	else
+		RES=$(cat /proc/cpuinfo | grep Serial | awk '{print $3}') #else print the cpu serial num(used incase of raspi-A)
+		echo "brbox-$RES"
+	fi
 	return 0
 }
 ##################################################
