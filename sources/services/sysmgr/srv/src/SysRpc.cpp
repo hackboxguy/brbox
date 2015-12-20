@@ -38,7 +38,7 @@ int SysRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_GET_HOSTNAME    :return json_to_bin_get_hostname(pReq);
 		case EJSON_SYSMGR_RPC_SET_HOSTNAME    :return json_to_bin_set_hostname(pReq);
 		case EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP:return json_to_bin_get_myip(pReq);
-
+		case EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME:return json_to_bin_set_def_hostname(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -65,6 +65,7 @@ int SysRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_GET_HOSTNAME    :return bin_to_json_get_hostname(pReq);
 		case EJSON_SYSMGR_RPC_SET_HOSTNAME    :return bin_to_json_set_hostname(pReq);
 		case EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP:return bin_to_json_get_myip(pReq);
+		case EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME:return bin_to_json_set_def_hostname(pReq);
 		default: break;
 	}
 	return -1;
@@ -91,6 +92,7 @@ int SysRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 		case EJSON_SYSMGR_RPC_GET_HOSTNAME    :return process_get_hostname(pReq);
 		case EJSON_SYSMGR_RPC_SET_HOSTNAME    :return process_set_hostname(pReq);
 		case EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP:return process_get_myip(pReq);
+		case EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME:return process_set_def_hostname(pReq);
 		default:break;
 	}
 	return 0;
@@ -856,6 +858,32 @@ int SysRpc::process_get_myip(JsonDataCommObj* pReq)
 	//strcpy(pPacket->ip,"192.168.1.1");
 	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 	//wget http://ipinfo.io/ip -qO -
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME
+int SysRpc::json_to_bin_set_def_hostname(JsonDataCommObj* pReq)
+{
+	SYSMGR_HOSTNAME_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_HOSTNAME_PACKET,RPC_SRV_ACT_WRITE,EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME);
+	//JSON_STRING_TO_STRING(SYSMGR_RPC_HOSTNAME_ARG,pPanelCmdObj->hostname);
+	return 0;
+}
+int SysRpc::bin_to_json_set_def_hostname(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,SYSMGR_HOSTNAME_PACKET);
+	return 0;
+}
+int SysRpc::process_set_def_hostname(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SYSMGR_HOSTNAME_PACKET* pPacket;
+	pPacket=(SYSMGR_HOSTNAME_PACKET*)pPanelReq->dataRef;
+	char cmdline[512];
+	ADSysInfo SysInfo;
+	sprintf(cmdline,"default-hostname -f y");
+	pPanelReq->result=SysInfo.run_shell_script(cmdline,get_emulation_flag());
 	return 0;
 }
 /* ------------------------------------------------------------------------- */

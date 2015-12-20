@@ -37,6 +37,8 @@ SysmgrCltCmdline::SysmgrCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--hostname                 [read/write hostname]");
 	CmdlineHelper.insert_options_entry((char*)"myip" ,optional_argument,EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP);
 	CmdlineHelper.insert_help_entry((char*)"--myip                     [read my internet ip]");
+	CmdlineHelper.insert_options_entry((char*)"defhostname" ,optional_argument,EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME);
+	CmdlineHelper.insert_help_entry((char*)"--defhostname              [reset hostname to default]");
 }
 /* ------------------------------------------------------------------------- */
 SysmgrCltCmdline::~SysmgrCltCmdline()
@@ -134,6 +136,11 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			CmdlineHelper.push_string_get_set_command(EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP,EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP,
 			SYSMGR_RPC_MY_PUBLIC_IP_GET,SYSMGR_RPC_MY_PUBLIC_IP_GET,(char*)SYSMGR_RPC_MY_PUBLIC_IP_ARG,sub_arg);
 			break;
+
+		case EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME:
+			CmdlineHelper.push_action_type_noarg_command(EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME,(char*)SYSMGR_RPC_DEFAULT_HOSTNAME_SET);
+			break;
+
 		default:
 			return 0;
 			break;	

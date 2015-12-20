@@ -79,6 +79,11 @@ public:
 	int json_to_bin_get_myip(JsonDataCommObj* pReq);
 	int bin_to_json_get_myip(JsonDataCommObj* pReq);
 	int process_get_myip(JsonDataCommObj* pReq);
+
+	int json_to_bin_set_def_hostname(JsonDataCommObj* pReq);
+	int bin_to_json_set_def_hostname(JsonDataCommObj* pReq);
+	int process_set_def_hostname(JsonDataCommObj* pReq);
+
 };
 /* ------------------------------------------------------------------------- */
 

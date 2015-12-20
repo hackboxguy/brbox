@@ -148,6 +148,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			//case EXMPP_CMD_FMW_SET_HOSTNAME:res=proc_cmd_fmw_set_hostname(cmd.cmdMsg);break;
 			case EXMPP_CMD_FMW_HOSTNAME    :res=proc_cmd_fmw_hostname(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_FMW_GET_MYIP    :res=proc_cmd_fmw_get_myip(cmd.cmdMsg,returnval);break;
+			case EXMPP_CMD_FMW_SET_DEFAULT_HOSTNAME:res=proc_cmd_fmw_set_default_hostname(cmd.cmdMsg);break;
 			default                       :break;
 		}
 		processCmd.pop_front();//after processing delete the entry
@@ -491,4 +492,18 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_get_myip(std::string msg,std::string &retur
 	return result;
 }
 /* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_set_default_hostname(std::string msg)
+{
+//14:52:09.440-->{ "jsonrpc": "2.0", "method": "set_default_hostname", "id": 0 }
+//14:52:09.440<--{ "jsonrpc": "2.0", "result": { "return": "Success"}, "id": 0 }
+	char temp_str[255];temp_str[0]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result = Client.set_action_noarg_type((char*)"set_default_hostname");
+	Client.rpc_server_disconnect();
+	return result;
+}
+/* ------------------------------------------------------------------------- */
+
 
