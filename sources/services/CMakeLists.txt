@@ -5,8 +5,8 @@ add_subdirectory(sysmgr)
 #add_subdirectory(smarteye)
 add_subdirectory(gpioctl)
 add_subdirectory(hotwire)
-#add_subdirectory(bboxsms)
-#add_subdirectory(xmproxy)
+add_subdirectory(bboxsms)
+add_subdirectory(xmproxy)
 add_subdirectory(apisrv)
 
 

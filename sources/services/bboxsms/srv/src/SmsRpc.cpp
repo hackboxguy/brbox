@@ -248,7 +248,8 @@ int SmsRpc::json_to_bin_sms_list_update(JsonDataCommObj* pReq)
 }
 int SmsRpc::bin_to_json_sms_list_update(JsonDataCommObj* pReq)
 {
-	PREPARE_JSON_RESP(RPC_SRV_REQ,BBOXSMS_SMS_PACKET);
+	//PREPARE_JSON_RESP(RPC_SRV_REQ,BBOXSMS_SMS_PACKET);
+	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,BBOXSMS_SMS_PACKET,RPCMGR_RPC_TASK_STS_ARGID);
 	return 0;
 }
 int SmsRpc::process_sms_list_update(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj)
@@ -266,10 +267,10 @@ int SmsRpc::process_sms_list_update(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* 
 		return -1;
 	}
 	//pWorkData->operation=pPacket->operation;
-	pPanelReq->result=pObj->PushAsyncTask(EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_DELETE);//WORK_CMD_AFTER_DONE_PRESERVE);
+	pPanelReq->result=pObj->PushAsyncTask(EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_PRESERVE);//WORK_CMD_AFTER_DONE_DELETE);
 	if(pPanelReq->result!=RPC_SRV_RESULT_IN_PROG)
 		OBJ_MEM_DELETE(pWorkData);
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;//although, this is async type, but internally taskID object is auto-deleted after completion
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;//although, this is async type, but internally taskID object is auto-deleted after completion
 	return 0;
 }
 RPC_SRV_RESULT SmsRpc::process_async_list_update(BBOXSMS_SMS_PACKET* pPacket)

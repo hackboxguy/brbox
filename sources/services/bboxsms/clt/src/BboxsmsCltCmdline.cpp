@@ -58,8 +58,10 @@ int BboxsmsCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 						     (char*)BBOXSMS_RPC_SMS_ARG_INDX,(char*)BBOXSMS_RPC_SMS_ARG_MSG);
 			break;
 		case EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE:
-			CmdlineHelper.push_action_type_noarg_command(EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE,(char*)BBOXSMS_RPC_SMS_LIST_UPDATE);
+			//CmdlineHelper.push_action_type_noarg_command(EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE,(char*)BBOXSMS_RPC_SMS_LIST_UPDATE);
 			//no inprogress returned for above command
+			CmdlineHelper.push_action_type_noarg_command(EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE,
+				(char*)BBOXSMS_RPC_SMS_LIST_UPDATE,(char*)RPCMGR_RPC_TASK_STS_ARGID);
 			break;
 		case EJSON_BBOXSMS_RPC_SMS_IDENTIFY_DEV:
 			CmdlineHelper.push_action_type_noarg_command(EJSON_BBOXSMS_RPC_SMS_IDENTIFY_DEV,

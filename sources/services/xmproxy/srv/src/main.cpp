@@ -9,6 +9,7 @@
 #include "SrcControlVersion.h"
 #include "ADTimer.hpp"
 #include "XmppMgr.h" //ADXmppProxy.hpp"
+#include "EvntHandler.h"
 /* ------------------------------------------------------------------------- */
 using namespace std;
 int main(int argc, const char* argv[])
@@ -68,6 +69,11 @@ int main(int argc, const char* argv[])
 	std::string XmpAccountAuthFilePath(filepath);
 	XmpManager.Start(XmpAccountAuthFilePath);//connect the xmpp server
 	XmpManager.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to xmpp client manager for sending white-space-ping-to-server
+
+ 	/********Prepare event receiver to receive events from different services******/
+	//TODO: wait for different services ready flag before subscribing for events
+	EvntHandler EvntReceiver("dummy_rpc",0,emulat,dbglog,&DataCache);
+	RpcMgr.AttachEventReceiver(&EvntReceiver);
 
 	//server is ready to serve rpc's
 	RpcMgr.SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE_READY);

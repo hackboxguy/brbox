@@ -1,17 +1,20 @@
-#ifndef __EVENT_HANDLER_H_
-#define __EVENT_HANDLER_H_
+#ifndef __EVNT_HANDLER_H_
+#define __EVNT_HANDLER_H_
 #include "ADJsonRpcMgr.hpp"
-#include "SysmgrJsonDef.h"
+#include "XmproxyJsonDef.h"
 #include "ADCmnStringProcessor.hpp"
 /* ------------------------------------------------------------------------- */
-class  EventHandler : public ADJsonRpcMgrConsumer, public ADCmnStringProcessor
+class  EvntHandler : public ADJsonRpcMgrConsumer, public ADCmnStringProcessor
 {
-	int srvToken;//=-1;
-	SYSMGR_CMN_DATA_CACHE *pDataCache;
-	bool gpioEventActive;
+	bool sysmgrEventActive;
+	int  sysMgrSrvToken;//=-1;
+	bool bboxSmsEventActive;
+	int  bboxSmsSrvToken;
+
+	XMPROXY_CMN_DATA_CACHE *pDataCache;
 public:
-	 EventHandler(std::string rpcName,int myIndex,bool emu,bool log,SYSMGR_CMN_DATA_CACHE *pData);
-	~ EventHandler();
+	 EvntHandler(std::string rpcName,int myIndex,bool emu,bool log,XMPROXY_CMN_DATA_CACHE *pData);
+	~ EvntHandler();
 	virtual int MapJsonToBinary(JsonDataCommObj* pReq,int index){};
 	virtual int MapBinaryToJson(JsonDataCommObj* pReq,int index){};
 	virtual int ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pObj){};

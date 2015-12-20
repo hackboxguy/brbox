@@ -74,15 +74,15 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	virtual int custom_sig_notification(int signum){return 0;};
 
 	EXMPP_CMD_TYPES ResolveCmdStr(std::string cmd);
-	RPC_SRV_RESULT proc_cmd_sms_deleteall(std::string msg);
+	RPC_SRV_RESULT proc_cmd_sms_deleteall(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_sms_delete(std::string msg);
 	RPC_SRV_RESULT proc_cmd_sms_get(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_sms_send(std::string msg);
-	RPC_SRV_RESULT proc_cmd_sms_list_update(std::string msg);
+	RPC_SRV_RESULT proc_cmd_sms_list_update(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_sms_get_total(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_get_version(std::string msg,std::string &returnval);
-	RPC_SRV_RESULT proc_cmd_fmw_update(std::string msg);
-	RPC_SRV_RESULT proc_cmd_fmw_reboot(std::string msg);
+	RPC_SRV_RESULT proc_cmd_fmw_update(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_fmw_reboot(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_update_sts(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_update_res(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_uptime(std::string msg,std::string &returnval);
@@ -101,7 +101,8 @@ public:
 	RPC_SRV_RESULT SendMessage(std::string msg);
 	void SetDebugLog(bool log);
 	int AttachHeartBeat(ADTimer* pTimer);
-
+	RPC_SRV_RESULT RpcResponseCallback(RPC_SRV_RESULT taskRes,int taskID);//called by eventHandler
+	RPC_SRV_RESULT RpcResponseCallback(std::string taskRes,int taskID);
 };
 #endif
 

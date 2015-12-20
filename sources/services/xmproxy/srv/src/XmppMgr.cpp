@@ -132,17 +132,17 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 		XmppCmdEntry cmd = processCmd.front();
 		switch(ResolveCmdStr(cmd.cmdMsg))
 		{
-			case EXMPP_CMD_SMS_DELETE_ALL  :res=proc_cmd_sms_deleteall(cmd.cmdMsg);break;
+			case EXMPP_CMD_SMS_DELETE_ALL  :res=proc_cmd_sms_deleteall(cmd.cmdMsg,returnval);break;//inProg
 			case EXMPP_CMD_SMS_DELETE      :res=proc_cmd_sms_delete(cmd.cmdMsg);break;
 			case EXMPP_CMD_SMS_GET         :res=proc_cmd_sms_get(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_SMS_SEND        :res=proc_cmd_sms_send(cmd.cmdMsg);break;
-			case EXMPP_CMD_SMS_LIST_UPDATE :res=proc_cmd_sms_list_update(cmd.cmdMsg);break;
+			case EXMPP_CMD_SMS_LIST_UPDATE :res=proc_cmd_sms_list_update(cmd.cmdMsg,returnval);break;//inProg
 			case EXMPP_CMD_SMS_GET_TOTAL   :res=proc_cmd_sms_get_total(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_FMW_GET_VERSION :res=proc_cmd_fmw_get_version(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_FMW_UPDATE      :res=proc_cmd_fmw_update(cmd.cmdMsg);break;
+			case EXMPP_CMD_FMW_UPDATE      :res=proc_cmd_fmw_update(cmd.cmdMsg,returnval);break;//inProg
 			case EXMPP_CMD_FMW_UPDATE_STS  :res=proc_cmd_fmw_update_sts(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_FMW_UPDATE_RES  :res=proc_cmd_fmw_update_res(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_FMW_REBOOT      :res=proc_cmd_fmw_reboot(cmd.cmdMsg);break;
+			case EXMPP_CMD_FMW_REBOOT      :res=proc_cmd_fmw_reboot(cmd.cmdMsg,returnval);break;//inProg
 			case EXMPP_CMD_FMW_UPTIME      :res=proc_cmd_fmw_uptime(cmd.cmdMsg,returnval);break;
 			//case EXMPP_CMD_FMW_GET_HOSTNAME:res=proc_cmd_fmw_get_hostname(cmd.cmdMsg,returnval);break;
 			//case EXMPP_CMD_FMW_SET_HOSTNAME:res=proc_cmd_fmw_set_hostname(cmd.cmdMsg);break;
@@ -158,6 +158,30 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 	std::string response = result +" : "+returnval;
 	XmppProxy.send_reply(response);//result+":"+returnval);
 	return 0;
+}
+//following function is called by EvntHandler object
+//after receiving the result of inProg task, this call back is called to send reply over xmpp
+RPC_SRV_RESULT XmppMgr::RpcResponseCallback(RPC_SRV_RESULT taskRes,int taskID)
+{
+	char tID[255];sprintf(tID,"%d",taskID);
+	std::string returnval="taskID=";
+	returnval+=tID;
+
+	const char *resTbl[] = STR_RPC_SRV_RESULT_STRING_TABLE;
+	std::string result   = resTbl[taskRes];
+	std::string response = result +" : "+returnval;
+	XmppProxy.send_reply(response);//result+":"+returnval);
+	return RPC_SRV_RESULT_SUCCESS;
+}
+RPC_SRV_RESULT XmppMgr::RpcResponseCallback(std::string taskRes,int taskID)
+{
+	char tID[255];sprintf(tID,"%d",taskID);
+	std::string returnval="taskID=";
+	returnval+=tID;
+	std::string result   = taskRes;
+	std::string response = result +" : "+returnval;
+	XmppProxy.send_reply(response);
+	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
 EXMPP_CMD_TYPES XmppMgr::ResolveCmdStr(std::string msg)
@@ -243,13 +267,17 @@ RPC_SRV_RESULT XmppMgr::SendMessage(std::string msg)
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
-RPC_SRV_RESULT XmppMgr::proc_cmd_sms_deleteall(std::string msg)
+RPC_SRV_RESULT XmppMgr::proc_cmd_sms_deleteall(std::string msg,std::string &returnval)
 {
+	char tID[255];tID[254]='\0';
 	ADJsonRpcClient Client;
 	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_BBOXSMS)!=0)
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
-	RPC_SRV_RESULT result=Client.set_action_noarg_type((char*)"delete_all_sms");
+	RPC_SRV_RESULT result=Client.set_action_noarg_get_single_string_type((char*)"delete_all_sms",(char*)"taskId",tID);
 	Client.rpc_server_disconnect();
+	returnval="taskID=";returnval+=tID;
+	//TODO:
+	//if(result==IN_PROGRESS)push(tID) to my chain 	//taskID=atoi(tID);
 	return result;
 }
 /* ------------------------------------------------------------------------- */
@@ -285,13 +313,17 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sms_send(std::string msg)
 	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
 }
 /* ------------------------------------------------------------------------- */
-RPC_SRV_RESULT XmppMgr::proc_cmd_sms_list_update(std::string msg)
+RPC_SRV_RESULT XmppMgr::proc_cmd_sms_list_update(std::string msg,std::string &returnval)
 {
+	char tID[255];tID[254]='\0';
 	ADJsonRpcClient Client;
 	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_BBOXSMS)!=0)
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
-	RPC_SRV_RESULT result=Client.set_action_noarg_type((char*)"update_sms_list");
+	RPC_SRV_RESULT result=Client.set_action_noarg_get_single_string_type((char*)"update_sms_list",(char*)"taskId",tID);
 	Client.rpc_server_disconnect();
+	returnval="taskID=";returnval+=tID;
+	//TODO:
+	//if(result==IN_PROGRESS)push(tID) to my chain 	//taskID=atoi(tID);
 	return result;
 }
 /* ------------------------------------------------------------------------- */
@@ -321,7 +353,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_get_version(std::string msg,std::string &re
 	return result;
 }
 /* ------------------------------------------------------------------------- */
-RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg)
+RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg,std::string &returnval)
 {
 	//00:06:05.434-->{ "jsonrpc": "2.0", "method": "download_ftp_file", "params": { "srcaddr": "http:\/\/github.com\/hackboxguy\/downloads\/raw\/master\/bbbmmcRbox\/readme.txt", "targetpath": "\/tmp\/readme.txt" }, "id": 0 }
 	//00:06:05.454<--{ "jsonrpc": "2.0", "result": { "return": "InProgress", "taskId": 1 }, "id": 0 }
@@ -357,12 +389,15 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg)
 									(char*)"filepath",(char*)"/tmp/uBrBoxRoot.uimg",
 									(char*)"taskId",temp_str);
 		LastFmwUpdateTaskID=atoi(temp_str);
+		returnval="taskID=";returnval+=temp_str;
+		//TODO:
+		//if(result==IN_PROGRESS)push(tID) to my chain 	//taskID=atoi(tID);
 	}
 	Client.rpc_server_disconnect();
 	return result;
 }
 /* ------------------------------------------------------------------------- */
-RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_reboot(std::string msg)
+RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_reboot(std::string msg,std::string &returnval)
 {
 	//01:39:52.718-->{ "jsonrpc": "2.0", "method": "set_device_operation", "params": { "operation": "reboot" }, "id": 0 }
 	//01:39:52.726<--{ "jsonrpc": "2.0", "result": { "return": "InProgress", "taskId": 1 }, "id": 0 }
@@ -370,8 +405,9 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_reboot(std::string msg)
 	ADJsonRpcClient Client;
 	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
-	RPC_SRV_RESULT result = Client.set_single_string_type((char*)"set_device_operation",(char*)"operation",(char*)"reboot");
+	RPC_SRV_RESULT result = Client.set_single_string_get_single_string_type((char*)"set_device_operation",(char*)"operation",(char*)"reboot",(char*)"taskId",temp_str);
 	Client.rpc_server_disconnect();
+	returnval="taskID=";returnval+=temp_str;
 	return result;
 }
 /* ------------------------------------------------------------------------- */

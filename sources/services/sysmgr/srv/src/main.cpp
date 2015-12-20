@@ -40,8 +40,8 @@ int main(int argc, const char* argv[])
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 
  	/****************Prepare event receiver to receive events*****************/
-	EventHandler EvntReceiver("dummy_rpc",0,emulat,dbglog,&DataCache);
-	RpcMgr.AttachEventReceiver(&EvntReceiver);
+	//EventHandler EvntReceiver("dummy_rpc",0,emulat,dbglog,&DataCache);
+	//RpcMgr.AttachEventReceiver(&EvntReceiver);
 	/****************************RPC list*************************************/
 	//network related rpc's
 	NetRpc MacGet  (SYSMGR_RPC_MAC_ADDR_GET ,EJSON_SYSMGR_RPC_GET_MAC_ADDR ,emulat,dbglog,&DataCache);  //network related rpc handler class
@@ -91,6 +91,12 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr
 	RpcMgr.SupportShutdownRpc(false);//this is a system-manager, needs to be alive all the time, hence dont support shutdown via rpc
 	RpcMgr.Start(CmdLine.get_port_number(),CmdLine.get_socket_log(),CmdLine.get_emulation_mode());
+
+ 	/****************Prepare event receiver to receive events*****************/
+	//TODO: wait for event-sending-service to be ready
+	EventHandler EvntReceiver("dummy_rpc",0,emulat,dbglog,&DataCache);
+	RpcMgr.AttachEventReceiver(&EvntReceiver);
+
 	//server is ready to serve rpc's
 	RpcMgr.SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE_READY);
 	//wait for sigkill or sigterm signal
