@@ -472,8 +472,12 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_uptime(std::string msg,std::string &returnv
 	RPC_SRV_RESULT result = Client.get_three_string_type(   (char*)"get_load_info",(char*)"current",str_cur,
 								(char*)"average",str_avg,(char*)"uptime",str_uptm);
 	Client.rpc_server_disconnect();
-	returnval=str_uptm;
-	returnval+=" Sec";
+	int hrs=atoi(str_uptm);hrs/=3600;
+	char hrs_str[255];sprintf(hrs_str,"%d",hrs);
+	//returnval=str_uptm;
+	//returnval+=" Sec";
+	returnval=hrs_str;
+	returnval+=" Hours";
 	return result;
 }
 /* ------------------------------------------------------------------------- */
