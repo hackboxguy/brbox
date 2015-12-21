@@ -46,22 +46,22 @@ void EvntHandler::ReceiveEvent(int cltToken,int evntNum,int evntArg)
 	if(cltToken==EVENT_BBXSMS && evntNum==ADLIB_EVENT_NUM_SHUT_DOWN)
 		bboxSmsEventActive=false;//bboxsms-srv is dead, subscription is not active any more
 
-	//if(cltToken==EVENT_SYSMGR && evntNum==ADLIB_EVENT_NUM_INPROG_DONE)
 	if(evntNum==ADLIB_EVENT_NUM_INPROG_DONE)
 	{
 		char taskIDString[255];char taskIDResult[255];taskIDResult[254]='\0';
 		sprintf(taskIDString,"%d",evntArg);
 		XmppMgr *pXmpp=(XmppMgr*)pDataCache->pXmpMgr;
-		//TODO: removebyDoubleIdent(cltToken,evntArg) scheduledTaskID from pXmppChain
-		//TODO: if taskID found in pXmppChain,read the inProg result from sysmgr-srv
-		ADJsonRpcClient Client;
-		if(Client.rpc_server_connect("127.0.0.1",cltToken)!=0)
-			return;// RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
-		RPC_SRV_RESULT result=Client.get_string_type_with_string_para((char*)ADLIB_RPC_NAME_GET_TASK_STATUS,
-					(char*)ADLIB_RPC_PARM_TASK_STS_ID,taskIDString,taskIDResult,(char*)ADLIB_RPC_PARM_TASK_STS);
-		Client.rpc_server_disconnect();
-		std::string finalRes=taskIDResult;
-		pXmpp->RpcResponseCallback(finalRes,evntArg);
+		if(pXmpp->IsItMyAsyncTaskResp(evntArg,cltToken)==RPC_SRV_RESULT_SUCCESS)
+		{
+			ADJsonRpcClient Client;
+			if(Client.rpc_server_connect("127.0.0.1",cltToken)!=0)
+				return;// RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+			RPC_SRV_RESULT result=Client.get_string_type_with_string_para((char*)ADLIB_RPC_NAME_GET_TASK_STATUS,
+						(char*)ADLIB_RPC_PARM_TASK_STS_ID,taskIDString,taskIDResult,(char*)ADLIB_RPC_PARM_TASK_STS);
+			Client.rpc_server_disconnect();
+			std::string finalRes=taskIDResult;
+			pXmpp->RpcResponseCallback(finalRes,evntArg);
+		}
 	}
 }
 /* ------------------------------------------------------------------------- */

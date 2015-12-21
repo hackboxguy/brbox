@@ -183,6 +183,14 @@ RPC_SRV_RESULT XmppMgr::RpcResponseCallback(std::string taskRes,int taskID)
 	XmppProxy.send_reply(response);
 	return RPC_SRV_RESULT_SUCCESS;
 }
+RPC_SRV_RESULT XmppMgr::IsItMyAsyncTaskResp(int tid,int port)
+{
+	if (find_if(AsyncTaskList.begin(), AsyncTaskList.end(), FindAsyncEventEntry(tid,port)) == AsyncTaskList.end())
+		return RPC_SRV_RESULT_FAIL;
+	//erase the entry
+	AsyncTaskList.erase(remove_if(AsyncTaskList.begin(), AsyncTaskList.end(), FindAsyncEventEntry(tid,port)) , AsyncTaskList.end());
+	return RPC_SRV_RESULT_SUCCESS;
+}
 /* ------------------------------------------------------------------------- */
 EXMPP_CMD_TYPES XmppMgr::ResolveCmdStr(std::string msg)
 {
@@ -276,8 +284,8 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sms_deleteall(std::string msg,std::string &retu
 	RPC_SRV_RESULT result=Client.set_action_noarg_get_single_string_type((char*)"delete_all_sms",(char*)"taskId",tID);
 	Client.rpc_server_disconnect();
 	returnval="taskID=";returnval+=tID;
-	//TODO:
-	//if(result==IN_PROGRESS)push(tID) to my chain 	//taskID=atoi(tID);
+	if(result==RPC_SRV_RESULT_IN_PROG)
+		AsyncTaskList.push_back(AyncEventEntry(atoi(tID),ADCMN_PORT_BBOXSMS));
 	return result;
 }
 /* ------------------------------------------------------------------------- */
@@ -322,8 +330,8 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sms_list_update(std::string msg,std::string &re
 	RPC_SRV_RESULT result=Client.set_action_noarg_get_single_string_type((char*)"update_sms_list",(char*)"taskId",tID);
 	Client.rpc_server_disconnect();
 	returnval="taskID=";returnval+=tID;
-	//TODO:
-	//if(result==IN_PROGRESS)push(tID) to my chain 	//taskID=atoi(tID);
+	if(result==RPC_SRV_RESULT_IN_PROG)
+		AsyncTaskList.push_back(AyncEventEntry(atoi(tID),ADCMN_PORT_BBOXSMS));
 	return result;
 }
 /* ------------------------------------------------------------------------- */
@@ -379,6 +387,8 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg,std::string &returnv
 					(char*)"srcaddr",(char*)URLPath.c_str(),
 					(char*)"targetpath",(char*)"/tmp/uBrBoxRoot.uimg",
 					(char*)"taskId",temp_str);
+	//Note: for caller, its one cmd, but internally there are two(download & update)
+	//pushAsyncEvent ID only for update-cmd(ignore download-complete taskEvent).
 
 	//fmw update rpc call
 //01:19:27.440-->{ "jsonrpc": "2.0", "method": "firmware_update", "params": { "module": "project", "filepath": "\/tmp\/messages" }, "id": 0 }
@@ -390,8 +400,8 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg,std::string &returnv
 									(char*)"taskId",temp_str);
 		LastFmwUpdateTaskID=atoi(temp_str);
 		returnval="taskID=";returnval+=temp_str;
-		//TODO:
-		//if(result==IN_PROGRESS)push(tID) to my chain 	//taskID=atoi(tID);
+		if(result==RPC_SRV_RESULT_IN_PROG)
+			AsyncTaskList.push_back(AyncEventEntry(atoi(temp_str),ADCMN_PORT_SYSMGR));
 	}
 	Client.rpc_server_disconnect();
 	return result;
@@ -408,6 +418,8 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_reboot(std::string msg,std::string &returnv
 	RPC_SRV_RESULT result = Client.set_single_string_get_single_string_type((char*)"set_device_operation",(char*)"operation",(char*)"reboot",(char*)"taskId",temp_str);
 	Client.rpc_server_disconnect();
 	returnval="taskID=";returnval+=temp_str;
+	if(result==RPC_SRV_RESULT_IN_PROG)
+		AsyncTaskList.push_back(AyncEventEntry(atoi(temp_str),ADCMN_PORT_SYSMGR));
 	return result;
 }
 /* ------------------------------------------------------------------------- */

@@ -2,6 +2,7 @@
 #define __XMPP_MGR_H_
 #include "ADXmppProxy.hpp"
 #include <iostream>
+#include <vector>
 #include <deque>
 #include "ADCommon.hpp"
 #include "ADThread.hpp"
@@ -12,7 +13,7 @@ using namespace std;
 #define GITHUB_FMW_DOWNLOAD_FOLDER "http://github.com/hackboxguy/downloads/raw/master/"
 
 #define BBOXSMS_SERVER_ADDR "127.0.0.1"
-#define EXMPP_CMD_TABL    {"smsdeleteall","smsdelete","smsget","smssend","smsupdate","smstotal","fmwver","fmwupdt","fmwupsts","fmwupres","reboot","uptime","hostname","myip","defhostname","unknown","none","\0"}
+#define EXMPP_CMD_TABL    {"smsdeleteall","smsdelete","smsget","smssend","smsupdate","smstotal","fmwver","fmwupdt","fmwupsts","fmwupres","reboot","uptime","hostname","myip","resethostname","unknown","none","\0"}
 #define EXMPP_CMD_TABL_HELP    {"","<zero_based_index>","<zero_based_index>","<phone-num> <msg>","","","","<filename>","","","","","","","","unknown","none","\0"}
 
 typedef enum EXMPP_CMD_TYPES_T
@@ -44,8 +45,30 @@ struct XmppCmdEntry
 public:
 	XmppCmdEntry(std::string msg) :cmdMsg(msg){}
 };
-
-
+/* ------------------------------------------------------------------------- */
+struct AyncEventEntry
+{
+	int taskID; //async event taskID returned by server
+	int srvPort;//port where async command was sent
+public:
+	AyncEventEntry(int tid,int port) :taskID(tid),srvPort(port){}
+};
+//following functor object is used as predicator for finding a specific vector element entry based on srvToken
+class FindAsyncEventEntry
+{
+	const int mytaskID;
+	const int mysrvPort;
+public:
+	FindAsyncEventEntry(const int tid,const int port) :mytaskID(tid),mysrvPort(port){}
+	bool operator()(AyncEventEntry pEntry) const
+	{
+		if(pEntry.taskID == mytaskID && pEntry.srvPort == mysrvPort)
+			return true;
+		else
+			return false;
+	}
+};
+/* ------------------------------------------------------------------------- */
 class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerConsumer
 {
 	int heartbeat_ms;
@@ -57,6 +80,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	bool DebugLog;
 	std::string bboxSmsServerAddr;
 	std::deque<XmppCmdEntry> processCmd;//fifo for processing xmpp messages
+	std::vector<AyncEventEntry> AsyncTaskList;
 
 	std::string XmppUserName;
 	std::string XmppUserPw;
@@ -103,6 +127,7 @@ public:
 	int AttachHeartBeat(ADTimer* pTimer);
 	RPC_SRV_RESULT RpcResponseCallback(RPC_SRV_RESULT taskRes,int taskID);//called by eventHandler
 	RPC_SRV_RESULT RpcResponseCallback(std::string taskRes,int taskID);
+	RPC_SRV_RESULT IsItMyAsyncTaskResp(int tid,int port);
 };
 #endif
 
