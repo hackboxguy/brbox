@@ -24,6 +24,8 @@ int SmsRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE :return json_to_bin_sms_list_update(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_IDENTIFY_DEV:return json_to_bin_ident_device(pReq);
 		case EJSON_BBOXSMS_RPC_DIAL_VOICE      :return json_to_bin_dial_voice(pReq);
+		case EJSON_BBOXSMS_RPC_DIAL_USSD       :return json_to_bin_dial_ussd(pReq);
+		case EJSON_BBOXSMS_RPC_USSD_GET        :return json_to_bin_get_ussd(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -43,6 +45,8 @@ int SmsRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE :return bin_to_json_sms_list_update(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_IDENTIFY_DEV:return bin_to_json_ident_device(pReq);
 		case EJSON_BBOXSMS_RPC_DIAL_VOICE      :return bin_to_json_dial_voice(pReq);
+		case EJSON_BBOXSMS_RPC_DIAL_USSD       :return bin_to_json_dial_ussd(pReq);
+		case EJSON_BBOXSMS_RPC_USSD_GET        :return bin_to_json_get_ussd(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -62,6 +66,8 @@ int SmsRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 		case EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE :return process_sms_list_update(pReq,pObj);
 		case EJSON_BBOXSMS_RPC_SMS_IDENTIFY_DEV:return process_ident_device(pReq,pObj);
 		case EJSON_BBOXSMS_RPC_DIAL_VOICE      :return process_dial_voice(pReq,pObj);
+		case EJSON_BBOXSMS_RPC_DIAL_USSD       :return process_dial_ussd(pReq,pObj);
+		case EJSON_BBOXSMS_RPC_USSD_GET        :return process_get_ussd(pReq);
 		default:break;
 	}
 	return 0;
@@ -77,7 +83,10 @@ BBOXSMS_ASYNCTASK_TYPE SmsRpc::get_async_task_in_progress()
 		case EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE :task=BBOXSMS_ASYNCTASK_LIST_UPDATE;break;
 		case EJSON_BBOXSMS_RPC_SMS_IDENTIFY_DEV:task=BBOXSMS_ASYNCTASK_IDENTIFY_DEV;break;
 		case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL  :task=BBOXSMS_ASYNCTASK_DELETE_ALL;break;
-		default                               :break;
+		case EJSON_BBOXSMS_RPC_SMS_SEND        :task=BBOXSMS_ASYNCTASK_SMS_SEND;break;
+		case EJSON_BBOXSMS_RPC_DIAL_VOICE      :task=BBOXSMS_ASYNCTASK_DIAL_VOICE;break;
+		case EJSON_BBOXSMS_RPC_DIAL_USSD       :task=BBOXSMS_ASYNCTASK_DIAL_USSD;break;
+		default                                :break;
 	}
 	return task;
 }
@@ -129,6 +138,14 @@ RPC_SRV_RESULT SmsRpc::ProcessWorkAsync(int cmd,unsigned char* pWorkData)
 				BBOXSMS_SMS_PACKET *pPacket;
 				pPacket=(BBOXSMS_SMS_PACKET*)pWorkData;
 				ret_val=process_async_dial_voice(pPacket);
+				OBJ_MEM_DELETE(pWorkData);
+			}
+			break;
+		case EJSON_BBOXSMS_RPC_DIAL_USSD:
+			{
+				BBOXSMS_SMS_PACKET *pPacket;
+				pPacket=(BBOXSMS_SMS_PACKET*)pWorkData;
+				ret_val=process_async_dial_ussd(pPacket);
 				OBJ_MEM_DELETE(pWorkData);
 			}
 			break;
@@ -343,7 +360,7 @@ RPC_SRV_RESULT SmsRpc::process_async_ident_device(BBOXSMS_SMS_PACKET* pPacket)
 int SmsRpc::json_to_bin_send_sms(JsonDataCommObj* pReq)
 {
 	BBOXSMS_SMS_PACKET* pPanelCmdObj=NULL;
-	PREPARE_JSON_REQUEST(RPC_SRV_REQ,BBOXSMS_SMS_PACKET,RPC_SRV_ACT_READ,EJSON_BBOXSMS_RPC_SMS_SEND);
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,BBOXSMS_SMS_PACKET,RPC_SRV_ACT_WRITE,EJSON_BBOXSMS_RPC_SMS_SEND);
 	JSON_STRING_TO_STRING(BBOXSMS_RPC_SMS_ARG_DEST,pPanelCmdObj->destNum);
 	JSON_STRING_TO_STRING(BBOXSMS_RPC_SMS_ARG_MSG,pPanelCmdObj->sms);
 	return 0;
@@ -378,7 +395,7 @@ RPC_SRV_RESULT SmsRpc::process_async_send_sms(BBOXSMS_SMS_PACKET* pPacket)
 {
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
 	if(pMgr->SendSms(pPacket->destNum,pPacket->sms)!=0)
-	//if(pMgr->DialVoice(pPacket->destNum)!=0)
+	//if(pMgr->DialUSSDCode(pPacket->destNum,pPacket->sms)!=0)
 		return RPC_SRV_RESULT_FAIL;
 	else
 		return RPC_SRV_RESULT_SUCCESS;
@@ -387,7 +404,7 @@ RPC_SRV_RESULT SmsRpc::process_async_send_sms(BBOXSMS_SMS_PACKET* pPacket)
 int SmsRpc::json_to_bin_dial_voice(JsonDataCommObj* pReq)
 {
 	BBOXSMS_SMS_PACKET* pPanelCmdObj=NULL;
-	PREPARE_JSON_REQUEST(RPC_SRV_REQ,BBOXSMS_SMS_PACKET,RPC_SRV_ACT_READ,EJSON_BBOXSMS_RPC_DIAL_VOICE);
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,BBOXSMS_SMS_PACKET,RPC_SRV_ACT_WRITE,EJSON_BBOXSMS_RPC_DIAL_VOICE);
 	JSON_STRING_TO_STRING(BBOXSMS_RPC_SMS_ARG_DEST,pPanelCmdObj->destNum);
 	return 0;
 }
@@ -418,11 +435,78 @@ int SmsRpc::process_dial_voice(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj)
 }
 RPC_SRV_RESULT SmsRpc::process_async_dial_voice(BBOXSMS_SMS_PACKET* pPacket)
 {
+	//char ret_val[1024];
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
 	if(pMgr->DialVoice(pPacket->destNum)!=0)
+	//if(pMgr->DialUSSDCode(pPacket->destNum,ret_val)!=0)
 		return RPC_SRV_RESULT_FAIL;
 	else
 		return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+int SmsRpc::json_to_bin_dial_ussd(JsonDataCommObj* pReq)
+{
+	BBOXSMS_SMS_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,BBOXSMS_SMS_PACKET,RPC_SRV_ACT_WRITE,EJSON_BBOXSMS_RPC_DIAL_USSD);
+	JSON_STRING_TO_STRING(BBOXSMS_RPC_SMS_ARG_DEST,pPanelCmdObj->destNum);
+	return 0;
+}
+int SmsRpc::bin_to_json_dial_ussd(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,BBOXSMS_SMS_PACKET,RPCMGR_RPC_TASK_STS_ARGID);
+	return 0;
+}
+int SmsRpc::process_dial_ussd(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	BBOXSMS_SMS_PACKET* pPacket;
+	pPacket=(BBOXSMS_SMS_PACKET*)pPanelReq->dataRef;
+
+	BBOXSMS_SMS_PACKET* pWorkData=NULL;
+	OBJECT_MEM_NEW(pWorkData,BBOXSMS_SMS_PACKET);//delete this object in run_work() callback function
+	if(pWorkData == NULL)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_MEM_ERROR;
+		return -1;
+	}
+	strcpy(pWorkData->destNum,pPacket->destNum);
+	pPanelReq->result=pObj->PushAsyncTask(EJSON_BBOXSMS_RPC_DIAL_USSD,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_PRESERVE);
+	if(pPanelReq->result!=RPC_SRV_RESULT_IN_PROG)
+		OBJ_MEM_DELETE(pWorkData);
+	return 0;
+}
+RPC_SRV_RESULT SmsRpc::process_async_dial_ussd(BBOXSMS_SMS_PACKET* pPacket)
+{
+	char ret_val[1024];
+	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	//if(pMgr->DialVoice(pPacket->destNum)!=0)
+	if(pMgr->DialUSSDCode(pPacket->destNum,ret_val)!=0)
+		return RPC_SRV_RESULT_FAIL;
+	else
+		return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+int SmsRpc::json_to_bin_get_ussd(JsonDataCommObj* pReq)
+{
+	BBOXSMS_SMS_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,BBOXSMS_SMS_PACKET,RPC_SRV_ACT_READ,EJSON_BBOXSMS_RPC_USSD_GET);
+	return 0;
+}
+int SmsRpc::bin_to_json_get_ussd(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_STRING(RPC_SRV_REQ,BBOXSMS_SMS_PACKET,BBOXSMS_RPC_SMS_ARG_MSG,sms);
+	return 0;
+}
+int SmsRpc::process_get_ussd(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	BBOXSMS_SMS_PACKET* pPacket;
+	pPacket=(BBOXSMS_SMS_PACKET*)pPanelReq->dataRef;
+	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	pPanelReq->result=pMgr->GetLatestUSSDReply(pPacket->sms);	
+	return 0;
 }
 /* ------------------------------------------------------------------------- */
 

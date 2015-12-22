@@ -150,8 +150,10 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			case EXMPP_CMD_FMW_HOSTNAME    :res=proc_cmd_fmw_hostname(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_FMW_GET_MYIP    :res=proc_cmd_fmw_get_myip(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_FMW_SET_DEFAULT_HOSTNAME:res=proc_cmd_fmw_set_default_hostname(cmd.cmdMsg);break;
-			case EXMPP_CMD_DIAL_VOICE      :res=proc_cmd_dial_voice(cmd.cmdMsg,returnval);break;
-			default                       :break;
+			case EXMPP_CMD_DIAL_VOICE      :res=proc_cmd_dial_voice(cmd.cmdMsg,returnval,(char*)"dial_voice");break;
+			case EXMPP_CMD_DIAL_USSD       :res=proc_cmd_dial_voice(cmd.cmdMsg,returnval,(char*)"dial_ussd");break;
+			case EXMPP_CMD_GET_USSD        :res=proc_cmd_get_ussd(cmd.cmdMsg,returnval);break;
+			default                        :break;
 		}
 		processCmd.pop_front();//after processing delete the entry
 	}
@@ -584,7 +586,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_set_default_hostname(std::string msg)
 	return result;
 }
 /* ------------------------------------------------------------------------- */
-RPC_SRV_RESULT XmppMgr::proc_cmd_dial_voice(std::string msg,std::string &returnval)
+RPC_SRV_RESULT XmppMgr::proc_cmd_dial_voice(std::string msg,std::string &returnval,char* rpc_cmd)
 {
 	std::string cmd,destArg;//,msgArg;
 	stringstream msgstream(msg);
@@ -602,7 +604,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_dial_voice(std::string msg,std::string &returnv
 	ADJsonRpcClient Client;
 	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_BBOXSMS)!=0)
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
-	RPC_SRV_RESULT result=Client.set_single_string_get_single_string_type((char*)"dial_voice",
+	RPC_SRV_RESULT result=Client.set_single_string_get_single_string_type((char*)rpc_cmd,//"dial_voice",
 				(char*)"destination",(char*)destArg.c_str(),
 				(char*)"taskId",(char*)tID);
 	Client.rpc_server_disconnect();
@@ -612,4 +614,17 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_dial_voice(std::string msg,std::string &returnv
 	return result;
 }
 /* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_get_ussd(std::string msg,std::string &returnval)
+{
+	char temp_str[255];temp_str[0]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_BBOXSMS)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result = Client.get_string_type((char*)"get_ussd",(char*)"message",temp_str);
+	Client.rpc_server_disconnect();
+	returnval=temp_str;
+	return result;
+}
+/* ------------------------------------------------------------------------- */
+
 

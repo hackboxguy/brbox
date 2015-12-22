@@ -54,6 +54,14 @@ public:
 	int process_dial_voice(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj);
 	RPC_SRV_RESULT process_async_dial_voice(BBOXSMS_SMS_PACKET* pPacket);
 
+	int json_to_bin_dial_ussd(JsonDataCommObj* pReq);
+	int bin_to_json_dial_ussd(JsonDataCommObj* pReq);
+	int process_dial_ussd(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj);
+	RPC_SRV_RESULT process_async_dial_ussd(BBOXSMS_SMS_PACKET* pPacket);
+
+	int json_to_bin_get_ussd(JsonDataCommObj* pReq);
+	int bin_to_json_get_ussd(JsonDataCommObj* pReq);
+	int process_get_ussd(JsonDataCommObj* pReq);
 };
 /* ------------------------------------------------------------------------- */
 

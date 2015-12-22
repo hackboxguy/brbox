@@ -21,8 +21,12 @@ BboxsmsCltCmdline::BboxsmsCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--devident                 [identify if sms modem is accessible]");
 	CmdlineHelper.insert_options_entry((char*)"sendsms" ,optional_argument,EJSON_BBOXSMS_RPC_SMS_SEND);
 	CmdlineHelper.insert_help_entry((char*)"--sendsms=destNum,msg      [send sms msg to destNum]");
-	//CmdlineHelper.insert_options_entry((char*)"dialvoice" ,optional_argument,EJSON_BBOXSMS_RPC_DIAL_VOICE);
-	//CmdlineHelper.insert_help_entry((char*)"--dialvoice=destNum        [send sms msg to destNum]");
+	CmdlineHelper.insert_options_entry((char*)"dialvoice" ,optional_argument,EJSON_BBOXSMS_RPC_DIAL_VOICE);
+	CmdlineHelper.insert_help_entry((char*)"--dialvoice=destNum        [dial given destNum]");
+	CmdlineHelper.insert_options_entry((char*)"dialussd" ,optional_argument,EJSON_BBOXSMS_RPC_DIAL_USSD);
+	CmdlineHelper.insert_help_entry((char*)"--dialussd=destNum         [dial ussd code to given destNum]");
+	CmdlineHelper.insert_options_entry((char*)"getussdmsg" ,optional_argument,EJSON_BBOXSMS_RPC_USSD_GET);
+	CmdlineHelper.insert_help_entry((char*)"--getussdmsg               [read latest updated ussd reply]");
 }
 /*****************************************************************************/
 BboxsmsCltCmdline::~BboxsmsCltCmdline()
@@ -75,6 +79,14 @@ int BboxsmsCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			push_send_sms(sub_arg);
 			break;
 		case EJSON_BBOXSMS_RPC_DIAL_VOICE:
+			push_dial_cmd(sub_arg,EJSON_BBOXSMS_RPC_DIAL_VOICE,(char*)BBOXSMS_RPC_DIAL_VOICE);
+			break;
+		case EJSON_BBOXSMS_RPC_DIAL_USSD:
+			push_dial_cmd(sub_arg,EJSON_BBOXSMS_RPC_DIAL_USSD,(char*)BBOXSMS_RPC_DIAL_USSD);
+			break;
+		case EJSON_BBOXSMS_RPC_USSD_GET:
+			CmdlineHelper.push_string_get_set_command(EJSON_BBOXSMS_RPC_USSD_GET,EJSON_BBOXSMS_RPC_USSD_GET,
+			BBOXSMS_RPC_USSD_GET,BBOXSMS_RPC_USSD_GET,(char*)BBOXSMS_RPC_SMS_ARG_MSG,sub_arg);
 			break;
 		default:
 			return 0;
@@ -92,6 +104,10 @@ int BboxsmsCltCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient 
 			break;
 		case EJSON_BBOXSMS_RPC_SMS_SEND:
 			run_send_sms(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
+			break;
+		case EJSON_BBOXSMS_RPC_DIAL_VOICE:
+		case EJSON_BBOXSMS_RPC_DIAL_USSD:
+			run_dial_cmd(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
 			break;
 		default:return -1;
 			break;
@@ -237,4 +253,61 @@ int BboxsmsCltCmdline::run_send_sms(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pS
 	}
 	return 0;
 }
+/* ------------------------------------------------------------------------- */
+int BboxsmsCltCmdline::push_dial_cmd(char* subarg,EJSON_BBOXSMS_RPC_TYPES cmd,char* cmdname)
+{
+	CmdExecutionObj *pCmdObj=NULL;
+	OBJECT_MEM_NEW(pCmdObj,CmdExecutionObj);
+	if(pCmdObj==NULL)
+	{
+		printf("failed create pCmdObj!!!\n");
+		return -1;
+	}
+	strcpy(pCmdObj->get_rpc_name,cmdname);
+	strcpy(pCmdObj->set_rpc_name,cmdname);
+	pCmdObj->command=cmd;//EJSON_BBOXSMS_RPC_SMS_SEND;
+	pCmdObj->action=RPC_SRV_ACT_WRITE;
+
+	if(CmdlineHelper.get_next_subargument(&subarg)==0)
+	{	
+		printf("for dialling,  destination phone number must be specified\n");
+		OBJ_MEM_DELETE(pCmdObj);
+		return -1;
+	}
+	else 
+	{
+		strcpy(pCmdObj->first_arg_param_name,BBOXSMS_RPC_SMS_ARG_DEST);
+		strcpy(pCmdObj->first_arg_param_value,subarg);
+		strcpy(pCmdObj->second_arg_param_name,RPCMGR_RPC_TASK_STS_ARGID);//taskID
+	}
+	pCmdObj->cmd_type=CLIENT_CMD_TYPE_USER_DEFINED;
+	//put the request into chain
+	if(CmdlineHelper.CmdChain.chain_put((void *)pCmdObj)!=0)
+	{
+		printf("push_dial_cmd: failed! unable to push json-req-task-obj to chain!\n");
+		OBJ_MEM_DELETE(pCmdObj);
+		return -1;
+	}
+	return 0;
+}
+int BboxsmsCltCmdline::run_dial_cmd(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker)
+{
+	ADThreadedSockClient *pOrig = (ADThreadedSockClient*)pWorker;
+	if(pCmdObj->action == RPC_SRV_ACT_WRITE)
+	{
+		pCmdObj->result=pSrvSockConn->set_single_string_get_single_string_type(pCmdObj->set_rpc_name,
+				pCmdObj->first_arg_param_name,pCmdObj->first_arg_param_value,
+				pCmdObj->second_arg_param_name,pCmdObj->second_arg_param_value);
+		pOrig->log_print_message(pSrvSockConn,pCmdObj->set_rpc_name,RPC_SRV_ACT_WRITE,pCmdObj->result,
+				pOutMsgList,pCmdObj->second_arg_param_value);
+	}
+	else
+	{
+		pOrig->my_log_print_message(pSrvSockConn,(char*)"run_dial_cmd",RPC_SRV_ACT_UNKNOWN,
+					(char*)CLIENT_CMD_RESULT_INVALID_ACT,pOutMsgList);
+		return -1;
+	}
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
 

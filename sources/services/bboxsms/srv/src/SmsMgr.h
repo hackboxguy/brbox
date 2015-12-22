@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 using namespace std;
-#define MODEM_DEV_NODE "/dev/ttyUSB0"
+#define MODEM_DEV_NODE "/dev/ttyUSB2"
 #define MODEM_AT_CONN  "at19200"
 
 typedef enum SMS_ACCESS_TYPE_T
@@ -38,7 +38,7 @@ class SmsMgr : public ADThreadConsumer
 	bool GsmDevDetected;
 	std::string GsmDevManf ;//gsm device manufacturer
 	std::string GsmDevModel;//gsm device model number
-	
+	std::string LatestUSSDReply;
 	int SmsProcessThreadID;
 	std::vector<MsgEntry> msgList;
 
@@ -62,6 +62,8 @@ public:
 	int SendSms(char* recipient_number,char* message_text);
 	int DeleteAllSMS(int foldernum);
 	int DialVoice(char* recipient_number);
+	int DialUSSDCode(char* code,char* return_str);
+	RPC_SRV_RESULT GetLatestUSSDReply(char* msg);
 };
 #endif
 

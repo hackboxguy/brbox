@@ -15,6 +15,8 @@ typedef enum EJSON_BBOXSMS_RPC_TYPES_T
 	EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE,
 	EJSON_BBOXSMS_RPC_SMS_IDENTIFY_DEV, //check if modem device is detected correctly
 	EJSON_BBOXSMS_RPC_DIAL_VOICE,
+	EJSON_BBOXSMS_RPC_DIAL_USSD,
+	EJSON_BBOXSMS_RPC_USSD_GET,//returns latest read ussd
 	EJSON_BBOXSMS_RPC_END,
 	EJSON_BBOXSMS_RPC_NONE
 }EJSON_BBOXSMS_RPC_TYPES;
@@ -22,12 +24,15 @@ typedef enum EJSON_BBOXSMS_RPC_TYPES_T
 //EJSON_BBOXSMS_RPC_GET_ASYNCTASK //get-async-task-in-progress
 #define BBOXSMS_RPC_ASYNCTASK_GET         "get_async_task"
 #define BBOXSMS_RPC_ASYNCTASK_ARG         "task"
-#define BBOXSMS_RPC_ASYNCTASK_ARG_TABL    {"listUpdate","devIdent","deleteAll","none","none","\0"} //show unknown as none
+#define BBOXSMS_RPC_ASYNCTASK_ARG_TABL    {"listUpdate","devIdent","deleteAll","sendSms","dialVoice","dialUssd","none","none","\0"} //show unknown as none
 typedef enum BBOXSMS_ASYNCTASK_TYPE_T
 {
 	BBOXSMS_ASYNCTASK_LIST_UPDATE,
 	BBOXSMS_ASYNCTASK_IDENTIFY_DEV,
 	BBOXSMS_ASYNCTASK_DELETE_ALL,
+	BBOXSMS_ASYNCTASK_SMS_SEND,
+	BBOXSMS_ASYNCTASK_DIAL_VOICE,
+	BBOXSMS_ASYNCTASK_DIAL_USSD,
 	BBOXSMS_ASYNCTASK_UNKNOWN,
 	BBOXSMS_ASYNCTASK_NONE
 }BBOXSMS_ASYNCTASK_TYPE;
@@ -40,6 +45,8 @@ typedef struct BBOXSMS_ASYNCTASK_PACKET_T
 //EJSON_BBOXSMS_RPC_SMS_GET,
 //EJSON_BBOXSMS_RPC_SMS_SEND,
 //EJSON_BBOXSMS_RPC_DIAL_VOICE
+//EJSON_BBOXSMS_RPC_DIAL_USSD
+//EJSON_BBOXSMS_RPC_USSD_GET
 #define BBOXSMS_RPC_SMS_DELETE_ALL    "delete_all_sms"
 #define BBOXSMS_RPC_SMS_DELETE        "delete_sms"
 #define BBOXSMS_RPC_SMS_TOTAL_GET     "get_total_sms"
@@ -52,6 +59,9 @@ typedef struct BBOXSMS_ASYNCTASK_PACKET_T
 #define BBOXSMS_RPC_SMS_LIST_UPDATE   "update_sms_list"
 #define BBOXSMS_RPC_SMS_IDENTIFY_DEV  "identify_dev"
 #define BBOXSMS_RPC_DIAL_VOICE        "dial_voice"
+#define BBOXSMS_RPC_DIAL_USSD         "dial_ussd"
+#define BBOXSMS_RPC_USSD_GET          "get_ussd"
+
 typedef struct BBOXSMS_SMS_PACKET_T
 {
 	int total_sms;

@@ -13,8 +13,8 @@ using namespace std;
 #define GITHUB_FMW_DOWNLOAD_FOLDER "http://github.com/hackboxguy/downloads/raw/master/"
 
 #define BBOXSMS_SERVER_ADDR "127.0.0.1"
-#define EXMPP_CMD_TABL    {"smsdeleteall","smsdelete","smsget","smssend","smsupdate","smstotal","fmwver","fmwupdt","fmwupsts","fmwupres","reboot","uptime","hostname","myip","resethostname","dialvoice","unknown","none","\0"}
-#define EXMPP_CMD_TABL_HELP    {"","<zero_based_index>","<zero_based_index>","<phone-num> <msg>","","","","<filename>","","","","","","","","<phone-num>","unknown","none","\0"}
+#define EXMPP_CMD_TABL    {"smsdeleteall","smsdelete","smsget","smssend","smsupdate","smstotal","fmwver","fmwupdt","fmwupsts","fmwupres","reboot","uptime","hostname","myip","resethostname","dialvoice","dialussd","readussd","unknown","none","\0"}
+#define EXMPP_CMD_TABL_HELP    {"","<zero_based_index>","<zero_based_index>","<phone-num> <msg>","","","","<filename>","","","","","","","","<phone-num>","<ussd-code>","","unknown","none","\0"}
 
 typedef enum EXMPP_CMD_TYPES_T
 {
@@ -36,6 +36,8 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_FMW_GET_MYIP,
 	EXMPP_CMD_FMW_SET_DEFAULT_HOSTNAME,
 	EXMPP_CMD_DIAL_VOICE,
+	EXMPP_CMD_DIAL_USSD,
+	EXMPP_CMD_GET_USSD,
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -116,7 +118,8 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_fmw_hostname(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_get_myip(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_set_default_hostname(std::string msg);
-	RPC_SRV_RESULT proc_cmd_dial_voice(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_dial_voice(std::string msg,std::string &returnval,char* rpc_cmd);
+	RPC_SRV_RESULT proc_cmd_get_ussd(std::string msg,std::string &returnval);
 	std::string print_help();
 
 public:

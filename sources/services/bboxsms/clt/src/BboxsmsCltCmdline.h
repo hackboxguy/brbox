@@ -20,6 +20,9 @@ class BboxsmsCltCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProces
 	int push_send_sms(char* subarg);
 	int run_send_sms(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,
 		ADThreadedSockClientProducer *pWorker);
+	int push_dial_cmd(char* subarg,EJSON_BBOXSMS_RPC_TYPES cmd,char* cmdname);
+	int run_dial_cmd(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,
+		ADThreadedSockClientProducer *pWorker);
 
 public:
 	BboxsmsCltCmdline();

@@ -15,6 +15,7 @@ SmsMgr::SmsMgr() //:AckToken(0)
 	SmsProcessThreadID=SmsProcessThread.subscribe_thread_callback(this);
 	SmsProcessThread.set_thread_properties(THREAD_TYPE_MONOSHOT,(void *)this);
 	SmsProcessThread.start_thread();
+	LatestUSSDReply="none";
 	//processThreadID=EventProcessThread.subscribe_thread_callback(this);
 	//EventProcessThread.set_thread_properties(THREAD_TYPE_MONOSHOT,(void *)this);
 	//EventProcessThread.start_thread();
@@ -659,15 +660,169 @@ int SmsMgr::DialVoice(char* recipient_number)
 	return 0;
 }
 
-
-/*
+bool ussdCodeArrived=false;
+char ussdCode[1024];
 volatile int num_replies = 0;
+void IncomingUSSD(GSM_StateMachine *sm UNUSED, GSM_USSDMessage *ussd, void *user_data)
+{
+        //printf("%s\n", ("USSD received"));
+        //printf(LISTFORMAT, ("Status"));
+
+        switch(ussd->Status) {
+                case USSD_NoActionNeeded:
+                        printf("%s\n", ("No action needed"));
+                        break;
+                case USSD_ActionNeeded:
+                        printf("%s\n", ("Action needed"));
+                        break;
+                case USSD_Terminated:
+                        printf("%s\n", ("Terminated"));
+                        break;
+                case USSD_AnotherClient:
+                        printf("%s\n", ("Another client replied"));
+                        break;
+                case USSD_NotSupported:
+                        printf("%s\n", ("Not supported"));
+                        break;
+                case USSD_Timeout:
+                        printf("%s\n", ("Timeout"));
+                        break;
+//#ifndef CHECK_CASES
+                default:
+//#endif
+//                case USSD_Unknown:
+                        printf("%s\n", ("Unknown"));
+                        break;
+        }
+
+	strcpy(ussdCode,DecodeUnicodeConsole(ussd->Text));
+	ussdCodeArrived=true;
+//        printf(LISTFORMAT "\"%s\"\n", ("Service reply"), DecodeUnicodeConsole(ussd->Text));
+        //printf("IncomingUSSD: %s",DecodeUnicodeConsole(ussd->Text));
+        //fflush(stdout);
+}
 void IncomingUSSD2(GSM_StateMachine *sm, GSM_USSDMessage *ussd, void * user_data)
 {
         IncomingUSSD(sm, ussd, user_data);
         num_replies++;
 }
-void GetUSSD(int argc UNUSED, char *argv[])
+int SmsMgr::DialUSSDCode(char* code,char* return_str)
+{
+//	cout<<"ussd code to be sent is = "<<code<<endl;
+	//ussdCode[0]='\0';
+	sprintf(ussdCode,"no-ussd-code");
+	ussdCodeArrived=false;
+
+        int last_replies;
+        time_t last_reply;
+
+	GSM_StateMachine *gsm;
+	GSM_Error error;
+	GSM_InitLocales(NULL);
+
+	/* disable global debugging to stderr */
+	GSM_Debug_Info *debug_info;
+	debug_info = GSM_GetGlobalDebug();
+	GSM_SetDebugFileDescriptor(stderr, FALSE, debug_info);
+	//GSM_SetDebugLevel("textall", debug_info);
+
+	gsm = GSM_AllocStateMachine();
+//cout<<"DialUSSDCode = 0"<<endl;
+	if (gsm == NULL)
+		return -1;
+//cout<<"DialUSSDCode = 1"<<endl;
+
+	GSM_Config *cfg;
+	cfg = GSM_GetConfig(gsm, 0);
+	free(cfg->Device);
+	cfg->Device     = strdup(MODEM_DEV_NODE);//argv[1]);
+	free(cfg->Connection);
+	cfg->Connection = strdup(MODEM_AT_CONN);//argv[2]);
+	cfg->SyncTime   = TRUE;
+	/* We have one valid configuration */
+	GSM_SetConfigNum(gsm, 1);
+	/* Connect to phone */
+	/* 1 means number of replies you want to wait for */
+	error = GSM_InitConnection(gsm, 1);
+//cout<<"DialUSSDCode = 2"<<endl;
+	if(error_handler(gsm,error)!=0)
+		return -1;
+//cout<<"DialUSSDCode = 3"<<endl;
+
+
+	GSM_SetIncomingUSSDCallback(gsm, IncomingUSSD2, NULL);
+	error=GSM_SetIncomingUSSD(gsm,TRUE);
+//cout<<"DialUSSDCode = 4"<<endl;
+	if(error_handler(gsm,error)!=0)
+		return -1;
+//cout<<"DialUSSDCode = 5"<<endl;
+
+	error=GSM_DialService(gsm, code);
+	// Fallback to voice call, it can work with some phones 
+	if (error == ERR_NOTIMPLEMENTED || error == ERR_NOTSUPPORTED)
+	{
+//cout<<"DialUSSDCode = falling back to voice call"<<endl;
+		error=GSM_DialVoice(gsm, code, GSM_CALL_DefaultNumberPresence);
+	}
+//cout<<"DialUSSDCode = 6"<<endl;
+	if(error_handler(gsm,error)!=0)
+		return -1;
+//cout<<"DialUSSDCode = 7"<<endl;
+
+
+	num_replies = 0;
+	last_replies = 0;
+	last_reply = time(NULL);
+	int timeout=0;
+	//while (1)//!gshutdown)
+	while (timeout++ <300) //wait for 30seconds and then hangon
+	{
+		/*if (num_replies != last_replies) 
+		{
+			last_replies = num_replies;
+			last_reply = time(NULL);
+		}
+		else if (num_replies == 0 && difftime(time(NULL), last_reply) > 60)
+		{
+			// Wait one minute for reply
+			break;//gshutdown = TRUE;
+		}
+		else if (num_replies > 0 && difftime(time(NULL), last_reply) > 30)
+		{
+			// Wait for consequent replies for 30 seconds
+			break;//gshutdown = TRUE;
+		}*/
+		if(ussdCodeArrived==true)break;
+		GSM_ReadDevice(gsm, FALSE);
+		//cout<<"read-ussd code: in while loop"<<endl;
+		usleep(100000);
+	}
+        error=GSM_SetIncomingUSSD(gsm, FALSE);
+	if(error_handler(gsm,error)!=0)
+		return -1;
+
+
+	strcpy(return_str,ussdCode);
+	cout<<"ussd-code = "<<return_str<<endl;
+	LatestUSSDReply=ussdCode;
+	/* Terminate connection */
+	error = GSM_TerminateConnection(gsm);
+	if(error_handler(gsm,error)!=0)
+		return -1;
+
+	/* Free up used memory */
+	GSM_FreeStateMachine(gsm);
+
+	if(timeout>=300)
+		return -1;//wait timed out: ussd code didnt arrive
+	return 0;
+}
+RPC_SRV_RESULT SmsMgr::GetLatestUSSDReply(char* msg)
+{
+	strcpy(msg,LatestUSSDReply.c_str());
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/*void GetUSSD(int argc UNUSED, char *argv[])
 {
         GSM_Error error;
         int last_replies;
