@@ -6,6 +6,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <string.h>
+volatile GSM_Error sms_send_status;
 
 /* ------------------------------------------------------------------------- */
 SmsMgr::SmsMgr() //:AckToken(0)
@@ -435,32 +436,285 @@ int SmsMgr::DeleteAllSMS(int foldernum)
 	return 0;
 
 }
-//todo:
-//1)dont use /home/user/gammu.rc file, instead user your own file 
-//2)add sms-update-list rpc
-//3)add sms-delete rpc
-//4)get sms shall return msg + from (two strings)
-//5)add get-latest-sms rpc
+/* Handler for SMS send reply */
+void send_sms_callback (GSM_StateMachine *sm, int status, int MessageReference, void * user_data)
+{
+//	printf("Sent SMS on device: \"%s\"\n", GSM_GetConfig(sm, -1)->Device);
+	if (status==0) 
+	{
+//		printf("..OK");
+		sms_send_status = ERR_NONE;
+	}
+	else
+	{
+//		printf("..error %i", status);
+		sms_send_status = ERR_UNKNOWN;
+	}
+//	printf(", message reference=%d\n", MessageReference);
+}
+//http://wammu.eu/docs/manual/c/examples.html
+int SmsMgr::SendSms(char* recipient_number,char* message_text)
+{
+	int return_value=-1;
+
+	GSM_SMSMessage sms;
+	GSM_SMSC PhoneSMSC;
+
+	GSM_StateMachine *s;
+	//INI_Section *cfg;
+	GSM_Error error;
+
+
+	GSM_Debug_Info *debug_info;
+	//gboolean start;
+	//GSM_MultiSMSMessage 	sms;
+	//int i;
+
+	GSM_InitLocales(NULL);
+
+	/* disable global debugging to stderr */
+	debug_info = GSM_GetGlobalDebug();
+	GSM_SetDebugFileDescriptor(stderr, FALSE, debug_info);
+	//GSM_SetDebugLevel("textall", debug_info);
+
+	/* Prepare message */
+	/* Cleanup the structure */
+	memset(&sms, 0, sizeof(sms));
+	/* Encode message text */
+	EncodeUnicode(sms.Text, message_text, strlen(message_text));
+	/* Encode recipient number */
+	EncodeUnicode(sms.Number, recipient_number, strlen(recipient_number));
+	/* We want to submit message */
+	sms.PDU = SMS_Submit;
+	/* No UDH, just a plain message */
+	sms.UDH.Type = UDH_NoUDH;
+	/* We used default coding for text */
+	sms.Coding = SMS_Coding_Default_No_Compression;
+	/* Class 1 message (normal) */
+	sms.Class = 1;
+
+
+	/* Allocates state machine */
+	s = GSM_AllocStateMachine();
+	if (s == NULL)
+		return -1;//3;
+
+	GSM_Config *cfg;
+	cfg = GSM_GetConfig(s, 0);
+	free(cfg->Device);
+	cfg->Device     = strdup(MODEM_DEV_NODE);//argv[1]);
+	free(cfg->Connection);
+	cfg->Connection = strdup(MODEM_AT_CONN);//argv[2]);
+	cfg->SyncTime   = TRUE;
+	/* We have one valid configuration */
+	GSM_SetConfigNum(s, 1);
+
+	/* Connect to phone */
+	/* 1 means number of replies you want to wait for */
+	error = GSM_InitConnection(s, 1);
+	if(error_handler(s,error)!=0)
+		return -1;
+
+	GSM_SetSendSMSStatusCallback(s, send_sms_callback, NULL);
+
+	/* We need to know SMSC number */
+	PhoneSMSC.Location = 1;
+	error = GSM_GetSMSC(s, &PhoneSMSC);
+	if(error_handler(s,error)!=0)
+		return -1;
+
+	/* Set SMSC number in message */
+	CopyUnicodeString(sms.SMSC.Number, PhoneSMSC.Number);
+
+	/*
+	 * Set flag before callind SendSMS, some phones might give
+	 * instant response
+	 */
+	sms_send_status = ERR_TIMEOUT;
+
+	/* Send message */
+	error = GSM_SendSMS(s, &sms);
+	if(error_handler(s,error)!=0)
+		return -1;
+
+	int timeout=0;
+	/* Wait for network reply */
+	while (timeout++ <50) //wait for 5seconds before failing
+	{
+		GSM_ReadDevice(s, TRUE);
+		if (sms_send_status == ERR_NONE) 
+		{
+			/* Message sent OK */
+			return_value = 0;
+			break;
+		}
+		if (sms_send_status != ERR_TIMEOUT) 
+		{
+			/* Message sending failed */
+			return_value = -1;//100;
+			break;
+		}
+		usleep(100000);
+		//cout<<"waiting for send "<<timeout<<endl;
+	}
+
+	/* Terminate connection */
+	error = GSM_TerminateConnection(s);
+	if(error_handler(s,error)!=0)
+		return -1;
+
+	/* Free up used memory */
+	GSM_FreeStateMachine(s);
+
+
+	return return_value;
+}
+
+
+volatile int TerminateID = -1;
+void IncomingCall0(GSM_StateMachine *sm UNUSED, GSM_Call *call, void * user_data)
+{
+        if (call->CallIDAvailable) 
+	{
+                TerminateID = call->CallID;
+        }
+}
+
+int SmsMgr::DialVoice(char* recipient_number)
+{
+	GSM_StateMachine *gsm;
+	GSM_Error error;
+	GSM_InitLocales(NULL);
+
+	/* disable global debugging to stderr */
+	GSM_Debug_Info *debug_info;
+	debug_info = GSM_GetGlobalDebug();
+	GSM_SetDebugFileDescriptor(stderr, FALSE, debug_info);
+	//GSM_SetDebugLevel("textall", debug_info);
+
+	gsm = GSM_AllocStateMachine();
+
+	if (gsm == NULL)
+		return -1;
+
+	GSM_Config *cfg;
+	cfg = GSM_GetConfig(gsm, 0);
+	free(cfg->Device);
+	cfg->Device     = strdup(MODEM_DEV_NODE);//argv[1]);
+	free(cfg->Connection);
+	cfg->Connection = strdup(MODEM_AT_CONN);//argv[2]);
+	cfg->SyncTime   = TRUE;
+	/* We have one valid configuration */
+	GSM_SetConfigNum(gsm, 1);
+	/* Connect to phone */
+	/* 1 means number of replies you want to wait for */
+	error = GSM_InitConnection(gsm, 1);
+	if(error_handler(gsm,error)!=0)
+		return -1;
+
+	GSM_CallShowNumber ShowNumber = GSM_CALL_DefaultNumberPresence;
+	//GSM_CallShowNumber ShowNumber = GSM_CALL_ShowNumber;
+	//GSM_CallShowNumber ShowNumber = GSM_CALL_HideNumber;
+
+
+	TerminateID = -1;
+	GSM_SetIncomingCallCallback(gsm, IncomingCall0, NULL);
+	error = GSM_SetIncomingCall(gsm, TRUE);
+	if(error_handler(gsm,error)!=0)
+		return -1;
+	//Print_Error(error);
+	error = GSM_DialVoice(gsm, recipient_number, ShowNumber);
+	if(error_handler(gsm,error)!=0)
+		return -1;
+	//Print_Error(error);
+	//sleep(GetInt(argv[3]));
+	int timeout=0;
+	while (timeout++ <150) //wait for 15seconds and then hangon
+	{
+		//cout<<"DialVoice waiting "<<timeout<<endl;
+		usleep(100000);
+	}
+
+	GSM_ReadDevice(gsm, TRUE);
+	if (TerminateID != -1)
+	{
+		error = GSM_CancelCall(gsm, TerminateID, FALSE);
+		if(error_handler(gsm,error)!=0)
+			return -1;
+	}
+	else
+	{
+		error = GSM_CancelCall(gsm, 0, TRUE);
+		if(error_handler(gsm,error)!=0)
+			return -1;
+	}
+
+	/* Terminate connection */
+	error = GSM_TerminateConnection(gsm);
+	if(error_handler(gsm,error)!=0)
+		return -1;
+
+	/* Free up used memory */
+	GSM_FreeStateMachine(gsm);
+	return 0;
+}
+
+
+/*
+volatile int num_replies = 0;
+void IncomingUSSD2(GSM_StateMachine *sm, GSM_USSDMessage *ussd, void * user_data)
+{
+        IncomingUSSD(sm, ussd, user_data);
+        num_replies++;
+}
+void GetUSSD(int argc UNUSED, char *argv[])
+{
+        GSM_Error error;
+        int last_replies;
+        time_t last_reply;
+
+        GSM_Init(TRUE);
+
+        signal(SIGINT, interrupt);
+        fprintf(stderr, "%s\n", _("Press Ctrl+C to break..."));
+        fflush(stderr);
+
+        GSM_SetIncomingUSSDCallback(gsm, IncomingUSSD2, NULL);
+
+        error=GSM_SetIncomingUSSD(gsm,TRUE);
+        Print_Error(error);
+
+        error=GSM_DialService(gsm, argv[2]);
+        // Fallback to voice call, it can work with some phones 
+        if (error == ERR_NOTIMPLEMENTED || error == ERR_NOTSUPPORTED) {
+                error=GSM_DialVoice(gsm, argv[2], GSM_CALL_DefaultNumberPresence);
+        }
+        Print_Error(error);
+
+        num_replies = 0;
+        last_replies = 0;
+        last_reply = time(NULL);
+        while (!gshutdown) {
+                if (num_replies != last_replies) {
+                        last_replies = num_replies;
+                        last_reply = time(NULL);
+                } else if (num_replies == 0 && difftime(time(NULL), last_reply) > 60) {
+                        // Wait one minute for reply
+                        gshutdown = TRUE;
+                } else if (num_replies > 0 && difftime(time(NULL), last_reply) > 30) {
+                        // Wait for consequent replies for 30 seconds
+                        gshutdown = TRUE;
+                }
+                GSM_ReadDevice(gsm, FALSE);
+        }
+
+        error=GSM_SetIncomingUSSD(gsm, FALSE);
+        Print_Error(error);
+        GSM_Terminate();
+}*/
+
 
 /*
 http://wammu.eu/docs/manual/c/examples.html
-
-adav@adav-private-linux:~$ sudo gammu --identify
-Device               : /dev/ttyUSB0
-Manufacturer         : Huawei
-Model                : E173 (E173)
-Firmware             : 11.126.29.00.76
-IMEI                 : 867749018934194
-SIM IMSI             : 262075201404740
-
-
-Location: 100002, Folder: 3
-Number: "+491726110283"
-Text: "Another test msg"
-
-Location: 100003, Folder: 3
-Number: "+491726110283"
-Text: "Here comes another for testing"
-
 */
 

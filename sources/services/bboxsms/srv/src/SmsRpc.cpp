@@ -20,9 +20,10 @@ int SmsRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_BBOXSMS_RPC_SMS_DELETE      :break;
 		case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET   :return json_to_bin_get_total_sms(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_GET         :return json_to_bin_get_sms(pReq);
-		case EJSON_BBOXSMS_RPC_SMS_SEND        :break;
+		case EJSON_BBOXSMS_RPC_SMS_SEND        :return json_to_bin_send_sms(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE :return json_to_bin_sms_list_update(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_IDENTIFY_DEV:return json_to_bin_ident_device(pReq);
+		case EJSON_BBOXSMS_RPC_DIAL_VOICE      :return json_to_bin_dial_voice(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -38,9 +39,10 @@ int SmsRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_BBOXSMS_RPC_SMS_DELETE      :break;
 		case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET   :return bin_to_json_get_total_sms(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_GET         :return bin_to_json_get_sms(pReq);
-		case EJSON_BBOXSMS_RPC_SMS_SEND        :break;
+		case EJSON_BBOXSMS_RPC_SMS_SEND        :return bin_to_json_send_sms(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE :return bin_to_json_sms_list_update(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_IDENTIFY_DEV:return bin_to_json_ident_device(pReq);
+		case EJSON_BBOXSMS_RPC_DIAL_VOICE      :return bin_to_json_dial_voice(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -56,9 +58,10 @@ int SmsRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 		case EJSON_BBOXSMS_RPC_SMS_DELETE      :break;
 		case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET   :return process_get_total_sms(pReq);
 		case EJSON_BBOXSMS_RPC_SMS_GET         :return process_get_sms(pReq);
-		case EJSON_BBOXSMS_RPC_SMS_SEND        :break;
+		case EJSON_BBOXSMS_RPC_SMS_SEND        :return process_send_sms(pReq,pObj);
 		case EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE :return process_sms_list_update(pReq,pObj);
 		case EJSON_BBOXSMS_RPC_SMS_IDENTIFY_DEV:return process_ident_device(pReq,pObj);
+		case EJSON_BBOXSMS_RPC_DIAL_VOICE      :return process_dial_voice(pReq,pObj);
 		default:break;
 	}
 	return 0;
@@ -110,6 +113,22 @@ RPC_SRV_RESULT SmsRpc::ProcessWorkAsync(int cmd,unsigned char* pWorkData)
 				//after deleting sms from sim-card, empty my local cache list
 				SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
 				pMgr->EmptySmsList();	
+				OBJ_MEM_DELETE(pWorkData);
+			}
+			break;
+		case EJSON_BBOXSMS_RPC_SMS_SEND:
+			{
+				BBOXSMS_SMS_PACKET *pPacket;
+				pPacket=(BBOXSMS_SMS_PACKET*)pWorkData;
+				ret_val=process_async_send_sms(pPacket);
+				OBJ_MEM_DELETE(pWorkData);
+			}
+			break;
+		case EJSON_BBOXSMS_RPC_DIAL_VOICE:
+			{
+				BBOXSMS_SMS_PACKET *pPacket;
+				pPacket=(BBOXSMS_SMS_PACKET*)pWorkData;
+				ret_val=process_async_dial_voice(pPacket);
 				OBJ_MEM_DELETE(pWorkData);
 			}
 			break;
@@ -319,6 +338,91 @@ RPC_SRV_RESULT SmsRpc::process_async_ident_device(BBOXSMS_SMS_PACKET* pPacket)
 		return RPC_SRV_RESULT_SUCCESS;
 	else
 		return RPC_SRV_RESULT_FAIL;
+}
+/* ------------------------------------------------------------------------- */
+int SmsRpc::json_to_bin_send_sms(JsonDataCommObj* pReq)
+{
+	BBOXSMS_SMS_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,BBOXSMS_SMS_PACKET,RPC_SRV_ACT_READ,EJSON_BBOXSMS_RPC_SMS_SEND);
+	JSON_STRING_TO_STRING(BBOXSMS_RPC_SMS_ARG_DEST,pPanelCmdObj->destNum);
+	JSON_STRING_TO_STRING(BBOXSMS_RPC_SMS_ARG_MSG,pPanelCmdObj->sms);
+	return 0;
+}
+int SmsRpc::bin_to_json_send_sms(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,BBOXSMS_SMS_PACKET,RPCMGR_RPC_TASK_STS_ARGID);
+	return 0;
+}
+int SmsRpc::process_send_sms(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	BBOXSMS_SMS_PACKET* pPacket;
+	pPacket=(BBOXSMS_SMS_PACKET*)pPanelReq->dataRef;
+
+	BBOXSMS_SMS_PACKET* pWorkData=NULL;
+	OBJECT_MEM_NEW(pWorkData,BBOXSMS_SMS_PACKET);//delete this object in run_work() callback function
+	if(pWorkData == NULL)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_MEM_ERROR;
+		return -1;
+	}
+	strcpy(pWorkData->destNum,pPacket->destNum);
+	strcpy(pWorkData->sms,pPacket->sms);
+	pPanelReq->result=pObj->PushAsyncTask(EJSON_BBOXSMS_RPC_SMS_SEND,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_PRESERVE);
+	if(pPanelReq->result!=RPC_SRV_RESULT_IN_PROG)
+		OBJ_MEM_DELETE(pWorkData);
+	return 0;
+}
+RPC_SRV_RESULT SmsRpc::process_async_send_sms(BBOXSMS_SMS_PACKET* pPacket)
+{
+	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	if(pMgr->SendSms(pPacket->destNum,pPacket->sms)!=0)
+	//if(pMgr->DialVoice(pPacket->destNum)!=0)
+		return RPC_SRV_RESULT_FAIL;
+	else
+		return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+int SmsRpc::json_to_bin_dial_voice(JsonDataCommObj* pReq)
+{
+	BBOXSMS_SMS_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,BBOXSMS_SMS_PACKET,RPC_SRV_ACT_READ,EJSON_BBOXSMS_RPC_DIAL_VOICE);
+	JSON_STRING_TO_STRING(BBOXSMS_RPC_SMS_ARG_DEST,pPanelCmdObj->destNum);
+	return 0;
+}
+int SmsRpc::bin_to_json_dial_voice(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,BBOXSMS_SMS_PACKET,RPCMGR_RPC_TASK_STS_ARGID);
+	return 0;
+}
+int SmsRpc::process_dial_voice(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	BBOXSMS_SMS_PACKET* pPacket;
+	pPacket=(BBOXSMS_SMS_PACKET*)pPanelReq->dataRef;
+
+	BBOXSMS_SMS_PACKET* pWorkData=NULL;
+	OBJECT_MEM_NEW(pWorkData,BBOXSMS_SMS_PACKET);//delete this object in run_work() callback function
+	if(pWorkData == NULL)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_MEM_ERROR;
+		return -1;
+	}
+	strcpy(pWorkData->destNum,pPacket->destNum);
+	pPanelReq->result=pObj->PushAsyncTask(EJSON_BBOXSMS_RPC_DIAL_VOICE,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_PRESERVE);
+	if(pPanelReq->result!=RPC_SRV_RESULT_IN_PROG)
+		OBJ_MEM_DELETE(pWorkData);
+	return 0;
+}
+RPC_SRV_RESULT SmsRpc::process_async_dial_voice(BBOXSMS_SMS_PACKET* pPacket)
+{
+	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	if(pMgr->DialVoice(pPacket->destNum)!=0)
+		return RPC_SRV_RESULT_FAIL;
+	else
+		return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
 

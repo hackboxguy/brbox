@@ -46,6 +46,7 @@ int main(int argc, const char* argv[])
 	SmsRpc SmsSend  (BBOXSMS_RPC_SMS_SEND        ,EJSON_BBOXSMS_RPC_SMS_SEND        ,emulat,dbglog,&DataCache);
 	SmsRpc SmsUpdate(BBOXSMS_RPC_SMS_LIST_UPDATE ,EJSON_BBOXSMS_RPC_SMS_LIST_UPDATE ,emulat,dbglog,&DataCache);
 	SmsRpc IdentDev (BBOXSMS_RPC_SMS_IDENTIFY_DEV,EJSON_BBOXSMS_RPC_SMS_IDENTIFY_DEV,emulat,dbglog,&DataCache);
+	SmsRpc DialVoice(BBOXSMS_RPC_DIAL_VOICE      ,EJSON_BBOXSMS_RPC_DIAL_VOICE      ,emulat,dbglog,&DataCache);
 
 	RpcMgr.AttachRpc(&AsyncGet);
 	RpcMgr.AttachRpc(&DeletAll);
@@ -55,6 +56,7 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&SmsSend);
 	RpcMgr.AttachRpc(&SmsUpdate);
 	RpcMgr.AttachRpc(&IdentDev);
+	RpcMgr.AttachRpc(&DialVoice);
 
 
 	//start listening for rpc-commands

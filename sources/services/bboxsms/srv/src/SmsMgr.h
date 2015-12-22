@@ -49,6 +49,7 @@ class SmsMgr : public ADThreadConsumer
 	int error_handler(GSM_StateMachine *s,GSM_Error error);
 	RPC_SRV_RESULT GetOrUpdateTotal(SMS_ACCESS_TYPE access,int &total,int indx,
 			std::string &msg,std::string &from,std::vector<MsgEntry> &newList);
+	//void send_sms_callback (GSM_StateMachine *sm, int status, int MessageReference, void * user_data);
 
 public:
 	SmsMgr();
@@ -58,7 +59,9 @@ public:
 	RPC_SRV_RESULT GetTotalSms(int *total);
 	int DetectSmsDevice();
 	int ReadSms(int indx);
+	int SendSms(char* recipient_number,char* message_text);
 	int DeleteAllSMS(int foldernum);
+	int DialVoice(char* recipient_number);
 };
 #endif
 

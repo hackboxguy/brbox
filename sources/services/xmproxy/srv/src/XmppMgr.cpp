@@ -13,6 +13,7 @@
 #include "ADCmnStringProcessor.hpp"
 #include "ADJsonRpcClient.hpp"
 #include "ADCmnPortList.h"
+using namespace std;
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
 {
@@ -135,7 +136,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			case EXMPP_CMD_SMS_DELETE_ALL  :res=proc_cmd_sms_deleteall(cmd.cmdMsg,returnval);break;//inProg
 			case EXMPP_CMD_SMS_DELETE      :res=proc_cmd_sms_delete(cmd.cmdMsg);break;
 			case EXMPP_CMD_SMS_GET         :res=proc_cmd_sms_get(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_SMS_SEND        :res=proc_cmd_sms_send(cmd.cmdMsg);break;
+			case EXMPP_CMD_SMS_SEND        :res=proc_cmd_sms_send(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_SMS_LIST_UPDATE :res=proc_cmd_sms_list_update(cmd.cmdMsg,returnval);break;//inProg
 			case EXMPP_CMD_SMS_GET_TOTAL   :res=proc_cmd_sms_get_total(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_FMW_GET_VERSION :res=proc_cmd_fmw_get_version(cmd.cmdMsg,returnval);break;
@@ -149,6 +150,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			case EXMPP_CMD_FMW_HOSTNAME    :res=proc_cmd_fmw_hostname(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_FMW_GET_MYIP    :res=proc_cmd_fmw_get_myip(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_FMW_SET_DEFAULT_HOSTNAME:res=proc_cmd_fmw_set_default_hostname(cmd.cmdMsg);break;
+			case EXMPP_CMD_DIAL_VOICE      :res=proc_cmd_dial_voice(cmd.cmdMsg,returnval);break;
 			default                       :break;
 		}
 		processCmd.pop_front();//after processing delete the entry
@@ -316,9 +318,34 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sms_get(std::string msg,std::string &returnval)
 	return result;
 }
 /* ------------------------------------------------------------------------- */
-RPC_SRV_RESULT XmppMgr::proc_cmd_sms_send(std::string msg)
+RPC_SRV_RESULT XmppMgr::proc_cmd_sms_send(std::string msg,std::string &returnval)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	std::string cmd,destArg,msgArg;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	msgstream >> destArg;
+	getline(msgstream, msgArg); //get rest of the string!
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(destArg.size()<=0)
+		return RPC_SRV_RESULT_ARG_ERROR;
+	if(msgArg.size()<=0)
+		return RPC_SRV_RESULT_ARG_ERROR;
+
+	char tID[255];tID[254]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_BBOXSMS)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result=Client.set_double_string_get_single_string_type((char*)"send_sms",
+				(char*)"destination",(char*)destArg.c_str(),
+				(char*)"message",(char*)msgArg.c_str(),
+				(char*)"taskId",(char*)tID);
+	Client.rpc_server_disconnect();
+	returnval="taskID=";returnval+=tID;
+	if(result==RPC_SRV_RESULT_IN_PROG)
+		AsyncTaskList.push_back(AyncEventEntry(atoi(tID),ADCMN_PORT_BBOXSMS));
+	return result;
+	//return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
 }
 /* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT XmppMgr::proc_cmd_sms_list_update(std::string msg,std::string &returnval)
@@ -557,5 +584,32 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_set_default_hostname(std::string msg)
 	return result;
 }
 /* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_dial_voice(std::string msg,std::string &returnval)
+{
+	std::string cmd,destArg;//,msgArg;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	msgstream >> destArg;
+	//getline(msgstream, msgArg); //get rest of the string!
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(destArg.size()<=0)
+		return RPC_SRV_RESULT_ARG_ERROR;
+	//if(msgArg.size()<=0)
+	//	return RPC_SRV_RESULT_ARG_ERROR;
 
+	char tID[255];tID[254]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_BBOXSMS)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result=Client.set_single_string_get_single_string_type((char*)"dial_voice",
+				(char*)"destination",(char*)destArg.c_str(),
+				(char*)"taskId",(char*)tID);
+	Client.rpc_server_disconnect();
+	returnval="taskID=";returnval+=tID;
+	if(result==RPC_SRV_RESULT_IN_PROG)
+		AsyncTaskList.push_back(AyncEventEntry(atoi(tID),ADCMN_PORT_BBOXSMS));
+	return result;
+}
+/* ------------------------------------------------------------------------- */
 

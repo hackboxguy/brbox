@@ -15,7 +15,11 @@ class BboxsmsCltCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProces
 	virtual int get_my_server_port();
 
 	int push_get_indexed_msg_command(char* subarg,char* rpc_name,int rpc_index,char* arg_name,char* result_name);
-	int run_get_indexed_msg_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);
+	int run_get_indexed_msg_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,
+		ADThreadedSockClientProducer *pWorker);
+	int push_send_sms(char* subarg);
+	int run_send_sms(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,
+		ADThreadedSockClientProducer *pWorker);
 
 public:
 	BboxsmsCltCmdline();
