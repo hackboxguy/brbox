@@ -13,6 +13,7 @@
 #include "ADCmnStringProcessor.hpp"
 #include "ADJsonRpcClient.hpp"
 #include "ADCmnPortList.h"
+#include "ADJsonRpcMgr.hpp"
 using namespace std;
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
@@ -153,6 +154,9 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			case EXMPP_CMD_DIAL_VOICE      :res=proc_cmd_dial_voice(cmd.cmdMsg,returnval,(char*)"dial_voice");break;
 			case EXMPP_CMD_DIAL_USSD       :res=proc_cmd_dial_voice(cmd.cmdMsg,returnval,(char*)"dial_ussd");break;
 			case EXMPP_CMD_GET_USSD        :res=proc_cmd_get_ussd(cmd.cmdMsg,returnval);break;
+			case EXMPP_CMD_DEBUG_LOG       :res=proc_cmd_logsts(cmd.cmdMsg,returnval);break;
+			case EXMPP_CMD_GSM_MODEM_IDENT :res=proc_cmd_gsm_modem_identify(cmd.cmdMsg,returnval);break;//inProg
+
 			default                        :break;
 		}
 		processCmd.pop_front();//after processing delete the entry
@@ -623,6 +627,58 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_get_ussd(std::string msg,std::string &returnval
 	RPC_SRV_RESULT result = Client.get_string_type((char*)"get_ussd",(char*)"message",temp_str);
 	Client.rpc_server_disconnect();
 	returnval=temp_str;
+	return result;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_logsts(std::string msg,std::string &returnval)
+{
+	std::string cmd,portArg,logArg;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	msgstream >> portArg;//service port-num
+	msgstream >> logArg; //log flag [enable/disable]
+
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(portArg.size()<=0)
+		return RPC_SRV_RESULT_ARG_ERROR;
+	if(logArg.size()<=0)
+	{
+		//read log flag
+		char temp_str[255];temp_str[254]='\0';
+		ADJsonRpcClient Client;
+		if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),atoi(portArg.c_str()))!=0)
+			return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+		RPC_SRV_RESULT result=Client.get_string_type((char*)RPCMGR_RPC_DEBUG_LOG_GET,
+					(char*)RPCMGR_RPC_DEBUG_LOG_ARGSTS,temp_str);
+		Client.rpc_server_disconnect();
+		returnval=temp_str;
+		return result;
+	}
+	else
+	{
+		//write log flag
+		ADJsonRpcClient Client;
+		if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),atoi(portArg.c_str()))!=0)
+			return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+		RPC_SRV_RESULT result=Client.set_single_string_type((char*)RPCMGR_RPC_DEBUG_LOG_SET,
+					(char*)RPCMGR_RPC_DEBUG_LOG_ARGSTS,(char*)logArg.c_str());
+		Client.rpc_server_disconnect();
+		return result;
+	}
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_gsm_modem_identify(std::string msg,std::string &returnval)
+{
+	char tID[255];tID[254]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_BBOXSMS)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result=Client.set_action_noarg_get_single_string_type((char*)"identify_dev",(char*)"taskId",tID);
+	Client.rpc_server_disconnect();
+	returnval="taskID=";returnval+=tID;
+	if(result==RPC_SRV_RESULT_IN_PROG)
+		AsyncTaskList.push_back(AyncEventEntry(atoi(tID),ADCMN_PORT_BBOXSMS));
 	return result;
 }
 /* ------------------------------------------------------------------------- */

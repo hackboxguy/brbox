@@ -121,6 +121,7 @@ RPC_SRV_RESULT SmsRpc::ProcessWorkAsync(int cmd,unsigned char* pWorkData)
 				ret_val=process_async_delete_all(pPacket);
 				//after deleting sms from sim-card, empty my local cache list
 				SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+				pMgr->LogFlag=get_debug_log_flag();
 				pMgr->EmptySmsList();	
 				OBJ_MEM_DELETE(pWorkData);
 			}
@@ -216,6 +217,7 @@ int SmsRpc::process_delete_all(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj)
 RPC_SRV_RESULT SmsRpc::process_async_delete_all(BBOXSMS_SMS_PACKET* pPacket)
 {
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	pMgr->LogFlag=get_debug_log_flag();
 	if(pMgr->DeleteAllSMS(1)!=0) //0,1,2,3,4(5 fails)
 		return RPC_SRV_RESULT_FAIL;
 	if(pMgr->DeleteAllSMS(2)!=0) 
@@ -246,6 +248,7 @@ int SmsRpc::process_get_sms(JsonDataCommObj* pReq)
 	BBOXSMS_SMS_PACKET* pPacket;
 	pPacket=(BBOXSMS_SMS_PACKET*)pPanelReq->dataRef;
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	pMgr->LogFlag=get_debug_log_flag();
 	pPanelReq->result=pMgr->GetSms(pPacket->index,pPacket->sms);	
 	return 0;
 }
@@ -268,6 +271,7 @@ int SmsRpc::process_get_total_sms(JsonDataCommObj* pReq)
 	BBOXSMS_SMS_PACKET* pPacket;
 	pPacket=(BBOXSMS_SMS_PACKET*)pPanelReq->dataRef;
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	pMgr->LogFlag=get_debug_log_flag();
 	pPanelReq->result=pMgr->GetTotalSms(&pPacket->total_sms);
 
 	//pPacket->total_sms=pMgr->ReadSms(0);
@@ -312,6 +316,7 @@ int SmsRpc::process_sms_list_update(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* 
 RPC_SRV_RESULT SmsRpc::process_async_list_update(BBOXSMS_SMS_PACKET* pPacket)
 {
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	pMgr->LogFlag=get_debug_log_flag();
 	if(pMgr->ReadSms(0)<0)
 		return RPC_SRV_RESULT_FAIL;
 	else
@@ -351,6 +356,7 @@ int SmsRpc::process_ident_device(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pOb
 RPC_SRV_RESULT SmsRpc::process_async_ident_device(BBOXSMS_SMS_PACKET* pPacket)
 {
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	pMgr->LogFlag=get_debug_log_flag();
 	if(pMgr->DetectSmsDevice()==0)
 		return RPC_SRV_RESULT_SUCCESS;
 	else
@@ -394,6 +400,7 @@ int SmsRpc::process_send_sms(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj)
 RPC_SRV_RESULT SmsRpc::process_async_send_sms(BBOXSMS_SMS_PACKET* pPacket)
 {
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	pMgr->LogFlag=get_debug_log_flag();
 	if(pMgr->SendSms(pPacket->destNum,pPacket->sms)!=0)
 	//if(pMgr->DialUSSDCode(pPacket->destNum,pPacket->sms)!=0)
 		return RPC_SRV_RESULT_FAIL;
@@ -437,6 +444,7 @@ RPC_SRV_RESULT SmsRpc::process_async_dial_voice(BBOXSMS_SMS_PACKET* pPacket)
 {
 	//char ret_val[1024];
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	pMgr->LogFlag=get_debug_log_flag();
 	if(pMgr->DialVoice(pPacket->destNum)!=0)
 	//if(pMgr->DialUSSDCode(pPacket->destNum,ret_val)!=0)
 		return RPC_SRV_RESULT_FAIL;
@@ -480,6 +488,7 @@ RPC_SRV_RESULT SmsRpc::process_async_dial_ussd(BBOXSMS_SMS_PACKET* pPacket)
 {
 	char ret_val[1024];
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	pMgr->LogFlag=get_debug_log_flag();
 	//if(pMgr->DialVoice(pPacket->destNum)!=0)
 	if(pMgr->DialUSSDCode(pPacket->destNum,ret_val)!=0)
 		return RPC_SRV_RESULT_FAIL;
@@ -505,6 +514,7 @@ int SmsRpc::process_get_ussd(JsonDataCommObj* pReq)
 	BBOXSMS_SMS_PACKET* pPacket;
 	pPacket=(BBOXSMS_SMS_PACKET*)pPanelReq->dataRef;
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	pMgr->LogFlag=get_debug_log_flag();
 	pPanelReq->result=pMgr->GetLatestUSSDReply(pPacket->sms);	
 	return 0;
 }

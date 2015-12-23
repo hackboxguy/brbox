@@ -128,7 +128,7 @@ do			\
 	if(logflag==true)\
 	{\
 	openlog (service, LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL0);\
-	syslog(LOG_ERR, msg);\
+	syslog(LOG_DEBUG, msg);\
 	closelog ();\
 	}\
 } while (0)
@@ -138,7 +138,7 @@ do			\
 	if(logflag==true)\
 	{\
 		openlog (service, LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL0);\
-		syslog(LOG_ERR, msg,arg1);\
+		syslog(LOG_DEBUG, msg,arg1);\
 		closelog ();\
 	}\
 } while (0)
@@ -148,7 +148,7 @@ do			\
 	if(logflag==true)\
 	{\
 		openlog (service, LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL0);\
-		syslog(LOG_ERR, msg,arg1,arg2);\
+		syslog(LOG_DEBUG, msg,arg1,arg2);\
 		closelog ();\
 	}\
 } while (0)

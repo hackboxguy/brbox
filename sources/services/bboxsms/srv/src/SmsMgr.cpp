@@ -11,6 +11,7 @@ volatile GSM_Error sms_send_status;
 /* ------------------------------------------------------------------------- */
 SmsMgr::SmsMgr() //:AckToken(0)
 {
+	LogFlag=false;
 	GsmDevDetected=false;
 	SmsProcessThreadID=SmsProcessThread.subscribe_thread_callback(this);
 	SmsProcessThread.set_thread_properties(THREAD_TYPE_MONOSHOT,(void *)this);
@@ -99,6 +100,7 @@ int SmsMgr::error_handler(GSM_StateMachine *s,GSM_Error error)
 	if (error != ERR_NONE)
 	{
 		//printf("ERROR: %s\n", GSM_ErrorString(error));//TODO: log this message
+		LOG_DEBUG_MSG_1_ARG(LogFlag,"BRBOX:bboxsms","SmsMgr::error_handler::error=%s",GSM_ErrorString(error));
 		if (GSM_IsConnected(s))
 			GSM_TerminateConnection(s);
 		return -1;//exit(error);
@@ -129,8 +131,10 @@ int SmsMgr::DetectSmsDevice()
 	/* Allocates state machine */
 	s = GSM_AllocStateMachine();
 	if (s == NULL)
+	{		
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DetectSmsDevice:GSM_AllocStateMachine() failed");
 		return -1;//3;
-
+	}
 	/*
 	 * Enable state machine debugging to stderr
 	 * Same could be achieved by just using global debug config.
@@ -171,8 +175,10 @@ int SmsMgr::DetectSmsDevice()
 	/* 1 means number of replies you want to wait for */
 	error = GSM_InitConnection(s, 1);
 	if(error_handler(s,error)!=0)
+	{		
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DetectSmsDevice:GSM_InitConnection() failed");
 		return -1;
-
+	}
 
 	/* Here you can do some stuff with phone... */
 
@@ -181,14 +187,20 @@ int SmsMgr::DetectSmsDevice()
 	/* Manufacturer name */
 	error = GSM_GetManufacturer(s, buffer);
 	if(error_handler(s,error)!=0)
+	{		
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DetectSmsDevice:GSM_GetManufacturer() failed");
 		return -1;
+	}
 	//printf("Manufacturer  : %s\n", buffer);
 	GsmDevManf=buffer;//gsm device manufacturer
 
 	/* Model name */
 	error = GSM_GetModel(s, buffer);
 	if(error_handler(s,error)!=0)
+	{		
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DetectSmsDevice:GSM_GetModel() failed");
 		return -1;
+	}
 	//printf("Model         : %s (%s)\n",
 	//	GSM_GetModelInfo(s)->model,
 	//	buffer);
@@ -197,7 +209,10 @@ int SmsMgr::DetectSmsDevice()
 	/* Terminate connection */
 	error = GSM_TerminateConnection(s);
 	if(error_handler(s,error)!=0)
+	{		
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DetectSmsDevice:GSM_TerminateConnection() failed");
 		return -1;
+	}
 
 	/* Free up used memory */
 	GSM_FreeStateMachine(s);
@@ -240,8 +255,10 @@ int SmsMgr::ReadSms(int indx)
 	/* Allocates state machine */
 	s = GSM_AllocStateMachine();
 	if (s == NULL)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::ReadSms:GSM_AllocStateMachine() failed");
 		return -1;//3;
-
+	}
 	/*
 	 * Enable state machine debugging to stderr
 	 * Same could be achieved by just using global debug config.
@@ -279,7 +296,10 @@ int SmsMgr::ReadSms(int indx)
 	/* 1 means number of replies you want to wait for */
 	error = GSM_InitConnection(s, 1);
 	if(error_handler(s,error)!=0)
-		return -1;
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::ReadSms:GSM_InitConnection() failed");
+		return -1;//3;
+	}
 
 	/* Read all messages */
 	error = ERR_NONE;
@@ -297,7 +317,10 @@ int SmsMgr::ReadSms(int indx)
 		error = GSM_GetNextSMS(s, &sms, start);
 		if (error == ERR_EMPTY) break;
 		if(error_handler(s,error)!=0)
-			return -1;
+		{
+			LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::ReadSms:GSM_GetNextSMS() failed");
+			return -1;//3;
+		}
 		start = FALSE;
 
 		/* Now we can do something with the message */
@@ -330,7 +353,10 @@ int SmsMgr::ReadSms(int indx)
 	/* Terminate connection */
 	error = GSM_TerminateConnection(s);
 	if(error_handler(s,error)!=0)
-		return -1;
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::ReadSms:GSM_TerminateConnection() failed");
+		return -1;//3;
+	}
 
 	/* Free up used memory */
 	GSM_FreeStateMachine(s);
@@ -359,7 +385,10 @@ int SmsMgr::DeleteAllSMS(int foldernum)
 	/* Allocates state machine */
 	gsm = GSM_AllocStateMachine();
 	if (gsm == NULL)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DeleteAllSMS:GSM_AllocStateMachine() failed");
 		return -1;//3;
+	}
 
 	GSM_Config *cfg;
 	cfg = GSM_GetConfig(gsm, 0);
@@ -374,7 +403,10 @@ int SmsMgr::DeleteAllSMS(int foldernum)
 	/* 1 means number of replies you want to wait for */
 	error = GSM_InitConnection(gsm, 1);
 	if(error_handler(gsm,error)!=0)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DeleteAllSMS:GSM_InitConnection() failed");
 		return -1;
+	}
 
 
 
@@ -391,8 +423,12 @@ int SmsMgr::DeleteAllSMS(int foldernum)
 		//Terminate(2);
 		error = GSM_TerminateConnection(gsm);
 		if(error_handler(gsm,error)!=0)
+		{
+			LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DeleteAllSMS:GSM_TerminateConnection() failed");
 			return -1;
+		}
 		GSM_FreeStateMachine(gsm);
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DeleteAllSMS:foldernum > folders.Number");
 		return -1;
 	}
 
@@ -430,7 +466,10 @@ int SmsMgr::DeleteAllSMS(int foldernum)
 	/* Terminate connection */
 	error = GSM_TerminateConnection(gsm);
 	if(error_handler(gsm,error)!=0)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DeleteAllSMS:GSM_TerminateConnection() failed");
 		return -1;
+	}
 
 	/* Free up used memory */
 	GSM_FreeStateMachine(gsm);
@@ -498,7 +537,10 @@ int SmsMgr::SendSms(char* recipient_number,char* message_text)
 	/* Allocates state machine */
 	s = GSM_AllocStateMachine();
 	if (s == NULL)
-		return -1;//3;
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::SendSms:GSM_AllocStateMachine() failed");
+		return -1;
+	}
 
 	GSM_Config *cfg;
 	cfg = GSM_GetConfig(s, 0);
@@ -514,7 +556,10 @@ int SmsMgr::SendSms(char* recipient_number,char* message_text)
 	/* 1 means number of replies you want to wait for */
 	error = GSM_InitConnection(s, 1);
 	if(error_handler(s,error)!=0)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::SendSms:GSM_InitConnection() failed");
 		return -1;
+	}
 
 	GSM_SetSendSMSStatusCallback(s, send_sms_callback, NULL);
 
@@ -522,7 +567,10 @@ int SmsMgr::SendSms(char* recipient_number,char* message_text)
 	PhoneSMSC.Location = 1;
 	error = GSM_GetSMSC(s, &PhoneSMSC);
 	if(error_handler(s,error)!=0)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::SendSms:GSM_GetSMSC() failed");
 		return -1;
+	}
 
 	/* Set SMSC number in message */
 	CopyUnicodeString(sms.SMSC.Number, PhoneSMSC.Number);
@@ -536,7 +584,10 @@ int SmsMgr::SendSms(char* recipient_number,char* message_text)
 	/* Send message */
 	error = GSM_SendSMS(s, &sms);
 	if(error_handler(s,error)!=0)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::SendSms:GSM_SendSMS() failed");
 		return -1;
+	}
 
 	int timeout=0;
 	/* Wait for network reply */
@@ -562,12 +613,13 @@ int SmsMgr::SendSms(char* recipient_number,char* message_text)
 	/* Terminate connection */
 	error = GSM_TerminateConnection(s);
 	if(error_handler(s,error)!=0)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::SendSms:GSM_TerminateConnection() failed");
 		return -1;
+	}
 
 	/* Free up used memory */
 	GSM_FreeStateMachine(s);
-
-
 	return return_value;
 }
 
@@ -594,9 +646,11 @@ int SmsMgr::DialVoice(char* recipient_number)
 	//GSM_SetDebugLevel("textall", debug_info);
 
 	gsm = GSM_AllocStateMachine();
-
 	if (gsm == NULL)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_AllocStateMachine() failed");
 		return -1;
+	}
 
 	GSM_Config *cfg;
 	cfg = GSM_GetConfig(gsm, 0);
@@ -611,7 +665,10 @@ int SmsMgr::DialVoice(char* recipient_number)
 	/* 1 means number of replies you want to wait for */
 	error = GSM_InitConnection(gsm, 1);
 	if(error_handler(gsm,error)!=0)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_InitConnection() failed");
 		return -1;
+	}
 
 	GSM_CallShowNumber ShowNumber = GSM_CALL_DefaultNumberPresence;
 	//GSM_CallShowNumber ShowNumber = GSM_CALL_ShowNumber;
@@ -622,11 +679,17 @@ int SmsMgr::DialVoice(char* recipient_number)
 	GSM_SetIncomingCallCallback(gsm, IncomingCall0, NULL);
 	error = GSM_SetIncomingCall(gsm, TRUE);
 	if(error_handler(gsm,error)!=0)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_SetIncomingCall() failed");
 		return -1;
+	}
 	//Print_Error(error);
 	error = GSM_DialVoice(gsm, recipient_number, ShowNumber);
 	if(error_handler(gsm,error)!=0)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_DialVoice() failed");
 		return -1;
+	}
 	//Print_Error(error);
 	//sleep(GetInt(argv[3]));
 	int timeout=0;
@@ -641,19 +704,28 @@ int SmsMgr::DialVoice(char* recipient_number)
 	{
 		error = GSM_CancelCall(gsm, TerminateID, FALSE);
 		if(error_handler(gsm,error)!=0)
+		{
+			LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_CancelCall(FALSE) failed");
 			return -1;
+		}
 	}
 	else
 	{
 		error = GSM_CancelCall(gsm, 0, TRUE);
 		if(error_handler(gsm,error)!=0)
+		{
+			LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_CancelCall(TRUE) failed");
 			return -1;
+		}
 	}
 
 	/* Terminate connection */
 	error = GSM_TerminateConnection(gsm);
 	if(error_handler(gsm,error)!=0)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_TerminateConnection() failed");
 		return -1;
+	}
 
 	/* Free up used memory */
 	GSM_FreeStateMachine(gsm);
@@ -729,7 +801,10 @@ int SmsMgr::DialUSSDCode(char* code,char* return_str)
 	gsm = GSM_AllocStateMachine();
 //cout<<"DialUSSDCode = 0"<<endl;
 	if (gsm == NULL)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_AllocStateMachine() failed");
 		return -1;
+	}
 //cout<<"DialUSSDCode = 1"<<endl;
 
 	GSM_Config *cfg;
@@ -744,31 +819,32 @@ int SmsMgr::DialUSSDCode(char* code,char* return_str)
 	/* Connect to phone */
 	/* 1 means number of replies you want to wait for */
 	error = GSM_InitConnection(gsm, 1);
-//cout<<"DialUSSDCode = 2"<<endl;
 	if(error_handler(gsm,error)!=0)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_InitConnection() failed");
 		return -1;
-//cout<<"DialUSSDCode = 3"<<endl;
+	}
 
 
 	GSM_SetIncomingUSSDCallback(gsm, IncomingUSSD2, NULL);
 	error=GSM_SetIncomingUSSD(gsm,TRUE);
-//cout<<"DialUSSDCode = 4"<<endl;
 	if(error_handler(gsm,error)!=0)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_SetIncomingUSSD() failed");
 		return -1;
-//cout<<"DialUSSDCode = 5"<<endl;
+	}
 
 	error=GSM_DialService(gsm, code);
 	// Fallback to voice call, it can work with some phones 
 	if (error == ERR_NOTIMPLEMENTED || error == ERR_NOTSUPPORTED)
 	{
-//cout<<"DialUSSDCode = falling back to voice call"<<endl;
 		error=GSM_DialVoice(gsm, code, GSM_CALL_DefaultNumberPresence);
 	}
-//cout<<"DialUSSDCode = 6"<<endl;
 	if(error_handler(gsm,error)!=0)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_DialService() failed");
 		return -1;
-//cout<<"DialUSSDCode = 7"<<endl;
-
+	}
 
 	num_replies = 0;
 	last_replies = 0;
@@ -799,7 +875,10 @@ int SmsMgr::DialUSSDCode(char* code,char* return_str)
 	}
         error=GSM_SetIncomingUSSD(gsm, FALSE);
 	if(error_handler(gsm,error)!=0)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_SetIncomingUSSD() failed");
 		return -1;
+	}
 
 
 	strcpy(return_str,ussdCode);
@@ -808,13 +887,19 @@ int SmsMgr::DialUSSDCode(char* code,char* return_str)
 	/* Terminate connection */
 	error = GSM_TerminateConnection(gsm);
 	if(error_handler(gsm,error)!=0)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_TerminateConnection() failed");
 		return -1;
+	}
 
 	/* Free up used memory */
 	GSM_FreeStateMachine(gsm);
 
 	if(timeout>=300)
+	{
+		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:timeout!!! ussd code didnt arrive");
 		return -1;//wait timed out: ussd code didnt arrive
+	}
 	return 0;
 }
 RPC_SRV_RESULT SmsMgr::GetLatestUSSDReply(char* msg)

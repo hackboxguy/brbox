@@ -52,6 +52,7 @@ class SmsMgr : public ADThreadConsumer
 	//void send_sms_callback (GSM_StateMachine *sm, int status, int MessageReference, void * user_data);
 
 public:
+	bool LogFlag;
 	SmsMgr();
 	~SmsMgr();
 	RPC_SRV_RESULT GetSms(int index,char* msg);
