@@ -810,7 +810,7 @@ int SmsMgr::DialUSSDCode(char* code,char* return_str)
 	GSM_Config *cfg;
 	cfg = GSM_GetConfig(gsm, 0);
 	free(cfg->Device);
-	cfg->Device     = strdup(MODEM_DEV_NODE);//argv[1]);
+	cfg->Device     = strdup("/dev/ttyUSB2");//MODEM_DEV_NODE);//argv[1]);
 	free(cfg->Connection);
 	cfg->Connection = strdup(MODEM_AT_CONN);//argv[2]);
 	cfg->SyncTime   = TRUE;

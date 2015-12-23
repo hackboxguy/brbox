@@ -31,6 +31,10 @@ class SysmgrCltCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcess
 	int push_file_download(char* subarg,EJSON_SYSMGR_RPC_TYPES rpc_cmd);
 	int run_file_download(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,
 		ADThreadedSockClientProducer *pWorker);
+	int push_get_indexed_msg_command(char* subarg,char* rpc_name,int rpc_index,char* arg_name,char* result_name);
+	int run_get_indexed_msg_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,
+					ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);
+
 
 public:
 	SysmgrCltCmdline();

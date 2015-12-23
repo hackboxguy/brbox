@@ -39,6 +39,12 @@ SysmgrCltCmdline::SysmgrCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--myip                     [read my internet ip]");
 	CmdlineHelper.insert_options_entry((char*)"defhostname" ,optional_argument,EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME);
 	CmdlineHelper.insert_help_entry((char*)"--defhostname              [reset hostname to default]");
+	CmdlineHelper.insert_options_entry((char*)"updateloglist" ,optional_argument,EJSON_SYSMGR_RPC_SET_UPDATE_LOG);
+	CmdlineHelper.insert_help_entry((char*)"--updateloglist            [update debug logging list]");
+	CmdlineHelper.insert_options_entry((char*)"getlogcount" ,optional_argument,EJSON_SYSMGR_RPC_GET_LOG_COUNT);
+	CmdlineHelper.insert_help_entry((char*)"--getlogcount              [returns total number of log lines available]");
+	CmdlineHelper.insert_options_entry((char*)"getlog" ,optional_argument,EJSON_SYSMGR_RPC_GET_LOG_LINE);
+	CmdlineHelper.insert_help_entry((char*)"--getlog=index             [read the log line of zero based index]");
 }
 /* ------------------------------------------------------------------------- */
 SysmgrCltCmdline::~SysmgrCltCmdline()
@@ -140,7 +146,18 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 		case EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME:
 			CmdlineHelper.push_action_type_noarg_command(EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME,(char*)SYSMGR_RPC_DEFAULT_HOSTNAME_SET);
 			break;
-
+		case EJSON_SYSMGR_RPC_SET_UPDATE_LOG:
+			CmdlineHelper.push_action_type_noarg_command(EJSON_SYSMGR_RPC_SET_UPDATE_LOG,
+				(char*)SYSMGR_RPC_UPDATE_LOG_SET,(char*)RPCMGR_RPC_TASK_STS_ARGID);
+			break;
+		case EJSON_SYSMGR_RPC_GET_LOG_COUNT:
+			CmdlineHelper.push_single_int_get_set_command(EJSON_SYSMGR_RPC_GET_LOG_COUNT,EJSON_SYSMGR_RPC_GET_LOG_COUNT,
+					SYSMGR_RPC_LOG_COUNT_GET,SYSMGR_RPC_LOG_COUNT_GET,(char*)SYSMGR_RPC_LOG_ARG_TOTAL,sub_arg,1);
+			break;
+		case EJSON_SYSMGR_RPC_GET_LOG_LINE:
+			push_get_indexed_msg_command(sub_arg,(char*)SYSMGR_RPC_LOG_LINE_GET,EJSON_SYSMGR_RPC_GET_LOG_LINE,
+						     (char*)SYSMGR_RPC_LOG_ARG_INDX,(char*)SYSMGR_RPC_LOG_ARG_LOGMSG);
+			break;
 		default:
 			return 0;
 			break;	
@@ -168,6 +185,9 @@ int SysmgrCltCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADFTP:
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:
 			run_file_download(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
+			break;
+		case EJSON_SYSMGR_RPC_GET_LOG_LINE:
+			run_get_indexed_msg_command(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
 			break;
 		default:return -1;
 			break;
@@ -532,4 +552,57 @@ int SysmgrCltCmdline::run_file_download(CmdExecutionObj *pCmdObj,ADJsonRpcClient
 	}
 	return 0;
 }
+/* ------------------------------------------------------------------------- */
+int SysmgrCltCmdline::push_get_indexed_msg_command(char* subarg,char* rpc_name,int rpc_index,char* arg_name,char* result_name)
+{
+	CmdExecutionObj *pCmdObj=NULL;
+	OBJECT_MEM_NEW(pCmdObj,CmdExecutionObj);
+	if(pCmdObj==NULL)
+	{
+		printf("failed create pCmdObj!!!\n");
+		return -1;
+	}
+	strcpy(pCmdObj->get_rpc_name,rpc_name);
+	if(CmdlineHelper.get_next_subargument(&subarg)==0)//user must specify index number
+	{
+		OBJ_MEM_DELETE(pCmdObj);
+		printf("please specify correct msg index number\n");
+		return -1;
+	}
+	else 
+	{
+			strcpy(pCmdObj->first_arg_param_name,arg_name);
+			//strcpy(pCmdObj->first_arg_param_value,subarg);
+			pCmdObj->first_arg_param_int_value=atoi(subarg);
+			strcpy(pCmdObj->second_arg_param_name,result_name);
+			pCmdObj->command=rpc_index;
+			pCmdObj->action=RPC_SRV_ACT_READ;
+	}
+	pCmdObj->cmd_type=CLIENT_CMD_TYPE_USER_DEFINED;
+	//put the request into chain
+	if(CmdlineHelper.CmdChain.chain_put((void *)pCmdObj)!=0)
+	{
+		printf("push_get_indexed_msg_command: failed! unable to push json-req-task-obj to chain!\n");
+		OBJ_MEM_DELETE(pCmdObj);
+		return -1;
+	}
+	return 0;
+}
+int SysmgrCltCmdline::run_get_indexed_msg_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker)
+{
+	ADThreadedSockClient *pOrig = (ADThreadedSockClient*)pWorker;
+	if(pCmdObj->action == RPC_SRV_ACT_READ)
+	{
+	//following command has different name for req_arg and for resp_arg.
+	pCmdObj->result=pSrvSockConn->get_int_type_with_string_para(pCmdObj->get_rpc_name,pCmdObj->first_arg_param_name,pCmdObj->first_arg_param_int_value,pCmdObj->second_arg_param_value,pCmdObj->second_arg_param_name);
+	pOrig->log_print_message(pSrvSockConn,pCmdObj->get_rpc_name,RPC_SRV_ACT_READ,pCmdObj->result,pOutMsgList,pCmdObj->second_arg_param_value);
+	}
+	else
+	{
+		pOrig->my_log_print_message(pSrvSockConn,(char*)"run_get_indexed_msg_command",RPC_SRV_ACT_UNKNOWN,(char*)CLIENT_CMD_RESULT_INVALID_ACT,pOutMsgList);
+		return -1;
+	}
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
 

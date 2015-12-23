@@ -39,6 +39,9 @@ int SysRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_SET_HOSTNAME    :return json_to_bin_set_hostname(pReq);
 		case EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP:return json_to_bin_get_myip(pReq);
 		case EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME:return json_to_bin_set_def_hostname(pReq);
+		case EJSON_SYSMGR_RPC_SET_UPDATE_LOG  :return json_to_bin_loglist_update(pReq);
+		case EJSON_SYSMGR_RPC_GET_LOG_COUNT   :return json_to_bin_get_logcount(pReq);
+		case EJSON_SYSMGR_RPC_GET_LOG_LINE    :return json_to_bin_get_logline(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -66,6 +69,9 @@ int SysRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_SET_HOSTNAME    :return bin_to_json_set_hostname(pReq);
 		case EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP:return bin_to_json_get_myip(pReq);
 		case EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME:return bin_to_json_set_def_hostname(pReq);
+		case EJSON_SYSMGR_RPC_SET_UPDATE_LOG  :return bin_to_json_loglist_update(pReq);
+		case EJSON_SYSMGR_RPC_GET_LOG_COUNT   :return bin_to_json_get_logcount(pReq);
+		case EJSON_SYSMGR_RPC_GET_LOG_LINE    :return bin_to_json_get_logline(pReq);
 		default: break;
 	}
 	return -1;
@@ -93,6 +99,9 @@ int SysRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 		case EJSON_SYSMGR_RPC_SET_HOSTNAME    :return process_set_hostname(pReq);
 		case EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP:return process_get_myip(pReq);
 		case EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME:return process_set_def_hostname(pReq);
+		case EJSON_SYSMGR_RPC_SET_UPDATE_LOG  :return process_loglist_update(pReq,pObj);
+		case EJSON_SYSMGR_RPC_GET_LOG_COUNT   :return process_get_logcount(pReq);
+		case EJSON_SYSMGR_RPC_GET_LOG_LINE    :return process_get_logline(pReq);
 		default:break;
 	}
 	return 0;
@@ -109,6 +118,7 @@ SYSMGR_ASYNCTASK_TYPE SysRpc::get_async_task_in_progress()
 		case EJSON_SYSMGR_RPC_SET_FMWUPDATE   :task=SYSMGR_ASYNCTASK_FUPDATE;break;
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADFTP :task=SYSMGR_ASYNCTASK_FTPDOWNLOAD;break;
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:task=SYSMGR_ASYNCTASK_TFTPDOWNLOAD;break;
+		case EJSON_SYSMGR_RPC_SET_UPDATE_LOG  :task=SYSMGR_ASYNCTASK_LOGLISTUPDATE;break;
 		default                               :break;
 	}
 	return task;
@@ -143,6 +153,14 @@ RPC_SRV_RESULT SysRpc::ProcessWorkAsync(int cmd,unsigned char* pWorkData)
 				SYSMGR_DOWNLOAD_FILE_PACKET *pPacket;
 				pPacket=(SYSMGR_DOWNLOAD_FILE_PACKET*)pWorkData;
 				ret_val=process_async_download_file(pPacket,(EJSON_SYSMGR_RPC_TYPES)cmd);
+				OBJ_MEM_DELETE(pWorkData);
+			}
+			break;
+		case EJSON_SYSMGR_RPC_SET_UPDATE_LOG  :
+			{
+				SYSMGR_LOG_PACKET *pPacket;
+				pPacket=(SYSMGR_LOG_PACKET*)pWorkData;
+				ret_val=process_async_loglist_update(pPacket);
 				OBJ_MEM_DELETE(pWorkData);
 			}
 			break;
@@ -884,6 +902,99 @@ int SysRpc::process_set_def_hostname(JsonDataCommObj* pReq)
 	ADSysInfo SysInfo;
 	sprintf(cmdline,"default-hostname -f y");
 	pPanelReq->result=SysInfo.run_shell_script(cmdline,get_emulation_flag());
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int SysRpc::json_to_bin_loglist_update(JsonDataCommObj* pReq)
+{
+	SYSMGR_LOG_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_LOG_PACKET,RPC_SRV_ACT_WRITE,EJSON_SYSMGR_RPC_SET_UPDATE_LOG);
+	return 0;
+}
+int SysRpc::bin_to_json_loglist_update(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,SYSMGR_LOG_PACKET,RPCMGR_RPC_TASK_STS_ARGID);
+	return 0;
+}
+int SysRpc::process_loglist_update(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SYSMGR_LOG_PACKET* pPacket;
+	pPacket=(SYSMGR_LOG_PACKET*)pPanelReq->dataRef;
+
+	SYSMGR_LOG_PACKET* pWorkData=NULL;
+	OBJECT_MEM_NEW(pWorkData,SYSMGR_LOG_PACKET);//delete this object in run_work() callback function
+	if(pWorkData == NULL)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_MEM_ERROR;
+		return -1;
+	}
+	pPanelReq->result=pObj->PushAsyncTask(EJSON_SYSMGR_RPC_SET_UPDATE_LOG,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_PRESERVE);
+	if(pPanelReq->result!=RPC_SRV_RESULT_IN_PROG)
+		OBJ_MEM_DELETE(pWorkData);
+	return 0;
+}
+RPC_SRV_RESULT SysRpc::process_async_loglist_update(SYSMGR_LOG_PACKET* pPacket)
+{
+	//SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	//pMgr->LogFlag=get_debug_log_flag();
+	//if(pMgr->ReadSms(0)<0)
+	//	return RPC_SRV_RESULT_FAIL;
+	//else
+		return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+int SysRpc::json_to_bin_get_logcount(JsonDataCommObj* pReq)
+{
+	SYSMGR_LOG_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_LOG_PACKET,RPC_SRV_ACT_READ,EJSON_SYSMGR_RPC_GET_LOG_COUNT);
+	return 0;
+}
+int SysRpc::bin_to_json_get_logcount(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_INT(RPC_SRV_REQ,SYSMGR_LOG_PACKET,SYSMGR_RPC_LOG_ARG_TOTAL,total);
+	return 0;
+}
+int SysRpc::process_get_logcount(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SYSMGR_LOG_PACKET* pPacket;
+	pPacket=(SYSMGR_LOG_PACKET*)pPanelReq->dataRef;
+	//SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	//pMgr->LogFlag=get_debug_log_flag();
+	//pPanelReq->result=pMgr->GetTotalSms(&pPacket->total);
+
+	pPacket->total=5;
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int SysRpc::json_to_bin_get_logline(JsonDataCommObj* pReq)
+{
+	SYSMGR_LOG_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_LOG_PACKET,RPC_SRV_ACT_READ,EJSON_SYSMGR_RPC_GET_LOG_LINE);
+	JSON_STRING_TO_INT(SYSMGR_RPC_LOG_ARG_INDX,pPanelCmdObj->index);
+	return 0;
+}
+int SysRpc::bin_to_json_get_logline(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_STRING(RPC_SRV_REQ,SYSMGR_LOG_PACKET,SYSMGR_RPC_LOG_ARG_LOGMSG,logmsg);
+	return 0;
+}
+int SysRpc::process_get_logline(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SYSMGR_LOG_PACKET* pPacket;
+	pPacket=(SYSMGR_LOG_PACKET*)pPanelReq->dataRef;
+	//SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	//pMgr->LogFlag=get_debug_log_flag();
+	//pPanelReq->result=pMgr->GetSms(pPacket->index,pPacket->sms);
+
+	strcpy(pPacket->logmsg,"test brbox msg");
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 	return 0;
 }
 /* ------------------------------------------------------------------------- */

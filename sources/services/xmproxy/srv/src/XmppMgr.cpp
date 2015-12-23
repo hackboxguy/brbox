@@ -156,7 +156,9 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			case EXMPP_CMD_GET_USSD        :res=proc_cmd_get_ussd(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_DEBUG_LOG       :res=proc_cmd_logsts(cmd.cmdMsg,returnval);break;
 			case EXMPP_CMD_GSM_MODEM_IDENT :res=proc_cmd_gsm_modem_identify(cmd.cmdMsg,returnval);break;//inProg
-
+			case EXMPP_CMD_LOG_UPDATE      :res=proc_cmd_log_list_update(cmd.cmdMsg,returnval);break;//inProg
+			case EXMPP_CMD_LOG_COUNT       :res=proc_cmd_log_get_count(cmd.cmdMsg,returnval);break;
+			case EXMPP_CMD_LOG_MSG         :res=proc_cmd_log_get_line(cmd.cmdMsg,returnval);break;
 			default                        :break;
 		}
 		processCmd.pop_front();//after processing delete the entry
@@ -679,6 +681,52 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_gsm_modem_identify(std::string msg,std::string 
 	returnval="taskID=";returnval+=tID;
 	if(result==RPC_SRV_RESULT_IN_PROG)
 		AsyncTaskList.push_back(AyncEventEntry(atoi(tID),ADCMN_PORT_BBOXSMS));
+	return result;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_log_list_update(std::string msg,std::string &returnval)
+{
+	char tID[255];tID[254]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result=Client.set_action_noarg_get_single_string_type((char*)"update_loglist",(char*)"taskId",tID);
+	Client.rpc_server_disconnect();
+	returnval="taskID=";returnval+=tID;
+	if(result==RPC_SRV_RESULT_IN_PROG)
+		AsyncTaskList.push_back(AyncEventEntry(atoi(tID),ADCMN_PORT_SYSMGR));
+	return result;
+}
+RPC_SRV_RESULT XmppMgr::proc_cmd_log_get_count(std::string msg,std::string &returnval)
+{
+	char temp_str[255];temp_str[0]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result = Client.get_integer_type((char*)"get_log_count",(char*)"logcount",temp_str);
+	Client.rpc_server_disconnect();
+	returnval=temp_str;
+	return result;
+}
+RPC_SRV_RESULT XmppMgr::proc_cmd_log_get_line(std::string msg,std::string &returnval)
+{
+	std::string cmd,cmdArg;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	msgstream >> cmdArg;
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0)
+		return RPC_SRV_RESULT_ARG_ERROR;
+
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	int msgIndex=atoi(cmdArg.c_str());
+	char returnmsg[1024];returnmsg[0]='\0';
+	RPC_SRV_RESULT result=Client.get_int_type_with_string_para((char*)"get_log_line",(char*)"index",msgIndex,returnmsg,(char*)"logmsg");
+	returnval=returnmsg;
+	Client.rpc_server_disconnect();
 	return result;
 }
 /* ------------------------------------------------------------------------- */

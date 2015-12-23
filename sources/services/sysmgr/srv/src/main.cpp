@@ -85,6 +85,12 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&MyIp);
 	SysRpc DefHostname(SYSMGR_RPC_DEFAULT_HOSTNAME_SET,EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME,emulat,dbglog,&DataCache); 
 	RpcMgr.AttachRpc(&DefHostname);
+	SysRpc UpdtLogList(SYSMGR_RPC_UPDATE_LOG_SET,EJSON_SYSMGR_RPC_SET_UPDATE_LOG,emulat,dbglog,&DataCache); 
+	RpcMgr.AttachRpc(&UpdtLogList);
+	SysRpc GetLogCount(SYSMGR_RPC_LOG_COUNT_GET,EJSON_SYSMGR_RPC_GET_LOG_COUNT,emulat,dbglog,&DataCache); 
+	RpcMgr.AttachRpc(&GetLogCount);
+	SysRpc GetLogLine(SYSMGR_RPC_LOG_LINE_GET,EJSON_SYSMGR_RPC_GET_LOG_LINE,emulat,dbglog,&DataCache); 
+	RpcMgr.AttachRpc(&GetLogLine);
 
 
 	//start listening for rpc-commands

@@ -13,8 +13,8 @@ using namespace std;
 #define GITHUB_FMW_DOWNLOAD_FOLDER "http://github.com/hackboxguy/downloads/raw/master/"
 
 #define BBOXSMS_SERVER_ADDR "127.0.0.1"
-#define EXMPP_CMD_TABL    {"smsdeleteall","smsdelete","smsget","smssend","smsupdate","smstotal","fmwver","fmwupdt","fmwupsts","fmwupres","reboot","uptime","hostname","myip","resethostname","dialvoice","dialussd","readussd","logsts","gsmcheck","unknown","none","\0"}
-#define EXMPP_CMD_TABL_HELP    {"","<zero_based_index>","<zero_based_index>","<phone-num> <msg>","","","","<filename>","","","","","","","","<phone-num>","<ussd-code>","","<port> [sts]","","unknown","none","\0"}
+#define EXMPP_CMD_TABL    {"smsdeleteall","smsdelete","smsget","smssend","smsupdate","smstotal","fmwver","fmwupdt","fmwupsts","fmwupres","reboot","uptime","hostname","myip","resethostname","dialvoice","dialussd","readussd","logsts","gsmcheck","logupdate","logcount","logmsg","unknown","none","\0"}
+#define EXMPP_CMD_TABL_HELP    {"","<zero_based_index>","<zero_based_index>","<phone-num> <msg>","","","","<filename>","","","","","","","","<phone-num>","<ussd-code>","","<port> [sts]","","","","<index>","unknown","none","\0"}
 
 typedef enum EXMPP_CMD_TYPES_T
 {
@@ -40,6 +40,9 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_GET_USSD,
 	EXMPP_CMD_DEBUG_LOG,
 	EXMPP_CMD_GSM_MODEM_IDENT,//identify gsm-usb modem
+	EXMPP_CMD_LOG_UPDATE,//trigger reloading of log message to vector list
+	EXMPP_CMD_LOG_COUNT, //read total items in vector list
+	EXMPP_CMD_LOG_MSG,   //read item-msg from vector list
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -124,8 +127,10 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_get_ussd(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_logsts(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_gsm_modem_identify(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_log_list_update(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_log_get_count(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_log_get_line(std::string msg,std::string &returnval);
 	std::string print_help();
-
 public:
 	XmppMgr();
 	~XmppMgr();

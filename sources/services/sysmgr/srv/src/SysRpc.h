@@ -84,6 +84,19 @@ public:
 	int bin_to_json_set_def_hostname(JsonDataCommObj* pReq);
 	int process_set_def_hostname(JsonDataCommObj* pReq);
 
+	int json_to_bin_loglist_update(JsonDataCommObj* pReq);
+	int bin_to_json_loglist_update(JsonDataCommObj* pReq);
+	int process_loglist_update(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj);
+	RPC_SRV_RESULT process_async_loglist_update(SYSMGR_LOG_PACKET* pPacket);
+
+	int json_to_bin_get_logcount(JsonDataCommObj* pReq);
+	int bin_to_json_get_logcount(JsonDataCommObj* pReq);
+	int process_get_logcount(JsonDataCommObj* pReq);
+
+	int json_to_bin_get_logline(JsonDataCommObj* pReq);
+	int bin_to_json_get_logline(JsonDataCommObj* pReq);
+	int process_get_logline(JsonDataCommObj* pReq);
+
 };
 /* ------------------------------------------------------------------------- */
 

@@ -28,6 +28,9 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_SET_HOSTNAME,
 	EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP, //internet ip
 	EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME, //set default hostname
+	EJSON_SYSMGR_RPC_SET_UPDATE_LOG, //reads BRBOX specific log lines from /tmp/messages and fills in vectorList 
+	EJSON_SYSMGR_RPC_GET_LOG_COUNT,  //returns total number of log lines which was filled in vectorList
+	EJSON_SYSMGR_RPC_GET_LOG_LINE,   //returns log-message of a given index from vectorList
 	//get device type
 	//EJSON_SYSMGR_RPC_IDENTIFY_DEVICE,
 	EJSON_SYSMGR_RPC_END,
@@ -198,13 +201,14 @@ typedef struct SYSMGR_DOWNLOAD_FILE_PACKET_T
 //EJSON_SYSMGR_RPC_GET_ASYNCTASK //get-async-task-in-progress
 #define SYSMGR_RPC_ASYNCTASK_GET         "get_async_task"
 #define SYSMGR_RPC_ASYNCTASK_ARG         "task"
-#define SYSMGR_RPC_ASYNCTASK_ARG_TABL    {"devop","fupdate","ftpdownload","tftpdownload","none","none","\0"} //show unknown as none
+#define SYSMGR_RPC_ASYNCTASK_ARG_TABL    {"devop","fupdate","ftpdownload","tftpdownload","loglistupdt","none","none","\0"} //show unknown as none
 typedef enum SYSMGR_ASYNCTASK_TYPE_T
 {
 	SYSMGR_ASYNCTASK_DEVOP,
 	SYSMGR_ASYNCTASK_FUPDATE,
 	SYSMGR_ASYNCTASK_FTPDOWNLOAD,
 	SYSMGR_ASYNCTASK_TFTPDOWNLOAD,
+	SYSMGR_ASYNCTASK_LOGLISTUPDATE,
 	SYSMGR_ASYNCTASK_UNKNOWN,
 	SYSMGR_ASYNCTASK_NONE
 }SYSMGR_ASYNCTASK_TYPE;
@@ -244,6 +248,24 @@ typedef struct SYSMGR_MY_PUBLIC_IP_PACKET_T
 /* ------------------------------------------------------------------------- */
 //EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME
 #define SYSMGR_RPC_DEFAULT_HOSTNAME_SET    "set_default_hostname"
+/* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_SET_UPDATE_LOG
+//EJSON_SYSMGR_RPC_GET_LOG_COUNT
+//EJSON_SYSMGR_RPC_GET_LOG_LINE
+#define SYSMGR_RPC_UPDATE_LOG_SET    "update_loglist"
+#define SYSMGR_RPC_LOG_COUNT_GET     "get_log_count"
+#define SYSMGR_RPC_LOG_LINE_GET      "get_log_line"
+#define SYSMGR_RPC_LOG_ARG_INDX      "index"
+#define SYSMGR_RPC_LOG_ARG_LOGMSG    "logmsg"
+#define SYSMGR_RPC_LOG_ARG_TOTAL     "logcount"
+
+typedef struct SYSMGR_LOG_PACKET_T
+{
+	int index;
+	int total;
+	char logmsg[1024];
+	int taskID;
+}SYSMGR_LOG_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct SYSMGR_CMN_DATA_CACHE_T
