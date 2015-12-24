@@ -694,7 +694,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_log_list_update(std::string msg,std::string &re
 	Client.rpc_server_disconnect();
 	returnval="taskID=";returnval+=tID;
 	if(result==RPC_SRV_RESULT_IN_PROG)
-		AsyncTaskList.push_back(AyncEventEntry(atoi(tID),ADCMN_PORT_SYSMGR));
+		AsyncTaskList.push_back(AyncEventEntry(atoi(tID),ADCMN_PORT_SYSMGR));//before pushing, if event comes back, then it is missed
 	return result;
 }
 RPC_SRV_RESULT XmppMgr::proc_cmd_log_get_count(std::string msg,std::string &returnval)

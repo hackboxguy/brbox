@@ -942,6 +942,7 @@ RPC_SRV_RESULT SysRpc::process_async_loglist_update(SYSMGR_LOG_PACKET* pPacket)
 	//if(pMgr->ReadSms(0)<0)
 	//	return RPC_SRV_RESULT_FAIL;
 	//else
+		usleep(100000);
 		return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
