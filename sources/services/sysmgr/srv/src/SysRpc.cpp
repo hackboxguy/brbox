@@ -1,5 +1,6 @@
 #include "SysRpc.h"
 #include "ADSysInfo.hpp"
+#include "LogHandler.h"
 #include <iostream>
 #include <fstream>
 //#include "SysmgrJsonDef.h"
@@ -937,13 +938,16 @@ int SysRpc::process_loglist_update(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* p
 }
 RPC_SRV_RESULT SysRpc::process_async_loglist_update(SYSMGR_LOG_PACKET* pPacket)
 {
+	usleep(100000);//needed because event might go too fast to subscriber before being handled in a proper way
+	LogHandler *pMgr=(LogHandler*)pDataCache->pLogger;
+	return pMgr->UpdateLogList();
 	//SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
 	//pMgr->LogFlag=get_debug_log_flag();
 	//if(pMgr->ReadSms(0)<0)
 	//	return RPC_SRV_RESULT_FAIL;
 	//else
-		usleep(100000);
-		return RPC_SRV_RESULT_SUCCESS;
+	//usleep(100000);
+	//return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
 int SysRpc::json_to_bin_get_logcount(JsonDataCommObj* pReq)
@@ -967,7 +971,9 @@ int SysRpc::process_get_logcount(JsonDataCommObj* pReq)
 	//pMgr->LogFlag=get_debug_log_flag();
 	//pPanelReq->result=pMgr->GetTotalSms(&pPacket->total);
 
-	pPacket->total=5;
+	LogHandler *pMgr=(LogHandler*)pDataCache->pLogger;
+	pPacket->total=pMgr->GetLogLines();
+	//pPacket->total=5;
 	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 	return 0;
 }
@@ -990,12 +996,12 @@ int SysRpc::process_get_logline(JsonDataCommObj* pReq)
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	SYSMGR_LOG_PACKET* pPacket;
 	pPacket=(SYSMGR_LOG_PACKET*)pPanelReq->dataRef;
-	//SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	
+	LogHandler *pMgr=(LogHandler*)pDataCache->pLogger;
 	//pMgr->LogFlag=get_debug_log_flag();
-	//pPanelReq->result=pMgr->GetSms(pPacket->index,pPacket->sms);
-
-	strcpy(pPacket->logmsg,"test brbox msg");
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	pPanelReq->result=pMgr->read_log_message_line(pPacket->index,pPacket->logmsg);
+	//strcpy(pPacket->logmsg,"test brbox msg");
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 	return 0;
 }
 /* ------------------------------------------------------------------------- */

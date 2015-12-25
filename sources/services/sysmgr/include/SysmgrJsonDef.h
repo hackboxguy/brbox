@@ -278,7 +278,7 @@ typedef struct SYSMGR_CMN_DATA_CACHE_T
 	char krnl_fmwver[100];//kernel version
 	SYSMGR_BOOT_SYSTEM_TYPE bootsys;//brbox1/brbox2
 	EJSON_SYSMGR_RPC_TYPES AsyncCmdInProgress;
-
+	void *pLogger;//log message handler
 	SYSMGR_CMN_DATA_CACHE_T()
 	{
 		AsyncCmdInProgress=EJSON_SYSMGR_RPC_NONE;

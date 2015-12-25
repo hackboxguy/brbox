@@ -11,7 +11,9 @@
 #include "NetRpc.h"
 #include "SysRpc.h"
 #include "EventHandler.h"
+#include "LogHandler.h"
 #define SERVER_JSON_PORT_NUM SYSMGR_JSON_PORT_NUMBER
+#define LOG_FILE_PATH         "/tmp/messages"
 /* ------------------------------------------------------------------------- */
 using namespace std;
 int main(int argc, const char* argv[])
@@ -35,6 +37,10 @@ int main(int argc, const char* argv[])
 	//create a common data Cache of the service
 	SYSMGR_CMN_DATA_CACHE DataCache;
 	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
+
+	//prepare logger
+	LogHandler Logger(LOG_FILE_PATH);//log handler
+	DataCache.pLogger =(void*)&Logger;//rpc's needs to know the object pointer of sms-handling-object
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
