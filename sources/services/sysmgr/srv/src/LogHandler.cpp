@@ -143,7 +143,7 @@ RPC_SRV_RESULT LogHandler::read_log_message_line(int line_num,char* message)
 	//LOG_MSG_PACKET pPacket;
 	LOG_MSG_PACKET *pHolder=NULL;
 	logmsg_chain.chain_lock();
-	int temp=line_num-1;//caller is calling by zero based index
+	int temp=line_num+1;//caller is calling by zero based index
 	pHolder=(LOG_MSG_PACKET*)logmsg_chain.chain_get_by_ident(temp);//line_num);
 	if(pHolder==NULL)//no task by this ID is in my list
 	{
