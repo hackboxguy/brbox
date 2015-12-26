@@ -34,15 +34,16 @@ typedef enum EXMPP_CMD_TYPES_T
 	//EXMPP_CMD_FMW_SET_HOSTNAME,
 	EXMPP_CMD_FMW_HOSTNAME,
 	EXMPP_CMD_FMW_GET_MYIP,
-	EXMPP_CMD_FMW_SET_DEFAULT_HOSTNAME,
+	EXMPP_CMD_FMW_RESET_HOSTNAME,
 	EXMPP_CMD_DIAL_VOICE,
 	EXMPP_CMD_DIAL_USSD,
 	EXMPP_CMD_GET_USSD,
-	EXMPP_CMD_DEBUG_LOG,
+	EXMPP_CMD_DEBUG_LOG_STS,
 	EXMPP_CMD_GSM_MODEM_IDENT,//identify gsm-usb modem
 	EXMPP_CMD_LOG_UPDATE,//trigger reloading of log message to vector list
 	EXMPP_CMD_LOG_COUNT, //read total items in vector list
 	EXMPP_CMD_LOG_MSG,   //read item-msg from vector list
+	EXMPP_CMD_FMW_GET_LOCALIP,
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -76,6 +77,14 @@ public:
 			return false;
 	}
 };
+/* ------------------------------------------------------------------------- */
+typedef struct XMPROXY_CMD_TABLE_T
+{
+	bool cmdsts;
+	EXMPP_CMD_TYPES cmd;
+	char cmd_name[128];
+	char cmd_arg[128];
+}XMPROXY_CMD_TABLE;
 /* ------------------------------------------------------------------------- */
 class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerConsumer
 {

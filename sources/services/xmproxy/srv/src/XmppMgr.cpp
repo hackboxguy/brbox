@@ -16,6 +16,33 @@
 #include "ADJsonRpcMgr.hpp"
 using namespace std;
 /* ------------------------------------------------------------------------- */
+//supported commands over xmpp
+XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] = 
+{
+	//rpc calls common to all services
+	{true ,EXMPP_CMD_GSM_MODEM_IDENT         , "gsmcheck"     ,""},
+	{true ,EXMPP_CMD_SMS_LIST_UPDATE         , "smsupdate"    ,""},
+	{true ,EXMPP_CMD_SMS_GET_TOTAL           , "smstotal"     ,""},
+	{true ,EXMPP_CMD_SMS_GET                 , "smsget"       ,"<zero_index_msg>"},
+	{true ,EXMPP_CMD_SMS_DELETE_ALL          , "smsdeleteall" ,""},
+	{true ,EXMPP_CMD_SMS_SEND                , "smssend"      ,"<phone-num> <msg>"},
+	{true ,EXMPP_CMD_DIAL_VOICE              , "dialvoice"    ,"<phone-num>"},
+	{true ,EXMPP_CMD_DIAL_USSD               , "dialussd"     ,"<ussd-code>"},
+	{true ,EXMPP_CMD_GET_USSD                , "readussd"     ,""},
+	{true ,EXMPP_CMD_FMW_GET_VERSION         , "fmwver"       ,""},
+	{true ,EXMPP_CMD_FMW_UPDATE              , "fmwupdt"      ,"<filename>"},
+	{true ,EXMPP_CMD_FMW_REBOOT              , "reboot"       ,""},
+	{true ,EXMPP_CMD_FMW_UPTIME              , "uptime"       ,""},
+	{true ,EXMPP_CMD_FMW_HOSTNAME            , "hostname"     ,"[name]"},
+	{true ,EXMPP_CMD_FMW_RESET_HOSTNAME      , "resethostname",""},
+	{true ,EXMPP_CMD_FMW_GET_MYIP            , "publicip"     ,""},
+	{false,EXMPP_CMD_FMW_GET_LOCALIP         , "localip"      ,""},
+	{true ,EXMPP_CMD_DEBUG_LOG_STS           , "logsts"       ,""},
+	{true ,EXMPP_CMD_LOG_UPDATE              , "logupdate"    ,""},
+	{true ,EXMPP_CMD_LOG_COUNT               , "logcount"     ,""},
+	{true ,EXMPP_CMD_LOG_MSG                 , "logmsg"       ,"<zero_index_lineNum>"}
+};
+/* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
 {
 	CyclicTime_ms=CLIENT_ALIVE_PING_DURATION_MS;//60000;//60seconds
@@ -76,11 +103,18 @@ void XmppMgr::SetDebugLog(bool log)
 std::string XmppMgr::print_help()
 {
 	std::string help="",cmd,cmdhlp;
-	const char *cmdTbl[]     = EXMPP_CMD_TABL;
+	/*const char *cmdTbl[]     = EXMPP_CMD_TABL;
 	const char *cmdTblHelp[] = EXMPP_CMD_TABL_HELP;
 	for(int i=0;i<EXMPP_CMD_UNKNOWN;i++)
 	{
 		cmd=cmdTbl[i];cmdhlp=cmdTblHelp[i];
+		help+=cmd+" "+cmdhlp+"\n";
+	}*/
+	int total_cmds=sizeof(xmproxy_cmd_table)/sizeof(XMPROXY_CMD_TABLE);
+	for(int i=0;i<total_cmds;i++)
+	{
+		if(xmproxy_cmd_table[i].cmdsts!=true)continue;//dont show disabled commands
+		cmd=xmproxy_cmd_table[i].cmd_name;cmdhlp=xmproxy_cmd_table[i].cmd_arg;
 		help+=cmd+" "+cmdhlp+"\n";
 	}
 	return help;
@@ -127,46 +161,67 @@ int XmppMgr::thread_callback_function(void* pUserData,ADThreadProducer* pObj)
 /* ------------------------------------------------------------------------- */
 int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 {
-	std::string returnval="";
-	RPC_SRV_RESULT res=RPC_SRV_RESULT_UNKNOWN_COMMAND;//RPC_SRV_RESULT_FAIL;
+	//std::string returnval="";
+	//RPC_SRV_RESULT res=RPC_SRV_RESULT_UNKNOWN_COMMAND;//RPC_SRV_RESULT_FAIL;
 	while (!processCmd.empty())
 	{
+		//TODO: handle semicolon separated multiple commands
 		XmppCmdEntry cmd = processCmd.front();
-		switch(ResolveCmdStr(cmd.cmdMsg))
+
+		stringstream ss(cmd.cmdMsg);
+		std::deque<string> result;
+		while( ss.good() )
 		{
-			case EXMPP_CMD_SMS_DELETE_ALL  :res=proc_cmd_sms_deleteall(cmd.cmdMsg,returnval);break;//inProg
-			case EXMPP_CMD_SMS_DELETE      :res=proc_cmd_sms_delete(cmd.cmdMsg);break;
-			case EXMPP_CMD_SMS_GET         :res=proc_cmd_sms_get(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_SMS_SEND        :res=proc_cmd_sms_send(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_SMS_LIST_UPDATE :res=proc_cmd_sms_list_update(cmd.cmdMsg,returnval);break;//inProg
-			case EXMPP_CMD_SMS_GET_TOTAL   :res=proc_cmd_sms_get_total(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_FMW_GET_VERSION :res=proc_cmd_fmw_get_version(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_FMW_UPDATE      :res=proc_cmd_fmw_update(cmd.cmdMsg,returnval);break;//inProg
-			case EXMPP_CMD_FMW_UPDATE_STS  :res=proc_cmd_fmw_update_sts(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_FMW_UPDATE_RES  :res=proc_cmd_fmw_update_res(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_FMW_REBOOT      :res=proc_cmd_fmw_reboot(cmd.cmdMsg,returnval);break;//inProg
-			case EXMPP_CMD_FMW_UPTIME      :res=proc_cmd_fmw_uptime(cmd.cmdMsg,returnval);break;
-			//case EXMPP_CMD_FMW_GET_HOSTNAME:res=proc_cmd_fmw_get_hostname(cmd.cmdMsg,returnval);break;
-			//case EXMPP_CMD_FMW_SET_HOSTNAME:res=proc_cmd_fmw_set_hostname(cmd.cmdMsg);break;
-			case EXMPP_CMD_FMW_HOSTNAME    :res=proc_cmd_fmw_hostname(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_FMW_GET_MYIP    :res=proc_cmd_fmw_get_myip(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_FMW_SET_DEFAULT_HOSTNAME:res=proc_cmd_fmw_set_default_hostname(cmd.cmdMsg);break;
-			case EXMPP_CMD_DIAL_VOICE      :res=proc_cmd_dial_voice(cmd.cmdMsg,returnval,(char*)"dial_voice");break;
-			case EXMPP_CMD_DIAL_USSD       :res=proc_cmd_dial_voice(cmd.cmdMsg,returnval,(char*)"dial_ussd");break;
-			case EXMPP_CMD_GET_USSD        :res=proc_cmd_get_ussd(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_DEBUG_LOG       :res=proc_cmd_logsts(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_GSM_MODEM_IDENT :res=proc_cmd_gsm_modem_identify(cmd.cmdMsg,returnval);break;//inProg
-			case EXMPP_CMD_LOG_UPDATE      :res=proc_cmd_log_list_update(cmd.cmdMsg,returnval);break;//inProg
-			case EXMPP_CMD_LOG_COUNT       :res=proc_cmd_log_get_count(cmd.cmdMsg,returnval);break;
-			case EXMPP_CMD_LOG_MSG         :res=proc_cmd_log_get_line(cmd.cmdMsg,returnval);break;
-			default                        :break;
+		    string substr;
+		    getline( ss, substr, ';' );
+		    result.push_back( substr );
+		}
+		while (!result.empty()) 
+		{
+			//std::cout << "The first character is: " << result.front() << '\n';
+			//switch(ResolveCmdStr(cmd.cmdMsg))
+			std::string returnval="";
+			RPC_SRV_RESULT res=RPC_SRV_RESULT_UNKNOWN_COMMAND;//RPC_SRV_RESULT_FAIL;
+
+			switch(ResolveCmdStr(result.front()))
+			{
+				case EXMPP_CMD_SMS_DELETE_ALL  :res=proc_cmd_sms_deleteall(cmd.cmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_SMS_DELETE      :res=proc_cmd_sms_delete(cmd.cmdMsg);break;
+				case EXMPP_CMD_SMS_GET         :res=proc_cmd_sms_get(cmd.cmdMsg,returnval);break;
+				case EXMPP_CMD_SMS_SEND        :res=proc_cmd_sms_send(cmd.cmdMsg,returnval);break;
+				case EXMPP_CMD_SMS_LIST_UPDATE :res=proc_cmd_sms_list_update(cmd.cmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_SMS_GET_TOTAL   :res=proc_cmd_sms_get_total(cmd.cmdMsg,returnval);break;
+				case EXMPP_CMD_FMW_GET_VERSION :res=proc_cmd_fmw_get_version(cmd.cmdMsg,returnval);break;
+				case EXMPP_CMD_FMW_UPDATE      :res=proc_cmd_fmw_update(cmd.cmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_FMW_UPDATE_STS  :res=proc_cmd_fmw_update_sts(cmd.cmdMsg,returnval);break;
+				case EXMPP_CMD_FMW_UPDATE_RES  :res=proc_cmd_fmw_update_res(cmd.cmdMsg,returnval);break;
+				case EXMPP_CMD_FMW_REBOOT      :res=proc_cmd_fmw_reboot(cmd.cmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_FMW_UPTIME      :res=proc_cmd_fmw_uptime(cmd.cmdMsg,returnval);break;
+				case EXMPP_CMD_FMW_HOSTNAME    :res=proc_cmd_fmw_hostname(cmd.cmdMsg,returnval);break;
+				case EXMPP_CMD_FMW_GET_MYIP    :res=proc_cmd_fmw_get_myip(cmd.cmdMsg,returnval);break;
+				case EXMPP_CMD_FMW_RESET_HOSTNAME:res=proc_cmd_fmw_set_default_hostname(cmd.cmdMsg);break;
+				case EXMPP_CMD_DIAL_VOICE      :res=proc_cmd_dial_voice(cmd.cmdMsg,returnval,(char*)"dial_voice");break;
+				case EXMPP_CMD_DIAL_USSD       :res=proc_cmd_dial_voice(cmd.cmdMsg,returnval,(char*)"dial_ussd");break;
+				case EXMPP_CMD_GET_USSD        :res=proc_cmd_get_ussd(cmd.cmdMsg,returnval);break;
+				case EXMPP_CMD_DEBUG_LOG_STS   :res=proc_cmd_logsts(cmd.cmdMsg,returnval);break;
+				case EXMPP_CMD_GSM_MODEM_IDENT :res=proc_cmd_gsm_modem_identify(cmd.cmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_LOG_UPDATE      :res=proc_cmd_log_list_update(cmd.cmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_LOG_COUNT       :res=proc_cmd_log_get_count(cmd.cmdMsg,returnval);break;
+				case EXMPP_CMD_LOG_MSG         :res=proc_cmd_log_get_line(cmd.cmdMsg,returnval);break;
+				default                        :break;
+			}
+			result.pop_front();
+			const char *resTbl[] = STR_RPC_SRV_RESULT_STRING_TABLE;
+			std::string result   = resTbl[res];
+			std::string response = result +" : "+returnval;
+			XmppProxy.send_reply(response);//result+":"+returnval);
 		}
 		processCmd.pop_front();//after processing delete the entry
 	}
-	const char *resTbl[] = STR_RPC_SRV_RESULT_STRING_TABLE;
-	std::string result   = resTbl[res];
-	std::string response = result +" : "+returnval;
-	XmppProxy.send_reply(response);//result+":"+returnval);
+	//const char *resTbl[] = STR_RPC_SRV_RESULT_STRING_TABLE;
+	//std::string result   = resTbl[res];
+	//std::string response = result +" : "+returnval;
+	//XmppProxy.send_reply(response);//result+":"+returnval);
 	return 0;
 }
 //following function is called by EvntHandler object
@@ -204,23 +259,33 @@ RPC_SRV_RESULT XmppMgr::IsItMyAsyncTaskResp(int tid,int port)
 /* ------------------------------------------------------------------------- */
 EXMPP_CMD_TYPES XmppMgr::ResolveCmdStr(std::string msg)
 {
-	EXMPP_CMD_TYPES xmpcmd;
-	const char *cmdTbl[] = EXMPP_CMD_TABL;
-	ADCmnStringProcessor string_proc;
-
 	stringstream mstream(msg);
 	std::string cmd;
 	mstream >> cmd;
-	//cout<<mstream.str();//remaining message
+	transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
 
+	/*EXMPP_CMD_TYPES xmpcmd;
+	const char *cmdTbl[] = EXMPP_CMD_TABL;
+	ADCmnStringProcessor string_proc;
+	//cout<<mstream.str();//remaining message
 	//------------function to convert string into lowercase---------------
 	transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
 	//--------------------------------------------------------------------
-
 	xmpcmd = (EXMPP_CMD_TYPES)string_proc.string_to_enum(cmdTbl,(char*)cmd.c_str(),EXMPP_CMD_UNKNOWN);
 	if(xmpcmd>=EXMPP_CMD_UNKNOWN)
 		xmpcmd=EXMPP_CMD_UNKNOWN;
-	return xmpcmd;
+	return xmpcmd;*/
+
+	std::string name;
+	int total_cmds=sizeof(xmproxy_cmd_table)/sizeof(XMPROXY_CMD_TABLE);
+	for(int i=0;i<total_cmds;i++)
+	{
+		if(xmproxy_cmd_table[i].cmdsts!=true)continue;//dont support disabled commands
+		name=xmproxy_cmd_table[i].cmd_name;
+		if(cmd == name)
+			return xmproxy_cmd_table[i].cmd;
+	}
+	return EXMPP_CMD_UNKNOWN;
 }
 /* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT XmppMgr::Start(std::string accountFilePath)
