@@ -8,7 +8,6 @@
 EvntHandler:: EvntHandler(std::string rpcName,int myIndex,bool emu,bool log,XMPROXY_CMN_DATA_CACHE *pData):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
 {
 	pDataCache=pData;
-
 	sysmgrEventActive=false;
 	sysMgrSrvToken=-1;
 	SUBSCRIBE_EVENT("127.0.0.1",EVENT_SYSMGR,&sysMgrSrvToken,EVENT_SYSMGR,-1,XMPROXY_JSON_PORT_NUMBER);
@@ -61,6 +60,10 @@ void EvntHandler::ReceiveEvent(int cltToken,int evntNum,int evntArg)
 			Client.rpc_server_disconnect();
 			std::string finalRes=taskIDResult;
 			pXmpp->RpcResponseCallback(finalRes,evntArg);
+		}
+		else
+		{
+			LOG_DEBUG_MSG_2_ARG(get_debug_log_flag(),"BRBOX:xmproxy","EvntHandler::ReceiveEvent::Entry not Found!!! evntArg=%d,cltToken=%d",evntArg,cltToken);
 		}
 	}
 }

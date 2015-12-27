@@ -10,7 +10,6 @@ class  EvntHandler : public ADJsonRpcMgrConsumer, public ADCmnStringProcessor
 	int  sysMgrSrvToken;//=-1;
 	bool bboxSmsEventActive;
 	int  bboxSmsSrvToken;
-
 	XMPROXY_CMN_DATA_CACHE *pDataCache;
 public:
 	 EvntHandler(std::string rpcName,int myIndex,bool emu,bool log,XMPROXY_CMN_DATA_CACHE *pData);
