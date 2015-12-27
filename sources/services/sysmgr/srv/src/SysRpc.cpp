@@ -938,7 +938,7 @@ int SysRpc::process_loglist_update(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* p
 }
 RPC_SRV_RESULT SysRpc::process_async_loglist_update(SYSMGR_LOG_PACKET* pPacket)
 {
-	usleep(100000);//needed because event might go too fast to subscriber before being handled in a proper way
+	usleep(250000);//needed because event might go too fast to subscriber before being handled in a proper way
 	LogHandler *pMgr=(LogHandler*)pDataCache->pLogger;
 	return pMgr->UpdateLogList();
 	//SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;

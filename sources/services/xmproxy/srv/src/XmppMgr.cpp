@@ -139,9 +139,11 @@ int XmppMgr::onXmppMessage(std::string msg,ADXmppProducer* pObj)
 int XmppMgr::thread_callback_function(void* pUserData,ADThreadProducer* pObj)
 {
 	//cout<<"going to connect"<<endl;
+	int loginAttempt=0;
 	while(1)
 	{
 		//cout<<"XmppMgr::thread_callback_function: entering xmpp connect"<<endl;
+		LOG_DEBUG_MSG_1_ARG(DebugLog,"BRBOX:xmproxy","XmppMgr::thread_callback_function::xmpp login attempt=%d",++loginAttempt);
 		XmppProxy.connect((char*)XmppUserName.c_str(),(char*)XmppUserPw.c_str());
 		//cout<<"XmppMgr::thread_callback_function: exited xmpp connect"<<endl;
 		//XmppProxy.disconnect();
@@ -188,7 +190,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_SMS_DELETE_ALL  :res=proc_cmd_sms_deleteall(cmd.cmdMsg,returnval);break;//inProg
 				case EXMPP_CMD_SMS_DELETE      :res=proc_cmd_sms_delete(cmd.cmdMsg);break;
 				case EXMPP_CMD_SMS_GET         :res=proc_cmd_sms_get(cmd.cmdMsg,returnval);break;
-				case EXMPP_CMD_SMS_SEND        :res=proc_cmd_sms_send(cmd.cmdMsg,returnval);break;
+				case EXMPP_CMD_SMS_SEND        :res=proc_cmd_sms_send(cmd.cmdMsg,returnval);break;//inProg
 				case EXMPP_CMD_SMS_LIST_UPDATE :res=proc_cmd_sms_list_update(cmd.cmdMsg,returnval);break;//inProg
 				case EXMPP_CMD_SMS_GET_TOTAL   :res=proc_cmd_sms_get_total(cmd.cmdMsg,returnval);break;
 				case EXMPP_CMD_FMW_GET_VERSION :res=proc_cmd_fmw_get_version(cmd.cmdMsg,returnval);break;
@@ -200,8 +202,8 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_FMW_HOSTNAME    :res=proc_cmd_fmw_hostname(cmd.cmdMsg,returnval);break;
 				case EXMPP_CMD_FMW_GET_MYIP    :res=proc_cmd_fmw_get_myip(cmd.cmdMsg,returnval);break;
 				case EXMPP_CMD_FMW_RESET_HOSTNAME:res=proc_cmd_fmw_set_default_hostname(cmd.cmdMsg);break;
-				case EXMPP_CMD_DIAL_VOICE      :res=proc_cmd_dial_voice(cmd.cmdMsg,returnval,(char*)"dial_voice");break;
-				case EXMPP_CMD_DIAL_USSD       :res=proc_cmd_dial_voice(cmd.cmdMsg,returnval,(char*)"dial_ussd");break;
+				case EXMPP_CMD_DIAL_VOICE      :res=proc_cmd_dial_voice(cmd.cmdMsg,returnval,(char*)"dial_voice");break;//inPrg
+				case EXMPP_CMD_DIAL_USSD       :res=proc_cmd_dial_voice(cmd.cmdMsg,returnval,(char*)"dial_ussd");break;//inPrg
 				case EXMPP_CMD_GET_USSD        :res=proc_cmd_get_ussd(cmd.cmdMsg,returnval);break;
 				case EXMPP_CMD_DEBUG_LOG_STS   :res=proc_cmd_logsts(cmd.cmdMsg,returnval);break;
 				case EXMPP_CMD_GSM_MODEM_IDENT :res=proc_cmd_gsm_modem_identify(cmd.cmdMsg,returnval);break;//inProg
@@ -501,6 +503,8 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg,std::string &returnv
 
 	URLPath=GITHUB_FMW_DOWNLOAD_FOLDER;//"http://github.com/hackboxguy/downloads/raw/master/" + "uBrBoxRoot.uimg"
 	URLPath+=cmdArg;
+	LOG_DEBUG_MSG_1_ARG(true,"BRBOX:xmproxy","XmppMgr::proc_cmd_fmw_update::cmdARG=%s",cmdArg.c_str());
+	LOG_DEBUG_MSG_1_ARG(true,"BRBOX:xmproxy","XmppMgr::proc_cmd_fmw_update::filepath=%s",URLPath.c_str());
 	char temp_str[255];temp_str[0]='\0';
 	ADJsonRpcClient Client;
 	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)

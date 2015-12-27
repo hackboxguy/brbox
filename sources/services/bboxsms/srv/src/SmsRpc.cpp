@@ -1,5 +1,7 @@
 #include "SmsRpc.h"
 #include "SmsMgr.h"
+#define ASYNC_TASK_EVENT_DELAY 250000 //needed because event might go too fast to subscriber before being handled in a proper way
+
 /* ------------------------------------------------------------------------- */
 SmsRpc:: SmsRpc(std::string rpcName,int myIndex,bool emu, bool log,BBOXSMS_CMN_DATA_CACHE *pData):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
 {
@@ -216,6 +218,7 @@ int SmsRpc::process_delete_all(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj)
 }
 RPC_SRV_RESULT SmsRpc::process_async_delete_all(BBOXSMS_SMS_PACKET* pPacket)
 {
+	usleep(ASYNC_TASK_EVENT_DELAY);//needed because event might go too fast to subscriber before being handled in a proper way
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
 	pMgr->LogFlag=get_debug_log_flag();
 	if(pMgr->DeleteAllSMS(1)!=0) //0,1,2,3,4(5 fails)
@@ -315,6 +318,7 @@ int SmsRpc::process_sms_list_update(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* 
 }
 RPC_SRV_RESULT SmsRpc::process_async_list_update(BBOXSMS_SMS_PACKET* pPacket)
 {
+	usleep(ASYNC_TASK_EVENT_DELAY);//needed because event might go too fast to subscriber before being handled in a proper way
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
 	pMgr->LogFlag=get_debug_log_flag();
 	if(pMgr->ReadSms(0)<0)
@@ -355,6 +359,7 @@ int SmsRpc::process_ident_device(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pOb
 }
 RPC_SRV_RESULT SmsRpc::process_async_ident_device(BBOXSMS_SMS_PACKET* pPacket)
 {
+	usleep(ASYNC_TASK_EVENT_DELAY);//needed because event might go too fast to subscriber before being handled in a proper way
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
 	pMgr->LogFlag=get_debug_log_flag();
 	if(pMgr->DetectSmsDevice()==0)
@@ -399,6 +404,7 @@ int SmsRpc::process_send_sms(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj)
 }
 RPC_SRV_RESULT SmsRpc::process_async_send_sms(BBOXSMS_SMS_PACKET* pPacket)
 {
+	usleep(ASYNC_TASK_EVENT_DELAY);//needed because event might go too fast to subscriber before being handled in a proper way
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
 	pMgr->LogFlag=get_debug_log_flag();
 	if(pMgr->SendSms(pPacket->destNum,pPacket->sms)!=0)
@@ -442,6 +448,7 @@ int SmsRpc::process_dial_voice(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj)
 }
 RPC_SRV_RESULT SmsRpc::process_async_dial_voice(BBOXSMS_SMS_PACKET* pPacket)
 {
+	usleep(ASYNC_TASK_EVENT_DELAY);//needed because event might go too fast to subscriber before being handled in a proper way
 	//char ret_val[1024];
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
 	pMgr->LogFlag=get_debug_log_flag();
@@ -486,6 +493,7 @@ int SmsRpc::process_dial_ussd(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj)
 }
 RPC_SRV_RESULT SmsRpc::process_async_dial_ussd(BBOXSMS_SMS_PACKET* pPacket)
 {
+	usleep(ASYNC_TASK_EVENT_DELAY);//needed because event might go too fast to subscriber before being handled in a proper way
 	char ret_val[1024];
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
 	pMgr->LogFlag=get_debug_log_flag();
