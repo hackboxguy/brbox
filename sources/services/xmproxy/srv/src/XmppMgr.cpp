@@ -177,6 +177,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 		    string substr;
 		    getline( ss, substr, ';' );
 		    result.push_back( substr );
+			//cout<<"substr = "<<substr<<endl;
 		}
 		while (!result.empty()) 
 		{
@@ -184,32 +185,32 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			//switch(ResolveCmdStr(cmd.cmdMsg))
 			std::string returnval="";
 			RPC_SRV_RESULT res=RPC_SRV_RESULT_UNKNOWN_COMMAND;//RPC_SRV_RESULT_FAIL;
-
-			switch(ResolveCmdStr(result.front()))
+			std::string cmdcmdMsg=result.front();
+			switch(ResolveCmdStr(cmdcmdMsg))
 			{
-				case EXMPP_CMD_SMS_DELETE_ALL  :res=proc_cmd_sms_deleteall(cmd.cmdMsg,returnval);break;//inProg
-				case EXMPP_CMD_SMS_DELETE      :res=proc_cmd_sms_delete(cmd.cmdMsg);break;
-				case EXMPP_CMD_SMS_GET         :res=proc_cmd_sms_get(cmd.cmdMsg,returnval);break;
-				case EXMPP_CMD_SMS_SEND        :res=proc_cmd_sms_send(cmd.cmdMsg,returnval);break;//inProg
-				case EXMPP_CMD_SMS_LIST_UPDATE :res=proc_cmd_sms_list_update(cmd.cmdMsg,returnval);break;//inProg
-				case EXMPP_CMD_SMS_GET_TOTAL   :res=proc_cmd_sms_get_total(cmd.cmdMsg,returnval);break;
-				case EXMPP_CMD_FMW_GET_VERSION :res=proc_cmd_fmw_get_version(cmd.cmdMsg,returnval);break;
-				case EXMPP_CMD_FMW_UPDATE      :res=proc_cmd_fmw_update(cmd.cmdMsg,returnval);break;//inProg
-				case EXMPP_CMD_FMW_UPDATE_STS  :res=proc_cmd_fmw_update_sts(cmd.cmdMsg,returnval);break;
-				case EXMPP_CMD_FMW_UPDATE_RES  :res=proc_cmd_fmw_update_res(cmd.cmdMsg,returnval);break;
-				case EXMPP_CMD_FMW_REBOOT      :res=proc_cmd_fmw_reboot(cmd.cmdMsg,returnval);break;//inProg
-				case EXMPP_CMD_FMW_UPTIME      :res=proc_cmd_fmw_uptime(cmd.cmdMsg,returnval);break;
-				case EXMPP_CMD_FMW_HOSTNAME    :res=proc_cmd_fmw_hostname(cmd.cmdMsg,returnval);break;
-				case EXMPP_CMD_FMW_GET_MYIP    :res=proc_cmd_fmw_get_myip(cmd.cmdMsg,returnval);break;
-				case EXMPP_CMD_FMW_RESET_HOSTNAME:res=proc_cmd_fmw_set_default_hostname(cmd.cmdMsg);break;
-				case EXMPP_CMD_DIAL_VOICE      :res=proc_cmd_dial_voice(cmd.cmdMsg,returnval,(char*)"dial_voice");break;//inPrg
-				case EXMPP_CMD_DIAL_USSD       :res=proc_cmd_dial_voice(cmd.cmdMsg,returnval,(char*)"dial_ussd");break;//inPrg
-				case EXMPP_CMD_GET_USSD        :res=proc_cmd_get_ussd(cmd.cmdMsg,returnval);break;
-				case EXMPP_CMD_DEBUG_LOG_STS   :res=proc_cmd_logsts(cmd.cmdMsg,returnval);break;
-				case EXMPP_CMD_GSM_MODEM_IDENT :res=proc_cmd_gsm_modem_identify(cmd.cmdMsg,returnval);break;//inProg
-				case EXMPP_CMD_LOG_UPDATE      :res=proc_cmd_log_list_update(cmd.cmdMsg,returnval);break;//inProg
-				case EXMPP_CMD_LOG_COUNT       :res=proc_cmd_log_get_count(cmd.cmdMsg,returnval);break;
-				case EXMPP_CMD_LOG_MSG         :res=proc_cmd_log_get_line(cmd.cmdMsg,returnval);break;
+				case EXMPP_CMD_SMS_DELETE_ALL  :res=proc_cmd_sms_deleteall(cmdcmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_SMS_DELETE      :res=proc_cmd_sms_delete(cmdcmdMsg);break;
+				case EXMPP_CMD_SMS_GET         :res=proc_cmd_sms_get(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_SMS_SEND        :res=proc_cmd_sms_send(cmdcmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_SMS_LIST_UPDATE :res=proc_cmd_sms_list_update(cmdcmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_SMS_GET_TOTAL   :res=proc_cmd_sms_get_total(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_FMW_GET_VERSION :res=proc_cmd_fmw_get_version(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_FMW_UPDATE      :res=proc_cmd_fmw_update(cmdcmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_FMW_UPDATE_STS  :res=proc_cmd_fmw_update_sts(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_FMW_UPDATE_RES  :res=proc_cmd_fmw_update_res(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_FMW_REBOOT      :res=proc_cmd_fmw_reboot(cmdcmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_FMW_UPTIME      :res=proc_cmd_fmw_uptime(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_FMW_HOSTNAME    :res=proc_cmd_fmw_hostname(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_FMW_GET_MYIP    :res=proc_cmd_fmw_get_myip(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_FMW_RESET_HOSTNAME:res=proc_cmd_fmw_set_default_hostname(cmdcmdMsg);break;
+				case EXMPP_CMD_DIAL_VOICE      :res=proc_cmd_dial_voice(cmdcmdMsg,returnval,(char*)"dial_voice");break;//inPrg
+				case EXMPP_CMD_DIAL_USSD       :res=proc_cmd_dial_voice(cmdcmdMsg,returnval,(char*)"dial_ussd");break;//inPrg
+				case EXMPP_CMD_GET_USSD        :res=proc_cmd_get_ussd(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_DEBUG_LOG_STS   :res=proc_cmd_logsts(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_GSM_MODEM_IDENT :res=proc_cmd_gsm_modem_identify(cmdcmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_LOG_UPDATE      :res=proc_cmd_log_list_update(cmdcmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_LOG_COUNT       :res=proc_cmd_log_get_count(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_LOG_MSG         :res=proc_cmd_log_get_line(cmdcmdMsg,returnval);break;
 				default                        :break;
 			}
 			result.pop_front();
@@ -503,8 +504,9 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg,std::string &returnv
 
 	URLPath=GITHUB_FMW_DOWNLOAD_FOLDER;//"http://github.com/hackboxguy/downloads/raw/master/" + "uBrBoxRoot.uimg"
 	URLPath+=cmdArg;
-	LOG_DEBUG_MSG_1_ARG(true,"BRBOX:xmproxy","XmppMgr::proc_cmd_fmw_update::cmdARG=%s",cmdArg.c_str());
-	LOG_DEBUG_MSG_1_ARG(true,"BRBOX:xmproxy","XmppMgr::proc_cmd_fmw_update::filepath=%s",URLPath.c_str());
+	//LOG_DEBUG_MSG_1_ARG(true,"BRBOX:xmproxy","XmppMgr::proc_cmd_fmw_update::cmdARG=%s",cmdArg.c_str());
+	//LOG_DEBUG_MSG_1_ARG(true,"BRBOX:xmproxy","XmppMgr::proc_cmd_fmw_update::filepath=%s",URLPath.c_str());
+
 	char temp_str[255];temp_str[0]='\0';
 	ADJsonRpcClient Client;
 	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
