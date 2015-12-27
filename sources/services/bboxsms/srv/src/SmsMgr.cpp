@@ -100,7 +100,7 @@ int SmsMgr::error_handler(GSM_StateMachine *s,GSM_Error error)
 	if (error != ERR_NONE)
 	{
 		//printf("ERROR: %s\n", GSM_ErrorString(error));//TODO: log this message
-		LOG_DEBUG_MSG_1_ARG(LogFlag,"BRBOX:bboxsms","SmsMgr::error_handler::error=%s",GSM_ErrorString(error));
+		//LOG_DEBUG_MSG_1_ARG(LogFlag,"BRBOX:bboxsms","SmsMgr::error_handler::error=%s",GSM_ErrorString(error));
 		if (GSM_IsConnected(s))
 			GSM_TerminateConnection(s);
 		return -1;//exit(error);
@@ -132,7 +132,7 @@ int SmsMgr::DetectSmsDevice()
 	s = GSM_AllocStateMachine();
 	if (s == NULL)
 	{		
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DetectSmsDevice:GSM_AllocStateMachine() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DetectSmsDevice:GSM_AllocStateMachine() failed");
 		return -1;//3;
 	}
 	/*
@@ -176,7 +176,7 @@ int SmsMgr::DetectSmsDevice()
 	error = GSM_InitConnection(s, 1);
 	if(error_handler(s,error)!=0)
 	{		
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DetectSmsDevice:GSM_InitConnection() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DetectSmsDevice:GSM_InitConnection() failed");
 		return -1;
 	}
 
@@ -188,7 +188,7 @@ int SmsMgr::DetectSmsDevice()
 	error = GSM_GetManufacturer(s, buffer);
 	if(error_handler(s,error)!=0)
 	{		
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DetectSmsDevice:GSM_GetManufacturer() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DetectSmsDevice:GSM_GetManufacturer() failed");
 		return -1;
 	}
 	//printf("Manufacturer  : %s\n", buffer);
@@ -198,7 +198,7 @@ int SmsMgr::DetectSmsDevice()
 	error = GSM_GetModel(s, buffer);
 	if(error_handler(s,error)!=0)
 	{		
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DetectSmsDevice:GSM_GetModel() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DetectSmsDevice:GSM_GetModel() failed");
 		return -1;
 	}
 	//printf("Model         : %s (%s)\n",
@@ -210,7 +210,7 @@ int SmsMgr::DetectSmsDevice()
 	error = GSM_TerminateConnection(s);
 	if(error_handler(s,error)!=0)
 	{		
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DetectSmsDevice:GSM_TerminateConnection() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DetectSmsDevice:GSM_TerminateConnection() failed");
 		return -1;
 	}
 
@@ -256,7 +256,7 @@ int SmsMgr::ReadSms(int indx)
 	s = GSM_AllocStateMachine();
 	if (s == NULL)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::ReadSms:GSM_AllocStateMachine() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::ReadSms:GSM_AllocStateMachine() failed");
 		return -1;//3;
 	}
 	/*
@@ -297,7 +297,7 @@ int SmsMgr::ReadSms(int indx)
 	error = GSM_InitConnection(s, 1);
 	if(error_handler(s,error)!=0)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::ReadSms:GSM_InitConnection() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::ReadSms:GSM_InitConnection() failed");
 		return -1;//3;
 	}
 
@@ -318,7 +318,7 @@ int SmsMgr::ReadSms(int indx)
 		if (error == ERR_EMPTY) break;
 		if(error_handler(s,error)!=0)
 		{
-			LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::ReadSms:GSM_GetNextSMS() failed");
+			//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::ReadSms:GSM_GetNextSMS() failed");
 			return -1;//3;
 		}
 		start = FALSE;
@@ -354,7 +354,7 @@ int SmsMgr::ReadSms(int indx)
 	error = GSM_TerminateConnection(s);
 	if(error_handler(s,error)!=0)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::ReadSms:GSM_TerminateConnection() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::ReadSms:GSM_TerminateConnection() failed");
 		return -1;//3;
 	}
 
@@ -386,7 +386,7 @@ int SmsMgr::DeleteAllSMS(int foldernum)
 	gsm = GSM_AllocStateMachine();
 	if (gsm == NULL)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DeleteAllSMS:GSM_AllocStateMachine() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DeleteAllSMS:GSM_AllocStateMachine() failed");
 		return -1;//3;
 	}
 
@@ -404,7 +404,7 @@ int SmsMgr::DeleteAllSMS(int foldernum)
 	error = GSM_InitConnection(gsm, 1);
 	if(error_handler(gsm,error)!=0)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DeleteAllSMS:GSM_InitConnection() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DeleteAllSMS:GSM_InitConnection() failed");
 		return -1;
 	}
 
@@ -424,11 +424,11 @@ int SmsMgr::DeleteAllSMS(int foldernum)
 		error = GSM_TerminateConnection(gsm);
 		if(error_handler(gsm,error)!=0)
 		{
-			LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DeleteAllSMS:GSM_TerminateConnection() failed");
+			//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DeleteAllSMS:GSM_TerminateConnection() failed");
 			return -1;
 		}
 		GSM_FreeStateMachine(gsm);
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DeleteAllSMS:foldernum > folders.Number");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DeleteAllSMS:foldernum > folders.Number");
 		return -1;
 	}
 
@@ -467,7 +467,7 @@ int SmsMgr::DeleteAllSMS(int foldernum)
 	error = GSM_TerminateConnection(gsm);
 	if(error_handler(gsm,error)!=0)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DeleteAllSMS:GSM_TerminateConnection() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DeleteAllSMS:GSM_TerminateConnection() failed");
 		return -1;
 	}
 
@@ -538,7 +538,7 @@ int SmsMgr::SendSms(char* recipient_number,char* message_text)
 	s = GSM_AllocStateMachine();
 	if (s == NULL)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::SendSms:GSM_AllocStateMachine() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::SendSms:GSM_AllocStateMachine() failed");
 		return -1;
 	}
 
@@ -557,7 +557,7 @@ int SmsMgr::SendSms(char* recipient_number,char* message_text)
 	error = GSM_InitConnection(s, 1);
 	if(error_handler(s,error)!=0)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::SendSms:GSM_InitConnection() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::SendSms:GSM_InitConnection() failed");
 		return -1;
 	}
 
@@ -568,7 +568,7 @@ int SmsMgr::SendSms(char* recipient_number,char* message_text)
 	error = GSM_GetSMSC(s, &PhoneSMSC);
 	if(error_handler(s,error)!=0)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::SendSms:GSM_GetSMSC() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::SendSms:GSM_GetSMSC() failed");
 		return -1;
 	}
 
@@ -585,7 +585,7 @@ int SmsMgr::SendSms(char* recipient_number,char* message_text)
 	error = GSM_SendSMS(s, &sms);
 	if(error_handler(s,error)!=0)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::SendSms:GSM_SendSMS() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::SendSms:GSM_SendSMS() failed");
 		return -1;
 	}
 
@@ -614,7 +614,7 @@ int SmsMgr::SendSms(char* recipient_number,char* message_text)
 	error = GSM_TerminateConnection(s);
 	if(error_handler(s,error)!=0)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::SendSms:GSM_TerminateConnection() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::SendSms:GSM_TerminateConnection() failed");
 		return -1;
 	}
 
@@ -648,7 +648,7 @@ int SmsMgr::DialVoice(char* recipient_number)
 	gsm = GSM_AllocStateMachine();
 	if (gsm == NULL)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_AllocStateMachine() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_AllocStateMachine() failed");
 		return -1;
 	}
 
@@ -666,7 +666,7 @@ int SmsMgr::DialVoice(char* recipient_number)
 	error = GSM_InitConnection(gsm, 1);
 	if(error_handler(gsm,error)!=0)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_InitConnection() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_InitConnection() failed");
 		return -1;
 	}
 
@@ -680,14 +680,14 @@ int SmsMgr::DialVoice(char* recipient_number)
 	error = GSM_SetIncomingCall(gsm, TRUE);
 	if(error_handler(gsm,error)!=0)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_SetIncomingCall() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_SetIncomingCall() failed");
 		return -1;
 	}
 	//Print_Error(error);
 	error = GSM_DialVoice(gsm, recipient_number, ShowNumber);
 	if(error_handler(gsm,error)!=0)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_DialVoice() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_DialVoice() failed");
 		return -1;
 	}
 	//Print_Error(error);
@@ -705,7 +705,7 @@ int SmsMgr::DialVoice(char* recipient_number)
 		error = GSM_CancelCall(gsm, TerminateID, FALSE);
 		if(error_handler(gsm,error)!=0)
 		{
-			LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_CancelCall(FALSE) failed");
+			//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_CancelCall(FALSE) failed");
 			return -1;
 		}
 	}
@@ -714,7 +714,7 @@ int SmsMgr::DialVoice(char* recipient_number)
 		error = GSM_CancelCall(gsm, 0, TRUE);
 		if(error_handler(gsm,error)!=0)
 		{
-			LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_CancelCall(TRUE) failed");
+			//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_CancelCall(TRUE) failed");
 			return -1;
 		}
 	}
@@ -723,7 +723,7 @@ int SmsMgr::DialVoice(char* recipient_number)
 	error = GSM_TerminateConnection(gsm);
 	if(error_handler(gsm,error)!=0)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_TerminateConnection() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialVoice:GSM_TerminateConnection() failed");
 		return -1;
 	}
 
@@ -802,7 +802,7 @@ int SmsMgr::DialUSSDCode(char* code,char* return_str)
 //cout<<"DialUSSDCode = 0"<<endl;
 	if (gsm == NULL)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_AllocStateMachine() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_AllocStateMachine() failed");
 		return -1;
 	}
 //cout<<"DialUSSDCode = 1"<<endl;
@@ -821,7 +821,7 @@ int SmsMgr::DialUSSDCode(char* code,char* return_str)
 	error = GSM_InitConnection(gsm, 1);
 	if(error_handler(gsm,error)!=0)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_InitConnection() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_InitConnection() failed");
 		return -1;
 	}
 
@@ -830,7 +830,7 @@ int SmsMgr::DialUSSDCode(char* code,char* return_str)
 	error=GSM_SetIncomingUSSD(gsm,TRUE);
 	if(error_handler(gsm,error)!=0)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_SetIncomingUSSD() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_SetIncomingUSSD() failed");
 		return -1;
 	}
 
@@ -842,7 +842,7 @@ int SmsMgr::DialUSSDCode(char* code,char* return_str)
 	}
 	if(error_handler(gsm,error)!=0)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_DialService() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_DialService() failed");
 		return -1;
 	}
 
@@ -876,7 +876,7 @@ int SmsMgr::DialUSSDCode(char* code,char* return_str)
         error=GSM_SetIncomingUSSD(gsm, FALSE);
 	if(error_handler(gsm,error)!=0)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_SetIncomingUSSD() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_SetIncomingUSSD() failed");
 		return -1;
 	}
 
@@ -888,7 +888,7 @@ int SmsMgr::DialUSSDCode(char* code,char* return_str)
 	error = GSM_TerminateConnection(gsm);
 	if(error_handler(gsm,error)!=0)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_TerminateConnection() failed");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:GSM_TerminateConnection() failed");
 		return -1;
 	}
 
@@ -897,7 +897,7 @@ int SmsMgr::DialUSSDCode(char* code,char* return_str)
 
 	if(timeout>=300)
 	{
-		LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:timeout!!! ussd code didnt arrive");
+		//LOG_DEBUG_MSG(LogFlag,"BRBOX:bboxsms","SmsMgr::DialUSSDCode:timeout!!! ussd code didnt arrive");
 		return -1;//wait timed out: ussd code didnt arrive
 	}
 	return 0;
