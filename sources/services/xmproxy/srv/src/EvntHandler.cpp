@@ -50,7 +50,8 @@ void EvntHandler::ReceiveEvent(int cltToken,int evntNum,int evntArg)
 		char taskIDString[255];char taskIDResult[255];taskIDResult[254]='\0';
 		sprintf(taskIDString,"%d",evntArg);
 		XmppMgr *pXmpp=(XmppMgr*)pDataCache->pXmpMgr;
-		if(pXmpp->IsItMyAsyncTaskResp(evntArg,cltToken)==RPC_SRV_RESULT_SUCCESS)
+		//if(pXmpp->IsItMyAsyncTaskResp(evntArg,cltToken)==RPC_SRV_RESULT_SUCCESS)
+		if(pXmpp->AccessAsyncTaskList(evntArg,cltToken,false)==RPC_SRV_RESULT_SUCCESS)
 		{
 			ADJsonRpcClient Client;
 			if(Client.rpc_server_connect("127.0.0.1",cltToken)!=0)

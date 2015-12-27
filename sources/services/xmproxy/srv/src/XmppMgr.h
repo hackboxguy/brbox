@@ -150,7 +150,9 @@ public:
 	int AttachHeartBeat(ADTimer* pTimer);
 	RPC_SRV_RESULT RpcResponseCallback(RPC_SRV_RESULT taskRes,int taskID);//called by eventHandler
 	RPC_SRV_RESULT RpcResponseCallback(std::string taskRes,int taskID);
-	RPC_SRV_RESULT IsItMyAsyncTaskResp(int tid,int port);
+	//RPC_SRV_RESULT IsItMyAsyncTaskResp(int tid,int port);
+	RPC_SRV_RESULT AccessAsyncTaskList(int tid, int port, bool insertEntryFlag=true);
+
 };
 #endif
 
