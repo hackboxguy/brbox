@@ -54,7 +54,10 @@ void EvntHandler::ReceiveEvent(int cltToken,int evntNum,int evntArg)
 		{
 			ADJsonRpcClient Client;
 			if(Client.rpc_server_connect("127.0.0.1",cltToken)!=0)
-				return;// RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+			{
+			LOG_DEBUG_MSG_1_ARG(true,"BRBOX:xmproxy","EvntHandler::ReceiveEvent::Conn Err, cltToken=%d",cltToken);
+				return ;// RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+			}
 			RPC_SRV_RESULT result=Client.get_string_type_with_string_para((char*)ADLIB_RPC_NAME_GET_TASK_STATUS,
 						(char*)ADLIB_RPC_PARM_TASK_STS_ID,taskIDString,taskIDResult,(char*)ADLIB_RPC_PARM_TASK_STS);
 			Client.rpc_server_disconnect();
@@ -63,7 +66,7 @@ void EvntHandler::ReceiveEvent(int cltToken,int evntNum,int evntArg)
 		}
 		else
 		{
-			LOG_DEBUG_MSG_2_ARG(get_debug_log_flag(),"BRBOX:xmproxy","EvntHandler::ReceiveEvent::Entry not Found!!! evntArg=%d,cltToken=%d",evntArg,cltToken);
+			LOG_DEBUG_MSG_2_ARG(true/*get_debug_log_flag()*/,"BRBOX:xmproxy","EvntHandler::ReceiveEvent::Entry not Found!!! evntArg=%d,cltToken=%d",evntArg,cltToken);
 		}
 	}
 }
