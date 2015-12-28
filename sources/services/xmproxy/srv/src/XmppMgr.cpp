@@ -16,10 +16,9 @@
 #include "ADJsonRpcMgr.hpp"
 using namespace std;
 /* ------------------------------------------------------------------------- */
-//supported commands over xmpp
+//supported commands over xmpp-channel
 XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] = 
 {
-	//rpc calls common to all services
 	{true ,EXMPP_CMD_GSM_MODEM_IDENT         , "gsmcheck"     ,""},
 	{true ,EXMPP_CMD_SMS_LIST_UPDATE         , "smsupdate"    ,""},
 	{true ,EXMPP_CMD_SMS_GET_TOTAL           , "smstotal"     ,""},
@@ -36,7 +35,7 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{true ,EXMPP_CMD_FMW_HOSTNAME            , "hostname"     ,"[name]"},
 	{true ,EXMPP_CMD_FMW_RESET_HOSTNAME      , "resethostname",""},
 	{true ,EXMPP_CMD_FMW_GET_MYIP            , "publicip"     ,""},
-	{false,EXMPP_CMD_FMW_GET_LOCALIP         , "localip"      ,""},
+	{true ,EXMPP_CMD_FMW_GET_LOCALIP         , "localip"      ,""},
 	{true ,EXMPP_CMD_DEBUG_LOG_STS           , "logsts"       ,""},
 	{true ,EXMPP_CMD_LOG_UPDATE              , "logupdate"    ,""},
 	{true ,EXMPP_CMD_LOG_COUNT               , "logcount"     ,""},
@@ -211,6 +210,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_LOG_UPDATE      :res=proc_cmd_log_list_update(cmdcmdMsg,returnval);break;//inProg
 				case EXMPP_CMD_LOG_COUNT       :res=proc_cmd_log_get_count(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_LOG_MSG         :res=proc_cmd_log_get_line(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_FMW_GET_LOCALIP :res=proc_cmd_fmw_get_localip(cmdcmdMsg,returnval);break;
 				default                        :break;
 			}
 			result.pop_front();
@@ -670,6 +670,19 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_get_myip(std::string msg,std::string &retur
 	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
 	RPC_SRV_RESULT result = Client.get_string_type((char*)"get_my_public_ip",(char*)"ip",temp_str);
+	Client.rpc_server_disconnect();
+	returnval=temp_str;
+	return result;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_get_localip(std::string msg,std::string &returnval)
+{
+	char temp_str[255];temp_str[0]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result = Client.get_string_type_with_string_para((char*)"get_ip_addr",(char*)"iface",(char*)"eth0",
+									temp_str,(char*)"addr");
 	Client.rpc_server_disconnect();
 	returnval=temp_str;
 	return result;

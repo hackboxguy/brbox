@@ -139,6 +139,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_log_list_update(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_log_get_count(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_log_get_line(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_fmw_get_localip(std::string msg,std::string &returnval);
 	std::string print_help();
 public:
 	XmppMgr();
