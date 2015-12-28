@@ -7,6 +7,10 @@ SysmgrCltCmdline::SysmgrCltCmdline()
 	CmdlineHelper.attach_helper(this);
 	CmdlineHelper.insert_options_entry((char*)"mac" ,optional_argument,EJSON_SYSMGR_RPC_GET_MAC_ADDR);
 	CmdlineHelper.insert_help_entry((char*)"--mac=ethN,<addr>          [get/set mac address]");
+	CmdlineHelper.insert_options_entry((char*)"ipaddr" ,optional_argument,EJSON_SYSMGR_RPC_GET_IP_ADDR);
+	CmdlineHelper.insert_help_entry((char*)"--ipaddr=ethN,<addr>       [get/set ip address]");
+	CmdlineHelper.insert_options_entry((char*)"netmask" ,optional_argument,EJSON_SYSMGR_RPC_GET_NETMASK);
+	CmdlineHelper.insert_help_entry((char*)"--netmask=ethN,<addr>      [get/set netmask address]");
 	CmdlineHelper.insert_options_entry((char*)"ethcount" ,optional_argument,EJSON_SYSMGR_RPC_GET_ETH_COUNT);
 	CmdlineHelper.insert_help_entry((char*)"--ethcount                 [read total available eth interfaces]");
 	CmdlineHelper.insert_options_entry((char*)"ethname" ,optional_argument,EJSON_SYSMGR_RPC_GET_ETH_NAME);
@@ -64,6 +68,24 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			(EJSON_SYSMGR_RPC_GET_MAC_ADDR,EJSON_SYSMGR_RPC_SET_MAC_ADDR,SYSMGR_RPC_MAC_ADDR_GET,SYSMGR_RPC_MAC_ADDR_SET,
 			SYSMGR_RPC_MAC_ADDR_ARG_IFACE,EJSON_SYSMGR_IFACE_TYPE_UNKNOWN,&table[0],
 			SYSMGR_RPC_MAC_ADDR_ARG,sub_arg);
+			}
+			break;
+		case EJSON_SYSMGR_RPC_GET_IP_ADDR:
+			{
+			const char *table[]   = SYSMGR_RPC_IP_ADDR_ARG_IFACE_TABL;
+			CmdlineHelper.push_string_get_set_with_enum_arg
+			(EJSON_SYSMGR_RPC_GET_IP_ADDR,EJSON_SYSMGR_RPC_SET_IP_ADDR,SYSMGR_RPC_IP_ADDR_GET,SYSMGR_RPC_IP_ADDR_SET,
+			SYSMGR_RPC_IP_ADDR_ARG_IFACE,EJSON_SYSMGR_IFACE_TYPE_UNKNOWN,&table[0],
+			SYSMGR_RPC_IP_ADDR_ARG,sub_arg);
+			}
+			break;
+		case EJSON_SYSMGR_RPC_GET_NETMASK:
+			{
+			const char *table[]   = SYSMGR_RPC_IP_ADDR_ARG_IFACE_TABL;
+			CmdlineHelper.push_string_get_set_with_enum_arg
+			(EJSON_SYSMGR_RPC_GET_NETMASK,EJSON_SYSMGR_RPC_SET_NETMASK,SYSMGR_RPC_NETMASK_GET,SYSMGR_RPC_NETMASK_SET,
+			SYSMGR_RPC_NETMASK_ARG_IFACE,EJSON_SYSMGR_IFACE_TYPE_UNKNOWN,&table[0],
+			SYSMGR_RPC_NETMASK_ARG,sub_arg);
 			}
 			break;
 		case EJSON_SYSMGR_RPC_GET_ETH_COUNT:

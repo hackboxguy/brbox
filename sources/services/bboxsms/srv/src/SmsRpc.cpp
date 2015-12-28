@@ -1,6 +1,6 @@
 #include "SmsRpc.h"
 #include "SmsMgr.h"
-#define ASYNC_TASK_EVENT_DELAY 250000 //needed because event might go too fast to subscriber before being handled in a proper way
+#define ASYNC_TASK_EVENT_DELAY 200000 //needed because event might go too fast to subscriber before being handled in a proper way
 
 /* ------------------------------------------------------------------------- */
 SmsRpc:: SmsRpc(std::string rpcName,int myIndex,bool emu, bool log,BBOXSMS_CMN_DATA_CACHE *pData):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)

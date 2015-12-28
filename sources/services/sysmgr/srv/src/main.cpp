@@ -58,6 +58,15 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&Ethcount);
 	NetRpc Ethname (SYSMGR_RPC_ETH_NAME_GET ,EJSON_SYSMGR_RPC_GET_ETH_NAME ,emulat,dbglog,&DataCache);  //network related rpc handler class
 	RpcMgr.AttachRpc(&Ethname);
+	NetRpc IpGet  (SYSMGR_RPC_IP_ADDR_GET ,EJSON_SYSMGR_RPC_GET_IP_ADDR ,emulat,dbglog,&DataCache);  //network related rpc handler class
+	RpcMgr.AttachRpc(&IpGet);
+	NetRpc IpSet  (SYSMGR_RPC_IP_ADDR_SET ,EJSON_SYSMGR_RPC_SET_IP_ADDR ,emulat,dbglog,&DataCache);  //network related rpc handler class
+	RpcMgr.AttachRpc(&IpSet);
+	NetRpc NetmaskGet(SYSMGR_RPC_NETMASK_GET ,EJSON_SYSMGR_RPC_GET_NETMASK ,emulat,dbglog,&DataCache);//network related rpc handler class
+	RpcMgr.AttachRpc(&NetmaskGet);
+	NetRpc NetmaskSet(SYSMGR_RPC_NETMASK_SET ,EJSON_SYSMGR_RPC_SET_NETMASK ,emulat,dbglog,&DataCache);//network related rpc handler class
+	RpcMgr.AttachRpc(&NetmaskSet);
+
 	//system related rpc's
 	SysRpc LoadInfoGet(SYSMGR_RPC_LOADINFO_GET  ,EJSON_SYSMGR_RPC_GET_LOADINFO    ,emulat,dbglog,&DataCache);//sys related rpc handler class
 	RpcMgr.AttachRpc(&LoadInfoGet);

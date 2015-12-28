@@ -33,6 +33,20 @@ public:
 	int json_to_bin_get_eth_name(JsonDataCommObj* pReq);
 	int bin_to_json_get_eth_name(JsonDataCommObj* pReq);
 	int process_get_eth_name(JsonDataCommObj* pReq);
+
+	int json_to_bin_get_ip_addr(JsonDataCommObj* pReq);
+	int bin_to_json_get_ip_addr(JsonDataCommObj* pReq);
+	int process_get_ip_addr(JsonDataCommObj* pReq);
+	int json_to_bin_set_ip_addr(JsonDataCommObj* pReq);
+	int bin_to_json_set_ip_addr(JsonDataCommObj* pReq);
+	int process_set_ip_addr(JsonDataCommObj* pReq);
+
+	int json_to_bin_get_netmask(JsonDataCommObj* pReq);
+	int bin_to_json_get_netmask(JsonDataCommObj* pReq);
+	int process_get_netmask(JsonDataCommObj* pReq);
+	int json_to_bin_set_netmask(JsonDataCommObj* pReq);
+	int bin_to_json_set_netmask(JsonDataCommObj* pReq);
+	int process_set_netmask(JsonDataCommObj* pReq);
 };
 /* ------------------------------------------------------------------------- */
 

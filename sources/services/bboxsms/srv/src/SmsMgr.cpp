@@ -693,7 +693,7 @@ int SmsMgr::DialVoice(char* recipient_number)
 	//Print_Error(error);
 	//sleep(GetInt(argv[3]));
 	int timeout=0;
-	while (timeout++ <300) //wait for 30seconds and then hangon
+	while (timeout++ <200) //wait for 20seconds and then hangon
 	{
 		//cout<<"DialVoice waiting "<<timeout<<endl;
 		usleep(100000);

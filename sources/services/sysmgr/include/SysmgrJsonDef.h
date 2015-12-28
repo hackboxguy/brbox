@@ -31,6 +31,10 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_SET_UPDATE_LOG, //reads BRBOX specific log lines from /tmp/messages and fills in vectorList 
 	EJSON_SYSMGR_RPC_GET_LOG_COUNT,  //returns total number of log lines which was filled in vectorList
 	EJSON_SYSMGR_RPC_GET_LOG_LINE,   //returns log-message of a given index from vectorList
+	EJSON_SYSMGR_RPC_GET_IP_ADDR,    //returns ip-addr of given "ethX" string
+	EJSON_SYSMGR_RPC_SET_IP_ADDR,    //sets ip-addr of given "ethX" string
+	EJSON_SYSMGR_RPC_GET_NETMASK,    //returns netmask of given "ethX" string
+	EJSON_SYSMGR_RPC_SET_NETMASK,    //sets netmask of given "ethX" string
 	//get device type
 	//EJSON_SYSMGR_RPC_IDENTIFY_DEVICE,
 	EJSON_SYSMGR_RPC_END,
@@ -258,7 +262,6 @@ typedef struct SYSMGR_MY_PUBLIC_IP_PACKET_T
 #define SYSMGR_RPC_LOG_ARG_INDX      "index"
 #define SYSMGR_RPC_LOG_ARG_LOGMSG    "logmsg"
 #define SYSMGR_RPC_LOG_ARG_TOTAL     "logcount"
-
 typedef struct SYSMGR_LOG_PACKET_T
 {
 	int index;
@@ -266,6 +269,27 @@ typedef struct SYSMGR_LOG_PACKET_T
 	char logmsg[1024];
 	int taskID;
 }SYSMGR_LOG_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_GET_IP_ADDR,    //returns ip-addr of given "ethX" string
+//EJSON_SYSMGR_RPC_SET_IP_ADDR,    //sets ip-addr of given "ethX" string
+//EJSON_SYSMGR_RPC_GET_NETMASK,    //returns netmask of given "ethX" string
+//EJSON_SYSMGR_RPC_SET_NETMASK,    //sets netmask of given "ethX" string
+#define SYSMGR_RPC_IP_ADDR_GET             "get_ip_addr"
+#define SYSMGR_RPC_IP_ADDR_SET             "set_ip_addr"
+#define SYSMGR_RPC_IP_ADDR_ARG             "addr"
+#define SYSMGR_RPC_IP_ADDR_ARG_IFACE       SYSMGR_RPC_MAC_ADDR_ARG_IFACE
+#define SYSMGR_RPC_IP_ADDR_ARG_IFACE_TABL  SYSMGR_RPC_MAC_ADDR_ARG_IFACE_TABL
+#define SYSMGR_RPC_NETMASK_GET             "get_netmask"
+#define SYSMGR_RPC_NETMASK_SET             "set_netmask"
+#define SYSMGR_RPC_NETMASK_ARG             "addr"
+#define SYSMGR_RPC_NETMASK_ARG_IFACE       SYSMGR_RPC_MAC_ADDR_ARG_IFACE
+#define SYSMGR_RPC_NETMASK_ARG_IFACE_TABL  SYSMGR_RPC_MAC_ADDR_ARG_IFACE_TABL
+typedef struct SYSMGR_NET_INFO_PACKET_T //common communication object for netinfo related rpc's
+{
+	EJSON_SYSMGR_IFACE_TYPE eth_type;
+	char addr[512];
+	char eth_name[512];
+}SYSMGR_NET_INFO_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct SYSMGR_CMN_DATA_CACHE_T
