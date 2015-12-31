@@ -6,9 +6,34 @@ CLIENT_NAME=/opt/fmw/bin/xmproxyclt
 SERVER_NAME=/opt/fmw/bin/xmproxysrv
 DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
 XMPP_LOGIN_DATA=/mnt/settings/etc/xmpp.login
+BOOT_BRBOX_PART=mmcblk0p1
+SETTINGS_MOUNT_POINT=/mnt/settings
+CheckIfNewXmppLoginExists() 
+{
+	TEMP_BOOT_MOUNT_POINT=$(mktemp -d)
+	if [ $? != "0" ]; then #unable to create temp mount directory
+		echo "Error: Unable to create temp directory for boot mount!!!"
+		return 1
+	fi
+	BRBOX_BOOT_PARTITION=/dev/$BOOT_BRBOX_PART
+	mount $BRBOX_BOOT_PARTITION $TEMP_BOOT_MOUNT_POINT
+	if [ $? != "0" ]; then #unable mount device, boot-filesystem might be corrupt
+		echo "Error: Unable to mount $BRBOX_BOOT_PARTITION to $TEMP_BOOT_MOUNT_POINT!!!"
+		rm -rf $TEMP_BOOT_MOUNT_POINT
+		return 1
+	fi
+	#if there exist new xmpp.login under boot partition, copy this new file to /mnt/settings/etc, else do nothing
+	cmp $TEMP_BOOT_MOUNT_POINT/xmpp.login $XMPP_LOGIN_DATA > /dev/null 2>/dev/null
+	[ $? != 0 ] && cp $TEMP_BOOT_MOUNT_POINT/xmpp.login $XMPP_LOGIN_DATA
+	sync
+	umount $BRBOX_BOOT_PARTITION
+	rm -rf $TEMP_BOOT_MOUNT_POINT
+	return 0
+}
 start() {
 	echo -n "Starting $SERVER_NAME Service: "
 	DEV_TYPE=$(cat $DEV_TYPE_FILE)
+	CheckIfNewXmppLoginExists
 	$SERVER_NAME --boardtype=$DEV_TYPE --loginfile=$XMPP_LOGIN_DATA &
 	echo "OK"
 }
