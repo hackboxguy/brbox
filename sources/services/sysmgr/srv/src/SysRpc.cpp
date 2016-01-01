@@ -374,14 +374,15 @@ RPC_SRV_RESULT SysRpc::process_async_set_devop(SYSMGR_DEV_OP_PACKET* pPacket)
 	{
 		case EJSON_SYSMGR_DEV_OP_IDLE   :
 		case EJSON_SYSMGR_DEV_OP_ON     :
-		case EJSON_SYSMGR_DEV_OP_STANDBY:
 			pDataCache->DevOp.operation=pPacket->operation;
 			ret_val=RPC_SRV_RESULT_SUCCESS;
 			break;
-		//case EJSON_SYSMGR_DEV_OP_BOOT :
+		case EJSON_SYSMGR_DEV_OP_STANDBY:
+			sprintf(cmdline,"%s","sleep 3;poweroff");
+			ret_val=SysInfo.run_shell_script(cmdline,get_emulation_flag());
+			break;
 		case EJSON_SYSMGR_DEV_OP_REBOOT :
 			sprintf(cmdline,"%s","sleep 3;reboot");//CMDLINE_TRIGGER_REBOOT_CMD);
-			//#define CMDLINE_TRIGGER_REBOOT_CMD       "sleep 3;reboot"
 			ret_val=SysInfo.run_shell_script(cmdline,get_emulation_flag());
 			break;
 		default:

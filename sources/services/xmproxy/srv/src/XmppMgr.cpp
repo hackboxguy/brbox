@@ -31,6 +31,7 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{true ,EXMPP_CMD_FMW_GET_VERSION         , "fmwver"       ,""},
 	{true ,EXMPP_CMD_FMW_UPDATE              , "fmwupdt"      ,"<filename>"},
 	{true ,EXMPP_CMD_FMW_REBOOT              , "reboot"       ,""},
+	{true ,EXMPP_CMD_FMW_POWEROFF            , "poweroff"     ,""},
 	{true ,EXMPP_CMD_FMW_UPTIME              , "uptime"       ,""},
 	{true ,EXMPP_CMD_FMW_HOSTNAME            , "hostname"     ,"[name]"},
 	{true ,EXMPP_CMD_FMW_RESET_HOSTNAME      , "resethostname",""},
@@ -222,6 +223,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_FMW_UPDATE_STS  :res=proc_cmd_fmw_update_sts(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_FMW_UPDATE_RES  :res=proc_cmd_fmw_update_res(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_FMW_REBOOT      :res=proc_cmd_fmw_reboot(cmdcmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_FMW_POWEROFF    :res=proc_cmd_fmw_poweroff(cmdcmdMsg,returnval);break;//inProg
 				case EXMPP_CMD_FMW_UPTIME      :res=proc_cmd_fmw_uptime(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_FMW_HOSTNAME    :res=proc_cmd_fmw_hostname(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_FMW_GET_MYIP    :res=proc_cmd_fmw_get_myip(cmdcmdMsg,returnval);break;
@@ -574,6 +576,19 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_reboot(std::string msg,std::string &returnv
 	returnval="taskID=";returnval+=temp_str;
 	if(result==RPC_SRV_RESULT_IN_PROG)
 		//AsyncTaskList.push_back(AyncEventEntry(atoi(temp_str),ADCMN_PORT_SYSMGR));
+		AccessAsyncTaskList(atoi(temp_str),ADCMN_PORT_SYSMGR);
+	return result;
+}
+RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_poweroff(std::string msg,std::string &returnval)
+{
+	char temp_str[255];temp_str[0]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result = Client.set_single_string_get_single_string_type((char*)"set_device_operation",(char*)"operation",(char*)"standby",(char*)"taskId",temp_str);
+	Client.rpc_server_disconnect();
+	returnval="taskID=";returnval+=temp_str;
+	if(result==RPC_SRV_RESULT_IN_PROG)
 		AccessAsyncTaskList(atoi(temp_str),ADCMN_PORT_SYSMGR);
 	return result;
 }

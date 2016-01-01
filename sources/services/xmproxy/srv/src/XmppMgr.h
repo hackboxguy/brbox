@@ -13,8 +13,8 @@ using namespace std;
 #define GITHUB_FMW_DOWNLOAD_FOLDER "http://github.com/hackboxguy/downloads/raw/master/"
 
 #define BBOXSMS_SERVER_ADDR "127.0.0.1"
-#define EXMPP_CMD_TABL    {"smsdeleteall","smsdelete","smsget","smssend","smsupdate","smstotal","fmwver","fmwupdt","fmwupsts","fmwupres","reboot","uptime","hostname","myip","resethostname","dialvoice","dialussd","readussd","logsts","gsmcheck","logupdate","logcount","logmsg","unknown","none","\0"}
-#define EXMPP_CMD_TABL_HELP    {"","<zero_based_index>","<zero_based_index>","<phone-num> <msg>","","","","<filename>","","","","","","","","<phone-num>","<ussd-code>","","<port> [sts]","","","","<index>","unknown","none","\0"}
+//#define EXMPP_CMD_TABL    {"smsdeleteall","smsdelete","smsget","smssend","smsupdate","smstotal","fmwver","fmwupdt","fmwupsts","fmwupres","reboot","uptime","hostname","myip","resethostname","dialvoice","dialussd","readussd","logsts","gsmcheck","logupdate","logcount","logmsg","unknown","none","\0"}
+//#define EXMPP_CMD_TABL_HELP    {"","<zero_based_index>","<zero_based_index>","<phone-num> <msg>","","","","<filename>","","","","","","","","<phone-num>","<ussd-code>","","<port> [sts]","","","","<index>","unknown","none","\0"}
 
 typedef enum EXMPP_CMD_TYPES_T
 {
@@ -44,6 +44,7 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_LOG_COUNT, //read total items in vector list
 	EXMPP_CMD_LOG_MSG,   //read item-msg from vector list
 	EXMPP_CMD_FMW_GET_LOCALIP,
+	EXMPP_CMD_FMW_POWEROFF,//shutdown linux and dont reboot
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -124,6 +125,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_fmw_get_version(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_update(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_reboot(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_fmw_poweroff(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_update_sts(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_update_res(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_uptime(std::string msg,std::string &returnval);
