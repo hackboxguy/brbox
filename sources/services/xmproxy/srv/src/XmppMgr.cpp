@@ -703,7 +703,6 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_hostname(std::string msg,std::string &retur
 }
 RPC_SRV_RESULT XmppMgr::proc_cmd_gpio(std::string msg,std::string &returnval)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
 	std::string cmd,cmdArg,cmdArg2;
 	stringstream msgstream(msg);
 	msgstream >> cmd;
