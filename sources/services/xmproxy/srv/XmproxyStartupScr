@@ -5,7 +5,8 @@
 CLIENT_NAME=/opt/fmw/bin/xmproxyclt
 SERVER_NAME=/opt/fmw/bin/xmproxysrv
 DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
-XMPP_LOGIN_DATA=/mnt/settings/etc/xmpp.login
+LOGINFILE_NAME=xmpp-login.txt
+XMPP_LOGIN_DATA=/mnt/settings/etc/$LOGINFILE_NAME
 BOOT_BRBOX_PART=mmcblk0p1
 SETTINGS_MOUNT_POINT=/mnt/settings
 CheckIfNewXmppLoginExists() 
@@ -23,8 +24,10 @@ CheckIfNewXmppLoginExists()
 		return 1
 	fi
 	#if there exist new xmpp.login under boot partition, copy this new file to /mnt/settings/etc, else do nothing
-	cmp $TEMP_BOOT_MOUNT_POINT/xmpp.login $XMPP_LOGIN_DATA > /dev/null 2>/dev/null
-	[ $? != 0 ] && cp $TEMP_BOOT_MOUNT_POINT/xmpp.login $XMPP_LOGIN_DATA
+	if [ -f "$TEMP_BOOT_MOUNT_POINT/$LOGINFILE_NAME" ]; then
+		cmp $TEMP_BOOT_MOUNT_POINT/$LOGINFILE_NAME $XMPP_LOGIN_DATA > /dev/null 2>/dev/null
+		[ $? != 0 ] && cp $TEMP_BOOT_MOUNT_POINT/$LOGINFILE_NAME $XMPP_LOGIN_DATA
+	fi	
 	sync
 	umount $BRBOX_BOOT_PARTITION
 	rm -rf $TEMP_BOOT_MOUNT_POINT
