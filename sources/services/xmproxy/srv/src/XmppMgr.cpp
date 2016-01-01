@@ -28,8 +28,8 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{true ,EXMPP_CMD_DIAL_VOICE              , "dialvoice"    ,"<phone-num>"},
 	{true ,EXMPP_CMD_DIAL_USSD               , "dialussd"     ,"<ussd-code>"},
 	{true ,EXMPP_CMD_GET_USSD                , "readussd"     ,""},
-	{true ,EXMPP_CMD_FMW_GET_VERSION         , "fmwver"       ,""},
-	{true ,EXMPP_CMD_FMW_UPDATE              , "fmwupdt"      ,"<filename>"},
+	{true ,EXMPP_CMD_FMW_GET_VERSION         , "version"      ,""},
+	{true ,EXMPP_CMD_FMW_UPDATE              , "sysupdate"    ,""},
 	{true ,EXMPP_CMD_FMW_REBOOT              , "reboot"       ,""},
 	{true ,EXMPP_CMD_FMW_POWEROFF            , "poweroff"     ,""},
 	{true ,EXMPP_CMD_FMW_UPTIME              , "uptime"       ,""},
@@ -37,10 +37,10 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{true ,EXMPP_CMD_FMW_RESET_HOSTNAME      , "resethostname",""},
 	{true ,EXMPP_CMD_FMW_GET_MYIP            , "publicip"     ,""},
 	{true ,EXMPP_CMD_FMW_GET_LOCALIP         , "localip"      ,""},
-	{true ,EXMPP_CMD_DEBUG_LOG_STS           , "logsts"       ,""},
-	{true ,EXMPP_CMD_LOG_UPDATE              , "logupdate"    ,""},
-	{true ,EXMPP_CMD_LOG_COUNT               , "logcount"     ,""},
-	{true ,EXMPP_CMD_LOG_MSG                 , "logmsg"       ,"<zero_index_lineNum>"},
+	{false ,EXMPP_CMD_DEBUG_LOG_STS          , "logsts"       ,""},//due to bug, disabled(to be fixed later)
+	{false ,EXMPP_CMD_LOG_UPDATE             , "logupdate"    ,""},//due to bug, disabled(to be fixed later)
+	{false ,EXMPP_CMD_LOG_COUNT              , "logcount"     ,""},//due to bug, disabled(to be fixed later)
+	{false ,EXMPP_CMD_LOG_MSG                , "logmsg"       ,"<zero_index_lineNum>"},//due to bug, disabled(to be fixed later)
 	{true ,EXMPP_CMD_GPIO                    , "gpio"         ,"<gpio_num> <sts[0/1]>"}
 };
 /* ------------------------------------------------------------------------- */
@@ -521,17 +521,24 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg,std::string &returnv
 	//00:06:05.454<--{ "jsonrpc": "2.0", "result": { "return": "InProgress", "taskId": 1 }, "id": 0 }
 	//github-file-download-cmd: wget -O /tmp/uBrBox.uimg http://github.com/hackboxguy/downloads/raw/master/README.md
 
-	std::string cmd,cmdArg,URLPath;
+	std::string cmd,URLPath;//cmdArg
 	stringstream msgstream(msg);
 	msgstream >> cmd;
-	msgstream >> cmdArg;
+	//msgstream >> cmdArg;
 	if(cmd.size()<=0)
 		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
-	if(cmdArg.size()<=0)
-		return RPC_SRV_RESULT_ARG_ERROR;
+	//if(cmdArg.size()<=0)
+	//	return RPC_SRV_RESULT_ARG_ERROR;
+
+	std::ifstream file(BRBOX_SYS_CONFIG_FILE_PATH);
+	std::string line;
+	std::getline(file, line);
+	if(line.size()<=0)
+		return RPC_SRV_RESULT_FAIL;//unable to detect system type
+	line+=".uimg";//ex: raspi1-rbox.uimg
 
 	URLPath=GITHUB_FMW_DOWNLOAD_FOLDER;//"http://github.com/hackboxguy/downloads/raw/master/" + "uBrBoxRoot.uimg"
-	URLPath+=cmdArg;
+	URLPath+=line;//cmdArg;
 	//LOG_DEBUG_MSG_1_ARG(true,"BRBOX:xmproxy","XmppMgr::proc_cmd_fmw_update::cmdARG=%s",cmdArg.c_str());
 	//LOG_DEBUG_MSG_1_ARG(true,"BRBOX:xmproxy","XmppMgr::proc_cmd_fmw_update::filepath=%s",URLPath.c_str());
 
