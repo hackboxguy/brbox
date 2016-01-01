@@ -37,7 +37,12 @@ start() {
 	echo -n "Starting $SERVER_NAME Service: "
 	DEV_TYPE=$(cat $DEV_TYPE_FILE)
 	CheckIfNewXmppLoginExists
-	$SERVER_NAME --boardtype=$DEV_TYPE --loginfile=$XMPP_LOGIN_DATA &
+	GSM_NODES=$(cat /proc/tty/driver/usbserial 2>/dev/null | grep "GSM modem"|wc -l)
+	if [ $GSM_NODES = "3" ]; then #if usb-gsm-module is connected, then let xmproxy know
+		$SERVER_NAME --boardtype=$DEV_TYPE --loginfile=$XMPP_LOGIN_DATA --usbgsm=1 &
+	else
+		$SERVER_NAME --boardtype=$DEV_TYPE --loginfile=$XMPP_LOGIN_DATA --usbgsm=0 &
+	fi
 	echo "OK"
 }
 

@@ -98,6 +98,30 @@ void XmppMgr::SetDebugLog(bool log)
 	DebugLog=log;
 	XmppProxy.SetDebugLog(log);
 }
+void XmppMgr::SetUSBGsmSts(bool sts)
+{
+	int total_cmds=sizeof(xmproxy_cmd_table)/sizeof(XMPROXY_CMD_TABLE);
+	for(int i=0;i<total_cmds;i++)
+	{
+		switch(xmproxy_cmd_table[i].cmd)
+		{
+			case EXMPP_CMD_GSM_MODEM_IDENT:
+			case EXMPP_CMD_SMS_LIST_UPDATE:
+			case EXMPP_CMD_SMS_GET_TOTAL  :
+			case EXMPP_CMD_SMS_GET        :
+			case EXMPP_CMD_SMS_DELETE_ALL :
+			case EXMPP_CMD_SMS_SEND       :
+			case EXMPP_CMD_DIAL_VOICE     :
+			case EXMPP_CMD_DIAL_USSD      :
+			case EXMPP_CMD_GET_USSD       :
+				if(xmproxy_cmd_table[i].cmdsts==true) //if default is disabled, then dont enable it
+					xmproxy_cmd_table[i].cmdsts=sts;
+				break;
+			default:
+				break;
+		}
+	}
+}
 /* ------------------------------------------------------------------------- */
 std::string XmppMgr::print_help()
 {

@@ -9,7 +9,7 @@ class MyCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 	char version_number[255];
 	ADCmdlineHelper CmdlineHelper;
 	char LoginFilePath[512];
-
+	bool UsbGSMSts;
 
 	//Chain-callback functions	
 	virtual int parse_my_cmdline_options(int arg, char* sub_arg);
@@ -28,6 +28,8 @@ public:
 	int get_port_number();
 	int get_dev_info(ADCMN_DEV_INFO *pInfo);
 	int get_login_filepath(char* filepath);
+	bool is_usbgsm_connected();
+
 	//service specific part
 };
 #endif

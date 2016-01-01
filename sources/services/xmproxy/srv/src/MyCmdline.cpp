@@ -4,6 +4,7 @@ using namespace std;
 typedef enum XMPROXY_CMDLINE_OPT_T
 {
 	XMPROXY_CMDLINE_OPT_LOGIN_FILE = 100,
+	XMPROXY_CMDLINE_OPT_USBGSM_STS,
 	XMPROXY_CMDLINE_OPT_UNKNOWN,
 	XMPROXY_CMDLINE_OPT_NONE
 }XMPROXY_CMDLINE_OPT;
@@ -17,7 +18,10 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 	//note:"hviptdln" are already used by the producer class in library
 	CmdlineHelper.insert_options_entry((char*)"loginfile" ,optional_argument,XMPROXY_CMDLINE_OPT_LOGIN_FILE);
 	CmdlineHelper.insert_help_entry((char*)"--loginfile=filepath (path to the file having xmpp user/pw details)");
+	CmdlineHelper.insert_options_entry((char*)"usbgsm" ,optional_argument,XMPROXY_CMDLINE_OPT_USBGSM_STS);
+	CmdlineHelper.insert_help_entry((char*)"--usbgsm=sts         (sts=0 means no usbgsm module connected)");
 	strcpy(LoginFilePath,XMPROXY_DEFAULT_LOGIN_FILE_PATH);
+	UsbGSMSts=false;
 }
 /*****************************************************************************/
 MyCmdline::~MyCmdline()
@@ -35,6 +39,18 @@ int MyCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 				strcpy(LoginFilePath,XMPROXY_DEFAULT_LOGIN_FILE_PATH);
 			else
 				strcpy(LoginFilePath,sub_arg);
+			break;
+		case XMPROXY_CMDLINE_OPT_USBGSM_STS:
+			if(CmdlineHelper.get_next_subargument(&sub_arg)==0)//no login filepath passed by user
+				UsbGSMSts=false;
+			else
+			{
+				int sts=atoi(sub_arg);
+				if(sts==1)
+					UsbGSMSts=true;
+				else
+					UsbGSMSts=false;
+			}
 			break;
 		default:return 0;break;	
 	}
@@ -111,6 +127,10 @@ int MyCmdline::get_login_filepath(char* filepath)
 {
 	strcpy(filepath,LoginFilePath);
 	return 0;
+}
+bool MyCmdline::is_usbgsm_connected()
+{
+	return UsbGSMSts;
 }
 /*****************************************************************************/
 
