@@ -40,7 +40,8 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{true ,EXMPP_CMD_DEBUG_LOG_STS           , "logsts"       ,""},
 	{true ,EXMPP_CMD_LOG_UPDATE              , "logupdate"    ,""},
 	{true ,EXMPP_CMD_LOG_COUNT               , "logcount"     ,""},
-	{true ,EXMPP_CMD_LOG_MSG                 , "logmsg"       ,"<zero_index_lineNum>"}
+	{true ,EXMPP_CMD_LOG_MSG                 , "logmsg"       ,"<zero_index_lineNum>"},
+	{true ,EXMPP_CMD_GPIO                    , "gpio"         ,"<gpio_num> <sts[0/1]>"}
 };
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
@@ -237,6 +238,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_LOG_COUNT       :res=proc_cmd_log_get_count(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_LOG_MSG         :res=proc_cmd_log_get_line(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_FMW_GET_LOCALIP :res=proc_cmd_fmw_get_localip(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_GPIO            :res=proc_cmd_gpio(cmdcmdMsg,returnval);break;
 				default                        :break;
 			}
 			result.pop_front();
@@ -698,6 +700,44 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_hostname(std::string msg,std::string &retur
 		return proc_cmd_fmw_get_hostname(msg,returnval);
 	else
 		return proc_cmd_fmw_set_hostname(msg);
+}
+RPC_SRV_RESULT XmppMgr::proc_cmd_gpio(std::string msg,std::string &returnval)
+{
+	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	std::string cmd,cmdArg,cmdArg2;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	msgstream >> cmdArg;
+	msgstream >> cmdArg2;
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0)//get-gpio pin number
+		return RPC_SRV_RESULT_ARG_ERROR;
+	if(cmdArg2.size()<=0)//read gpio pin
+	{
+		int gpioAddr=atoi(cmdArg.c_str());
+		char temp_str[255];temp_str[0]='\0';
+		ADJsonRpcClient Client;
+		if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_GPIOCTL)!=0)
+			return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+		RPC_SRV_RESULT result = Client.get_integer_type_with_addr_para((char*)"gpio_get",(char*)"addr",gpioAddr,
+										(char*)"data",temp_str);
+		Client.rpc_server_disconnect();
+		returnval=temp_str;
+		return result;
+	}
+	else //write gpio pin
+	{
+		int gpioAddr=atoi(cmdArg.c_str());
+		int gpioVal=atoi(cmdArg2.c_str());
+		ADJsonRpcClient Client;
+		if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_GPIOCTL)!=0)
+			return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+		RPC_SRV_RESULT result = Client.set_integer_type_with_addr_para((char*)"gpio_set",(char*)"addr",gpioAddr,
+										(char*)"data",gpioVal);
+		Client.rpc_server_disconnect();
+		return result;
+	}
 }
 /* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_get_myip(std::string msg,std::string &returnval)

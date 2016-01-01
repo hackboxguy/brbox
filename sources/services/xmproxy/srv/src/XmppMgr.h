@@ -45,6 +45,7 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_LOG_MSG,   //read item-msg from vector list
 	EXMPP_CMD_FMW_GET_LOCALIP,
 	EXMPP_CMD_FMW_POWEROFF,//shutdown linux and dont reboot
+	EXMPP_CMD_GPIO,//gpio pin read write
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -142,6 +143,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_log_get_count(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_log_get_line(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_get_localip(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_gpio(std::string msg,std::string &returnval);
 	std::string print_help();
 public:
 	XmppMgr();
