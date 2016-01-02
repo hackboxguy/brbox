@@ -27,14 +27,15 @@ ROOTFS_TYPE_BBB="BrBoxRtBbb"
 ROOTFS_TYPE_WDB="BrBoxRtWdb"
 
 BOARD_TYPE_BTR="baytrail"                 #base-build
-BOARD_TYPE_BTR_MEDIA="baytrail-media"                 #base-build
+BOARD_TYPE_BTR_MEDIA="baytrail-media"     #multimedia-application-build
 BOARD_TYPE_RP1="raspi1"                   #base-build
-BOARD_TYPE_RP1_SMSW="raspi1-smartsw"      #application-build
-BOARD_TYPE_RP1_RBOX="raspi1-rbox"          #application-build
-BOARD_TYPE_RP1_DSPT="raspi1-disptst"      #application-build
+BOARD_TYPE_RP1_SMSW="raspi1-smartsw"      #relayswitch-application-build
+BOARD_TYPE_RP1_RBOX="raspi1-rbox"         #remote-box-application-build
+BOARD_TYPE_RP1_DSPT="raspi1-disptst"      #display-test-application-build
 BOARD_TYPE_RP2="raspi2"                   #base-build
 BOARD_TYPE_BBB="bbb"                      #base-build
 BOARD_TYPE_BBBMMC="bbbmmc"                #base-build
+BOARD_TYPE_BBBMMC_RBOX="bbbmmc-rbox"      #remote-box-application-build
 BOARD_TYPE_WDB="wandboard"                #base-build
 ###############################################################################
 while getopts b:o:v:c:s:ip f
@@ -76,6 +77,10 @@ elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_BBB" ]; then
 	BR_BOARD_LINUX_CONFIG_PATH=board/beaglebone/
 	BOOT_IMG_SCRIPT=$(pwd)/scripts/beagle-bootdisk.sh
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_BBBMMC" ]; then
+	BR_BOARD_CONFIG=beaglebone_defconfig
+	BR_BOARD_LINUX_CONFIG_PATH=board/beaglebone/
+	BOOT_IMG_SCRIPT=$(pwd)/scripts/beaglemmc-bootdisk.sh
+elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_BBBMMC_RBOX" ]; then
 	BR_BOARD_CONFIG=beaglebone_defconfig
 	BR_BOARD_LINUX_CONFIG_PATH=board/beaglebone/
 	BOOT_IMG_SCRIPT=$(pwd)/scripts/beaglemmc-bootdisk.sh
@@ -137,6 +142,9 @@ elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_BBB" ]; then
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 	ROOTFS_TYPE=$ROOTFS_TYPE_BBB
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_BBBMMC" ]; then
+	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
+	ROOTFS_TYPE=$ROOTFS_TYPE_BBB
+elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_BBBMMC_RBOX" ]; then
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 	ROOTFS_TYPE=$ROOTFS_TYPE_BBB
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_BTR_MEDIA" ]; then
