@@ -19,29 +19,29 @@ using namespace std;
 //supported commands over xmpp-channel
 XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] = 
 {
-	{true ,EXMPP_CMD_GSM_MODEM_IDENT         , "Gsmcheck"     ,""},
-	{true ,EXMPP_CMD_SMS_LIST_UPDATE         , "Smsupdate"    ,""},
-	{true ,EXMPP_CMD_SMS_GET_TOTAL           , "Smstotal"     ,""},
-	{true ,EXMPP_CMD_SMS_GET                 , "Smsget"       ,"<zero_index_msg>"},
-	{true ,EXMPP_CMD_SMS_DELETE_ALL          , "Smsdeleteall" ,""},
-	{true ,EXMPP_CMD_SMS_SEND                , "Smssend"      ,"<phone-num> <msg>"},
-	{true ,EXMPP_CMD_DIAL_VOICE              , "Dialvoice"    ,"<phone-num>"},
-	{true ,EXMPP_CMD_DIAL_USSD               , "Dialussd"     ,"<ussd-code>"},
-	{true ,EXMPP_CMD_GET_USSD                , "Readussd"     ,""},
-	{true ,EXMPP_CMD_FMW_GET_VERSION         , "Version"      ,""},
-	{true ,EXMPP_CMD_FMW_UPDATE              , "Sysupdate"    ,""},
-	{true ,EXMPP_CMD_FMW_REBOOT              , "Reboot"       ,""},
-	{true ,EXMPP_CMD_FMW_POWEROFF            , "Poweroff"     ,""},
-	{true ,EXMPP_CMD_FMW_UPTIME              , "Uptime"       ,""},
-	{true ,EXMPP_CMD_FMW_HOSTNAME            , "Hostname"     ,"[name]"},
-	{true ,EXMPP_CMD_FMW_RESET_HOSTNAME      , "Resethostname",""},
-	{true ,EXMPP_CMD_FMW_GET_MYIP            , "Publicip"     ,""},
-	{true ,EXMPP_CMD_FMW_GET_LOCALIP         , "Localip"      ,""},
-	{false,EXMPP_CMD_DEBUG_LOG_STS           , "Logsts"       ,""},//due to bug, disabled(to be fixed later)
-	{false,EXMPP_CMD_LOG_UPDATE              , "Logupdate"    ,""},//due to bug, disabled(to be fixed later)
-	{false,EXMPP_CMD_LOG_COUNT               , "Logcount"     ,""},//due to bug, disabled(to be fixed later)
-	{false,EXMPP_CMD_LOG_MSG                 , "Logmsg"       ,"<zero_index_lineNum>"},//due to bug, disabled(to be fixed later)
-	{true ,EXMPP_CMD_GPIO                    , "Gpio"         ,"<gpio_num> <sts[0/1]>"}
+	{true ,EXMPP_CMD_GSM_MODEM_IDENT         , "gsmcheck"     ,""},
+	{true ,EXMPP_CMD_SMS_LIST_UPDATE         , "smsupdate"    ,""},
+	{true ,EXMPP_CMD_SMS_GET_TOTAL           , "smstotal"     ,""},
+	{true ,EXMPP_CMD_SMS_GET                 , "smsget"       ,"<zero_index_msg>"},
+	{true ,EXMPP_CMD_SMS_DELETE_ALL          , "smsdeleteall" ,""},
+	{true ,EXMPP_CMD_SMS_SEND                , "smssend"      ,"<phone-num> <msg>"},
+	{true ,EXMPP_CMD_DIAL_VOICE              , "dialvoice"    ,"<phone-num>"},
+	{true ,EXMPP_CMD_DIAL_USSD               , "dialussd"     ,"<ussd-code>"},
+	{true ,EXMPP_CMD_GET_USSD                , "readussd"     ,""},
+	{true ,EXMPP_CMD_FMW_GET_VERSION         , "version"      ,""},
+	{true ,EXMPP_CMD_FMW_UPDATE              , "sysupdate"    ,""},
+	{true ,EXMPP_CMD_FMW_REBOOT              , "reboot"       ,""},
+	{true ,EXMPP_CMD_FMW_POWEROFF            , "poweroff"     ,""},
+	{true ,EXMPP_CMD_FMW_UPTIME              , "uptime"       ,""},
+	{true ,EXMPP_CMD_FMW_HOSTNAME            , "hostname"     ,"[name]"},
+	{true ,EXMPP_CMD_FMW_RESET_HOSTNAME      , "resethostname",""},
+	{true ,EXMPP_CMD_FMW_GET_MYIP            , "publicip"     ,""},
+	{true ,EXMPP_CMD_FMW_GET_LOCALIP         , "localip"      ,""},
+	{false,EXMPP_CMD_DEBUG_LOG_STS           , "logsts"       ,""},//due to bug, disabled(to be fixed later)
+	{false,EXMPP_CMD_LOG_UPDATE              , "logupdate"    ,""},//due to bug, disabled(to be fixed later)
+	{false,EXMPP_CMD_LOG_COUNT               , "logcount"     ,""},//due to bug, disabled(to be fixed later)
+	{false,EXMPP_CMD_LOG_MSG                 , "logmsg"       ,"<zero_index_lineNum>"},//due to bug, disabled(to be fixed later)
+	{true ,EXMPP_CMD_GPIO                    , "gpio"         ,"<gpio_num> <sts[0/1]>"}
 };
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
