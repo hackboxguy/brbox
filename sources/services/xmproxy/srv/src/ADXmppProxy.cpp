@@ -194,7 +194,8 @@ void ADXmppProxy::handleMessageSession( MessageSession *session )
 	if(DebugLog)
 		printf( "got new session\n");
 	// this example can handle only one session. so we get rid of the old session
-	j->disposeMessageSession( m_session );
+	if(m_session)
+		j->disposeMessageSession( m_session );
 	m_session = session;
 	m_session->registerMessageHandler( this );
 	m_messageEventFilter = new MessageEventFilter( m_session );
