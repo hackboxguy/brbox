@@ -24,6 +24,7 @@
 #include <gloox/connectionhttpproxy.h>
 #include <gloox/messagehandler.h>
 #include <gloox/eventhandler.h>
+#include <gloox/rostermanager.h>
 #include "ADThread.hpp"
 #include <deque>
 
@@ -67,7 +68,7 @@ public:
 };
 /* ------------------------------------------------------------------------- */
 class ADXmppProxy : public MessageSessionHandler, ConnectionListener, LogHandler,
-                    MessageEventHandler, MessageHandler, ChatStateHandler,EventHandler, public ADXmppProducer,public ADThreadConsumer
+                    MessageEventHandler, MessageHandler, ChatStateHandler,EventHandler,RosterListener, public ADXmppProducer,public ADThreadConsumer
 {
 public:
 	ADXmppProxy();
@@ -92,6 +93,24 @@ public:
 	virtual void handleChatState( const JID& from, ChatStateType state );
 	virtual void handleMessageSession( MessageSession *session );
 	virtual void handleLog( LogLevel level, LogArea area, const std::string& message );
+
+	//roster related overrider
+	virtual void onResourceBindError( ResourceBindError error );
+	virtual void onSessionCreateError( SessionCreateError error );
+	virtual void handleItemSubscribed( const JID& jid );
+	virtual void handleItemAdded( const JID& jid );
+	virtual void handleItemUnsubscribed( const JID& jid );
+	virtual void handleItemRemoved( const JID& jid );
+	virtual void handleItemUpdated( const JID& jid );
+	virtual void handleRoster( const Roster& roster );
+	virtual void handleRosterError( const IQ& /*iq*/ );
+	virtual void handleRosterPresence( const RosterItem& item, const std::string& resource,
+	Presence::PresenceType presence, const std::string& /*msg*/ );
+	virtual void handleSelfPresence( const RosterItem& item, const std::string& resource,
+		Presence::PresenceType presence, const std::string& /*msg*/ );
+	virtual bool handleSubscriptionRequest( const JID& jid, const std::string& /*msg*/ );
+	virtual bool handleUnsubscriptionRequest( const JID& jid, const std::string& /*msg*/ );
+	virtual void handleNonrosterPresence( const Presence& presence );
 
 	std::deque<int> PingPipe;//fifo for processing xmpp ping requests
 	ADThread PingThread;

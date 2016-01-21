@@ -64,6 +64,7 @@ int ADXmppProxy::connect(char* user,char* password)
 
 	j->registerConnectionListener( this );
 	j->registerMessageSessionHandler( this, 0 );
+	j->rosterManager()->registerRosterListener( this );
 	j->disco()->setVersion( "messageTest", GLOOX_VERSION, "Linux" );
 	j->disco()->setIdentity( "client", "jsonbot" );
 	j->disco()->addFeature( XMLNS_CHAT_STATES );
@@ -187,6 +188,7 @@ void ADXmppProxy::handleChatState( const JID& from, ChatStateType state)
 		printf( "received state: %d from: %s\n", state, from.full().c_str() );
 }
 /*****************************************************************************/
+//this function is called first time when client starts chat(after this, handleMessage is called)
 void ADXmppProxy::handleMessageSession( MessageSession *session )
 {
 	if(j==NULL)
@@ -222,25 +224,6 @@ const std::string ADXmppProxy::currentDateTime()
 }
 void ADXmppProxy::send_client_alive_ping()
 {
-	//if(connected)
-		//j->whitespacePing();
-	/*if(j!=NULL)
-	{
-		j->xmppPing(j->jid(),this);//,this->handleEvent);
-		if(++HeartBeat > 3)//MAX_RESPONSE_TIME_OUT)
-		{
-			if(DebugLog)
-				cout<<"ADXmppProxy::send_client_alive_ping:going to disconnect"<<endl;
-			//j->disconnect();//ConnNotConnected);//ConnTlsFailed);// fake disconnect reason so that no </stream:stream> is sent
-			disconnect();
-
-			if(DebugLog)
-				cout<<"ADXmppProxy::send_client_alive_ping:disconnected"<<endl;
-		}
-	}
-	if(DebugLog)
-		cout<<"ADXmppProxy::send_client_alive_ping:"<<currentDateTime()<<" connSts="<<connected<<endl;*/
-
 	//if ping-thread is already blocked, then dont push for more ping requests, just return.
 	if(PingPipe.empty())
 	{
@@ -292,6 +275,85 @@ void ADXmppProxy::handleEvent( const Event& event )
 			break;
 	}
 	//cout<<"handleEvent::pong received"<<endl;
+}
+/*****************************************************************************/
+void ADXmppProxy::onResourceBindError( ResourceBindError error )
+{
+	//printf( "onResourceBindError: %d\n", error );
+}
+void ADXmppProxy::onSessionCreateError( SessionCreateError error )
+{
+	//printf( "onSessionCreateError: %d\n", error );
+}
+void ADXmppProxy::handleItemSubscribed( const JID& jid )
+{
+	//printf( "subscribed %s\n", jid.bare().c_str() );
+}
+void ADXmppProxy::handleItemAdded( const JID& jid )
+{
+	//printf( "added %s\n", jid.bare().c_str() );
+}
+void ADXmppProxy::handleItemUnsubscribed( const JID& jid )
+{
+	//printf( "unsubscribed %s\n", jid.bare().c_str() );
+}
+void ADXmppProxy::handleItemRemoved( const JID& jid )
+{
+	//printf( "removed %s\n", jid.bare().c_str() );
+}
+void ADXmppProxy::handleItemUpdated( const JID& jid )
+{
+	//printf( "updated %s\n", jid.bare().c_str() );
+}
+void ADXmppProxy::handleRoster( const Roster& roster )
+{
+	/*printf( "roster arriving\nitems:\n" );
+	Roster::const_iterator it = roster.begin();
+	for( ; it != roster.end(); ++it )
+	{
+		printf( "jid: %s, name: %s, subscription: %d\n",
+		(*it).second->jidJID().full().c_str(), (*it).second->name().c_str(),
+		(*it).second->subscription() );
+		StringList g = (*it).second->groups();
+		StringList::const_iterator it_g = g.begin();
+		for( ; it_g != g.end(); ++it_g )
+		printf( "\tgroup: %s\n", (*it_g).c_str() );
+		RosterItem::ResourceMap::const_iterator rit = (*it).second->resources().begin();
+		for( ; rit != (*it).second->resources().end(); ++rit )
+		printf( "resource: %s\n", (*rit).first.c_str() );
+	}*/
+}
+void ADXmppProxy::handleRosterError( const IQ& /*iq*/ )
+{
+	//printf( "a roster-related error occured\n" );
+}
+void ADXmppProxy::handleRosterPresence( const RosterItem& item, const std::string& resource,
+Presence::PresenceType presence, const std::string& /*msg*/ )
+{
+	//printf( "presence received: %s/%s -- %d\n", item.jidJID().full().c_str(), resource.c_str(), presence );
+}
+void ADXmppProxy::handleSelfPresence( const RosterItem& item, const std::string& resource,
+	Presence::PresenceType presence, const std::string& /*msg*/ )
+{
+	//printf( "self presence received: %s/%s -- %d\n", item.jidJID().full().c_str(), resource.c_str(), presence );
+}
+bool ADXmppProxy::handleSubscriptionRequest( const JID& jid, const std::string& /*msg*/ )
+{
+	//printf("request for subscription");//dont allow auto subscribing
+	//printf( "subscription: %s\n", jid.bare().c_str() );
+	//StringList groups;
+	//JID id( jid );
+	//j->rosterManager()->subscribe( id, "", groups, "" );
+	return false;//true;
+}
+bool ADXmppProxy::handleUnsubscriptionRequest( const JID& jid, const std::string& /*msg*/ )
+{
+	//printf( "unsubscription: %s\n", jid.bare().c_str() );
+	return false;//true;
+}
+void ADXmppProxy::handleNonrosterPresence( const Presence& presence )
+{
+	//printf( "received presence from entity not in the roster: %s\n", presence.from().full().c_str() );
 }
 /*****************************************************************************/
 
