@@ -337,7 +337,9 @@ bool ADXmppProxy::handleSubscriptionRequest( const JID& jid, const std::string& 
 bool ADXmppProxy::handleUnsubscriptionRequest( const JID& jid, const std::string& /*msg*/ )
 {
 	//printf( "unsubscription: %s\n", jid.bare().c_str() );
-	return false;//true;
+	if(DebugLog)
+		cout<<"ADXmppProxy::handleUnsubscriptionRequest: user "<<jid.bare().c_str()<<" removed from buddy-list"<<endl;
+	return true;
 }
 void ADXmppProxy::handleNonrosterPresence( const Presence& presence )
 {
