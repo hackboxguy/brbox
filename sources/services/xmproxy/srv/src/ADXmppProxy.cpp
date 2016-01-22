@@ -11,6 +11,7 @@ int ADXmppProducer::IDGenerator = 0;//generate Unique ID for every ADXmppProxy o
 /*****************************************************************************/
 ADXmppProxy::ADXmppProxy()
 {
+	iConnect=false;
 	DebugLog=false;
 	failed_authorization=false;
 	connected=false;
@@ -32,25 +33,17 @@ ADXmppProxy::~ADXmppProxy()
 /*****************************************************************************/
 int ADXmppProxy::disconnect()
 {
-	//if(connected)
 	if(j!=NULL)
 	{
-		j->disconnect();//ConnNotConnected
+		j->disconnect();
 		while(connected)
 			usleep(100000);
-		//delete( j );
-		//j=NULL;
-		//connected=false;
-		//if(DebugLog)
-		//	cout<<"ADXmppProxy::disconnect: Deleted Client!!!!! disconnected"<<endl;
 	}
 	return 0;
 }
 /*****************************************************************************/
 int ADXmppProxy::connect(char* user,char* password)
 {
-	//if(connected==true)
-	//	return 0;
 	if(j!=NULL)
 		return 0;
 
@@ -112,7 +105,7 @@ void ADXmppProxy::onConnect()
 {
 	if(DebugLog)
 		cout<<"ADXmppProxy::onConnect:connected!!!"<<endl;
-	//connected=true;
+	iConnect=true;
 }
 /*****************************************************************************/
 void ADXmppProxy::onDisconnect( ConnectionError e )
@@ -123,16 +116,9 @@ void ADXmppProxy::onDisconnect( ConnectionError e )
 		if(DebugLog)
 			cout<<"ADXmppProxy::onDisconnect:disconnected due to failed authrization"<<endl;
 	}
-	//connected=false;
 	if(DebugLog)
 		cout<<"ADXmppProxy::onDisconnect:disconnected"<<endl;
-
-	//if(j!=NULL)
-	//{
-	//	delete( j );
-	//	j=NULL;
-	//	connected=false;
-	//}
+	iConnect=false;
 }
 /*****************************************************************************/
 bool ADXmppProxy::onTLSConnect( const CertInfo& info )
@@ -140,22 +126,21 @@ bool ADXmppProxy::onTLSConnect( const CertInfo& info )
 	return true;
 }
 /*****************************************************************************/
-void ADXmppProxy::handleMessage( const Message& msg, MessageSession * /*session*/ )
+void ADXmppProxy::handleMessage( const Message& msg, MessageSession * session )
 {
 	if(DebugLog)
-		cout<<"ADXmppProxy::handleMessage:arrived:msg:"<<msg.body()<<":len:"<<msg.body().size()<<endl;
+	cout<<"ADXmppProxy::handleMessage:arrived:msg:"<<msg.body()<<":len:"<<msg.body().size()<<" from="<<session->target().bare()<<endl;
 	if(msg.body().size()>0)
-		receive_request(msg.body());
+		receive_request(msg.body(),session->target().bare());
 	//else 
 		//ignore-the-message
 }
 /*****************************************************************************/
-int ADXmppProxy::receive_request(std::string req)
+int ADXmppProxy::receive_request(std::string req,std::string sender)
 {
-	//printf("%s\n",req.c_str());
 	if(DebugLog)
-		cout<<"ADXmppProxy::receive_request:received msg = "<<req<<endl;
-	onXmppMessage(req);//callback to the attached msg-processing-object
+		cout<<"ADXmppProxy::receive_request:received from="<<sender<<" msg="<<req<<endl;
+	onXmppMessage(req,sender);//callback to the attached msg-processing-object
 	return 0;
 }
 int ADXmppProxy::send_reply(std::string reply)
@@ -307,21 +292,24 @@ void ADXmppProxy::handleItemUpdated( const JID& jid )
 }
 void ADXmppProxy::handleRoster( const Roster& roster )
 {
-	/*printf( "roster arriving\nitems:\n" );
+	//printf( "roster arriving\nitems:\n" );
 	Roster::const_iterator it = roster.begin();
 	for( ; it != roster.end(); ++it )
 	{
-		printf( "jid: %s, name: %s, subscription: %d\n",
+		/*printf( "jid: %s, name: %s, subscription: %d\n",
 		(*it).second->jidJID().full().c_str(), (*it).second->name().c_str(),
 		(*it).second->subscription() );
 		StringList g = (*it).second->groups();
 		StringList::const_iterator it_g = g.begin();
 		for( ; it_g != g.end(); ++it_g )
-		printf( "\tgroup: %s\n", (*it_g).c_str() );
+			printf( "\tgroup: %s\n", (*it_g).c_str() );
 		RosterItem::ResourceMap::const_iterator rit = (*it).second->resources().begin();
 		for( ; rit != (*it).second->resources().end(); ++rit )
-		printf( "resource: %s\n", (*rit).first.c_str() );
-	}*/
+			printf( "resource: %s\n", (*rit).first.c_str() );*/
+		BuddyList.push_back((*it).second->jidJID().full());
+		if(DebugLog)
+			cout<<"ADXmppProxy::handleRoster:"<<(*it).second->jidJID().full()<<endl;
+	}
 }
 void ADXmppProxy::handleRosterError( const IQ& /*iq*/ )
 {
@@ -354,6 +342,35 @@ bool ADXmppProxy::handleUnsubscriptionRequest( const JID& jid, const std::string
 void ADXmppProxy::handleNonrosterPresence( const Presence& presence )
 {
 	//printf( "received presence from entity not in the roster: %s\n", presence.from().full().c_str() );
+}
+//following function is used for sending async-event-notification to subscribed buddy
+bool ADXmppProxy::SendMessageToBuddy(std::string address, const std::string & body, const std::string & subject)
+{
+	//for testing async-sync event
+	//XmppProxy.SendMessageToBuddy(cmdArg,"hellloooo","test-subjext");
+	//return RPC_SRV_RESULT_SUCCESS;
+	if(iConnect==false)
+	{
+		if(DebugLog)
+			cout<<"ADXmppProxy::SendMessageToBuddy:client disconnected, cannot send message to buddy!!!"<<endl;
+		return false;
+	}
+	//check if address is in my buddy-list(doesnt make sense to send message to non-buddy - it will not be delivered)
+	vector<std::string>::iterator it;
+	for(it = BuddyList.begin(); it != BuddyList.end(); it++)
+	{
+		string str = *it;
+		if(address==str)
+		{
+			MessageSession* session = new MessageSession(j,JID(address));
+			session->send(body, subject);//todo: presence check needed before sending message?
+			j->disposeMessageSession( session );
+			if(DebugLog)
+				cout<<"ADXmppProxy::SendMessageToBuddy:address="<<address<<" body="<<body<<" subject="<<subject<<endl;
+			return true;
+		}
+	}
+	return false;//address is not in my buddy-list
 }
 /*****************************************************************************/
 

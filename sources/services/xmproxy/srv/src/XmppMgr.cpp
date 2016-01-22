@@ -41,7 +41,9 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{false,EXMPP_CMD_LOG_UPDATE              , "logupdate"    ,""},//due to bug, disabled(to be fixed later)
 	{false,EXMPP_CMD_LOG_COUNT               , "logcount"     ,""},//due to bug, disabled(to be fixed later)
 	{false,EXMPP_CMD_LOG_MSG                 , "logmsg"       ,"<zero_index_lineNum>"},//due to bug, disabled(to be fixed later)
-	{true ,EXMPP_CMD_GPIO                    , "gpio"         ,"<gpio_num> <sts[0/1]>"}
+	{true ,EXMPP_CMD_GPIO                    , "gpio"         ,"<gpio_num> <sts[0/1]>"},
+	{true ,EXMPP_CMD_GSM_EVENT_NOTIFY        , "eventgsm"     ,"<sts[0/1]>"},
+	{true ,EXMPP_CMD_GPIO_EVENT_NOTIFY       , "eventgpio"    ,"<gpio_num> <sts[0/1]>"}
 };
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
@@ -116,6 +118,7 @@ void XmppMgr::SetUSBGsmSts(bool sts)
 			case EXMPP_CMD_DIAL_VOICE     :
 			case EXMPP_CMD_DIAL_USSD      :
 			case EXMPP_CMD_GET_USSD       :
+			case EXMPP_CMD_GSM_EVENT_NOTIFY:
 				if(xmproxy_cmd_table[i].cmdsts==true) //if default is disabled, then dont enable it
 					xmproxy_cmd_table[i].cmdsts=sts;
 				break;
@@ -145,7 +148,7 @@ std::string XmppMgr::print_help()
 	return help;
 }
 /* ------------------------------------------------------------------------- */
-int XmppMgr::onXmppMessage(std::string msg,ADXmppProducer* pObj)
+int XmppMgr::onXmppMessage(std::string msg,std::string sender,ADXmppProducer* pObj)
 {
 	//process the messages
 	//cout<<"msg arrived: "<<msg<<endl;
@@ -155,7 +158,7 @@ int XmppMgr::onXmppMessage(std::string msg,ADXmppProducer* pObj)
 		XmppProxy.send_reply(print_help());
 	else
 	{
-		processCmd.push_back(XmppCmdEntry(msg));
+		processCmd.push_back(XmppCmdEntry(msg,sender));
 		XmppCmdProcessThread.wakeup_thread();//tell the worker to start working
 	}
 	return 0;
@@ -239,6 +242,8 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_LOG_MSG         :res=proc_cmd_log_get_line(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_FMW_GET_LOCALIP :res=proc_cmd_fmw_get_localip(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_GPIO            :res=proc_cmd_gpio(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_GSM_EVENT_NOTIFY:res=proc_cmd_event_gsm(cmdcmdMsg,cmd.sender,returnval);break;
+				case EXMPP_CMD_GPIO_EVENT_NOTIFY:res=proc_cmd_event_gpio(cmdcmdMsg,cmd.sender,returnval);break;
 				default                        :break;
 			}
 			result.pop_front();
@@ -925,6 +930,15 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_log_get_line(std::string msg,std::string &retur
 	returnval=returnmsg;
 	Client.rpc_server_disconnect();
 	return result;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_event_gsm(std::string msg,std::string sender,std::string &returnval)
+{
+	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+}
+RPC_SRV_RESULT XmppMgr::proc_cmd_event_gpio(std::string msg,std::string sender,std::string &returnval)
+{
+	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
 }
 /* ------------------------------------------------------------------------- */
 

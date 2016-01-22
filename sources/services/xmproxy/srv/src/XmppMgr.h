@@ -46,6 +46,8 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_FMW_GET_LOCALIP,
 	EXMPP_CMD_FMW_POWEROFF,//shutdown linux and dont reboot
 	EXMPP_CMD_GPIO,//gpio pin read write
+	EXMPP_CMD_GSM_EVENT_NOTIFY,//sms/call async-event-notification
+	EXMPP_CMD_GPIO_EVENT_NOTIFY,//gpio async-event-notification
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -53,8 +55,9 @@ typedef enum EXMPP_CMD_TYPES_T
 struct XmppCmdEntry
 {
 	std::string cmdMsg;
+	std::string sender;
 public:
-	XmppCmdEntry(std::string msg) :cmdMsg(msg){}
+	XmppCmdEntry(std::string msg,std::string from) :cmdMsg(msg),sender(from){}
 };
 /* ------------------------------------------------------------------------- */
 struct AyncEventEntry
@@ -105,7 +108,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	std::string XmppUserPw;
 	ADXmppProxy XmppProxy;//xmpp client
 	//xmpp-client-callback functions
-	virtual int onXmppMessage(std::string msg,ADXmppProducer* pObj);
+	virtual int onXmppMessage(std::string msg,std::string sender,ADXmppProducer* pObj);
 
 	ADThread XmppClientThread,XmppCmdProcessThread;//thread for xmpp client connection
 	virtual int monoshot_callback_function(void* pUserData,ADThreadProducer* pObj);//{return 0;};
@@ -144,6 +147,8 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_log_get_line(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_get_localip(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_gpio(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_event_gsm(std::string msg,std::string sender,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_event_gpio(std::string msg,std::string sender,std::string &returnval);
 	std::string print_help();
 public:
 	XmppMgr();

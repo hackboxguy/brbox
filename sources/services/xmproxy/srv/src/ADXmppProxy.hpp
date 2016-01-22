@@ -27,14 +27,16 @@
 #include <gloox/rostermanager.h>
 #include "ADThread.hpp"
 #include <deque>
-
+#include <vector>
+#include <iostream>
+using namespace std;
 using namespace gloox;
 /* ------------------------------------------------------------------------- */
 class ADXmppProducer; //subject
 class ADXmppConsumer //observer
 {
 public:
-	virtual int onXmppMessage(std::string msg,ADXmppProducer* pObj)=0;
+	virtual int onXmppMessage(std::string msg,std::string sender,ADXmppProducer* pObj)=0;
 	virtual ~ADXmppConsumer(){};
 };
 class ADXmppProducer
@@ -44,10 +46,10 @@ class ADXmppProducer
 	int id;//id number for consumer to distinguish between many producers
 
 protected:
-	int onXmppMessage(std::string msg)
+	int onXmppMessage(std::string msg,std::string sender="")
 	{
 		if(pConsumer!=NULL)		
-			return pConsumer->onXmppMessage(msg,this);
+			return pConsumer->onXmppMessage(msg,sender,this);
 		return -1;
 	}
 public:
@@ -76,13 +78,15 @@ public:
 	int disconnect();
 	int connect(char* user,char* password);
 	int send_reply(std::string reply);
-	int receive_request(std::string request);
+	int receive_request(std::string request,std::string sender);
 	bool get_connect_sts(){return connected;};
 	void SetDebugLog(bool log);
 	void send_client_alive_ping();
 	const std::string currentDateTime();
 	bool getForcedDisconnect(){return DisconnectNow;}
 	void setForcedDisconnect(){DisconnectNow=true;}
+	//for sending asyc-event to a buddy
+	bool SendMessageToBuddy(std::string address, const std::string & body, const std::string & subject);
 
 	virtual void handleEvent( const Event& event );// = 0;
 	virtual void onConnect();
@@ -116,8 +120,10 @@ public:
 	ADThread PingThread;
 	virtual int monoshot_callback_function(void* pUserData,ADThreadProducer* pObj);//{return 0;};
 	virtual int thread_callback_function(void* pUserData,ADThreadProducer* pObj){return 0;};
-
+	
 private:
+	vector<std::string> BuddyList;//authorized accounts that can contact me
+	bool iConnect;//shows status of onConnect/onDisconnect
 	bool DisconnectNow;
 	bool DebugLog;
 	bool failed_authorization;
