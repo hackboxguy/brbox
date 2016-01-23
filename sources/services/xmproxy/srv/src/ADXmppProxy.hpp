@@ -77,7 +77,7 @@ public:
 	~ADXmppProxy();//{}
 	int disconnect();
 	int connect(char* user,char* password);
-	int send_reply(std::string reply);
+	int send_reply(std::string reply,std::string sender="");
 	int receive_request(std::string request,std::string sender);
 	bool get_connect_sts(){return connected;};
 	void SetDebugLog(bool log);

@@ -143,7 +143,7 @@ int ADXmppProxy::receive_request(std::string req,std::string sender)
 	onXmppMessage(req,sender);//callback to the attached msg-processing-object
 	return 0;
 }
-int ADXmppProxy::send_reply(std::string reply)
+int ADXmppProxy::send_reply(std::string reply,std::string sender)
 {
 	if(j==NULL)
 		return -1;
@@ -155,7 +155,7 @@ int ADXmppProxy::send_reply(std::string reply)
 	m_messageEventFilter->raiseMessageEvent( MessageEventDisplayed );
 	m_messageEventFilter->raiseMessageEvent( MessageEventComposing );
 	m_chatStateFilter->setChatState( ChatStateComposing );
-	m_session->send( reply, sub );//after reply from json-rpc-server, call send reply
+	m_session->send( reply, gloox::EmptyString );//after reply from json-rpc-server, call send reply
 	if(DebugLog)
 		cout<<"ADXmppProxy::send_reply:sending msg = "<<reply<<endl;
 	return 0;

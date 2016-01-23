@@ -51,7 +51,8 @@ void EvntHandler::ReceiveEvent(int cltToken,int evntNum,int evntArg)
 		sprintf(taskIDString,"%d",evntArg);
 		XmppMgr *pXmpp=(XmppMgr*)pDataCache->pXmpMgr;
 		//if(pXmpp->IsItMyAsyncTaskResp(evntArg,cltToken)==RPC_SRV_RESULT_SUCCESS)
-		if(pXmpp->AccessAsyncTaskList(evntArg,cltToken,false)==RPC_SRV_RESULT_SUCCESS)
+		int xmpTID=-1;
+		if(pXmpp->AccessAsyncTaskList(evntArg,cltToken,false,&xmpTID)==RPC_SRV_RESULT_SUCCESS)
 		{
 			ADJsonRpcClient Client;
 			if(Client.rpc_server_connect("127.0.0.1",cltToken)!=0)
@@ -63,7 +64,7 @@ void EvntHandler::ReceiveEvent(int cltToken,int evntNum,int evntArg)
 						(char*)ADLIB_RPC_PARM_TASK_STS_ID,taskIDString,taskIDResult,(char*)ADLIB_RPC_PARM_TASK_STS);
 			Client.rpc_server_disconnect();
 			std::string finalRes=taskIDResult;
-			pXmpp->RpcResponseCallback(finalRes,evntArg);
+			pXmpp->RpcResponseCallback(finalRes,xmpTID);//evntArg);
 		}
 		else
 		{

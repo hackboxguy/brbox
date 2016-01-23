@@ -64,8 +64,9 @@ struct AyncEventEntry
 {
 	int taskID; //async event taskID returned by server
 	int srvPort;//port where async command was sent
+	int xmppTID;//internal global task id of xmpp-proxy
 public:
-	AyncEventEntry(int tid,int port) :taskID(tid),srvPort(port){}
+	AyncEventEntry(int tid,int port,int xmtid) :taskID(tid),srvPort(port),xmppTID(xmtid){}
 };
 //following functor object is used as predicator for finding a specific vector element entry based on srvToken
 class FindAsyncEventEntry
@@ -93,6 +94,7 @@ typedef struct XMPROXY_CMD_TABLE_T
 /* ------------------------------------------------------------------------- */
 class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerConsumer
 {
+	int XmppTaskIDCounter;
 	int heartbeat_ms;
 	int event_period_ms;//
 	int CyclicTime_ms;//60sec cycle counter
@@ -161,7 +163,7 @@ public:
 	RPC_SRV_RESULT RpcResponseCallback(RPC_SRV_RESULT taskRes,int taskID);//called by eventHandler
 	RPC_SRV_RESULT RpcResponseCallback(std::string taskRes,int taskID);
 	//RPC_SRV_RESULT IsItMyAsyncTaskResp(int tid,int port);
-	RPC_SRV_RESULT AccessAsyncTaskList(int tid, int port, bool insertEntryFlag=true);
+	RPC_SRV_RESULT AccessAsyncTaskList(int tid, int port, bool insertEntryFlag=true,int *xmpptID=NULL);
 	void SetUSBGsmSts(bool sts);
 };
 #endif

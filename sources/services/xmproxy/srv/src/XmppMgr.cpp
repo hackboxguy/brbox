@@ -53,6 +53,7 @@ XmppMgr::XmppMgr() //:AckToken(0)
 	heartbeat_ms=100;
 	pMyTimer=NULL;
 	LastFmwUpdateTaskID=0;
+	XmppTaskIDCounter=0;
 
 	DebugLog=false;
 	//GsmDevDetected=false;
@@ -191,8 +192,6 @@ int XmppMgr::thread_callback_function(void* pUserData,ADThreadProducer* pObj)
 /* ------------------------------------------------------------------------- */
 int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 {
-	//std::string returnval="";
-	//RPC_SRV_RESULT res=RPC_SRV_RESULT_UNKNOWN_COMMAND;//RPC_SRV_RESULT_FAIL;
 	while (!processCmd.empty())
 	{
 		//TODO: handle semicolon separated multiple commands
@@ -205,12 +204,9 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 		    string substr;
 		    getline( ss, substr, ';' );
 		    result.push_back( substr );
-			//cout<<"substr = "<<substr<<endl;
 		}
 		while (!result.empty()) 
 		{
-			//std::cout << "The first character is: " << result.front() << '\n';
-			//switch(ResolveCmdStr(cmd.cmdMsg))
 			std::string returnval="";
 			RPC_SRV_RESULT res=RPC_SRV_RESULT_UNKNOWN_COMMAND;//RPC_SRV_RESULT_FAIL;
 			std::string cmdcmdMsg=result.front();
@@ -250,14 +246,10 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			const char *resTbl[] = STR_RPC_SRV_RESULT_STRING_TABLE;
 			std::string result   = resTbl[res];
 			std::string response = result +" : "+returnval;
-			XmppProxy.send_reply(response);//result+":"+returnval);
+			XmppProxy.send_reply(response,cmd.sender);//result+":"+returnval);
 		}
 		processCmd.pop_front();//after processing delete the entry
 	}
-	//const char *resTbl[] = STR_RPC_SRV_RESULT_STRING_TABLE;
-	//std::string result   = resTbl[res];
-	//std::string response = result +" : "+returnval;
-	//XmppProxy.send_reply(response);//result+":"+returnval);
 	return 0;
 }
 //following function is called by EvntHandler object
@@ -284,16 +276,8 @@ RPC_SRV_RESULT XmppMgr::RpcResponseCallback(std::string taskRes,int taskID)
 	XmppProxy.send_reply(response);
 	return RPC_SRV_RESULT_SUCCESS;
 }
-/*RPC_SRV_RESULT XmppMgr::IsItMyAsyncTaskResp(int tid,int port)
-{
-	if (find_if(AsyncTaskList.begin(), AsyncTaskList.end(), FindAsyncEventEntry(tid,port)) == AsyncTaskList.end())
-		return RPC_SRV_RESULT_FAIL;
-	//erase the entry
-	AsyncTaskList.erase(remove_if(AsyncTaskList.begin(), AsyncTaskList.end(), FindAsyncEventEntry(tid,port)) , AsyncTaskList.end());
-	return RPC_SRV_RESULT_SUCCESS;
-}*/
 //RAII function, used for inserting entry or searching for existing entry
-RPC_SRV_RESULT XmppMgr::AccessAsyncTaskList(int tid, int port, bool insertEntryFlag) 
+RPC_SRV_RESULT XmppMgr::AccessAsyncTaskList(int tid, int port, bool insertEntryFlag,int *xmpptID) 
 {
 	// mutex to protect cmn resource access (shared across threads)
 	static std::mutex mutex;
@@ -301,14 +285,24 @@ RPC_SRV_RESULT XmppMgr::AccessAsyncTaskList(int tid, int port, bool insertEntryF
 	std::lock_guard<std::mutex> lock(mutex);
 	if(insertEntryFlag==true)
 	{
-		AsyncTaskList.push_back(AyncEventEntry(tid,port));
+		XmppTaskIDCounter++;//global task id counter for external xmpp clients
+		AsyncTaskList.push_back(AyncEventEntry(tid,port,XmppTaskIDCounter));
+		if(xmpptID!=NULL)
+			*xmpptID=XmppTaskIDCounter;
 	}
 	else
 	{
-	if (find_if(AsyncTaskList.begin(), AsyncTaskList.end(), FindAsyncEventEntry(tid,port)) == AsyncTaskList.end())
+	//cout<<"size-before="<<AsyncTaskList.size()<<endl;
+	std::vector<AyncEventEntry>::iterator it = find_if(AsyncTaskList.begin(), AsyncTaskList.end(), FindAsyncEventEntry(tid,port));
+	if(it == AsyncTaskList.end())
 		return RPC_SRV_RESULT_FAIL;
+	if(xmpptID!=NULL)
+		*xmpptID=(*it).xmppTID;
+	//if (find_if(AsyncTaskList.begin(), AsyncTaskList.end(), FindAsyncEventEntry(tid,port)) == AsyncTaskList.end())
+	//	return RPC_SRV_RESULT_FAIL;
 	//erase the entry
 	AsyncTaskList.erase(remove_if(AsyncTaskList.begin(), AsyncTaskList.end(), FindAsyncEventEntry(tid,port)) , AsyncTaskList.end());
+	//cout<<"size-after="<<AsyncTaskList.size()<<endl;
 	}
 	return RPC_SRV_RESULT_SUCCESS;
 }
@@ -414,10 +408,11 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sms_deleteall(std::string msg,std::string &retu
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
 	RPC_SRV_RESULT result=Client.set_action_noarg_get_single_string_type((char*)"delete_all_sms",(char*)"taskId",tID);
 	Client.rpc_server_disconnect();
-	returnval="taskID=";returnval+=tID;
+	returnval="taskID=";//returnval+=tID;
+	int xmptid=-1;
 	if(result==RPC_SRV_RESULT_IN_PROG)
-		//AsyncTaskList.push_back(AyncEventEntry(atoi(tID),ADCMN_PORT_BBOXSMS));
-		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS);
+		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS,true,&xmptid);
+	sprintf(tID,"%d",xmptid);returnval+=tID;
 	return result;
 }
 /* ------------------------------------------------------------------------- */
@@ -471,12 +466,12 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sms_send(std::string msg,std::string &returnval
 				(char*)"message",(char*)msgArg.c_str(),
 				(char*)"taskId",(char*)tID);
 	Client.rpc_server_disconnect();
-	returnval="taskID=";returnval+=tID;
+	returnval="taskID=";//returnval+=tID;
+	int xmptid=-1;
 	if(result==RPC_SRV_RESULT_IN_PROG)
-		//AsyncTaskList.push_back(AyncEventEntry(atoi(tID),ADCMN_PORT_BBOXSMS));
-		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS);
+		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS,true,&xmptid);
+	sprintf(tID,"%d",xmptid);returnval+=tID;
 	return result;
-	//return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
 }
 /* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT XmppMgr::proc_cmd_sms_list_update(std::string msg,std::string &returnval)
@@ -487,10 +482,11 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sms_list_update(std::string msg,std::string &re
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
 	RPC_SRV_RESULT result=Client.set_action_noarg_get_single_string_type((char*)"update_sms_list",(char*)"taskId",tID);
 	Client.rpc_server_disconnect();
-	returnval="taskID=";returnval+=tID;
+	returnval="taskID=";//returnval+=tID;
+	int xmptid=-1;
 	if(result==RPC_SRV_RESULT_IN_PROG)
-		//AsyncTaskList.push_back(AyncEventEntry(atoi(tID),ADCMN_PORT_BBOXSMS));
-		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS);
+		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS,true,&xmptid);
+	sprintf(tID,"%d",xmptid);returnval+=tID;
 	return result;
 }
 /* ------------------------------------------------------------------------- */
@@ -568,10 +564,11 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg,std::string &returnv
 									(char*)"filepath",(char*)"/tmp/uBrBoxRoot.uimg",
 									(char*)"taskId",temp_str);
 		LastFmwUpdateTaskID=atoi(temp_str);
-		returnval="taskID=";returnval+=temp_str;
+		returnval="taskID=";//returnval+=temp_str;
+		int xmptid=-1;
 		if(result==RPC_SRV_RESULT_IN_PROG)
-			//AsyncTaskList.push_back(AyncEventEntry(atoi(temp_str),ADCMN_PORT_SYSMGR));
-			AccessAsyncTaskList(atoi(temp_str),ADCMN_PORT_SYSMGR);
+			AccessAsyncTaskList(atoi(temp_str),ADCMN_PORT_SYSMGR,true,&xmptid);
+		sprintf(temp_str,"%d",xmptid);returnval+=temp_str;
 	}
 	Client.rpc_server_disconnect();
 	return result;
@@ -587,10 +584,11 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_reboot(std::string msg,std::string &returnv
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
 	RPC_SRV_RESULT result = Client.set_single_string_get_single_string_type((char*)"set_device_operation",(char*)"operation",(char*)"reboot",(char*)"taskId",temp_str);
 	Client.rpc_server_disconnect();
-	returnval="taskID=";returnval+=temp_str;
+	returnval="taskID=";//returnval+=temp_str;
+	int xmptid=-1;
 	if(result==RPC_SRV_RESULT_IN_PROG)
-		//AsyncTaskList.push_back(AyncEventEntry(atoi(temp_str),ADCMN_PORT_SYSMGR));
-		AccessAsyncTaskList(atoi(temp_str),ADCMN_PORT_SYSMGR);
+		AccessAsyncTaskList(atoi(temp_str),ADCMN_PORT_SYSMGR,true,&xmptid);
+	sprintf(temp_str,"%d",xmptid);returnval+=temp_str;
 	return result;
 }
 RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_poweroff(std::string msg,std::string &returnval)
@@ -601,9 +599,11 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_poweroff(std::string msg,std::string &retur
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
 	RPC_SRV_RESULT result = Client.set_single_string_get_single_string_type((char*)"set_device_operation",(char*)"operation",(char*)"standby",(char*)"taskId",temp_str);
 	Client.rpc_server_disconnect();
-	returnval="taskID=";returnval+=temp_str;
+	returnval="taskID=";//returnval+=temp_str;
+	int xmptid=-1;
 	if(result==RPC_SRV_RESULT_IN_PROG)
-		AccessAsyncTaskList(atoi(temp_str),ADCMN_PORT_SYSMGR);
+		AccessAsyncTaskList(atoi(temp_str),ADCMN_PORT_SYSMGR,true,&xmptid);
+	sprintf(temp_str,"%d",xmptid);returnval+=temp_str;
 	return result;
 }
 /* ------------------------------------------------------------------------- */
@@ -813,10 +813,11 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_dial_voice(std::string msg,std::string &returnv
 				(char*)"destination",(char*)destArg.c_str(),
 				(char*)"taskId",(char*)tID);
 	Client.rpc_server_disconnect();
-	returnval="taskID=";returnval+=tID;
+	returnval="taskID=";//returnval+=tID;
+	int xmptid=-1;
 	if(result==RPC_SRV_RESULT_IN_PROG)
-		//AsyncTaskList.push_back(AyncEventEntry(atoi(tID),ADCMN_PORT_BBOXSMS));
-		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS);
+		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS,true,&xmptid);
+	sprintf(tID,"%d",xmptid);returnval+=tID;
 	return result;
 }
 /* ------------------------------------------------------------------------- */
@@ -878,10 +879,11 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_gsm_modem_identify(std::string msg,std::string 
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
 	RPC_SRV_RESULT result=Client.set_action_noarg_get_single_string_type((char*)"identify_dev",(char*)"taskId",tID);
 	Client.rpc_server_disconnect();
-	returnval="taskID=";returnval+=tID;
+	returnval="taskID=";//returnval+=tID;
+	int xmptid=-1;
 	if(result==RPC_SRV_RESULT_IN_PROG)
-		//AsyncTaskList.push_back(AyncEventEntry(atoi(tID),ADCMN_PORT_BBOXSMS));
-		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS);
+		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS,true,&xmptid);
+	sprintf(tID,"%d",xmptid);returnval+=tID;
 	return result;
 }
 /* ------------------------------------------------------------------------- */
@@ -893,10 +895,11 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_log_list_update(std::string msg,std::string &re
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
 	RPC_SRV_RESULT result=Client.set_action_noarg_get_single_string_type((char*)"update_loglist",(char*)"taskId",tID);
 	Client.rpc_server_disconnect();
-	returnval="taskID=";returnval+=tID;
+	returnval="taskID=";//returnval+=tID;
+	int xmptid=-1;
 	if(result==RPC_SRV_RESULT_IN_PROG)
-		//AsyncTaskList.push_back(AyncEventEntry(atoi(tID),ADCMN_PORT_SYSMGR));//before pushing, if event comes back, then it is missed
-		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_SYSMGR);
+		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_SYSMGR,true,&xmptid);
+	sprintf(tID,"%d",xmptid);returnval+=tID;
 	return result;
 }
 RPC_SRV_RESULT XmppMgr::proc_cmd_log_get_count(std::string msg,std::string &returnval)
