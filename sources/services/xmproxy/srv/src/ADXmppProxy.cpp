@@ -17,9 +17,9 @@ ADXmppProxy::ADXmppProxy()
 	connected=false;
 	HeartBeat=0;
 	DisconnectNow=false;
-	m_session=0;
-	m_messageEventFilter=0;
-	m_chatStateFilter=0;
+	//m_session=0;
+	//m_messageEventFilter=0;
+	//m_chatStateFilter=0;
 	j=NULL;
 
 	PingThread.subscribe_thread_callback(this);
@@ -147,18 +147,28 @@ int ADXmppProxy::send_reply(std::string reply,std::string sender)
 {
 	if(j==NULL)
 		return -1;
+	//std::string sub;
+	Sessions::iterator it = mySessions.find(sender);
+	if (it != mySessions.end())
+	{
+		it->second.m_messageEventFilter->raiseMessageEvent( MessageEventDisplayed );
+		it->second.m_messageEventFilter->raiseMessageEvent( MessageEventComposing );
+		it->second.m_chatStateFilter->setChatState( ChatStateComposing );
+		it->second.m_session->send( reply, gloox::EmptyString );
+		if(DebugLog)
+			cout<<"ADXmppProxy::send_reply:to:"<<sender<<" sending msg = "<<reply<<endl;
+		return 0;
+	}
+	return -1;
 
-//	if(!connected)
-	//	return -1;//if no connection, then dont send data
-	std::string sub;
 	//send response
-	m_messageEventFilter->raiseMessageEvent( MessageEventDisplayed );
-	m_messageEventFilter->raiseMessageEvent( MessageEventComposing );
-	m_chatStateFilter->setChatState( ChatStateComposing );
-	m_session->send( reply, gloox::EmptyString );//after reply from json-rpc-server, call send reply
-	if(DebugLog)
-		cout<<"ADXmppProxy::send_reply:sending msg = "<<reply<<endl;
-	return 0;
+	//m_messageEventFilter->raiseMessageEvent( MessageEventDisplayed );
+	//m_messageEventFilter->raiseMessageEvent( MessageEventComposing );
+	//m_chatStateFilter->setChatState( ChatStateComposing );
+	//m_session->send( reply, gloox::EmptyString );//after reply from json-rpc-server, call send reply
+	//if(DebugLog)
+	//	cout<<"ADXmppProxy::send_reply:to:"<<sender<<" sending msg = "<<reply<<endl;
+	//return 0;
 }
 /*****************************************************************************/
 void ADXmppProxy::handleMessageEvent( const JID& from, MessageEventType event )
@@ -178,17 +188,38 @@ void ADXmppProxy::handleMessageSession( MessageSession *session )
 {
 	if(j==NULL)
 		return;
+	const gloox::JID& jid = session->target();
 	if(DebugLog)
-		printf( "got new session\n");
+		cout<<"Got new message session for "<<jid.full().c_str()<<endl;
+	Sessions::iterator it = mySessions.find(jid.bare());
+	if (it != mySessions.end())
+	{
+		if(DebugLog)
+		cout<<"Disposing existing message session for "<<it->second.m_session->target().full().c_str()<<endl;
+		j->disposeMessageSession(it->second.m_session);
+		mySessions.erase(it);
+	}
+	session->registerMessageHandler(this);
+	gloox::ChatStateFilter* filter = new gloox::ChatStateFilter(session);
+	gloox::MessageEventFilter* evntfilter = new gloox::MessageEventFilter(session);
+	filter->registerChatStateHandler(this);
+	evntfilter->registerMessageEventHandler( this );
+	Session newSession;
+	newSession.m_session            = session;
+	newSession.m_chatStateFilter    = filter;
+	newSession.m_messageEventFilter = evntfilter;
+	mySessions[jid.bare()] = newSession;
+
+	//printf( "got new session\n");
 	// this example can handle only one session. so we get rid of the old session
-	if(m_session)
+	/*if(m_session)
 		j->disposeMessageSession( m_session );
 	m_session = session;
 	m_session->registerMessageHandler( this );
 	m_messageEventFilter = new MessageEventFilter( m_session );
 	m_messageEventFilter->registerMessageEventHandler( this );
 	m_chatStateFilter = new ChatStateFilter( m_session );
-	m_chatStateFilter->registerChatStateHandler( this );
+	m_chatStateFilter->registerChatStateHandler( this );*/
 }
 /*****************************************************************************/
 void ADXmppProxy::handleLog( LogLevel level, LogArea area, const std::string& message )
@@ -364,11 +395,24 @@ bool ADXmppProxy::SendMessageToBuddy(std::string address, const std::string & bo
 		string str = *it;
 		if(address==str)
 		{
-			MessageSession* session = new MessageSession(j,JID(address));
-			session->send(body, subject);//todo: presence check needed before sending message?
-			j->disposeMessageSession( session );
-			if(DebugLog)
-				cout<<"ADXmppProxy::SendMessageToBuddy:address="<<address<<" body="<<body<<" subject="<<subject<<endl;
+			Sessions::iterator it = mySessions.find(address);
+			if (it != mySessions.end()) //check if session already exists in my list
+			{
+				it->second.m_messageEventFilter->raiseMessageEvent( MessageEventDisplayed );
+				it->second.m_messageEventFilter->raiseMessageEvent( MessageEventComposing );
+				it->second.m_chatStateFilter->setChatState( ChatStateComposing );
+				it->second.m_session->send( body, subject);//gloox::EmptyString );
+				if(DebugLog)
+			cout<<"ADXmppProxy::SendMessageToBuddy:address="<<address<<" body="<<body<<" subject="<<subject<<endl;
+			}
+			else //if session doesnt exist in my list, then create new session and send the message
+			{
+				MessageSession* session = new MessageSession(j,JID(address));
+				session->send(body, subject);//todo: presence check needed before sending message?
+				j->disposeMessageSession( session );
+				if(DebugLog)
+			cout<<"ADXmppProxy::SendMessageToBuddy:address="<<address<<" body="<<body<<" subject="<<subject<<endl;
+			}
 			return true;
 		}
 	}

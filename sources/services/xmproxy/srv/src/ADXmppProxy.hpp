@@ -131,8 +131,17 @@ private:
 	int  HeartBeat;
 	//JID myJid;
 	Client *j;
-	MessageSession *m_session;
-	MessageEventFilter *m_messageEventFilter;
-	ChatStateFilter *m_chatStateFilter;
+	//MessageSession *m_session;
+	//MessageEventFilter *m_messageEventFilter;
+	//ChatStateFilter *m_chatStateFilter;
+	//sessions container
+	struct Session
+	{
+		gloox::MessageSession* m_session;
+		gloox::ChatStateFilter* m_chatStateFilter;
+		gloox::MessageEventFilter *m_messageEventFilter;
+	};
+	typedef std::map<std::string, Session> Sessions;
+	Sessions mySessions;
 };
 #endif

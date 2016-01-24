@@ -65,8 +65,9 @@ struct AyncEventEntry
 	int taskID; //async event taskID returned by server
 	int srvPort;//port where async command was sent
 	int xmppTID;//internal global task id of xmpp-proxy
+	std::string to;//reply back to this requestor
 public:
-	AyncEventEntry(int tid,int port,int xmtid) :taskID(tid),srvPort(port),xmppTID(xmtid){}
+	AyncEventEntry(int tid,int port,int xmtid,std::string sender) :taskID(tid),srvPort(port),xmppTID(xmtid),to(sender){}
 };
 //following functor object is used as predicator for finding a specific vector element entry based on srvToken
 class FindAsyncEventEntry
@@ -122,16 +123,16 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	virtual int custom_sig_notification(int signum){return 0;};
 
 	EXMPP_CMD_TYPES ResolveCmdStr(std::string cmd);
-	RPC_SRV_RESULT proc_cmd_sms_deleteall(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_sms_deleteall(std::string msg,std::string &returnval,std::string sender);
 	RPC_SRV_RESULT proc_cmd_sms_delete(std::string msg);
 	RPC_SRV_RESULT proc_cmd_sms_get(std::string msg,std::string &returnval);
-	RPC_SRV_RESULT proc_cmd_sms_send(std::string msg,std::string &returnval);
-	RPC_SRV_RESULT proc_cmd_sms_list_update(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_sms_send(std::string msg,std::string &returnval,std::string sender);
+	RPC_SRV_RESULT proc_cmd_sms_list_update(std::string msg,std::string &returnval,std::string sender);
 	RPC_SRV_RESULT proc_cmd_sms_get_total(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_get_version(std::string msg,std::string &returnval);
-	RPC_SRV_RESULT proc_cmd_fmw_update(std::string msg,std::string &returnval);
-	RPC_SRV_RESULT proc_cmd_fmw_reboot(std::string msg,std::string &returnval);
-	RPC_SRV_RESULT proc_cmd_fmw_poweroff(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_fmw_update(std::string msg,std::string &returnval,std::string sender);
+	RPC_SRV_RESULT proc_cmd_fmw_reboot(std::string msg,std::string &returnval,std::string sender);
+	RPC_SRV_RESULT proc_cmd_fmw_poweroff(std::string msg,std::string &returnval,std::string sender);
 	RPC_SRV_RESULT proc_cmd_fmw_update_sts(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_update_res(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_uptime(std::string msg,std::string &returnval);
@@ -140,11 +141,11 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_fmw_hostname(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_get_myip(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_set_default_hostname(std::string msg);
-	RPC_SRV_RESULT proc_cmd_dial_voice(std::string msg,std::string &returnval,char* rpc_cmd);
+	RPC_SRV_RESULT proc_cmd_dial_voice(std::string msg,std::string &returnval,char* rpc_cmd,std::string sender);
 	RPC_SRV_RESULT proc_cmd_get_ussd(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_logsts(std::string msg,std::string &returnval);
-	RPC_SRV_RESULT proc_cmd_gsm_modem_identify(std::string msg,std::string &returnval);
-	RPC_SRV_RESULT proc_cmd_log_list_update(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_gsm_modem_identify(std::string msg,std::string &returnval,std::string sender);
+	RPC_SRV_RESULT proc_cmd_log_list_update(std::string msg,std::string &returnval,std::string sender);
 	RPC_SRV_RESULT proc_cmd_log_get_count(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_log_get_line(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_fmw_get_localip(std::string msg,std::string &returnval);
@@ -160,10 +161,10 @@ public:
 	RPC_SRV_RESULT SendMessage(std::string msg);
 	void SetDebugLog(bool log);
 	int AttachHeartBeat(ADTimer* pTimer);
-	RPC_SRV_RESULT RpcResponseCallback(RPC_SRV_RESULT taskRes,int taskID);//called by eventHandler
-	RPC_SRV_RESULT RpcResponseCallback(std::string taskRes,int taskID);
+	RPC_SRV_RESULT RpcResponseCallback(RPC_SRV_RESULT taskRes,int taskID,std::string to);//called by eventHandler
+	RPC_SRV_RESULT RpcResponseCallback(std::string taskRes,int taskID,std::string to);
 	//RPC_SRV_RESULT IsItMyAsyncTaskResp(int tid,int port);
-	RPC_SRV_RESULT AccessAsyncTaskList(int tid, int port, bool insertEntryFlag=true,int *xmpptID=NULL);
+	RPC_SRV_RESULT AccessAsyncTaskList(int tid, int port, bool insertEntryFlag,int *xmpptID,std::string &sender);
 	void SetUSBGsmSts(bool sts);
 };
 #endif

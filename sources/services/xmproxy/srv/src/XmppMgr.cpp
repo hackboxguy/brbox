@@ -154,9 +154,9 @@ int XmppMgr::onXmppMessage(std::string msg,std::string sender,ADXmppProducer* pO
 	//process the messages
 	//cout<<"msg arrived: "<<msg<<endl;
 	if(msg=="Echo" || msg=="echo") //for checking if client is alive
-		XmppProxy.send_reply(msg);
+		XmppProxy.send_reply(msg,sender);
 	else if(msg=="Help" || msg=="help") //print help
-		XmppProxy.send_reply(print_help());
+		XmppProxy.send_reply(print_help(),sender);
 	else
 	{
 		processCmd.push_back(XmppCmdEntry(msg,sender));
@@ -212,28 +212,28 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			std::string cmdcmdMsg=result.front();
 			switch(ResolveCmdStr(cmdcmdMsg))
 			{
-				case EXMPP_CMD_SMS_DELETE_ALL  :res=proc_cmd_sms_deleteall(cmdcmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_SMS_DELETE_ALL  :res=proc_cmd_sms_deleteall(cmdcmdMsg,returnval,cmd.sender);break;//inProg
 				case EXMPP_CMD_SMS_DELETE      :res=proc_cmd_sms_delete(cmdcmdMsg);break;
 				case EXMPP_CMD_SMS_GET         :res=proc_cmd_sms_get(cmdcmdMsg,returnval);break;
-				case EXMPP_CMD_SMS_SEND        :res=proc_cmd_sms_send(cmdcmdMsg,returnval);break;//inProg
-				case EXMPP_CMD_SMS_LIST_UPDATE :res=proc_cmd_sms_list_update(cmdcmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_SMS_SEND        :res=proc_cmd_sms_send(cmdcmdMsg,returnval,cmd.sender);break;//inProg
+				case EXMPP_CMD_SMS_LIST_UPDATE :res=proc_cmd_sms_list_update(cmdcmdMsg,returnval,cmd.sender);break;//inProg
 				case EXMPP_CMD_SMS_GET_TOTAL   :res=proc_cmd_sms_get_total(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_FMW_GET_VERSION :res=proc_cmd_fmw_get_version(cmdcmdMsg,returnval);break;
-				case EXMPP_CMD_FMW_UPDATE      :res=proc_cmd_fmw_update(cmdcmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_FMW_UPDATE      :res=proc_cmd_fmw_update(cmdcmdMsg,returnval,cmd.sender);break;//inProg
 				case EXMPP_CMD_FMW_UPDATE_STS  :res=proc_cmd_fmw_update_sts(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_FMW_UPDATE_RES  :res=proc_cmd_fmw_update_res(cmdcmdMsg,returnval);break;
-				case EXMPP_CMD_FMW_REBOOT      :res=proc_cmd_fmw_reboot(cmdcmdMsg,returnval);break;//inProg
-				case EXMPP_CMD_FMW_POWEROFF    :res=proc_cmd_fmw_poweroff(cmdcmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_FMW_REBOOT      :res=proc_cmd_fmw_reboot(cmdcmdMsg,returnval,cmd.sender);break;//inProg
+				case EXMPP_CMD_FMW_POWEROFF    :res=proc_cmd_fmw_poweroff(cmdcmdMsg,returnval,cmd.sender);break;//inProg
 				case EXMPP_CMD_FMW_UPTIME      :res=proc_cmd_fmw_uptime(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_FMW_HOSTNAME    :res=proc_cmd_fmw_hostname(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_FMW_GET_MYIP    :res=proc_cmd_fmw_get_myip(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_FMW_RESET_HOSTNAME:res=proc_cmd_fmw_set_default_hostname(cmdcmdMsg);break;
-				case EXMPP_CMD_DIAL_VOICE      :res=proc_cmd_dial_voice(cmdcmdMsg,returnval,(char*)"dial_voice");break;//inPrg
-				case EXMPP_CMD_DIAL_USSD       :res=proc_cmd_dial_voice(cmdcmdMsg,returnval,(char*)"dial_ussd");break;//inPrg
+				case EXMPP_CMD_DIAL_VOICE      :res=proc_cmd_dial_voice(cmdcmdMsg,returnval,(char*)"dial_voice",cmd.sender);break;//inPrg
+				case EXMPP_CMD_DIAL_USSD       :res=proc_cmd_dial_voice(cmdcmdMsg,returnval,(char*)"dial_ussd",cmd.sender);break;//inPrg
 				case EXMPP_CMD_GET_USSD        :res=proc_cmd_get_ussd(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_DEBUG_LOG_STS   :res=proc_cmd_logsts(cmdcmdMsg,returnval);break;
-				case EXMPP_CMD_GSM_MODEM_IDENT :res=proc_cmd_gsm_modem_identify(cmdcmdMsg,returnval);break;//inProg
-				case EXMPP_CMD_LOG_UPDATE      :res=proc_cmd_log_list_update(cmdcmdMsg,returnval);break;//inProg
+				case EXMPP_CMD_GSM_MODEM_IDENT :res=proc_cmd_gsm_modem_identify(cmdcmdMsg,returnval,cmd.sender);break;//inProg
+				case EXMPP_CMD_LOG_UPDATE      :res=proc_cmd_log_list_update(cmdcmdMsg,returnval,cmd.sender);break;//inProg
 				case EXMPP_CMD_LOG_COUNT       :res=proc_cmd_log_get_count(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_LOG_MSG         :res=proc_cmd_log_get_line(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_FMW_GET_LOCALIP :res=proc_cmd_fmw_get_localip(cmdcmdMsg,returnval);break;
@@ -254,7 +254,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 }
 //following function is called by EvntHandler object
 //after receiving the result of inProg task, this call back is called to send reply over xmpp
-RPC_SRV_RESULT XmppMgr::RpcResponseCallback(RPC_SRV_RESULT taskRes,int taskID)
+RPC_SRV_RESULT XmppMgr::RpcResponseCallback(RPC_SRV_RESULT taskRes,int taskID,std::string to)
 {
 	char tID[255];sprintf(tID,"%d",taskID);
 	std::string returnval="taskID=";
@@ -263,21 +263,21 @@ RPC_SRV_RESULT XmppMgr::RpcResponseCallback(RPC_SRV_RESULT taskRes,int taskID)
 	const char *resTbl[] = STR_RPC_SRV_RESULT_STRING_TABLE;
 	std::string result   = resTbl[taskRes];
 	std::string response = result +" : "+returnval;
-	XmppProxy.send_reply(response);//result+":"+returnval);
+	XmppProxy.send_reply(response,to);//result+":"+returnval);
 	return RPC_SRV_RESULT_SUCCESS;
 }
-RPC_SRV_RESULT XmppMgr::RpcResponseCallback(std::string taskRes,int taskID)
+RPC_SRV_RESULT XmppMgr::RpcResponseCallback(std::string taskRes,int taskID,std::string to)
 {
 	char tID[255];sprintf(tID,"%d",taskID);
 	std::string returnval="taskID=";
 	returnval+=tID;
 	std::string result   = taskRes;
 	std::string response = result +" : "+returnval;
-	XmppProxy.send_reply(response);
+	XmppProxy.send_reply(response,to);
 	return RPC_SRV_RESULT_SUCCESS;
 }
 //RAII function, used for inserting entry or searching for existing entry
-RPC_SRV_RESULT XmppMgr::AccessAsyncTaskList(int tid, int port, bool insertEntryFlag,int *xmpptID) 
+RPC_SRV_RESULT XmppMgr::AccessAsyncTaskList(int tid, int port, bool insertEntryFlag,int *xmpptID,std::string &sender) 
 {
 	// mutex to protect cmn resource access (shared across threads)
 	static std::mutex mutex;
@@ -286,7 +286,7 @@ RPC_SRV_RESULT XmppMgr::AccessAsyncTaskList(int tid, int port, bool insertEntryF
 	if(insertEntryFlag==true)
 	{
 		XmppTaskIDCounter++;//global task id counter for external xmpp clients
-		AsyncTaskList.push_back(AyncEventEntry(tid,port,XmppTaskIDCounter));
+		AsyncTaskList.push_back(AyncEventEntry(tid,port,XmppTaskIDCounter,sender));
 		if(xmpptID!=NULL)
 			*xmpptID=XmppTaskIDCounter;
 	}
@@ -298,6 +298,7 @@ RPC_SRV_RESULT XmppMgr::AccessAsyncTaskList(int tid, int port, bool insertEntryF
 		return RPC_SRV_RESULT_FAIL;
 	if(xmpptID!=NULL)
 		*xmpptID=(*it).xmppTID;
+	sender=(*it).to;
 	//if (find_if(AsyncTaskList.begin(), AsyncTaskList.end(), FindAsyncEventEntry(tid,port)) == AsyncTaskList.end())
 	//	return RPC_SRV_RESULT_FAIL;
 	//erase the entry
@@ -400,7 +401,7 @@ RPC_SRV_RESULT XmppMgr::SendMessage(std::string msg)
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
-RPC_SRV_RESULT XmppMgr::proc_cmd_sms_deleteall(std::string msg,std::string &returnval)
+RPC_SRV_RESULT XmppMgr::proc_cmd_sms_deleteall(std::string msg,std::string &returnval,std::string sender)
 {
 	char tID[255];tID[254]='\0';
 	ADJsonRpcClient Client;
@@ -411,7 +412,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sms_deleteall(std::string msg,std::string &retu
 	returnval="taskID=";//returnval+=tID;
 	int xmptid=-1;
 	if(result==RPC_SRV_RESULT_IN_PROG)
-		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS,true,&xmptid);
+		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS,true,&xmptid,sender);
 	sprintf(tID,"%d",xmptid);returnval+=tID;
 	return result;
 }
@@ -443,7 +444,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sms_get(std::string msg,std::string &returnval)
 	return result;
 }
 /* ------------------------------------------------------------------------- */
-RPC_SRV_RESULT XmppMgr::proc_cmd_sms_send(std::string msg,std::string &returnval)
+RPC_SRV_RESULT XmppMgr::proc_cmd_sms_send(std::string msg,std::string &returnval,std::string sender)
 {
 	std::string cmd,destArg,msgArg;
 	stringstream msgstream(msg);
@@ -469,12 +470,12 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sms_send(std::string msg,std::string &returnval
 	returnval="taskID=";//returnval+=tID;
 	int xmptid=-1;
 	if(result==RPC_SRV_RESULT_IN_PROG)
-		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS,true,&xmptid);
+		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS,true,&xmptid,sender);
 	sprintf(tID,"%d",xmptid);returnval+=tID;
 	return result;
 }
 /* ------------------------------------------------------------------------- */
-RPC_SRV_RESULT XmppMgr::proc_cmd_sms_list_update(std::string msg,std::string &returnval)
+RPC_SRV_RESULT XmppMgr::proc_cmd_sms_list_update(std::string msg,std::string &returnval,std::string sender)
 {
 	char tID[255];tID[254]='\0';
 	ADJsonRpcClient Client;
@@ -485,7 +486,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sms_list_update(std::string msg,std::string &re
 	returnval="taskID=";//returnval+=tID;
 	int xmptid=-1;
 	if(result==RPC_SRV_RESULT_IN_PROG)
-		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS,true,&xmptid);
+		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS,true,&xmptid,sender);
 	sprintf(tID,"%d",xmptid);returnval+=tID;
 	return result;
 }
@@ -516,7 +517,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_get_version(std::string msg,std::string &re
 	return result;
 }
 /* ------------------------------------------------------------------------- */
-RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg,std::string &returnval)
+RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg,std::string &returnval,std::string sender)
 {
 	//00:06:05.434-->{ "jsonrpc": "2.0", "method": "download_ftp_file", "params": { "srcaddr": "http:\/\/github.com\/hackboxguy\/downloads\/raw\/master\/bbbmmcRbox\/readme.txt", "targetpath": "\/tmp\/readme.txt" }, "id": 0 }
 	//00:06:05.454<--{ "jsonrpc": "2.0", "result": { "return": "InProgress", "taskId": 1 }, "id": 0 }
@@ -567,14 +568,14 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg,std::string &returnv
 		returnval="taskID=";//returnval+=temp_str;
 		int xmptid=-1;
 		if(result==RPC_SRV_RESULT_IN_PROG)
-			AccessAsyncTaskList(atoi(temp_str),ADCMN_PORT_SYSMGR,true,&xmptid);
+			AccessAsyncTaskList(atoi(temp_str),ADCMN_PORT_SYSMGR,true,&xmptid,sender);
 		sprintf(temp_str,"%d",xmptid);returnval+=temp_str;
 	}
 	Client.rpc_server_disconnect();
 	return result;
 }
 /* ------------------------------------------------------------------------- */
-RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_reboot(std::string msg,std::string &returnval)
+RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_reboot(std::string msg,std::string &returnval,std::string sender)
 {
 	//01:39:52.718-->{ "jsonrpc": "2.0", "method": "set_device_operation", "params": { "operation": "reboot" }, "id": 0 }
 	//01:39:52.726<--{ "jsonrpc": "2.0", "result": { "return": "InProgress", "taskId": 1 }, "id": 0 }
@@ -587,11 +588,11 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_reboot(std::string msg,std::string &returnv
 	returnval="taskID=";//returnval+=temp_str;
 	int xmptid=-1;
 	if(result==RPC_SRV_RESULT_IN_PROG)
-		AccessAsyncTaskList(atoi(temp_str),ADCMN_PORT_SYSMGR,true,&xmptid);
+		AccessAsyncTaskList(atoi(temp_str),ADCMN_PORT_SYSMGR,true,&xmptid,sender);
 	sprintf(temp_str,"%d",xmptid);returnval+=temp_str;
 	return result;
 }
-RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_poweroff(std::string msg,std::string &returnval)
+RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_poweroff(std::string msg,std::string &returnval,std::string sender)
 {
 	char temp_str[255];temp_str[0]='\0';
 	ADJsonRpcClient Client;
@@ -602,7 +603,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_poweroff(std::string msg,std::string &retur
 	returnval="taskID=";//returnval+=temp_str;
 	int xmptid=-1;
 	if(result==RPC_SRV_RESULT_IN_PROG)
-		AccessAsyncTaskList(atoi(temp_str),ADCMN_PORT_SYSMGR,true,&xmptid);
+		AccessAsyncTaskList(atoi(temp_str),ADCMN_PORT_SYSMGR,true,&xmptid,sender);
 	sprintf(temp_str,"%d",xmptid);returnval+=temp_str;
 	return result;
 }
@@ -791,7 +792,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_set_default_hostname(std::string msg)
 	return result;
 }
 /* ------------------------------------------------------------------------- */
-RPC_SRV_RESULT XmppMgr::proc_cmd_dial_voice(std::string msg,std::string &returnval,char* rpc_cmd)
+RPC_SRV_RESULT XmppMgr::proc_cmd_dial_voice(std::string msg,std::string &returnval,char* rpc_cmd,std::string sender)
 {
 	std::string cmd,destArg;//,msgArg;
 	stringstream msgstream(msg);
@@ -816,7 +817,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_dial_voice(std::string msg,std::string &returnv
 	returnval="taskID=";//returnval+=tID;
 	int xmptid=-1;
 	if(result==RPC_SRV_RESULT_IN_PROG)
-		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS,true,&xmptid);
+		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS,true,&xmptid,sender);
 	sprintf(tID,"%d",xmptid);returnval+=tID;
 	return result;
 }
@@ -871,7 +872,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_logsts(std::string msg,std::string &returnval)
 	}
 }
 /* ------------------------------------------------------------------------- */
-RPC_SRV_RESULT XmppMgr::proc_cmd_gsm_modem_identify(std::string msg,std::string &returnval)
+RPC_SRV_RESULT XmppMgr::proc_cmd_gsm_modem_identify(std::string msg,std::string &returnval,std::string sender)
 {
 	char tID[255];tID[254]='\0';
 	ADJsonRpcClient Client;
@@ -882,12 +883,12 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_gsm_modem_identify(std::string msg,std::string 
 	returnval="taskID=";//returnval+=tID;
 	int xmptid=-1;
 	if(result==RPC_SRV_RESULT_IN_PROG)
-		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS,true,&xmptid);
+		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_BBOXSMS,true,&xmptid,sender);
 	sprintf(tID,"%d",xmptid);returnval+=tID;
 	return result;
 }
 /* ------------------------------------------------------------------------- */
-RPC_SRV_RESULT XmppMgr::proc_cmd_log_list_update(std::string msg,std::string &returnval)
+RPC_SRV_RESULT XmppMgr::proc_cmd_log_list_update(std::string msg,std::string &returnval,std::string sender)
 {
 	char tID[255];tID[254]='\0';
 	ADJsonRpcClient Client;
@@ -898,7 +899,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_log_list_update(std::string msg,std::string &re
 	returnval="taskID=";//returnval+=tID;
 	int xmptid=-1;
 	if(result==RPC_SRV_RESULT_IN_PROG)
-		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_SYSMGR,true,&xmptid);
+		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_SYSMGR,true,&xmptid,sender);
 	sprintf(tID,"%d",xmptid);returnval+=tID;
 	return result;
 }
