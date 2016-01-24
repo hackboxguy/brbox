@@ -28,6 +28,7 @@ ADXmppProxy::ADXmppProxy()
 }
 ADXmppProxy::~ADXmppProxy()
 {
+	mySessions.clear();
 	PingThread.stop_thread();
 }
 /*****************************************************************************/
