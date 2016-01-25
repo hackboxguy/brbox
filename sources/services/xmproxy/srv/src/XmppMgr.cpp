@@ -214,6 +214,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			std::string cmdcmdMsg=result.front();
 
 			//check if it is an alias
+			transform(cmdcmdMsg.begin(), cmdcmdMsg.end(), cmdcmdMsg.begin(), ::tolower);//convert all lower case
 			Alias::iterator it = AliasList.find(cmdcmdMsg);
 			if (it != AliasList.end())
 				cmdcmdMsg=it->second;
