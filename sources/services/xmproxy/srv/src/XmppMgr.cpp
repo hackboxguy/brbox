@@ -43,7 +43,8 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{false,EXMPP_CMD_LOG_MSG                 , "logmsg"       ,"<zero_index_lineNum>"},//due to bug, disabled(to be fixed later)
 	{true ,EXMPP_CMD_GPIO                    , "gpio"         ,"<gpio_num> <sts[0/1]>"},
 	{true ,EXMPP_CMD_GSM_EVENT_NOTIFY        , "eventgsm"     ,"<sts[0/1]>"},
-	{true ,EXMPP_CMD_GPIO_EVENT_NOTIFY       , "eventgpio"    ,"<gpio_num> <sts[0/1]>"}
+	{true ,EXMPP_CMD_GPIO_EVENT_NOTIFY       , "eventgpio"    ,"<gpio_num> <sts[0/1]>"},
+	{true ,EXMPP_CMD_ALIAS                   , "alias"        ,"name=cmd"}
 };
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
@@ -78,6 +79,7 @@ XmppMgr::~XmppMgr()
 	}*/
 	//XmppClientThread.stop_thread();
 	XmppCmdProcessThread.stop_thread();
+	AliasList.clear();
 }
 /* ------------------------------------------------------------------------- */
 int XmppMgr::AttachHeartBeat(ADTimer* pTimer)
@@ -210,6 +212,12 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			std::string returnval="";
 			RPC_SRV_RESULT res=RPC_SRV_RESULT_UNKNOWN_COMMAND;//RPC_SRV_RESULT_FAIL;
 			std::string cmdcmdMsg=result.front();
+
+			//check if it is an alias
+			Alias::iterator it = AliasList.find(cmdcmdMsg);
+			if (it != AliasList.end())
+				cmdcmdMsg=it->second;
+
 			switch(ResolveCmdStr(cmdcmdMsg))
 			{
 				case EXMPP_CMD_SMS_DELETE_ALL  :res=proc_cmd_sms_deleteall(cmdcmdMsg,returnval,cmd.sender);break;//inProg
@@ -240,6 +248,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_GPIO            :res=proc_cmd_gpio(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_GSM_EVENT_NOTIFY:res=proc_cmd_event_gsm(cmdcmdMsg,cmd.sender,returnval);break;
 				case EXMPP_CMD_GPIO_EVENT_NOTIFY:res=proc_cmd_event_gpio(cmdcmdMsg,cmd.sender,returnval);break;
+				case EXMPP_CMD_ALIAS           :res=proc_cmd_alias(cmdcmdMsg,returnval);break;
 				default                        :break;
 			}
 			result.pop_front();
@@ -943,6 +952,45 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_event_gsm(std::string msg,std::string sender,st
 RPC_SRV_RESULT XmppMgr::proc_cmd_event_gpio(std::string msg,std::string sender,std::string &returnval)
 {
 	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_alias(std::string msg,std::string &returnval)
+{
+	//msg "Alias Light ON=Gpio 2 0"
+	transform(msg.begin(), msg.end(), msg.begin(), ::tolower);//convert all lower case
+	if(msg=="alias")//if it is just the "alias" print the content of AliasList
+	{
+		returnval="";
+		for( Alias::iterator it = AliasList.begin(); it != AliasList.end(); ++it)
+		{
+			std::string line=it->first+"="+it->second;
+			returnval+=line;
+			returnval+='\n';
+		}
+		return RPC_SRV_RESULT_SUCCESS;
+	}
+	std::string cmd,value="";
+	stringstream msgstream(msg);
+	getline(msgstream,cmd,'=');//"alias light on"
+	getline(msgstream,value,'=');//"gpio 2 0"
+
+	std::string name,key;
+	stringstream alias(cmd);
+	alias>>name;//alias
+	getline(alias,key);
+	key.erase(0, key.find_first_not_of(" \t\n\r\f\v"));//remove leading whitespace " light on"
+	if(value=="")//request for deleting an alias from list
+	{
+		Alias::iterator it = AliasList.find(key);
+		if (it != AliasList.end())
+			AliasList.erase(it);
+		return RPC_SRV_RESULT_SUCCESS;
+	}
+	//cout<<"key  ="<<key<<endl;//"light on"
+	//cout<<"value="<<value<<endl;//"gpio 2 0"
+	//add new alias to list
+	AliasList[key] = value;
+	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
 

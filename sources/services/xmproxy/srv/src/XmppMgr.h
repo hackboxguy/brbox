@@ -48,6 +48,7 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_GPIO,//gpio pin read write
 	EXMPP_CMD_GSM_EVENT_NOTIFY,//sms/call async-event-notification
 	EXMPP_CMD_GPIO_EVENT_NOTIFY,//gpio async-event-notification
+	EXMPP_CMD_ALIAS,
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -110,6 +111,10 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	std::string XmppUserName;
 	std::string XmppUserPw;
 	ADXmppProxy XmppProxy;//xmpp client
+
+	typedef std::map<std::string, std::string> Alias;
+	Alias AliasList;
+
 	//xmpp-client-callback functions
 	virtual int onXmppMessage(std::string msg,std::string sender,ADXmppProducer* pObj);
 
@@ -152,6 +157,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_gpio(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_event_gsm(std::string msg,std::string sender,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_event_gpio(std::string msg,std::string sender,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_alias(std::string msg,std::string &returnval);
 	std::string print_help();
 public:
 	XmppMgr();
