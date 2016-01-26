@@ -10,6 +10,8 @@ class MyCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 	ADCmdlineHelper CmdlineHelper;
 	char LoginFilePath[512];
 	bool UsbGSMSts;
+	char AliasListFilePath[512];
+
 
 	//Chain-callback functions	
 	virtual int parse_my_cmdline_options(int arg, char* sub_arg);
@@ -29,7 +31,7 @@ public:
 	int get_dev_info(ADCMN_DEV_INFO *pInfo);
 	int get_login_filepath(char* filepath);
 	bool is_usbgsm_connected();
-
+	std::string get_alias_list_filepath();//char* filepath);
 	//service specific part
 };
 #endif

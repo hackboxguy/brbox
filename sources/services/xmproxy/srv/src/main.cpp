@@ -39,6 +39,7 @@ int main(int argc, const char* argv[])
 	DataCache.pXmpMgr =(void*)&XmpManager;//rpc's needs to know the object pointer of xmpp-handling-object
 	XmpManager.SetDebugLog(dbglog);
 	XmpManager.SetUSBGsmSts(CmdLine.is_usbgsm_connected());
+	XmpManager.SetAliasListFilePath(CmdLine.get_alias_list_filepath());
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 

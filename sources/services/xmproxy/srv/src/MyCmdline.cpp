@@ -5,6 +5,7 @@ typedef enum XMPROXY_CMDLINE_OPT_T
 {
 	XMPROXY_CMDLINE_OPT_LOGIN_FILE = 100,
 	XMPROXY_CMDLINE_OPT_USBGSM_STS,
+	XMPROXY_CMDLINE_OPT_ALIAS_LIST_FILE,
 	XMPROXY_CMDLINE_OPT_UNKNOWN,
 	XMPROXY_CMDLINE_OPT_NONE
 }XMPROXY_CMDLINE_OPT;
@@ -20,8 +21,11 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 	CmdlineHelper.insert_help_entry((char*)"--loginfile=filepath (path to the file having xmpp user/pw details)");
 	CmdlineHelper.insert_options_entry((char*)"usbgsm" ,optional_argument,XMPROXY_CMDLINE_OPT_USBGSM_STS);
 	CmdlineHelper.insert_help_entry((char*)"--usbgsm=sts         (sts=0 means no usbgsm module connected)");
+	CmdlineHelper.insert_options_entry((char*)"aliaslist" ,optional_argument,XMPROXY_CMDLINE_OPT_ALIAS_LIST_FILE);
+	CmdlineHelper.insert_help_entry((char*)"--aliaslist=filepath (file path of alias list)");
 	strcpy(LoginFilePath,XMPROXY_DEFAULT_LOGIN_FILE_PATH);
 	UsbGSMSts=false;
+	AliasListFilePath[0]='\0';
 }
 /*****************************************************************************/
 MyCmdline::~MyCmdline()
@@ -51,6 +55,12 @@ int MyCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 				else
 					UsbGSMSts=false;
 			}
+			break;
+		case XMPROXY_CMDLINE_OPT_ALIAS_LIST_FILE:
+			if(CmdlineHelper.get_next_subargument(&sub_arg)==0)//no alias-list filepath passed by user
+				strcpy(AliasListFilePath,"");
+			else
+				strcpy(AliasListFilePath,sub_arg);
 			break;
 		default:return 0;break;	
 	}
@@ -131,6 +141,12 @@ int MyCmdline::get_login_filepath(char* filepath)
 bool MyCmdline::is_usbgsm_connected()
 {
 	return UsbGSMSts;
+}
+std::string MyCmdline::get_alias_list_filepath()//char* filepath)
+{
+	std::string path=AliasListFilePath;//
+	//strcpy(filepath,AliasListFilePath);
+	return path;
 }
 /*****************************************************************************/
 

@@ -49,6 +49,7 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_GSM_EVENT_NOTIFY,//sms/call async-event-notification
 	EXMPP_CMD_GPIO_EVENT_NOTIFY,//gpio async-event-notification
 	EXMPP_CMD_ALIAS,
+	EXMPP_CMD_SLEEP,
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -112,6 +113,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	std::string XmppUserPw;
 	ADXmppProxy XmppProxy;//xmpp client
 
+	std::string AliasListFile;
 	typedef std::map<std::string, std::string> Alias;
 	Alias AliasList;
 
@@ -158,7 +160,13 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_event_gsm(std::string msg,std::string sender,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_event_gpio(std::string msg,std::string sender,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_alias(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_sleep(std::string msg);
 	std::string print_help();
+
+	RPC_SRV_RESULT LoadAliasList(std::string listFile);
+	RPC_SRV_RESULT ExtendAliasList(std::string listFile,std::string key,std::string val);
+	RPC_SRV_RESULT RewriteAliasList(std::string listFile);
+
 public:
 	XmppMgr();
 	~XmppMgr();
@@ -172,6 +180,7 @@ public:
 	//RPC_SRV_RESULT IsItMyAsyncTaskResp(int tid,int port);
 	RPC_SRV_RESULT AccessAsyncTaskList(int tid, int port, bool insertEntryFlag,int *xmpptID,std::string &sender);
 	void SetUSBGsmSts(bool sts);
+	inline void SetAliasListFilePath(std::string filepath){AliasListFile=filepath;};
 };
 #endif
 

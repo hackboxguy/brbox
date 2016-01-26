@@ -44,7 +44,8 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{true ,EXMPP_CMD_GPIO                    , "gpio"         ,"<gpio_num> <sts[0/1]>"},
 	{true ,EXMPP_CMD_GSM_EVENT_NOTIFY        , "eventgsm"     ,"<sts[0/1]>"},
 	{true ,EXMPP_CMD_GPIO_EVENT_NOTIFY       , "eventgpio"    ,"<gpio_num> <sts[0/1]>"},
-	{true ,EXMPP_CMD_ALIAS                   , "alias"        ,"name=cmd"}
+	{true ,EXMPP_CMD_ALIAS                   , "alias"        ,"name=cmd"},
+	{true ,EXMPP_CMD_SLEEP                   , "sleep"        ,"<seconds>"} //adding delay between multiple commands
 };
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
@@ -55,6 +56,7 @@ XmppMgr::XmppMgr() //:AckToken(0)
 	pMyTimer=NULL;
 	LastFmwUpdateTaskID=0;
 	XmppTaskIDCounter=0;
+	AliasListFile="";
 
 	DebugLog=false;
 	//GsmDevDetected=false;
@@ -227,9 +229,22 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 		std::deque<string> result;
 		while( ss.good() )
 		{
-		    string substr;
-		    getline( ss, substr, ';' );
-		    result.push_back( substr );
+			string substr;
+			getline( ss, substr, ';' );
+			//nested alias(allow only two level of alias expansion)
+			Alias::iterator it = AliasList.find(substr);
+			if (it != AliasList.end())
+			{
+				stringstream sss(it->second);
+				while( sss.good() )
+				{
+					string subsubstr;
+					getline( sss, subsubstr, ';' );
+					result.push_back( subsubstr );
+				}
+			}
+			else
+				result.push_back( substr );
 		}
 		while (!result.empty()) 
 		{
@@ -274,6 +289,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_GSM_EVENT_NOTIFY:res=proc_cmd_event_gsm(cmdcmdMsg,cmd.sender,returnval);break;
 				case EXMPP_CMD_GPIO_EVENT_NOTIFY:res=proc_cmd_event_gpio(cmdcmdMsg,cmd.sender,returnval);break;
 				//case EXMPP_CMD_ALIAS           :res=proc_cmd_alias(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_SLEEP           :res=proc_cmd_sleep(cmdcmdMsg);break;
 				default                        :break;
 			}
 			result.pop_front();
@@ -377,6 +393,10 @@ RPC_SRV_RESULT XmppMgr::Start(std::string accountFilePath)
 {
 	if(accountFilePath.size()<=0)
 		return RPC_SRV_RESULT_FAIL;
+
+	//fill AliasList with contents of alias-file
+	LoadAliasList(AliasListFile);
+
 	//cout<<"loginfilepath: "<<accountFilePath<<endl;
 	std::ifstream file(accountFilePath.c_str());
 	std::string line,key;
@@ -986,7 +1006,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_alias(std::string msg,std::string &returnval)
 	transform(msg.begin(), msg.end(), msg.begin(), ::tolower);//convert all lower case
 	if(msg=="alias")//if it is just the "alias" print the content of AliasList
 	{
-		returnval="";
+		returnval='\n';//"";
 		for( Alias::iterator it = AliasList.begin(); it != AliasList.end(); ++it)
 		{
 			std::string line=it->first+"="+it->second;
@@ -1010,14 +1030,70 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_alias(std::string msg,std::string &returnval)
 		Alias::iterator it = AliasList.find(key);
 		if (it != AliasList.end())
 			AliasList.erase(it);
+		//re-write alias-file with contents of AliasList
+		RewriteAliasList(AliasListFile);
 		return RPC_SRV_RESULT_SUCCESS;
 	}
 	//cout<<"key  ="<<key<<endl;//"light on"
 	//cout<<"value="<<value<<endl;//"gpio 2 0"
 	//add new alias to list
 	AliasList[key] = value;
+	//extend alias-file with contents of AliasList
+	ExtendAliasList(AliasListFile,key,value);
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
-
+#include <unistd.h>
+RPC_SRV_RESULT XmppMgr::proc_cmd_sleep(std::string msg)
+{
+	std::string cmd,cmdArg;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	msgstream >> cmdArg;
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0)
+		return RPC_SRV_RESULT_ARG_ERROR;
+	int sec=atoi(cmdArg.c_str());
+	usleep(sec *1000 * 1000);
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+#include <fstream>
+RPC_SRV_RESULT XmppMgr::LoadAliasList(std::string listFile)
+{
+	if(listFile.size()<=0)
+		return RPC_SRV_RESULT_FAIL;
+	std::ifstream infile(listFile);
+	std::string line;
+	while (std::getline(infile, line))
+	{
+		stringstream iss(line);std::string cmd,value;
+		getline(iss,cmd,'=');//"alias light on"
+		getline(iss,value,'=');//"gpio 2 0"
+		AliasList[cmd] = value;
+	}
+	//infile.close();
+	return RPC_SRV_RESULT_SUCCESS;
+}
+RPC_SRV_RESULT XmppMgr::ExtendAliasList(std::string listFile,std::string key,std::string val)
+{
+	if(listFile.size()<=0)
+		return RPC_SRV_RESULT_FAIL;
+	std::ofstream outfile;
+	outfile.open(listFile, std::ios::app);
+	outfile <<key<<"="<<val<<endl;
+	return RPC_SRV_RESULT_SUCCESS;
+}
+RPC_SRV_RESULT XmppMgr::RewriteAliasList(std::string listFile)
+{
+	if(listFile.size()<=0)
+		return RPC_SRV_RESULT_FAIL;
+	std::ofstream outfile;
+	outfile.open(listFile, std::ofstream::out | std::ofstream::trunc);
+	for( Alias::iterator it = AliasList.begin(); it != AliasList.end(); ++it)
+		outfile <<it->first<<"="<<it->second<<endl;
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
 
