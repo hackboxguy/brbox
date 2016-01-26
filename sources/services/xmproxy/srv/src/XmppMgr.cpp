@@ -199,6 +199,28 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 		//TODO: handle semicolon separated multiple commands
 		XmppCmdEntry cmd = processCmd.front();
 
+		stringstream mystream(cmd.cmdMsg);
+		std::string mycmd;
+		mystream >> mycmd;
+		transform(mycmd.begin(), mycmd.end(), mycmd.begin(), ::tolower);
+		if(mycmd=="alias");
+		{
+			std::string myreturnval="";
+			RPC_SRV_RESULT myres=RPC_SRV_RESULT_UNKNOWN_COMMAND;//RPC_SRV_RESULT_FAIL;
+			myres=proc_cmd_alias(cmd.cmdMsg,myreturnval);
+			const char *myresTbl[] = STR_RPC_SRV_RESULT_STRING_TABLE;
+			std::string myresult   = myresTbl[myres];
+			std::string myresponse = myresult +" : "+myreturnval;
+			XmppProxy.send_reply(myresponse,cmd.sender);
+			return 0;
+		}
+		//check if it is an alias
+		transform(cmd.cmdMsg.begin(), cmd.cmdMsg.end(), cmd.cmdMsg.begin(), ::tolower);//convert all lower case
+		Alias::iterator it = AliasList.find(cmd.cmdMsg);
+		if (it != AliasList.end())
+			cmd.cmdMsg=it->second;
+
+
 		stringstream ss(cmd.cmdMsg);
 		std::deque<string> result;
 		while( ss.good() )
@@ -214,10 +236,10 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			std::string cmdcmdMsg=result.front();
 
 			//check if it is an alias
-			transform(cmdcmdMsg.begin(), cmdcmdMsg.end(), cmdcmdMsg.begin(), ::tolower);//convert all lower case
-			Alias::iterator it = AliasList.find(cmdcmdMsg);
-			if (it != AliasList.end())
-				cmdcmdMsg=it->second;
+			//transform(cmdcmdMsg.begin(), cmdcmdMsg.end(), cmdcmdMsg.begin(), ::tolower);//convert all lower case
+			//Alias::iterator it = AliasList.find(cmdcmdMsg);
+			//if (it != AliasList.end())
+			//	cmdcmdMsg=it->second;
 
 			switch(ResolveCmdStr(cmdcmdMsg))
 			{
@@ -249,7 +271,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_GPIO            :res=proc_cmd_gpio(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_GSM_EVENT_NOTIFY:res=proc_cmd_event_gsm(cmdcmdMsg,cmd.sender,returnval);break;
 				case EXMPP_CMD_GPIO_EVENT_NOTIFY:res=proc_cmd_event_gpio(cmdcmdMsg,cmd.sender,returnval);break;
-				case EXMPP_CMD_ALIAS           :res=proc_cmd_alias(cmdcmdMsg,returnval);break;
+				//case EXMPP_CMD_ALIAS           :res=proc_cmd_alias(cmdcmdMsg,returnval);break;
 				default                        :break;
 			}
 			result.pop_front();
