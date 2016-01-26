@@ -203,7 +203,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 		std::string mycmd;
 		mystream >> mycmd;
 		transform(mycmd.begin(), mycmd.end(), mycmd.begin(), ::tolower);
-		if(mycmd=="alias");
+		if(mycmd=="alias")
 		{
 			std::string myreturnval="";
 			RPC_SRV_RESULT myres=RPC_SRV_RESULT_UNKNOWN_COMMAND;//RPC_SRV_RESULT_FAIL;
