@@ -198,7 +198,8 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 	{
 		//TODO: handle semicolon separated multiple commands
 		XmppCmdEntry cmd = processCmd.front();
-
+		
+		//std::string temp=cmd.cmdMsg;
 		stringstream mystream(cmd.cmdMsg);
 		std::string mycmd;
 		mystream >> mycmd;
@@ -212,6 +213,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			std::string myresult   = myresTbl[myres];
 			std::string myresponse = myresult +" : "+myreturnval;
 			XmppProxy.send_reply(myresponse,cmd.sender);
+			processCmd.pop_front();
 			return 0;
 		}
 		//check if it is an alias
@@ -219,7 +221,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 		Alias::iterator it = AliasList.find(cmd.cmdMsg);
 		if (it != AliasList.end())
 			cmd.cmdMsg=it->second;
-
+		//cout<<"cmd="<<cmd.cmdMsg<<endl;
 
 		stringstream ss(cmd.cmdMsg);
 		std::deque<string> result;
@@ -979,6 +981,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_event_gpio(std::string msg,std::string sender,s
 /* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT XmppMgr::proc_cmd_alias(std::string msg,std::string &returnval)
 {
+	//cout<<"msg="<<msg<<endl;
 	//msg "Alias Light ON=Gpio 2 0"
 	transform(msg.begin(), msg.end(), msg.begin(), ::tolower);//convert all lower case
 	if(msg=="alias")//if it is just the "alias" print the content of AliasList
