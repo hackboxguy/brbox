@@ -213,7 +213,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			myres=proc_cmd_alias(cmd.cmdMsg,myreturnval);
 			const char *myresTbl[] = STR_RPC_SRV_RESULT_STRING_TABLE;
 			std::string myresult   = myresTbl[myres];
-			std::string myresponse = myresult +" : "+myreturnval;
+			std::string myresponse = "return="+myresult +" : "+"result="+myreturnval;
 			XmppProxy.send_reply(myresponse,cmd.sender);
 			processCmd.pop_front();
 			return 0;
@@ -295,7 +295,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			result.pop_front();
 			const char *resTbl[] = STR_RPC_SRV_RESULT_STRING_TABLE;
 			std::string result   = resTbl[res];
-			std::string response = result +" : "+returnval;
+			std::string response = "return="+result +" : "+"result="+returnval;
 			XmppProxy.send_reply(response,cmd.sender);//result+":"+returnval);
 		}
 		processCmd.pop_front();//after processing delete the entry
@@ -312,7 +312,7 @@ RPC_SRV_RESULT XmppMgr::RpcResponseCallback(RPC_SRV_RESULT taskRes,int taskID,st
 
 	const char *resTbl[] = STR_RPC_SRV_RESULT_STRING_TABLE;
 	std::string result   = resTbl[taskRes];
-	std::string response = result +" : "+returnval;
+	std::string response = "return="+result +" : "+"result="+returnval;
 	XmppProxy.send_reply(response,to);//result+":"+returnval);
 	return RPC_SRV_RESULT_SUCCESS;
 }
@@ -322,7 +322,7 @@ RPC_SRV_RESULT XmppMgr::RpcResponseCallback(std::string taskRes,int taskID,std::
 	std::string returnval="taskID=";
 	returnval+=tID;
 	std::string result   = taskRes;
-	std::string response = result +" : "+returnval;
+	std::string response = "return="+result +" : "+"result="+returnval;
 	XmppProxy.send_reply(response,to);
 	return RPC_SRV_RESULT_SUCCESS;
 }
@@ -1036,10 +1036,20 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_alias(std::string msg,std::string &returnval)
 	}
 	//cout<<"key  ="<<key<<endl;//"light on"
 	//cout<<"value="<<value<<endl;//"gpio 2 0"
-	//add new alias to list
-	AliasList[key] = value;
-	//extend alias-file with contents of AliasList
-	ExtendAliasList(AliasListFile,key,value);
+	Alias::iterator it = AliasList.find(key);
+	if (it != AliasList.end())
+	{
+		AliasList.erase(it);//erase existing
+		AliasList[key] = value;//add new
+		RewriteAliasList(AliasListFile);//update list file
+	}
+	else
+	{
+		//add new alias to list
+		AliasList[key] = value;
+		//extend alias-file with contents of AliasList
+		ExtendAliasList(AliasListFile,key,value);
+	}
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
