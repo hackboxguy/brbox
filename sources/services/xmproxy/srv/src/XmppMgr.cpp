@@ -41,11 +41,13 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{false,EXMPP_CMD_LOG_UPDATE              , "logupdate"    ,""},//due to bug, disabled(to be fixed later)
 	{false,EXMPP_CMD_LOG_COUNT               , "logcount"     ,""},//due to bug, disabled(to be fixed later)
 	{false,EXMPP_CMD_LOG_MSG                 , "logmsg"       ,"<zero_index_lineNum>"},//due to bug, disabled(to be fixed later)
-	{true ,EXMPP_CMD_GPIO                    , "gpio"         ,"<gpio_num> <sts[0/1]>"},
+	{true ,EXMPP_CMD_GPIO                    , "gpio"         ,"<gpio_num> [sts(0/1)]"},
 	{true ,EXMPP_CMD_GSM_EVENT_NOTIFY        , "eventgsm"     ,"<sts[0/1]>"},
-	{true ,EXMPP_CMD_GPIO_EVENT_NOTIFY       , "eventgpio"    ,"<gpio_num> <sts[0/1]>"},
+	{true ,EXMPP_CMD_GPIO_EVENT_NOTIFY       , "eventgpio"    ,"<gpio_num> [sts(0/1)]"},
 	{true ,EXMPP_CMD_ALIAS                   , "alias"        ,"name=cmd"},
-	{true ,EXMPP_CMD_SLEEP                   , "sleep"        ,"<seconds>"} //adding delay between multiple commands
+	{true ,EXMPP_CMD_SLEEP                   , "sleep"        ,"<seconds>"}, //adding delay between multiple commands
+	{true ,EXMPP_CMD_ACCOUNT                 , "account"      ,""}, //xmpp logid ID used for logging into server
+	{true ,EXMPP_CMD_BOTNAME                 , "botname"      ,"[name]"} //xmpp chat-bot name for identification
 };
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
@@ -57,6 +59,9 @@ XmppMgr::XmppMgr() //:AckToken(0)
 	LastFmwUpdateTaskID=0;
 	XmppTaskIDCounter=0;
 	AliasListFile="";
+	XmppUserName="";
+	XmppBotName="";
+	XmppBotNameFilePath="";
 
 	DebugLog=false;
 	//GsmDevDetected=false;
@@ -290,6 +295,8 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_GPIO_EVENT_NOTIFY:res=proc_cmd_event_gpio(cmdcmdMsg,cmd.sender,returnval);break;
 				//case EXMPP_CMD_ALIAS           :res=proc_cmd_alias(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_SLEEP           :res=proc_cmd_sleep(cmdcmdMsg);break;
+				case EXMPP_CMD_ACCOUNT         :res=proc_cmd_account_name(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_BOTNAME         :res= proc_cmd_bot_name(cmdcmdMsg,returnval);break;
 				default                        :break;
 			}
 			result.pop_front();
@@ -1104,6 +1111,52 @@ RPC_SRV_RESULT XmppMgr::RewriteAliasList(std::string listFile)
 	for( Alias::iterator it = AliasList.begin(); it != AliasList.end(); ++it)
 		outfile <<it->first<<"="<<it->second<<endl;
 	return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_account_name(std::string msg,std::string &returnval)
+{
+	if(XmppUserName.size()<=0)
+		returnval="none";
+	else
+		returnval=XmppUserName;
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_bot_name(std::string msg,std::string &returnval)
+{
+	std::string cmd,cmdArg;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	getline(msgstream, cmdArg); //get rest of the string!
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0)//get-hostname-cmd
+	{
+		if(XmppBotName.size()<=0)
+			returnval="none";
+		else
+			returnval=XmppBotName;
+	}
+	else
+	{
+		XmppBotName=cmdArg;
+		if(XmppBotNameFilePath.size()>0)
+		{
+			std::ofstream outfile;
+			outfile.open(XmppBotNameFilePath, std::ofstream::out | std::ofstream::trunc);
+				outfile<<XmppBotName<<endl;
+		}
+	}
+	return RPC_SRV_RESULT_SUCCESS;
+}
+void XmppMgr::SetBotNameFilePath(std::string filepath)
+{
+	XmppBotNameFilePath=filepath;
+	if(XmppBotNameFilePath.size()>0)
+	{
+		std::ifstream infile(XmppBotNameFilePath);
+		std::getline(infile, XmppBotName);
+	}
 }
 /* ------------------------------------------------------------------------- */
 

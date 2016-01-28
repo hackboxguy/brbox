@@ -50,6 +50,8 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_GPIO_EVENT_NOTIFY,//gpio async-event-notification
 	EXMPP_CMD_ALIAS,
 	EXMPP_CMD_SLEEP,
+	EXMPP_CMD_ACCOUNT,
+	EXMPP_CMD_BOTNAME, //name of the chat-bot, set a friendly name e.g: myhome-raspi-bot(helps in identifying when u have multiple bots)
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -111,6 +113,8 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 
 	std::string XmppUserName;
 	std::string XmppUserPw;
+	std::string XmppBotName;
+	std::string XmppBotNameFilePath;
 	ADXmppProxy XmppProxy;//xmpp client
 
 	std::string AliasListFile;
@@ -161,6 +165,8 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_event_gpio(std::string msg,std::string sender,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_alias(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_sleep(std::string msg);
+	RPC_SRV_RESULT proc_cmd_account_name(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_bot_name(std::string msg,std::string &returnval);
 	std::string print_help();
 
 	RPC_SRV_RESULT LoadAliasList(std::string listFile);
@@ -181,6 +187,7 @@ public:
 	RPC_SRV_RESULT AccessAsyncTaskList(int tid, int port, bool insertEntryFlag,int *xmpptID,std::string &sender);
 	void SetUSBGsmSts(bool sts);
 	inline void SetAliasListFilePath(std::string filepath){AliasListFile=filepath;};
+	void SetBotNameFilePath(std::string filepath);
 };
 #endif
 

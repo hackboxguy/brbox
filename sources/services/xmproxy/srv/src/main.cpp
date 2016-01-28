@@ -39,7 +39,8 @@ int main(int argc, const char* argv[])
 	DataCache.pXmpMgr =(void*)&XmpManager;//rpc's needs to know the object pointer of xmpp-handling-object
 	XmpManager.SetDebugLog(dbglog);
 	XmpManager.SetUSBGsmSts(CmdLine.is_usbgsm_connected());
-	XmpManager.SetAliasListFilePath(CmdLine.get_alias_list_filepath());
+	XmpManager.SetAliasListFilePath(CmdLine.get_alias_list_filepath());//persistant alias list file
+	XmpManager.SetBotNameFilePath(CmdLine.get_botname_filepath());//persistent bot-name-file
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 
