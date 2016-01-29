@@ -52,6 +52,7 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_SLEEP,
 	EXMPP_CMD_ACCOUNT,
 	EXMPP_CMD_BOTNAME, //name of the chat-bot, set a friendly name e.g: myhome-raspi-bot(helps in identifying when u have multiple bots)
+	EXMPP_CMD_BUDDY_LIST, //returns list of buddies
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -63,6 +64,14 @@ struct XmppCmdEntry
 public:
 	XmppCmdEntry(std::string msg,std::string from) :cmdMsg(msg),sender(from){}
 };
+/* ------------------------------------------------------------------------- */
+typedef enum EXMPP_EVNT_TYPES_T
+{
+	EXMPP_EVNT_GSM=0,
+	EXMPP_EVNT_GPIO,
+	EXMPP_EVNT_UNKNOWN,
+	EXMPP_EVNT_NONE
+}EXMPP_EVNT_TYPES;
 /* ------------------------------------------------------------------------- */
 struct AyncEventEntry
 {
@@ -121,6 +130,16 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	typedef std::map<std::string, std::string> Alias;
 	Alias AliasList;
 
+	struct EventSubscription
+	{
+		EXMPP_EVNT_TYPES m_EvntType;
+		int m_EvntArg;//e.g:gpio number
+		bool m_Status;//enable/disable status
+	};
+	typedef std::map<std::string, EventSubscription> EvntSubscr;
+	EvntSubscr myEventList;
+
+
 	//xmpp-client-callback functions
 	virtual int onXmppMessage(std::string msg,std::string sender,ADXmppProducer* pObj);
 
@@ -167,6 +186,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_sleep(std::string msg);
 	RPC_SRV_RESULT proc_cmd_account_name(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_bot_name(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_buddy_list(std::string msg,std::string &returnval);
 	std::string print_help();
 
 	RPC_SRV_RESULT LoadAliasList(std::string listFile);

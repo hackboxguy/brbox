@@ -47,7 +47,8 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{true ,EXMPP_CMD_ALIAS                   , "alias"        ,"name=cmd"},
 	{true ,EXMPP_CMD_SLEEP                   , "sleep"        ,"<seconds>"}, //adding delay between multiple commands
 	{true ,EXMPP_CMD_ACCOUNT                 , "account"      ,""}, //xmpp logid ID used for logging into server
-	{true ,EXMPP_CMD_BOTNAME                 , "botname"      ,"[name]"} //xmpp chat-bot name for identification
+	{true ,EXMPP_CMD_BOTNAME                 , "botname"      ,"[name]"}, //xmpp chat-bot name for identification
+	{true ,EXMPP_CMD_BUDDY_LIST              , "buddylist"    ,""} //prints buddy list
 };
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
@@ -87,6 +88,7 @@ XmppMgr::~XmppMgr()
 	//XmppClientThread.stop_thread();
 	XmppCmdProcessThread.stop_thread();
 	AliasList.clear();
+	myEventList.clear();
 }
 /* ------------------------------------------------------------------------- */
 int XmppMgr::AttachHeartBeat(ADTimer* pTimer)
@@ -296,7 +298,8 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				//case EXMPP_CMD_ALIAS           :res=proc_cmd_alias(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_SLEEP           :res=proc_cmd_sleep(cmdcmdMsg);break;
 				case EXMPP_CMD_ACCOUNT         :res=proc_cmd_account_name(cmdcmdMsg,returnval);break;
-				case EXMPP_CMD_BOTNAME         :res= proc_cmd_bot_name(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_BOTNAME         :res=proc_cmd_bot_name(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_BUDDY_LIST      :res=proc_cmd_buddy_list(cmdcmdMsg,returnval);break;
 				default                        :break;
 			}
 			result.pop_front();
@@ -997,13 +1000,82 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_log_get_line(std::string msg,std::string &retur
 	return result;
 }
 /* ------------------------------------------------------------------------- */
+//	{true ,EXMPP_CMD_GPIO                    , "gpio"         ,"<gpio_num> [sts(0/1)]"},
+//	{true ,EXMPP_CMD_GSM_EVENT_NOTIFY        , "eventgsm"     ,"<sts[0/1]>"},
 RPC_SRV_RESULT XmppMgr::proc_cmd_event_gsm(std::string msg,std::string sender,std::string &returnval)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	std::string cmd,cmdArg;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	msgstream >> cmdArg;
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0) //read status
+	{
+		EvntSubscr::iterator it = myEventList.find(sender);
+		if (it != myEventList.end()) //found entry
+		{
+			if(it->second.m_Status == true)
+				returnval="1";
+			else
+				returnval="0";
+		}
+		else
+			returnval="0";
+	}
+	else //write status
+	{
+		EvntSubscr::iterator it = myEventList.find(sender);
+		if (it != myEventList.end()) //found entry
+		{
+			if(cmdArg=="1")
+				it->second.m_Status=true;
+			else
+				it->second.m_Status=false;
+		}
+		else
+		{
+			EventSubscription newEvnt;
+			if(cmdArg=="1")
+				newEvnt.m_Status=true;
+			else
+				newEvnt.m_Status=false;
+			myEventList[sender] = newEvnt;
+		}
+	}
+	return RPC_SRV_RESULT_SUCCESS;
 }
 RPC_SRV_RESULT XmppMgr::proc_cmd_event_gpio(std::string msg,std::string sender,std::string &returnval)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	std::string cmd,cmdArg,cmdArgVal;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	msgstream >> cmdArg;
+	msgstream >> cmdArgVal;
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0)
+		return RPC_SRV_RESULT_ARG_ERROR;
+	if(cmdArgVal.size()<=0) //read status
+	{
+		/*EvntSubscr::iterator it = myEventList.find(sender);
+		if (it != myEventList.end()) //found entry
+		{
+			int gpio=atoi(cmdArgVal.c_str());
+			if(gpio
+			if(it->second.m_Status == true)
+				returnval="1";
+			else
+				returnval="0";
+		}
+		else
+			returnval="0";*/
+	}
+	else //write status
+	{
+	
+	}
+	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT XmppMgr::proc_cmd_alias(std::string msg,std::string &returnval)
@@ -1157,6 +1229,19 @@ void XmppMgr::SetBotNameFilePath(std::string filepath)
 		std::ifstream infile(XmppBotNameFilePath);
 		std::getline(infile, XmppBotName);
 	}
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_buddy_list(std::string msg,std::string &returnval)
+{
+	returnval='\n';
+	XmppProxy.get_buddy_list(returnval);
+	//for( Alias::iterator it = AliasList.begin(); it != AliasList.end(); ++it)
+	//{
+	//	std::string line=it->first+"="+it->second;
+	//	returnval+=line;
+	//	returnval+='\n';
+	//}
+	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
 

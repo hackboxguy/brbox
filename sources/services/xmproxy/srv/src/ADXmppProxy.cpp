@@ -377,6 +377,7 @@ void ADXmppProxy::handleNonrosterPresence( const Presence& presence )
 {
 	//printf( "received presence from entity not in the roster: %s\n", presence.from().full().c_str() );
 }
+/* ------------------------------------------------------------------------- */
 //following function is used for sending async-event-notification to subscribed buddy
 bool ADXmppProxy::SendMessageToBuddy(std::string address, const std::string & body, const std::string & subject)
 {
@@ -419,5 +420,16 @@ bool ADXmppProxy::SendMessageToBuddy(std::string address, const std::string & bo
 	}
 	return false;//address is not in my buddy-list
 }
-/*****************************************************************************/
+/* ------------------------------------------------------------------------- */
+int ADXmppProxy::get_buddy_list(std::string &returnval)
+{
+	vector<std::string>::iterator it;
+	for(it = BuddyList.begin(); it != BuddyList.end(); it++)
+	{
+		returnval+=*it;
+		returnval+='\n';
+	}
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
 

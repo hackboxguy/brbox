@@ -87,6 +87,7 @@ public:
 	void setForcedDisconnect(){DisconnectNow=true;}
 	//for sending asyc-event to a buddy
 	bool SendMessageToBuddy(std::string address, const std::string & body, const std::string & subject);
+	int get_buddy_list(std::string &returnval);
 
 	virtual void handleEvent( const Event& event );// = 0;
 	virtual void onConnect();
