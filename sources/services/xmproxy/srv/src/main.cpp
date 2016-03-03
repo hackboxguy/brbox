@@ -41,6 +41,7 @@ int main(int argc, const char* argv[])
 	XmpManager.SetUSBGsmSts(CmdLine.is_usbgsm_connected());
 	XmpManager.SetAliasListFilePath(CmdLine.get_alias_list_filepath());//persistant alias list file
 	XmpManager.SetBotNameFilePath(CmdLine.get_botname_filepath());//persistent bot-name-file
+	XmpManager.SetEventSubscrListFilePath(CmdLine.get_evnt_subscr_list_filepath());//persistent event subscriber's list file
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 

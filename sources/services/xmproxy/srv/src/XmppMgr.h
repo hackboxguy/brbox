@@ -10,8 +10,7 @@
 
 using namespace std;
 #define CLIENT_ALIVE_PING_DURATION_MS 60000;//60seconds
-//#define GITHUB_FMW_DOWNLOAD_FOLDER "http://github.com/hackboxguy/downloads/raw/master/"
-#define GITHUB_FMW_DOWNLOAD_FOLDER "http://raw.githubusercontent.com/hackboxguy/downloads/master/"
+#define GITHUB_FMW_DOWNLOAD_FOLDER "http://github.com/hackboxguy/downloads/raw/master/"
 #define BRBOX_SYS_CONFIG_FILE_PATH "/boot/sysconfig.txt"
 #define BBOXSMS_SERVER_ADDR "127.0.0.1"
 //#define EXMPP_CMD_TABL    {"smsdeleteall","smsdelete","smsget","smssend","smsupdate","smstotal","fmwver","fmwupdt","fmwupsts","fmwupres","reboot","uptime","hostname","myip","resethostname","dialvoice","dialussd","readussd","logsts","gsmcheck","logupdate","logcount","logmsg","unknown","none","\0"}
@@ -66,6 +65,7 @@ public:
 	XmppCmdEntry(std::string msg,std::string from) :cmdMsg(msg),sender(from){}
 };
 /* ------------------------------------------------------------------------- */
+#define EXMPP_EVNT_TYPES_TABL    {"gsm","gpio","unknown","none","\0"}
 typedef enum EXMPP_EVNT_TYPES_T
 {
 	EXMPP_EVNT_GSM=0,
@@ -94,6 +94,42 @@ public:
 	{
 		if(pEntry.taskID == mytaskID && pEntry.srvPort == mysrvPort)
 			return true;
+		else
+			return false;
+	}
+};
+/* ------------------------------------------------------------------------- */
+struct EventSubscrEntry
+{
+	std::string subscriber;
+	EXMPP_EVNT_TYPES m_EvntType;
+	int m_EvntArg;//e.g:gpio number
+	bool m_Status;//enable/disable status
+public:
+	EventSubscrEntry(std::string subscr,EXMPP_EVNT_TYPES typ,int arg,bool sts) :subscriber(subscr),m_EvntType(typ),m_EvntArg(arg),m_Status(sts){}
+};
+class FindEventSubscrEntry
+{
+	const std::string Addr;
+	const int Arg;
+public:
+	FindEventSubscrEntry(const std::string addr,const int arg) :Addr(addr),Arg(arg){}
+	bool operator()(EventSubscrEntry pEntry) const
+	{
+		if(pEntry.m_EvntType==EXMPP_EVNT_GSM)
+		{
+			if(pEntry.subscriber == Addr)
+				return true;
+			else
+				return false;
+		}
+		else if(pEntry.m_EvntType==EXMPP_EVNT_GPIO)
+		{
+			if(pEntry.subscriber == Addr && pEntry.m_EvntArg == Arg)
+				return true;
+			else
+				return false;
+		}
 		else
 			return false;
 	}
@@ -131,14 +167,18 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	typedef std::map<std::string, std::string> Alias;
 	Alias AliasList;
 
-	struct EventSubscription
-	{
-		EXMPP_EVNT_TYPES m_EvntType;
-		int m_EvntArg;//e.g:gpio number
-		bool m_Status;//enable/disable status
-	};
-	typedef std::map<std::string, EventSubscription> EvntSubscr;
-	EvntSubscr myEventList;
+	//struct EventSubscription
+	//{
+	//	std::string subscriber;
+	//	EXMPP_EVNT_TYPES m_EvntType;
+	//	int m_EvntArg;//e.g:gpio number
+	//	bool m_Status;//enable/disable status
+	//};
+	//typedef std::vector<EventSubscription> EvntSubscr;
+	//typedef std::map<std::string, EventSubscription> EvntSubscr;
+	//EvntSubscr myEventList;
+	std::string EventSubscrListFile;
+	std::vector<EventSubscrEntry> myEventList;
 
 
 	//xmpp-client-callback functions
@@ -194,6 +234,10 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT ExtendAliasList(std::string listFile,std::string key,std::string val);
 	RPC_SRV_RESULT RewriteAliasList(std::string listFile);
 
+	RPC_SRV_RESULT LoadEventSubscrList(std::string listFile,std::vector<EventSubscrEntry> *pList);
+	RPC_SRV_RESULT ExtendEventSubscrList(std::string listFile,std::string addr,EXMPP_EVNT_TYPES type,int arg);
+	RPC_SRV_RESULT RewriteEventSubscrList(std::string listFile,std::vector<EventSubscrEntry> *pList);
+
 public:
 	XmppMgr();
 	~XmppMgr();
@@ -208,6 +252,7 @@ public:
 	RPC_SRV_RESULT AccessAsyncTaskList(int tid, int port, bool insertEntryFlag,int *xmpptID,std::string &sender);
 	void SetUSBGsmSts(bool sts);
 	inline void SetAliasListFilePath(std::string filepath){AliasListFile=filepath;};
+	inline void SetEventSubscrListFilePath(std::string filepath){EventSubscrListFile=filepath;};
 	void SetBotNameFilePath(std::string filepath);
 };
 #endif

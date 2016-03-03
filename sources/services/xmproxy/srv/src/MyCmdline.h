@@ -12,7 +12,7 @@ class MyCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 	bool UsbGSMSts;
 	char AliasListFilePath[512];
 	char BotNameFilePath[512];
-
+	char EvntSubscrListFilePath[512];
 
 	//Chain-callback functions	
 	virtual int parse_my_cmdline_options(int arg, char* sub_arg);
@@ -34,6 +34,7 @@ public:
 	bool is_usbgsm_connected();
 	std::string get_alias_list_filepath();//char* filepath);
 	std::string get_botname_filepath();
+	std::string get_evnt_subscr_list_filepath();//char* filepath);
 	//service specific part
 };
 #endif

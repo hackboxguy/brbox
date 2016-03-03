@@ -7,6 +7,7 @@ typedef enum XMPROXY_CMDLINE_OPT_T
 	XMPROXY_CMDLINE_OPT_USBGSM_STS,
 	XMPROXY_CMDLINE_OPT_ALIAS_LIST_FILE,
 	XMPROXY_CMDLINE_OPT_BOT_NAME_FILE,
+	XMPROXY_CMDLINE_OPT_EVNT_SUBSCR_LIST_FILE,
 	XMPROXY_CMDLINE_OPT_UNKNOWN,
 	XMPROXY_CMDLINE_OPT_NONE
 }XMPROXY_CMDLINE_OPT;
@@ -26,10 +27,13 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 	CmdlineHelper.insert_help_entry((char*)"--aliaslist=filepath (file path of alias list)");
 	CmdlineHelper.insert_options_entry((char*)"botname" ,optional_argument,XMPROXY_CMDLINE_OPT_BOT_NAME_FILE);
 	CmdlineHelper.insert_help_entry((char*)"--botname=filepath   (file path of Bot Name)");
+	CmdlineHelper.insert_options_entry((char*)"evntsubscr" ,optional_argument,XMPROXY_CMDLINE_OPT_EVNT_SUBSCR_LIST_FILE);
+	CmdlineHelper.insert_help_entry((char*)"--evntsubscr=filepath(file path of event subscriber's list)");
 	strcpy(LoginFilePath,XMPROXY_DEFAULT_LOGIN_FILE_PATH);
 	UsbGSMSts=false;
 	AliasListFilePath[0]='\0';
 	BotNameFilePath[0]='\0';
+	EvntSubscrListFilePath[0]='\0';
 }
 /*****************************************************************************/
 MyCmdline::~MyCmdline()
@@ -71,6 +75,12 @@ int MyCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 				strcpy(BotNameFilePath,"");
 			else
 				strcpy(BotNameFilePath,sub_arg);
+			break;
+		case XMPROXY_CMDLINE_OPT_EVNT_SUBSCR_LIST_FILE:
+			if(CmdlineHelper.get_next_subargument(&sub_arg)==0)//no alias-list filepath passed by user
+				strcpy(EvntSubscrListFilePath,"");
+			else
+				strcpy(EvntSubscrListFilePath,sub_arg);
 			break;
 		default:return 0;break;	
 	}
@@ -160,6 +170,11 @@ std::string MyCmdline::get_alias_list_filepath()
 std::string MyCmdline::get_botname_filepath()
 {
 	std::string path=BotNameFilePath;
+	return path;
+}
+std::string MyCmdline::get_evnt_subscr_list_filepath()
+{
+	std::string path=EvntSubscrListFilePath;
 	return path;
 }
 /*****************************************************************************/

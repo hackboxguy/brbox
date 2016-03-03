@@ -60,6 +60,7 @@ XmppMgr::XmppMgr() //:AckToken(0)
 	LastFmwUpdateTaskID=0;
 	XmppTaskIDCounter=0;
 	AliasListFile="";
+	EventSubscrListFile="";
 	XmppUserName="";
 	XmppBotName="";
 	XmppBotNameFilePath="";
@@ -88,7 +89,7 @@ XmppMgr::~XmppMgr()
 	//XmppClientThread.stop_thread();
 	XmppCmdProcessThread.stop_thread();
 	AliasList.clear();
-	myEventList.clear();
+	//myEventList.clear();
 }
 /* ------------------------------------------------------------------------- */
 int XmppMgr::AttachHeartBeat(ADTimer* pTimer)
@@ -406,6 +407,7 @@ RPC_SRV_RESULT XmppMgr::Start(std::string accountFilePath)
 
 	//fill AliasList with contents of alias-file
 	LoadAliasList(AliasListFile);
+	LoadEventSubscrList(EventSubscrListFile,&myEventList);
 
 	//cout<<"loginfilepath: "<<accountFilePath<<endl;
 	std::ifstream file(accountFilePath.c_str());
@@ -1000,8 +1002,6 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_log_get_line(std::string msg,std::string &retur
 	return result;
 }
 /* ------------------------------------------------------------------------- */
-//	{true ,EXMPP_CMD_GPIO                    , "gpio"         ,"<gpio_num> [sts(0/1)]"},
-//	{true ,EXMPP_CMD_GSM_EVENT_NOTIFY        , "eventgsm"     ,"<sts[0/1]>"},
 RPC_SRV_RESULT XmppMgr::proc_cmd_event_gsm(std::string msg,std::string sender,std::string &returnval)
 {
 	std::string cmd,cmdArg;
@@ -1010,12 +1010,12 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_event_gsm(std::string msg,std::string sender,st
 	msgstream >> cmdArg;
 	if(cmd.size()<=0)
 		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	std::vector<EventSubscrEntry>::iterator it = find_if(myEventList.begin(), myEventList.end(), FindEventSubscrEntry(sender,0));
 	if(cmdArg.size()<=0) //read status
 	{
-		EvntSubscr::iterator it = myEventList.find(sender);
-		if (it != myEventList.end()) //found entry
+		if(it != myEventList.end())
 		{
-			if(it->second.m_Status == true)
+			if((*it).m_Status == true)
 				returnval="1";
 			else
 				returnval="0";
@@ -1025,22 +1025,23 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_event_gsm(std::string msg,std::string sender,st
 	}
 	else //write status
 	{
-		EvntSubscr::iterator it = myEventList.find(sender);
-		if (it != myEventList.end()) //found entry
+		if(it != myEventList.end())//found entry, modify existing entry
 		{
 			if(cmdArg=="1")
-				it->second.m_Status=true;
+				(*it).m_Status=true;
 			else
-				it->second.m_Status=false;
+				(*it).m_Status=false;
+			RewriteEventSubscrList(EventSubscrListFile,&myEventList);
 		}
 		else
 		{
-			EventSubscription newEvnt;
+			bool sts=false;
 			if(cmdArg=="1")
-				newEvnt.m_Status=true;
-			else
-				newEvnt.m_Status=false;
-			myEventList[sender] = newEvnt;
+			{
+				sts=true;
+				myEventList.push_back(EventSubscrEntry(sender,EXMPP_EVNT_GSM,0,sts));
+				ExtendEventSubscrList(EventSubscrListFile,sender,EXMPP_EVNT_GSM,0);
+			}
 		}
 	}
 	return RPC_SRV_RESULT_SUCCESS;
@@ -1054,26 +1055,100 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_event_gpio(std::string msg,std::string sender,s
 	msgstream >> cmdArgVal;
 	if(cmd.size()<=0)
 		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
-	if(cmdArg.size()<=0)
+	if(cmdArg.size()<=0) //gpio number
 		return RPC_SRV_RESULT_ARG_ERROR;
+
+	int io=atoi(cmdArg.c_str());//gpio number
+	std::vector<EventSubscrEntry>::iterator it = find_if(myEventList.begin(), myEventList.end(), FindEventSubscrEntry(sender,io));
 	if(cmdArgVal.size()<=0) //read status
 	{
-		/*EvntSubscr::iterator it = myEventList.find(sender);
-		if (it != myEventList.end()) //found entry
+		if(it != myEventList.end())
 		{
-			int gpio=atoi(cmdArgVal.c_str());
-			if(gpio
-			if(it->second.m_Status == true)
+			if((*it).m_Status == true)
 				returnval="1";
 			else
 				returnval="0";
 		}
 		else
-			returnval="0";*/
+			returnval="0";
 	}
 	else //write status
 	{
-	
+		if(it != myEventList.end())//found entry, modify existing entry
+		{
+			if(cmdArgVal=="1")
+				(*it).m_Status=true;
+			else
+				(*it).m_Status=false;
+			RewriteEventSubscrList(EventSubscrListFile,&myEventList);
+		}
+		else
+		{
+			bool sts=false;
+			if(cmdArgVal=="1")
+			{	
+				sts=true;
+				myEventList.push_back(EventSubscrEntry(sender,EXMPP_EVNT_GPIO,io,sts));
+				ExtendEventSubscrList(EventSubscrListFile,sender,EXMPP_EVNT_GPIO,io);
+			}
+		}
+	}
+	return RPC_SRV_RESULT_SUCCESS;
+}
+RPC_SRV_RESULT XmppMgr::LoadEventSubscrList(std::string listFile,std::vector<EventSubscrEntry> *pList)
+{
+	if(listFile.size()<=0)
+		return RPC_SRV_RESULT_FAIL;
+	std::ifstream infile(listFile);
+	std::string line;
+	while (std::getline(infile, line))
+	{
+		stringstream iss(line);
+		std::string addr,type,arg,sts;
+		iss >> addr;
+		iss >> type;
+		iss >> arg;
+		int io=atoi(arg.c_str());//gpio number
+		const char *table[]   = EXMPP_EVNT_TYPES_TABL;
+		if(type==table[EXMPP_EVNT_GSM])
+			pList->push_back(EventSubscrEntry(addr,EXMPP_EVNT_GSM,io,true));
+		else if(type==table[EXMPP_EVNT_GPIO])
+			pList->push_back(EventSubscrEntry(addr,EXMPP_EVNT_GPIO,io,true));
+		//else, dont know the type, so dont fill this record to list
+	}
+	//infile.close();
+	return RPC_SRV_RESULT_SUCCESS;
+}
+RPC_SRV_RESULT XmppMgr::ExtendEventSubscrList(std::string listFile,std::string addr,EXMPP_EVNT_TYPES type,int arg)
+{
+	if(listFile.size()<=0)
+		return RPC_SRV_RESULT_FAIL;
+	std::ofstream outfile;
+	outfile.open(listFile, std::ios::app);
+	std::string Typ,Arg;
+	const char *table[]   = EXMPP_EVNT_TYPES_TABL;
+	Typ=table[type];
+	Arg = std::to_string(arg);
+	outfile <<addr<<" "<<Typ<<" "<<Arg<<endl;
+	return RPC_SRV_RESULT_SUCCESS;
+}
+RPC_SRV_RESULT XmppMgr::RewriteEventSubscrList(std::string listFile,std::vector<EventSubscrEntry> *pList)
+{
+	if(listFile.size()<=0)
+		return RPC_SRV_RESULT_FAIL;
+	std::ofstream outfile;
+	outfile.open(listFile, std::ofstream::out | std::ofstream::trunc);
+	for( std::vector<EventSubscrEntry>::iterator it = pList->begin(); it != pList->end(); ++it)
+	{
+		if((*it).m_Status==true)
+		{
+			std::string addr,typ,arg;
+			addr=(*it).subscriber;
+			const char *table[]   = EXMPP_EVNT_TYPES_TABL;
+			typ=table[(*it).m_EvntType];
+			arg = std::to_string((*it).m_EvntArg);
+			outfile <<addr<<" "<<typ<<" "<<arg<<endl;
+		}
 	}
 	return RPC_SRV_RESULT_SUCCESS;
 }
@@ -1148,7 +1223,6 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sleep(std::string msg)
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
-#include <fstream>
 RPC_SRV_RESULT XmppMgr::LoadAliasList(std::string listFile)
 {
 	if(listFile.size()<=0)
