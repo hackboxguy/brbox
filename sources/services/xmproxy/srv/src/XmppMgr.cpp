@@ -1010,7 +1010,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_event_gsm(std::string msg,std::string sender,st
 	msgstream >> cmdArg;
 	if(cmd.size()<=0)
 		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
-	std::vector<EventSubscrEntry>::iterator it = find_if(myEventList.begin(), myEventList.end(), FindEventSubscrEntry(sender,0));
+	std::vector<EventSubscrEntry>::iterator it = find_if(myEventList.begin(), myEventList.end(), FindEventSubscrEntry(sender,0,EXMPP_EVNT_GSM));
 	if(cmdArg.size()<=0) //read status
 	{
 		if(it != myEventList.end())
@@ -1046,6 +1046,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_event_gsm(std::string msg,std::string sender,st
 	}
 	return RPC_SRV_RESULT_SUCCESS;
 }
+
 RPC_SRV_RESULT XmppMgr::proc_cmd_event_gpio(std::string msg,std::string sender,std::string &returnval)
 {
 	std::string cmd,cmdArg,cmdArgVal;
@@ -1059,7 +1060,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_event_gpio(std::string msg,std::string sender,s
 		return RPC_SRV_RESULT_ARG_ERROR;
 
 	int io=atoi(cmdArg.c_str());//gpio number
-	std::vector<EventSubscrEntry>::iterator it = find_if(myEventList.begin(), myEventList.end(), FindEventSubscrEntry(sender,io));
+	std::vector<EventSubscrEntry>::iterator it = find_if(myEventList.begin(), myEventList.end(), FindEventSubscrEntry(sender,io,EXMPP_EVNT_GPIO));
 	if(cmdArgVal.size()<=0) //read status
 	{
 		if(it != myEventList.end())
@@ -1315,6 +1316,21 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_buddy_list(std::string msg,std::string &returnv
 	//	returnval+=line;
 	//	returnval+='\n';
 	//}
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::GpioEventCallback(int evntNum,int evntArg)
+{
+	char msg[255];
+	sprintf(msg,"eventgpio %d",evntArg);//prepare event message
+	std::string evntStr(msg);
+	std::vector<EventSubscrEntry>::iterator it;
+	for(it = myEventList.begin(); it != myEventList.end(); it++)
+	{
+		EventSubscrEntry pEntry = (*it);
+		if(pEntry.m_EvntType == EXMPP_EVNT_GPIO && pEntry.m_EvntArg == evntArg && pEntry.m_Status==true)
+			XmppProxy.SendMessageToBuddy(pEntry.subscriber,evntStr,"event");
+	}
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */

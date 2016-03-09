@@ -112,20 +112,21 @@ class FindEventSubscrEntry
 {
 	const std::string Addr;
 	const int Arg;
+	EXMPP_EVNT_TYPES EvntType;
 public:
-	FindEventSubscrEntry(const std::string addr,const int arg) :Addr(addr),Arg(arg){}
+	FindEventSubscrEntry(const std::string addr,const int arg,EXMPP_EVNT_TYPES type) :Addr(addr),Arg(arg),EvntType(type){}
 	bool operator()(EventSubscrEntry pEntry) const
 	{
 		if(pEntry.m_EvntType==EXMPP_EVNT_GSM)
 		{
-			if(pEntry.subscriber == Addr)
+			if(pEntry.subscriber == Addr && pEntry.m_EvntType==EvntType)
 				return true;
 			else
 				return false;
 		}
 		else if(pEntry.m_EvntType==EXMPP_EVNT_GPIO)
 		{
-			if(pEntry.subscriber == Addr && pEntry.m_EvntArg == Arg)
+			if(pEntry.subscriber == Addr && pEntry.m_EvntArg == Arg && pEntry.m_EvntType==EvntType)
 				return true;
 			else
 				return false;
@@ -248,6 +249,7 @@ public:
 	int AttachHeartBeat(ADTimer* pTimer);
 	RPC_SRV_RESULT RpcResponseCallback(RPC_SRV_RESULT taskRes,int taskID,std::string to);//called by eventHandler
 	RPC_SRV_RESULT RpcResponseCallback(std::string taskRes,int taskID,std::string to);
+	RPC_SRV_RESULT GpioEventCallback(int evntNum,int evntArg);
 	//RPC_SRV_RESULT IsItMyAsyncTaskResp(int tid,int port);
 	RPC_SRV_RESULT AccessAsyncTaskList(int tid, int port, bool insertEntryFlag,int *xmpptID,std::string &sender);
 	void SetUSBGsmSts(bool sts);
