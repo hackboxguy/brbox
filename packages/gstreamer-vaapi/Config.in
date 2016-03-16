@@ -1,0 +1,7 @@
+config BR2_PACKAGE_GSTREAMER_VAAPI
+	bool "gstreamer-vaapi"
+	depends on BR2_PACKAGE_GSTREAMER
+    depends on BR2_PACKAGE_LIBVA
+	help
+	  gstreamer-vaapi consists in a collection of VA-API based plugins for
+	  GStreamer and helper libraries.
