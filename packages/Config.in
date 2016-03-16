@@ -49,5 +49,4 @@ source "package/brbox/brbox_smarteye/Config.in"
 source "package/brbox/brbox_bboxsms/Config.in"
 source "package/brbox/brbox_xmproxy/Config.in"
 source "package/brbox/brbox_apisrv/Config.in"
-source "package/brbox/gstreamer-vaapi/Config.in"
 endmenu
