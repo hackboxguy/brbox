@@ -4,10 +4,13 @@ BR_LAST_STABLE_VERSION=2016.02 #2015.11.1 #2015.08.1 #2015.05 #2015.02
 BR_DOWNLOAD_FOLDER=dl
 ####################checkout buildroot#####################
 git clone git://git.buildroot.net/buildroot
+[ $? != 0 ] && echo "git clone failed!!!" && exit -1
 pushd .
 cd buildroot
 git checkout $BR_LAST_STABLE_VERSION
+[ $? != 0 ] && echo "git checkout failed!!!" && exit -1
 git pull . $BR_LAST_STABLE_VERSION
+[ $? != 0 ] && echo "git pull failed!!!" && exit -1
 
 #add brbox package menu to Config.in of buildroot/package
 #and create a package folder softlink of brbox
