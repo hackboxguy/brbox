@@ -144,9 +144,9 @@ void *ADGenericChain::chain_get_by_ident(int ident)//, datIdfunc_t custom_func)
 void *ADGenericChain::chain_remove_by_ident(int ident)//,datIdfunc_t custom_func)
 {
 	void *data=NULL;
+	SEMA_LOCK();
 	struct chain_holder *pHolder = base_chain.pNext;
 
-	SEMA_LOCK();
 
 	if(init_flag==false)//check if chain has been released
 	{
@@ -199,6 +199,7 @@ void *ADGenericChain::chain_remove_by_ident(int ident)//,datIdfunc_t custom_func
 	
 		//delete pHolder;
 		free(pHolder);
+		pHolder=NULL;
 		chain_size--;
 	}
 	SEMA_UNLOCK();
@@ -209,9 +210,8 @@ void *ADGenericChain::chain_remove_by_ident(int ident)//,datIdfunc_t custom_func
 void *ADGenericChain::chain_remove_by_double_ident(int ident1,int ident2)//,dbdatIdfunc_t cust_func)
 {
 	void *data=NULL;
-	struct chain_holder *pHolder = base_chain.pNext;
-
 	SEMA_LOCK();
+	struct chain_holder *pHolder = base_chain.pNext;
 
 	if(init_flag==false)//check if chain has been released
 	{
@@ -266,6 +266,7 @@ void *ADGenericChain::chain_remove_by_double_ident(int ident1,int ident2)//,dbda
 	
 		//delete pHolder;
 		free(pHolder);
+		pHolder=NULL;
 		chain_size--;
 	}
 
