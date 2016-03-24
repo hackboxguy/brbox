@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 2.8.9)
 #set(UPDATENAME update)             #generic script name for all h/w
 #set(BRDS_SCR baytrail-brdskmgr)  #script to be copied to target
 set(USBMODE_UDEVRULE 41-usb_modeswitch.rules)    #/etc/fstab file
+set(USBMODE_SWITCH_SCRIPT S53USBModeSwitch)
 
 #project(${COMPONENT_NAME})
 #file(GLOB SOURCES "*.c")
@@ -13,9 +14,10 @@ set(USBMODE_UDEVRULE 41-usb_modeswitch.rules)    #/etc/fstab file
 #include_directories(${CMAKE_CURRENT_BINARY_DIR})
 #add_executable(${COMPONENT_NAME} ${SOURCES})
 
-file(GLOB  UDEV_RULE ${USBMODE_UDEVRULE})
-install(PROGRAMS ${UDEV_RULE} DESTINATION etc/udev/rules.d)
-
+#file(GLOB  UDEV_RULE ${USBMODE_UDEVRULE})
+#install(PROGRAMS ${UDEV_RULE} DESTINATION etc/udev/rules.d)
+file(GLOB  USB_MODE_SWITCH ${USBMODE_SWITCH_SCRIPT})
+install(PROGRAMS ${USB_MODE_SWITCH} DESTINATION etc/init.d)
 #if(CMAKE_HOST_UNIX)
 #install(CODE "EXECUTE_PROCESS(WORKING_DIRECTORY \$ENV{TARGET_DIR}\${CMAKE_INSTALL_PREFIX}/sbin COMMAND ln -sf ${BRDS_SCR} ${BRDISKNAME})")
 #install(CODE "EXECUTE_PROCESS(WORKING_DIRECTORY \$ENV{TARGET_DIR}\${CMAKE_INSTALL_PREFIX}/sbin COMMAND ln -sf ${UPDT_SCR} ${UPDATENAME})")
