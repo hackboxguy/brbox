@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+# Start/stop server script
+#
+start() {
+	echo -n "Starting usb-mode-switch activity: "
+	IDPROD="none"
+	IDPROD=$(dmesg | grep 12d1 | sed s/.*idVendor=*// | awk '{print $2}' | sed s/idProduct=//)
+	if [ $IDPROD != "none" ]; then
+		[ $IDPROD = "1446" ] && IDVEND=14db	
+		[ $IDPROD = "1f01" ] && IDVEND=1001	
+		usb_modeswitch -v 0x12d1 -p 0x$IDPROD -V 0x12d1 -P 0x$IDVEND -M "55534243123456780000000000000011063000000100010000000000000000"
+		usb_modeswitch -v 0x12d1 -p 0x$IDPROD -V 0x12d1 -P 0x$IDVEND -M "55534243123456780000000000000011063000000100010000000000000000"
+		sleep 5
+	fi
+	echo "OK"
+}
+
+stop() {
+	echo "OK"
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	stop
+	start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
