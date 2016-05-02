@@ -56,81 +56,75 @@ RPC_SRV_RESULT Pcf8574Rpc::ProcessWorkAsync(int index,unsigned char* pWorkData)
 /* ------------------------------------------------------------------------- */
 int Pcf8574Rpc::json_to_bin_pcf_get(JsonDataCommObj* pReq)
 {
-	//GPIOCTL_IO_ACCESS_PACKET* pPanelCmdObj=NULL;
-	//PREPARE_JSON_REQUEST(RPC_SRV_REQ,GPIOCTL_IO_ACCESS_PACKET,RPC_SRV_ACT_READ,EJSON_GPIOCTL_RPC_IO_GET);
-	//JSON_STRING_TO_INT(GPIOCTL_RPC_IO_ADDR_ARG,pPanelCmdObj->addr);
+	I2CSRV_PCF8574_ACCESS_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,I2CSRV_PCF8574_ACCESS_PACKET,RPC_SRV_ACT_READ,EJSON_I2CSRV_RPC_PCF8574_GET);
+	JSON_STRING_TO_INT(I2CSRV_RPC_PCF8574_ADDR_ARG,pPanelCmdObj->devaddr);
 	return 0;
 }
 int Pcf8574Rpc::bin_to_json_pcf_get(JsonDataCommObj* pReq)
 {
-	//PREPARE_JSON_RESP_INT(RPC_SRV_REQ,GPIOCTL_IO_ACCESS_PACKET,GPIOCTL_RPC_IO_DATA_ARG,data);
+	PREPARE_JSON_RESP_INT(RPC_SRV_REQ,I2CSRV_PCF8574_ACCESS_PACKET,I2CSRV_RPC_PCF8574_DATA_ARG,data);
 	return 0;
 }
 int Pcf8574Rpc::process_pcf_get(JsonDataCommObj* pReq)
 {
-	/*RaspiIo Raspi;
 	RPC_SRV_REQ *pPanelReq=NULL;
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
-	GPIOCTL_IO_ACCESS_PACKET* pPacket;
-	pPacket=(GPIOCTL_IO_ACCESS_PACKET*)pPanelReq->dataRef;
-
-	if(pPacket->addr>=GPIOCTL_MAX_GPIO_PINS)
+	I2CSRV_PCF8574_ACCESS_PACKET* pPacket;
+	pPacket=(I2CSRV_PCF8574_ACCESS_PACKET*)pPanelReq->dataRef;
+	if(pPacket->devaddr<0x2) //i2c device cannot have address as 0 or 1 //TODO: more checks for address
 	{
-		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;//max allowed gpio pins or 0 to 63
+		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;//out of valid address range
 		return 0;
 	}
-
-	pPacket->data=pDataCache->gpio_data[pPacket->addr];
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
-	//pPanelReq->result=Raspi.ReadGPIO (pPacket->addr,pPacket->data);
-
-	//set debug logging flag
-	//ImgId.logflag=get_debug_log_flag();//get_debug_log_flag() is a function f parent class ADJsonRpcMgrConsumer
-	//pPanelReq->result=ImgId.IdentifyPattern(pPacket->pattern_type,pDataCache->StrImgIdDebugFile);*/
+	if(get_emulation_flag())//no h/w present, just simulate
+	{
+		pPacket->data=pDataCache->pcf8574cache[pPacket->devaddr];
+		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	}
+	else
+	{
+		//TODO: do tha actual device driver(/dev/i2c-x) access 
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+	}
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
 int Pcf8574Rpc::json_to_bin_pcf_set(JsonDataCommObj* pReq)
 {
-	/*GPIOCTL_IO_ACCESS_PACKET* pPanelCmdObj=NULL;
-	PREPARE_JSON_REQUEST(RPC_SRV_REQ,GPIOCTL_IO_ACCESS_PACKET,RPC_SRV_ACT_WRITE,EJSON_GPIOCTL_RPC_IO_SET);
-	JSON_STRING_TO_INT(GPIOCTL_RPC_IO_ADDR_ARG,pPanelCmdObj->addr);
-	JSON_STRING_TO_INT(GPIOCTL_RPC_IO_DATA_ARG,pPanelCmdObj->data);*/
+	I2CSRV_PCF8574_ACCESS_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,I2CSRV_PCF8574_ACCESS_PACKET,RPC_SRV_ACT_WRITE,EJSON_I2CSRV_RPC_PCF8574_SET);
+	JSON_STRING_TO_INT(I2CSRV_RPC_PCF8574_ADDR_ARG,pPanelCmdObj->devaddr);
+	JSON_STRING_TO_INT(I2CSRV_RPC_PCF8574_DATA_ARG,pPanelCmdObj->data);
 	return 0;
 }
 int Pcf8574Rpc::bin_to_json_pcf_set(JsonDataCommObj* pReq)
 {
-	//PREPARE_JSON_RESP(RPC_SRV_REQ,GPIOCTL_IO_ACCESS_PACKET);
+	PREPARE_JSON_RESP(RPC_SRV_REQ,I2CSRV_PCF8574_ACCESS_PACKET);
 	return 0;
 }
 int Pcf8574Rpc::process_pcf_set(JsonDataCommObj* pReq)
 {
-	/*RPC_SRV_REQ *pPanelReq=NULL;
+	RPC_SRV_REQ *pPanelReq=NULL;
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
-	GPIOCTL_IO_ACCESS_PACKET* pPacket;
-	pPacket=(GPIOCTL_IO_ACCESS_PACKET*)pPanelReq->dataRef;
-	if(pPacket->addr>=GPIOCTL_MAX_GPIO_PINS)
+	I2CSRV_PCF8574_ACCESS_PACKET* pPacket;
+	pPacket=(I2CSRV_PCF8574_ACCESS_PACKET*)pPanelReq->dataRef;
+	if(pPacket->devaddr<0x2) //i2c device cannot have address as 0 or 1 //TODO: more checks for address
 	{
-		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;//max allowed gpio pins or 0 to 63
+		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;//out of valid address range
 		return 0;
 	}
-	RaspiIo Raspi;
+	//RaspiIo Raspi;
 	if(get_emulation_flag())
-		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;//dummy write to memory
-	else
-		pPanelReq->result=Raspi.WriteGPIO(pPacket->addr,pPacket->data);
-	if(pPanelReq->result==RPC_SRV_RESULT_SUCCESS)
 	{
-		pDataCache->gpio_data[pPacket->addr]=pPacket->data;//store last set gpio value in my local-cache
-		if(pDataCache->gpio_data[pPacket->addr]!=pDataCache->gpio_data_prev[pPacket->addr])
-		{
-			pDataCache->gpio_data_prev[pPacket->addr]=pDataCache->gpio_data[pPacket->addr];
-			//gpio value changed, notify subscribers
-			ADEvntNotifier* pNotifier=(ADEvntNotifier*)pDataCache->pEventNotifier;
-			pNotifier->NotifyEvent(EGPIOCTL_EVENT_TYPE_OUTPUT_CHANGED,pPacket->addr,SERVER_JSON_PORT_NUM);
-			//NOTIFY_EVENT(EGPIOCTL_EVENT_TYPE_OUTPUT_CHANGED,pPacket->addr,SERVER_JSON_PORT_NUM);
-		}
-	}*/
+		pDataCache->pcf8574cache[pPacket->devaddr]=pPacket->data;
+		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;//dummy write to memory
+	}
+	else
+	{
+		//TODO: do tha actual device driver(/dev/i2c-x) access 
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+	}
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
