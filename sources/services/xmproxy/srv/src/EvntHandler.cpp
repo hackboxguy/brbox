@@ -13,6 +13,8 @@ EvntHandler:: EvntHandler(std::string rpcName,int myIndex,bool emu,bool log,XMPR
 	//subscribe for events from sysmgr-service
 	sysmgrEventActive=false;
 	sysMgrSrvToken=-1;
+	//SUBSCRIBE_EVENT("172.29.10.1",0,&sysMgrSrvToken,0,-1,42513);
+
 	SUBSCRIBE_EVENT("127.0.0.1",EVENT_SYSMGR,&sysMgrSrvToken,EVENT_SYSMGR,-1,XMPROXY_JSON_PORT_NUMBER);
 	if(sysMgrSrvToken!=-1)
 		sysmgrEventActive=true;//subscription is active
