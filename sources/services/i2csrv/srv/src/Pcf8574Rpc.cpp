@@ -16,8 +16,8 @@ int Pcf8574Rpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 	EJSON_I2CSRV_RPC_TYPES command =(EJSON_I2CSRV_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_I2CSRV_RPC_PCF8574_GET :return json_to_bin_gpio_get(pReq);
-		case EJSON_I2CSRV_RPC_PCF8574_SET :return json_to_bin_gpio_set(pReq);
+		case EJSON_I2CSRV_RPC_PCF8574_GET :return json_to_bin_pcf_get(pReq);
+		case EJSON_I2CSRV_RPC_PCF8574_SET :return json_to_bin_pcf_set(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -28,8 +28,8 @@ int Pcf8574Rpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 	EJSON_I2CSRV_RPC_TYPES command =(EJSON_I2CSRV_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_I2CSRV_RPC_PCF8574_GET :return bin_to_json_gpio_get(pReq);
-		case EJSON_I2CSRV_RPC_PCF8574_SET :return bin_to_json_gpio_set(pReq);
+		case EJSON_I2CSRV_RPC_PCF8574_GET :return bin_to_json_pcf_get(pReq);
+		case EJSON_I2CSRV_RPC_PCF8574_SET :return bin_to_json_pcf_set(pReq);
 		default:break;
 	}
 	return -1;
@@ -40,8 +40,8 @@ int Pcf8574Rpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer
 	EJSON_I2CSRV_RPC_TYPES command =(EJSON_I2CSRV_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_I2CSRV_RPC_PCF8574_GET :return process_gpio_get(pReq);
-		case EJSON_I2CSRV_RPC_PCF8574_SET :return process_gpio_set(pReq);
+		case EJSON_I2CSRV_RPC_PCF8574_GET :return process_pcf_get(pReq);
+		case EJSON_I2CSRV_RPC_PCF8574_SET :return process_pcf_set(pReq);
 		default:break;
 	}
 	return 0;
@@ -54,19 +54,19 @@ RPC_SRV_RESULT Pcf8574Rpc::ProcessWorkAsync(int index,unsigned char* pWorkData)
 	return ret_val;
 }
 /* ------------------------------------------------------------------------- */
-int Pcf8574Rpc::json_to_bin_gpio_get(JsonDataCommObj* pReq)
+int Pcf8574Rpc::json_to_bin_pcf_get(JsonDataCommObj* pReq)
 {
 	//GPIOCTL_IO_ACCESS_PACKET* pPanelCmdObj=NULL;
 	//PREPARE_JSON_REQUEST(RPC_SRV_REQ,GPIOCTL_IO_ACCESS_PACKET,RPC_SRV_ACT_READ,EJSON_GPIOCTL_RPC_IO_GET);
 	//JSON_STRING_TO_INT(GPIOCTL_RPC_IO_ADDR_ARG,pPanelCmdObj->addr);
 	return 0;
 }
-int Pcf8574Rpc::bin_to_json_gpio_get(JsonDataCommObj* pReq)
+int Pcf8574Rpc::bin_to_json_pcf_get(JsonDataCommObj* pReq)
 {
 	//PREPARE_JSON_RESP_INT(RPC_SRV_REQ,GPIOCTL_IO_ACCESS_PACKET,GPIOCTL_RPC_IO_DATA_ARG,data);
 	return 0;
 }
-int Pcf8574Rpc::process_gpio_get(JsonDataCommObj* pReq)
+int Pcf8574Rpc::process_pcf_get(JsonDataCommObj* pReq)
 {
 	/*RaspiIo Raspi;
 	RPC_SRV_REQ *pPanelReq=NULL;
@@ -90,7 +90,7 @@ int Pcf8574Rpc::process_gpio_get(JsonDataCommObj* pReq)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
-int Pcf8574Rpc::json_to_bin_gpio_set(JsonDataCommObj* pReq)
+int Pcf8574Rpc::json_to_bin_pcf_set(JsonDataCommObj* pReq)
 {
 	/*GPIOCTL_IO_ACCESS_PACKET* pPanelCmdObj=NULL;
 	PREPARE_JSON_REQUEST(RPC_SRV_REQ,GPIOCTL_IO_ACCESS_PACKET,RPC_SRV_ACT_WRITE,EJSON_GPIOCTL_RPC_IO_SET);
@@ -98,12 +98,12 @@ int Pcf8574Rpc::json_to_bin_gpio_set(JsonDataCommObj* pReq)
 	JSON_STRING_TO_INT(GPIOCTL_RPC_IO_DATA_ARG,pPanelCmdObj->data);*/
 	return 0;
 }
-int Pcf8574Rpc::bin_to_json_gpio_set(JsonDataCommObj* pReq)
+int Pcf8574Rpc::bin_to_json_pcf_set(JsonDataCommObj* pReq)
 {
 	//PREPARE_JSON_RESP(RPC_SRV_REQ,GPIOCTL_IO_ACCESS_PACKET);
 	return 0;
 }
-int Pcf8574Rpc::process_gpio_set(JsonDataCommObj* pReq)
+int Pcf8574Rpc::process_pcf_set(JsonDataCommObj* pReq)
 {
 	/*RPC_SRV_REQ *pPanelReq=NULL;
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;

@@ -16,13 +16,13 @@ public:
 	virtual RPC_SRV_RESULT ProcessWorkAsync(int index,unsigned char* pWorkData);
 	virtual void ReceiveEvent(int cltToken,int evntNum,int evntArg){};
 
-	int json_to_bin_gpio_get(JsonDataCommObj* pReq);
-	int bin_to_json_gpio_get(JsonDataCommObj* pReq);
-	int process_gpio_get(JsonDataCommObj* pReq);
+	int json_to_bin_pcf_get(JsonDataCommObj* pReq);
+	int bin_to_json_pcf_get(JsonDataCommObj* pReq);
+	int process_pcf_get(JsonDataCommObj* pReq);
 
-	int json_to_bin_gpio_set(JsonDataCommObj* pReq);
-	int bin_to_json_gpio_set(JsonDataCommObj* pReq);
-	int process_gpio_set(JsonDataCommObj* pReq);
+	int json_to_bin_pcf_set(JsonDataCommObj* pReq);
+	int bin_to_json_pcf_set(JsonDataCommObj* pReq);
+	int process_pcf_set(JsonDataCommObj* pReq);
 };
 /* ------------------------------------------------------------------------- */
 
