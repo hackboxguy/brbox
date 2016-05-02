@@ -13,7 +13,7 @@ set(AUTO_SVN_VERSION    ON CACHE BOOL ON)  #by default include svn revision numb
 set(INSTALL_MY_HEADERS  ON CACHE BOOL ON)  #by default install header files to target-install-directory
 set(STARTUP_SCRIPT I2CSrvStartupScr)         #server startup script
 #set(STARTUP_SCRIPT_ALIAS S71GpioCtl)          #todo: automate numbering of startup scripts
-set(STARTNUM "76" CACHE STRING "76")       #init order number of the service
+set(STARTNUM "77" CACHE STRING "77")       #init order number of the service
 file(GLOB SOURCES "src/*.cpp")
 add_executable(${COMPONENT_NAME} ${SOURCES})
 set(INC_ADSTTNG  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-settings/include")

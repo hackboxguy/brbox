@@ -21,7 +21,7 @@ I2CCltCmdline::~I2CCltCmdline()
 //override virtual functions of ADGeneric Chain
 int I2CCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 {
-	EJSON_GPIOCTL_RPC_TYPES command =(EJSON_GPIOCTL_RPC_TYPES)arg;
+	EJSON_I2CSRV_RPC_TYPES command =(EJSON_I2CSRV_RPC_TYPES)arg;
 	switch(command)
 	{
 		case EJSON_I2CSRV_RPC_PCF8574_GET://EJSON_GPIOCTL_RPC_IO_SET

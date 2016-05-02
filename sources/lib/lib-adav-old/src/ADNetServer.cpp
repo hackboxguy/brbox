@@ -477,6 +477,7 @@ int ADNetServer::print_client_info(struct sockaddr *in_addr,socklen_t in_len,int
 	in_clt_info = getnameinfo (in_addr,in_len,hbuf,sizeof(hbuf),sbuf,sizeof(sbuf),NI_NUMERICHOST | NI_NUMERICSERV);
 	if(in_clt_info==0)
 	{
+//#ifdef SOCKET_DEBUG_MESSAGE
 		if(socketlog)
 			printf("[%06d]Connection accepted: clientip=%s, port=%s\n",sock_descr,hbuf,sbuf);
 		port=atoi(sbuf);
