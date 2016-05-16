@@ -50,4 +50,5 @@ source "package/brbox/brbox_bboxsms/Config.in"
 source "package/brbox/brbox_xmproxy/Config.in"
 source "package/brbox/brbox_apisrv/Config.in"
 source "package/brbox/brbox_gstreamer_vaapi/Config.in"
+source "package/brbox/brbox_genintrdrv/Config.in"
 endmenu

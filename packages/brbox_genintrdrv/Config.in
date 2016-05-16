@@ -1,0 +1,9 @@
+config BR2_PACKAGE_BRBOX_GENINTRDRV
+        bool "generic-interrupt-driver"
+        depends on BR2_LINUX_KERNEL
+        help
+          Kernel modules for generic interrupt driver.
+
+comment "generic-interrupt-driver needs a Linux kernel to be built"
+        depends on !BR2_LINUX_KERNEL
+
