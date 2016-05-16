@@ -27,7 +27,8 @@
  * example) this assertion would be false because the header file
  * would be placed in the kernel include area.
  */
-#include "../include/linux/genintrdrv.h"
+//#include "../include/linux/genintrdrv.h"
+#include <genintrdrv.h>
 
 
 /*

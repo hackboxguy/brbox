@@ -1,7 +1,9 @@
 CONFIG_MODULE_SIG=n
 MODULENAME=genintrdrv
+INCLDIR=$(PWD)/include/linux
+obj-m += kmod/$(MODULENAME).o
 
-obj-m += $(MODULENAME).o
+ccflags-y := -I$(INCLDIR)
 
 module:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
