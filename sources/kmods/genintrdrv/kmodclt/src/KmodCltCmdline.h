@@ -1,7 +1,7 @@
 #ifndef __KMODCLT_CMDLINE_H_
 #define __KMODCLT_CMDLINE_H_
 #include "ADCmdlineHelper.hpp"
-#include "GpioctlJsonDef.h"
+//#include "GpioctlJsonDef.h"
 #include "ADCmnStringProcessor.hpp"
 class KmodCltCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 {
@@ -13,6 +13,10 @@ class KmodCltCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 	virtual int run_my_autotest(char* ip,int interval_us,int max_loop,int test_num);
 	virtual int print_my_version();
 	virtual int get_my_server_port();
+
+	int kmod_open(char* device);
+	int kmod_close(int fd);
+	int kmod_increase_count(void);
 public:
 	KmodCltCmdline();
 	~KmodCltCmdline();

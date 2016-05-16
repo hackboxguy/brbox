@@ -70,10 +70,12 @@ static void genintrdrv_inc_message_count(void)
  */
 static int genintrdrv_open(struct inode *inode, struct file *file)
 {
+	printk("genintrdrv_open()\n");
 	return 0;
 }
 static int genintrdrv_close(struct inode *inode, struct file *file)
 {
+	printk("genintrdrv_close()\n");
 	return 0;
 }
 static long genintrdrv_ioctl(struct file *file, unsigned int ioctl_num, unsigned long ioctl_param)
@@ -91,6 +93,7 @@ static long genintrdrv_ioctl(struct file *file, unsigned int ioctl_num, unsigned
 	{
 		case GENINTRDRV_IOCTL_INCREMENT:
 			{
+				printk("genintrdrv: GENINTRDRV_IOCTL_INCREMENT called\n");
 				genintrdrv_inc_message_count();
 				ret = 0;
 				break;
@@ -121,6 +124,7 @@ static int genintrdrv_proc_read(char *buffer,
 {
 	int ret;
 	int i;
+
 
 	/* 
 	 * Obtain a local copy of the atomic variable that is
@@ -176,7 +180,7 @@ static int genintrdrv_proc_read(char *buffer,
 		}
 		ret = strlen(buffer);
 	}
-
+	//*eof = 1;                          /* end of file */
 	return ret;
 }
 
