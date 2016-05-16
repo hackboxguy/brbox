@@ -1,1 +1,3 @@
 obj-m  := genintrdrv.o
+genintrdrv-y := kmod/genintrdrv.o
+ccflags-y := -I$(include/linux)
