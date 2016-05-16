@@ -5,7 +5,7 @@
 ################################################################################
 BRBOX_GENINTRDRV_VERSION = 0.1
 BRBOX_GENINTRDRV_SITE_METHOD = local
-BRBOX_GENINTRDRV_SITE = $(TOPDIR)/../sources/kmods/genintrdrv/kmod
+BRBOX_GENINTRDRV_SITE = $(TOPDIR)/../sources/kmods/genintrdrv
 BRBOX_GENINTRDRV_INSTALL_TARGET = YES
 BRBOX_GENINTRDRV_LICENSE = GPLv2
 BRBOX_GENINTRDRV_LICENSE_FILES = COPYING
