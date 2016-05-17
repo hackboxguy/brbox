@@ -3,6 +3,7 @@
 # generic-interrupt-driver
 #
 ################################################################################
+#BRBOX_GENINTRDRV_STARTSCR=$(call qstrip,$(BR2_PACKAGE_BRBOX_GENINTRDRV_INIT_SCRIPT))
 BRBOX_GENINTRDRV_VERSION = 0.1
 BRBOX_GENINTRDRV_SITE_METHOD = local
 BRBOX_GENINTRDRV_SITE = $(TOPDIR)/../sources/kmods/genintrdrv
@@ -22,8 +23,11 @@ BRBOX_GENINTRDRV_DEPENDENCIES = linux
 #endef
 #define BRBOX_GENINTRDRV_INSTALL_STAGING_CMDS
 #endef
-#define BRBOX_GENINTRDRV_INSTALL_TARGET_CMDS
-#endef
+define BRBOX_GENINTRDRV_INSTALL_INIT_SYSV
+        $(INSTALL) -D -m 0755 package/brbox/brbox_genintrdrv/S59GenIntrDrvModule \
+                $(TARGET_DIR)/etc/init.d/S59GenIntrDrvModule
+endef
+
 #define BRBOX_GENINTRDRV_DEVICES
 #endef
 #define BRBOX_GENINTRDRV_PERMISSIONS
