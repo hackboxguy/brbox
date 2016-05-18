@@ -7,6 +7,7 @@
 #include <linux/seq_file.h>
 #include <genintrdrv.h>
 static int debuglogflag=0;
+static int interruptflag=0;
 atomic_t genintrdrv_message_count = ATOMIC_INIT(0);
 struct proc_dir_entry *genintrdrv_proc_entry;
 static void genintrdrv_inc_message_count(void)
@@ -140,7 +141,19 @@ static ssize_t debuglogflag_store(struct kobject *kobj, struct kobj_attribute *a
         sscanf(buf, "%d", &debuglogflag);
         return count;
 }
-static struct kobj_attribute debuglog_attribute =__ATTR(debuglog, 0666, debuglogflag_show,debuglogflag_store);
+static ssize_t interruptflag_show(struct kobject *kobj, struct kobj_attribute *attr,
+                      char *buf)
+{
+        return sprintf(buf, "%d\n", interruptflag);
+}
+static ssize_t interruptflag_store(struct kobject *kobj, struct kobj_attribute *attr,
+                      char *buf, size_t count)
+{
+        sscanf(buf, "%d", &interruptflag);
+        return count;
+}
+static struct kobj_attribute debuglog_attribute  =__ATTR(debuglog, 0666, debuglogflag_show,debuglogflag_store);
+static struct kobj_attribute interrupt_attribute =__ATTR(interrupt, 0666, interruptflag_show,interruptflag_store);
 static struct kobject *sysfs_kobj;
 static int __init genintrdrv_init(void)
 {
@@ -158,6 +171,10 @@ static int __init genintrdrv_init(void)
         ret = sysfs_create_file(sysfs_kobj, &debuglog_attribute.attr);
         if (ret) 
                 printk("failed to create the debuglog file in /sys/kernel/kobject_example \n");
+        ret = sysfs_create_file(sysfs_kobj, &interrupt_attribute.attr);
+        if (ret) 
+                printk("failed to create the interrupt file in /sys/kernel/kobject_example \n");
+
 	printk("%s: init\n",GENINTRDRV_MODULE_NAME);
 	return ret;
 }
