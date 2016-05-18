@@ -90,5 +90,23 @@ typedef union genintrdrv_ioctl_param_u {
  */
 #define GENINTRDRV_IOCTL_INCREMENT	   _IOW(GENINTRDRV_MAGIC, 1, genintrdrv_ioctl_inc_t)
 
+#undef PDEBUG	/* undef it, just in case */
+#ifdef GENINTRDRV_DRV_DEBUG
+//#ifdef DEBUG
+# define PDEBUG(fmt,args...) printk( "%s:%04d:%s:" fmt,GENINTRDRV_MODULE_NAME,__LINE__,__FUNCTION__, ## args)
+#else
+# define PDEBUG(fmt,args...) /* not debugging: nothing */
+#endif
+#undef PDEBUGG
+#define PDEBUGG(fmt,args...) /* nothing: it's a placeholder */
+
+#define DEBUG_MSG(logflag,fmt,args...)\
+do			\
+{			\
+	if(logflag==1)\
+	{\
+	printk("%s:%04d:%s:"fmt,GENINTRDRV_MODULE_NAME,__LINE__,__FUNCTION__, ## args);\
+	}\
+} while (0)
 
 #endif /* GENINTRDRV_H */
