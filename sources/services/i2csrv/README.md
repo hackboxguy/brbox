@@ -4,8 +4,8 @@ Before running i2csrv, ensure that /dev/i2c-n exists, n should be the index of t
 
 On raspberry pi, /dev/i2c-1 is accessible on following pins.
   1. Pin-01 : 3.3vDC
-  2. Pin-02 : SDA1
-  3. Pin-03 : SCL1
+  2. Pin-03 : SDA1
+  3. Pin-05 : SCL1
   4. Pin-39 : Ground
 
 
