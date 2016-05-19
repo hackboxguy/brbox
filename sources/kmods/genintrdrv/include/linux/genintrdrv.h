@@ -105,7 +105,7 @@ do			\
 {			\
 	if(logflag==1)\
 	{\
-	printk("%s:%04d:%s:"fmt,GENINTRDRV_MODULE_NAME,__LINE__,__FUNCTION__, ## args);\
+	printk(KERN_DEBUG "%s:%04d:%s:"fmt,GENINTRDRV_MODULE_NAME,__LINE__,__FUNCTION__, ## args);\
 	}\
 } while (0)
 
