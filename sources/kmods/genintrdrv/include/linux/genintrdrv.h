@@ -109,4 +109,11 @@ do			\
 	}\
 } while (0)
 
+typedef struct GENINTDRV_SIGINFO_T 
+{
+	int32_t intr;//interrupt umber
+	int32_t	sig;//signal number to send
+	int32_t	pid;//on which pid signal to be sent
+}GENINTDRV_SIGINFO;
+
 #endif /* GENINTRDRV_H */
