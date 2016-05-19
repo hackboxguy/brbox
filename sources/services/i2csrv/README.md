@@ -3,10 +3,10 @@ i2csrv is a userspace daemon which allows accessing of i2c devices over tcp-sock
 Before running i2csrv, ensure that /dev/i2c-n exists, n should be the index of the bus number.
 
 On raspberry pi, /dev/i2c-1 is accessible on following pins.
-pin  1: 3.3vDC
-pin  3: SDA1
-pin  5: SCL1
-pin 39: Ground
+  pin  1: 3.3vDC
+  pin  3: SDA1
+  pin  5: SCL1
+  pin 39: Ground
 
 Before running i2csrv, its a good idea to scan available i2c devices on the bus using following command.
 ```i2cdetect -y 1```
