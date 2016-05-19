@@ -1,5 +1,5 @@
 obj-m  := genintrdrv.o
 INCLDIR=$(PWD)/include/linux
-genintrdrv-y := kmod/genintrdrv.o
+genintrdrv-y := kmod/genintrdrv.o kmod/chain.o kmod/sl_chain.o
 ccflags-y := -I$(INCLDIR)
 

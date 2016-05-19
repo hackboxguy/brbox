@@ -114,6 +114,7 @@ typedef struct GENINTDRV_SIGINFO_T
 	int32_t intr;//interrupt umber
 	int32_t	sig;//signal number to send
 	int32_t	pid;//on which pid signal to be sent
+	int32_t active;//shows whether entry is active or not
 }GENINTDRV_SIGINFO;
 
 #endif /* GENINTRDRV_H */
