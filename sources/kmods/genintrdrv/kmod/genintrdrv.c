@@ -20,9 +20,11 @@
 //#include <linux/delay.h>
 //#include <linux/version.h>
 #include <genintrdrv.h>
-static int debuglogflag=0;
+/*****************************************************************************/
+//variables of genintrdrv module
+static int debuglogflag=0;//by default debug logging is disabled
 static int interruptflag=0;
-static int sigcounter=0;
+static int sigcounter=0;//number of times signal has been sent
 atomic_t genintrdrv_message_count = ATOMIC_INIT(0);
 struct proc_dir_entry *genintrdrv_proc_entry;
 GENINTDRV_SIGINFO SigList;

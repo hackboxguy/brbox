@@ -47,3 +47,13 @@ after ./build-image.sh is complete, you will see following files under /mnt/buil
 2. ```sudo sh -c "pv -tpreb /mnt/buildramdisk/00.01/images/bootable-usb-disk.img | dd bs=128k of=/dev/sdX conv=fdatasync"```
 3. Insert the sdcard and boot Raspi and login using root/brb0x
 
+###How to compile code for Raspberry-1 on x86 native host machine?
+1. ```cd /home/user/sandbox/;git clone svn co https://github.com/hackboxguy/downloads```
+2. ```cp /home/adav/sandbox/downloads/toolchain/brbox-raspi1-disptst.tar.xz /opt``` (ensure that your user has write permission to /opt)
+3. ```cd /opt/;tar -xvf brbox-raspi1-disptst.tar.xz```
+4. ```ln -s brbox-raspi1-disptst/ brbox-raspi1-arm```
+5. ```cd /home/user/sandbox/;svn co https://github.com/hackboxguy/brbox```
+6. ```cd brbox/trunk/sources```
+7. ```cmake -H. -BOutput -DCMAKE_INSTALL_PREFIX=/home/usr/tmp/brbox-install -DCMAKE_TOOLCHAIN_FILE=/home/user/sandbox/brbox/trunk/sources/cmake/brbox-raspi1-arm.cmake```
+8. ```cmake --build Output -- install -j4``` (use correct -j option based on number of cpu's for faster compilation time).
+9. ```/home/usr/tmp/brbox-install``` (here you will see all compiled binaries for raspi-1, copy this folder to your raspberry-pi using scp)
