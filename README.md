@@ -49,7 +49,7 @@ after ./build-image.sh is complete, you will see following files under /mnt/buil
 
 ###How to compile code for Raspberry-1 on x86 native host machine?
 1. ```cd /home/user/sandbox/;git clone svn co https://github.com/hackboxguy/downloads```
-2. ```cp /home/adav/sandbox/downloads/toolchain/brbox-raspi1-disptst.tar.xz /opt``` (ensure that your user has write permission to /opt)
+2. ```cp /home/user/sandbox/downloads/toolchain/brbox-raspi1-disptst.tar.xz /opt``` (ensure that your user has write permission to /opt)
 3. ```cd /opt/;tar -xvf brbox-raspi1-disptst.tar.xz```
 4. ```ln -s brbox-raspi1-disptst/ brbox-raspi1-arm```
 5. ```cd /home/user/sandbox/;svn co https://github.com/hackboxguy/brbox```
