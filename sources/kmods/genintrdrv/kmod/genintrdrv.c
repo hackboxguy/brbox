@@ -1,4 +1,5 @@
-/*  This is the main file of generic-interrupt-driver. 
+/*  This is the main file of generic-interrupt-driver.
+ *  how to insert driver with cmdargs : sudo insmod genintrdrv.ko intrlist="1,17,4,5" 
  *  how to enable debug-log?          : sudo bash -c 'echo 1 > /sys/kernel/genintrdrv/debuglog'
  *  how to check debug-log sts?       : cat /sys/kernel/genintrdrv/debuglog 
  *  how to check active subscriptions?: cat /sys/kernel/genintrdrv/subscribe
@@ -16,8 +17,10 @@
 #include <linux/seq_file.h>
 #include <linux/pid.h>
 #include <linux/sched.h>
-//#include <linux/ioport.h>
 #include <linux/slab.h>
+#include <linux/interrupt.h>
+#include <asm/io.h>
+//#include <linux/ioport.h>
 //#include <linux/delay.h>
 //#include <linux/version.h>
 #include "chain.h"
@@ -27,6 +30,8 @@
 static int debuglogflag=0;//by default debug logging is disabled
 static int interruptflag=0;
 static int sigcounter=0;//number of times signal has been sent
+static int intcounter=0;//number of times irq function has been called
+static int bhcounter=0;//number of times bottom-half(tasklet) function has been called
 atomic_t genintrdrv_message_count = ATOMIC_INIT(0);
 struct proc_dir_entry *genintrdrv_proc_entry;
 GENINTDRV_SIGINFO SigList;
@@ -144,6 +149,31 @@ int8_t send_signal_to_process(int32_t intr,int32_t sig,int32_t pid,int32_t* tot_
 	}
 	return 0;
 }
+int8_t send_signal_to_subscribers(int32_t interrupt)
+{
+	GENINTDRV_SIGINFO *pEntry=NULL;
+	int size=chain_size(&SubscribersList);
+	int i=0;
+	chain_lock(&SubscribersList);
+	while(i<size)
+	{
+		pEntry = (GENINTDRV_SIGINFO*)chain_get_by_index(&SubscribersList,i);//get the top element and check if it has to be removed
+		if(pEntry!=NULL)//no valid object
+		{
+			if(pEntry->intr==interrupt && pEntry->active==1)
+			{
+				if(send_signal_to_process(pEntry->intr,pEntry->sig,pEntry->pid,&sigcounter)!=0)
+				{
+					//process is not alive anymore, deactivate this entry and clean it later
+					pEntry->active=0;
+				}
+			}
+		}
+		i++;
+	}
+	chain_unlock(&SubscribersList);
+	//TODO: remove inactive entries: //void *chain_remove_by_triple_ident(chain *pChain,int32_t ident1,int32_t ident2,int32_t ident3,tpdatIdfunc_t cust_func)
+}
 /*****************************************************************************/
 //sysfs related stuff
 static ssize_t debuglogflag_show(struct kobject *kobj, struct kobj_attribute *attr,
@@ -166,29 +196,8 @@ static ssize_t interruptflag_store(struct kobject *kobj, struct kobj_attribute *
                       char *buf, size_t count)
 {
         sscanf(buf, "%d", &interruptflag);
+	send_signal_to_subscribers(interruptflag);
 	//send the signal to subscribers from the list
-	GENINTDRV_SIGINFO *pEntry=NULL;
-	int size=chain_size(&SubscribersList);
-	int i=0;
-	chain_lock(&SubscribersList);
-	while(i<size)
-	{
-		pEntry = (GENINTDRV_SIGINFO*)chain_get_by_index(&SubscribersList,i);//get the top element and check if it has to be removed
-		if(pEntry!=NULL)//no valid object
-		{
-			if(pEntry->intr==interruptflag && pEntry->active==1)
-			{
-				if(send_signal_to_process(pEntry->intr,pEntry->sig,pEntry->pid,&sigcounter)!=0)
-				{
-					//process is not alive anymore, deactivate this entry and clean it later
-					pEntry->active=0;
-				}
-			}
-		}
-		i++;
-	}
-	chain_unlock(&SubscribersList);
-	//void *chain_remove_by_triple_ident(chain *pChain,int32_t ident1,int32_t ident2,int32_t ident3,tpdatIdfunc_t cust_func)
         return count;
 }
 static ssize_t intrsubscribe_show(struct kobject *kobj, struct kobj_attribute *attr,
@@ -238,7 +247,7 @@ static ssize_t intrsubscribe_store(struct kobject *kobj, struct kobj_attribute *
 static ssize_t sigcount_show(struct kobject *kobj, struct kobj_attribute *attr,
                       char *buf)
 {
-        return sprintf(buf, "%d\n", sigcounter);
+        return sprintf(buf, "sigcount=%d intrcount=%d bhcount=%d\n",sigcounter,intcounter,bhcounter);
 }
 static ssize_t sigcount_store(struct kobject *kobj, struct kobj_attribute *attr,
                       char *buf, size_t count)
@@ -252,6 +261,32 @@ static struct kobj_attribute subscribe_attribute =__ATTR(subscribe, 0664, intrsu
 static struct kobj_attribute sigcount_attribute  =__ATTR(sigcount , 0664, sigcount_show,sigcount_store);//show total signals sent
 static struct kobject *sysfs_kobj;
 /*****************************************************************************/
+//irq related stuff
+int which_interrupt=-1;
+void irq_tasklet_bh(unsigned long);
+DECLARE_TASKLET(irq_tasklet, irq_tasklet_bh, 0);
+DEFINE_SPINLOCK(irq_lock);
+void irq_tasklet_bh(unsigned long hits) 
+{
+	bhcounter++;
+	spin_lock(&irq_lock);
+	//scode = scancode; //TODO: shared resource between top-half and bottom-half
+	send_signal_to_subscribers(which_interrupt);//TODO:dequeue the interrupt number from chain
+	spin_unlock(&irq_lock);
+	return;
+}
+irq_handler_t irq_handler (int irq, void *dev_id, struct pt_regs *regs) 
+{
+	intcounter++;//number of times interrupt routine has been called
+	spin_lock(&irq_lock);
+	//scancode = inb (0x60);
+	which_interrupt=irq;//TODO:queue the interrupt number to chain
+	spin_unlock(&irq_lock);
+	tasklet_schedule(&irq_tasklet);//schedule the tasklet
+	return (irq_handler_t) IRQ_HANDLED;
+}
+/*****************************************************************************/
+//genintrdrv module related stuff
 struct file_operations
 genintrdrv_dev_fops = {
 	.owner          = THIS_MODULE,
@@ -304,11 +339,17 @@ static int __init genintrdrv_init(void)
 	DEBUG_MSG(1,"cmdarg=%s\n",intrlist);
 	//TODO: based on cmdarg, register requested irq's
 
+	ret = request_irq (17, (irq_handler_t) irq_handler, IRQF_SHARED, "genintdrv", (void *)(irq_handler));
+	if (ret)
+		DEBUG_MSG(1,"can't get shared interrupt for keyboard\n");
+
 	DEBUG_MSG(1,"\n");//always print this
 	return ret;
 }
 static void __exit genintrdrv_exit(void)
 { 
+	free_irq(17, (void *)(irq_handler)); /* i can't pass NULL, this is a shared interrupt handler! */
+
 	kobject_put(sysfs_kobj);
  	misc_deregister(&genintrdrv_misc);
 	chain_release(&SubscribersList);
