@@ -8,8 +8,8 @@ EventHandler:: EventHandler(std::string rpcName,int myIndex,bool emu,bool log,SY
 	gpioEventActive=false;
 	srvToken=-1;
 	pDataCache=pData;
-	//SUBSCRIBE_EVENT("127.0.0.1",EVENT_GPIOSRV,&srvToken,EVENT_GPIOSRV,-1,40001);
-	SUBSCRIBE_EVENT("10.128.64.154",42513,&srvToken,42513,5,ADCMN_PORT_SYSMGR);
+	SUBSCRIBE_EVENT("127.0.0.1",EVENT_GPIOSRV,&srvToken,EVENT_GPIOSRV,-1,40001);
+	//SUBSCRIBE_EVENT("10.128.64.154",42513,&srvToken,42513,5,ADCMN_PORT_SYSMGR);
 	if(srvToken!=-1)
 	{
 		gpioEventActive=true;//subscription is active
