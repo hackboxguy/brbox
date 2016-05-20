@@ -13,10 +13,10 @@ EventHandler:: EventHandler(std::string rpcName,int myIndex,bool emu,bool log,SY
 	if(srvToken!=-1)
 	{
 		gpioEventActive=true;//subscription is active
-		std::cout<<"event subscription with sdsms is success and srvToken given by sdsms is = "<<srvToken<<endl;
+		std::cout<<"event subscription with gpiosrv is success and srvToken given by gpiosrv is = "<<srvToken<<endl;
 	}
 	else
-		cout<<"unable subscribe all events with sdsms"<<endl;
+		cout<<"unable subscribe all events with gpiosrv"<<endl;
 //	std::cout<<"srvToken = "<<srvToken<<endl;
 	//second arg:40003 : port number of gpio-server
 	//thirdarg:srvToken: on success, gpio-server returns a unique token ID to sysmgr
