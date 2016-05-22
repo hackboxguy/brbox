@@ -116,5 +116,10 @@ typedef struct GENINTDRV_SIGINFO_T
 	int32_t	pid;//on which pid signal to be sent
 	int32_t active;//shows whether entry is active or not
 }GENINTDRV_SIGINFO;
+typedef struct GENINTDRV_IRQINFO_T 
+{
+	int32_t irqnum;//interrupt number
+	int32_t irqsts;//irq registration status with kernel
+}GENINTDRV_IRQINFO;
 
 #endif /* GENINTRDRV_H */

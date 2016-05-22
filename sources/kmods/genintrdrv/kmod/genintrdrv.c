@@ -25,6 +25,7 @@
 //#include <linux/version.h>
 #include "chain.h"
 #include <genintrdrv.h>
+#include <linux/kernel.h>
 /*****************************************************************************/
 //variables of genintrdrv module
 static int debuglogflag=0;//by default debug logging is disabled
@@ -35,7 +36,7 @@ static int bhcounter=0;//number of times bottom-half(tasklet) function has been 
 atomic_t genintrdrv_message_count = ATOMIC_INIT(0);
 struct proc_dir_entry *genintrdrv_proc_entry;
 GENINTDRV_SIGINFO SigList;
-chain SubscribersList;
+chain SubscribersList,IRQList;
 static char *intrlist = "";//commandline argument passed to module during insmod.
 /*****************************************************************************/
 /*static void genintrdrv_inc_message_count(void)
@@ -232,6 +233,7 @@ static ssize_t intrsubscribe_store(struct kobject *kobj, struct kobj_attribute *
 	//add a new subscriber if there is no existing subscription
 	if(find_duplicate_entry(SigList.intr,SigList.sig,SigList.pid,&SubscribersList)!=0)
 	{
+		//TODO: check if requested interrupt is already active
 		SigList.active=1;//keep this entry active till next chance of event-sending
 		if(add_subscriber_to_list(&SigList,&SubscribersList)!=0)
 			DEBUG_MSG(debuglogflag,"unable to add new subscription!!!   intr=%d signal=%d pid=%d\n",SigList.intr,SigList.sig,SigList.pid);
@@ -255,10 +257,22 @@ static ssize_t sigcount_store(struct kobject *kobj, struct kobj_attribute *attr,
         sscanf(buf, "%d", &sigcounter);
         return count;
 }
+static ssize_t activeirq_show(struct kobject *kobj, struct kobj_attribute *attr,
+                      char *buf)
+{
+        return sprintf(buf, "none\n");//TODO
+}
+static ssize_t activeirq_store(struct kobject *kobj, struct kobj_attribute *attr,
+                      char *buf, size_t count)
+{
+        //sscanf(buf, "%d", &sigcounter);//nothing to do
+        return count;
+}
 static struct kobj_attribute debuglog_attribute  =__ATTR(debuglog , 0664, debuglogflag_show,debuglogflag_store);//enable/disable debug logging
 static struct kobj_attribute interrupt_attribute =__ATTR(interrupt, 0664, interruptflag_show,interruptflag_store);//simulate interrupt arrival
 static struct kobj_attribute subscribe_attribute =__ATTR(subscribe, 0664, intrsubscribe_show,intrsubscribe_store);//subscribe for interrupt
 static struct kobj_attribute sigcount_attribute  =__ATTR(sigcount , 0664, sigcount_show,sigcount_store);//show total signals sent
+static struct kobj_attribute activeirq_attribute =__ATTR(activeirq, 0664, activeirq_show,activeirq_store);//show active interrupts
 static struct kobject *sysfs_kobj;
 /*****************************************************************************/
 //irq related stuff
@@ -284,6 +298,91 @@ irq_handler_t irq_handler (int irq, void *dev_id, struct pt_regs *regs)
 	spin_unlock(&irq_lock);
 	tasklet_schedule(&irq_tasklet);//schedule the tasklet
 	return (irq_handler_t) IRQ_HANDLED;
+}
+/*****************************************************************************/
+int32_t find_duplicate_irq_entry(int32_t irq,chain *pChain)
+{
+	GENINTDRV_IRQINFO *pEntry=NULL;
+	int size=chain_size(pChain);
+	int i=0;
+	chain_lock(pChain);
+	while(i<size)
+	{
+		pEntry = (GENINTDRV_IRQINFO*)chain_get_by_index(pChain,i);
+		if(pEntry==NULL)//no valid object
+		{
+			chain_unlock(pChain);
+			return -1;//no duplicate found
+		}
+		if(pEntry->irqnum == irq) //entry already exists
+		{
+			chain_unlock(pChain);
+			return 0;//duplicate entry found
+		}
+		i++;
+	}
+	chain_unlock(pChain);
+	return -1;//no duplicate found
+}
+int32_t add_irq_to_list(GENINTDRV_IRQINFO *pNewEntry,chain *pChain)
+{
+	GENINTDRV_IRQINFO *pEntry=NULL;
+	pEntry = (GENINTDRV_IRQINFO*)kmalloc(sizeof(GENINTDRV_IRQINFO),GFP_KERNEL);
+	if(pEntry==NULL)
+		return -1;
+	pEntry->irqnum    = pNewEntry->irqnum;
+	pEntry->irqsts    = pNewEntry->irqsts;
+	if(chain_put(pChain,(void *)pEntry)!=0)//failed
+	{
+		kfree(pEntry);
+		return -1;
+	}
+	return 0;
+}
+int scan_cmdline_irqlist(char *str,chain *pIRQList)
+{
+	int maxcount=0;long intrnum;	
+	char *token = str;
+	char *end = str;
+	GENINTDRV_IRQINFO IRQItem;
+
+	while (token != NULL)
+	{
+		intrnum = simple_strtol(token,NULL,10);//convert comma separated char-string to int value
+		//DEBUG_MSG(1,"val=%d strlen=%d\n",intrnum,strlen(token));
+		if(find_duplicate_irq_entry((int32_t)intrnum,pIRQList)!=0)
+		{
+			IRQItem.irqnum=(int32_t)intrnum;
+			IRQItem.irqsts=0;//irq is not registered with kernel yet
+			if(add_irq_to_list(&IRQItem,pIRQList)!=0)
+				DEBUG_MSG(1,"unable to add %d irq to list!!!\n",intrnum);
+		}
+		else // duplicate entry, this subscription is already available
+		{
+			DEBUG_MSG(1,"duplicate entry fount for irq=%d!!!\n",intrnum);
+		}
+
+		strsep(&end, ",");
+		token = end;
+		if(maxcount++>1023)break;//incase something goes wrong, then break this loop
+	}
+	return 0;
+}
+int register_irqlist(chain *pIRQList)
+{
+	//GENINTDRV_IRQINFO
+	//ret = request_irq (1, (irq_handler_t) irq_handler, IRQF_SHARED, "genintdrv", (void *)(irq_handler));
+	//if (ret)
+	//	DEBUG_MSG(1,"can't get shared interrupt for keyboard\n");
+	//TODO:
+	return 0;
+}
+int free_irqlist(chain *pIRQList)
+{
+	//GENINTDRV_IRQINFO
+	//free_irq(1, (void *)(irq_handler)); /* i can't pass NULL, this is a shared interrupt handler! */
+	//TODO:
+	return 0;
 }
 /*****************************************************************************/
 //genintrdrv module related stuff
@@ -334,24 +433,25 @@ static int __init genintrdrv_init(void)
                 printk("failed to create /sys/kernel/genintrdrv/sigcount\n");
 
 	chain_init(&SubscribersList);
+	chain_init(&IRQList);
 
 	//parse the cmdline args, and check which interrupts are requested to be active
 	DEBUG_MSG(1,"cmdarg=%s\n",intrlist);
-	//TODO: based on cmdarg, register requested irq's
-
-	ret = request_irq (17, (irq_handler_t) irq_handler, IRQF_SHARED, "genintdrv", (void *)(irq_handler));
-	if (ret)
-		DEBUG_MSG(1,"can't get shared interrupt for keyboard\n");
-
+	scan_cmdline_irqlist(intrlist,&IRQList);
+	register_irqlist(&IRQList);
+	//ret = request_irq (1, (irq_handler_t) irq_handler, IRQF_SHARED, "genintdrv", (void *)(irq_handler));
+	//if (ret)
+	//	DEBUG_MSG(1,"can't get shared interrupt for keyboard\n");
 	DEBUG_MSG(1,"\n");//always print this
 	return ret;
 }
 static void __exit genintrdrv_exit(void)
 { 
-	free_irq(17, (void *)(irq_handler)); /* i can't pass NULL, this is a shared interrupt handler! */
-
+	//free_irq(1, (void *)(irq_handler)); /* i can't pass NULL, this is a shared interrupt handler! */
+	free_irqlist(&IRQList);
 	kobject_put(sysfs_kobj);
  	misc_deregister(&genintrdrv_misc);
+	chain_release(&IRQList);
 	chain_release(&SubscribersList);
 	DEBUG_MSG(1,"\n");//always print this
 }
@@ -365,6 +465,7 @@ module_param(intrlist, charp, 0000);
 MODULE_PARM_DESC(intrlist, "comma separated list of interrupts to be active");//read cmdline args for knowing which interrupts to be activated
 /*****************************************************************************/
 //todo: provide a timer based interrupt generation
+//todo: when irq number -1 is requested during insmod, treat this as simulation mode
 //todo: IRQ handler with top and bottom-half implementation
 //how to pass parameters to module? http://www.tldp.org/LDP/lkmpg/2.4/html/x354.htm
 
