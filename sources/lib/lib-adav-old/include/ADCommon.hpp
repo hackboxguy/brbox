@@ -32,6 +32,17 @@
 #define ADLIB_RPC_INDX_GET_TASK_STATUS      0
 #define ADLIB_RPC_PARM_TASK_STS_ID          "taskId"
 #define ADLIB_RPC_PARM_TASK_STS             "taskStatus"
+#define ADLIB_RPC_PARM_ASYNC_RESP_TYPE      "resptype"
+#define ADLIB_RPC_TABL_ASYNC_RESP_TYPE      {"poll","trigger","event","unknown","none","\0"}
+typedef enum ADLIB_ASYNC_RESP_TYPE_T
+{
+	ADLIB_ASYNC_RESP_TYPE_POLL,    //after async call is finished, no event is sent, caller should poll for status of the taskID(existing implementation)
+	ADLIB_ASYNC_RESP_TYPE_TRIGGER, //after async call is finished, no result is available(fire-and-forget type of async call)
+	ADLIB_ASYNC_RESP_TYPE_EVENT,   //after async call is finished, event is sent to subscriber along with taskID and result-value
+	ADLIB_ASYNC_RESP_TYPE_UNKNOWN,
+	ADLIB_ASYNC_RESP_TYPE_NONE
+}ADLIB_ASYNC_RESP_TYPE;
+
 
 //rpc version related index,name and arg strings
 #define ADLIB_RPC_NAME_GET_SRV_VER          "get_rpc_srv_version" //shall remain same in all services
@@ -78,7 +89,8 @@ typedef enum ADLIB_SERVICE_READY_STATE_T
 #define RPCMGR_RPC_EVENT_ARG_PORT     "port"
 #define RPCMGR_RPC_EVENT_ARG_EVENTNUM "evntNum"  //which of the events
 #define RPCMGR_RPC_EVENT_ARG_SRVTOK   "srvToken" //sent from server to client as a subscription token
-#define RPCMGR_RPC_EVENT_ARG_EXTRA    "evntArg"  //optional extra argument sent with eventNum
+#define RPCMGR_RPC_EVENT_ARG_EXTRA    "evntArg1"  //optional extra argument sent with eventNum
+#define RPCMGR_RPC_EVENT_ARG2_EXTRA   "evntArg2"  //optional second argument sent with eventNum
 #define ADLIB_EVENT_NUM_INPROG_DONE 0
 #define ADLIB_EVENT_NUM_SHUT_DOWN   1
 #define ADLIB_EVENT_NUM_RESERVED1   2

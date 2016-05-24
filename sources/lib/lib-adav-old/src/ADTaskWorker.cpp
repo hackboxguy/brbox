@@ -57,6 +57,10 @@ int ADTaskWorker::monoshot_callback_function(void* pUserData,ADThreadProducer* p
 		RPC_SRV_RESULT task_result=run_work(work_obj->command,work_obj->pWorkData);//call the consumers's function(callback)
 		WORK_CMD_TASK_IN_PROG *work_inprog_obj=NULL;
 
+		//just check if request is of type fire-and-forget(trigger)
+		if(work_obj->resp_type==ADLIB_ASYNC_RESP_TYPE_TRIGGER)
+			work_obj->done_action=WORK_CMD_AFTER_DONE_DELETE;
+
 		if(work_obj->done_action==WORK_CMD_AFTER_DONE_PRESERVE)
 		{
 			work_inprog_chain.chain_lock();
