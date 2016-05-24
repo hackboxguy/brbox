@@ -21,8 +21,11 @@ typedef struct WORK_CMD_TASK_T
 	int command;//command type
 	RPC_SRV_RESULT taskSts;//status(success/fail/inprogress)
 	WORK_CMD_AFTER_DONE done_action;
+	ADLIB_ASYNC_RESP_TYPE resp_type;
 	//unsigned int  WorkDataSize;
 	unsigned char* pWorkData;//caller knows what kind of object is it.
+public:
+	WORK_CMD_TASK_T() {resp_type=ADLIB_ASYNC_RESP_TYPE_POLL;}
 }WORK_CMD_TASK;
 
 typedef struct WORK_CMD_TASK_IN_PROG_T
@@ -80,6 +83,7 @@ public:
 class ADTaskWorker: public ADTaskWorkerProducer, public ADChainConsumer, public ADThreadConsumer
 {
 	//ADGenericChain PushTaskLock;//chain abused just for getting the sema-lock feature
+
 	ADThread work_thread;//thread for commands that needs longer execution time(ex: fmw-update)
 	ADGenericChain work_chain;//all the commands to be executed by work_thread are in this chain.
 	//ADGenericChain work_done_chain;
