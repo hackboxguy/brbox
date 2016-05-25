@@ -14,7 +14,7 @@ public:
 	virtual int MapBinaryToJson(JsonDataCommObj* pReq,int index);
 	virtual int ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pObj);
 	virtual RPC_SRV_RESULT ProcessWorkAsync(int index,unsigned char* pWorkData);
-	virtual void ReceiveEvent(int cltToken,int evntNum,int evntArg){};
+	virtual void ReceiveEvent(int cltToken,int evntNum,int evntArg,int evntArg2){};
 
 	int json_to_bin_pcf_get(JsonDataCommObj* pReq);
 	int bin_to_json_pcf_get(JsonDataCommObj* pReq);

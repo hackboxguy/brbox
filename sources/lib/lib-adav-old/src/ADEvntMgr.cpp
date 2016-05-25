@@ -38,12 +38,12 @@ int ADEvntMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj
 			{
 				if(eventList[i]->eventNum==-1)//notify all events
 				{
-					if (send_event(eventList[i],entry.eventNum,entry.eventArg) == -1)
+					if (send_event(eventList[i],entry.eventNum,entry.eventArg,entry.eventArg2) == -1)
 						eventList[i]->deleteFlag=true;//after this loop, delete the entry(subscriber is not listening)
 				}				
 				else if(eventList[i]->eventNum == entry.eventNum)//notify specific event number
 				{
-					if(send_event(eventList[i],entry.eventNum,entry.eventArg) == -1)
+					if(send_event(eventList[i],entry.eventNum,entry.eventArg,entry.eventArg2) == -1)
 						eventList[i]->deleteFlag=true;//after this loop, delete the entry(subscriber is not listening)
 
 				}
@@ -60,7 +60,7 @@ int ADEvntMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj
 		{
 			EventProcEntry entry = processEvent.front();
 			//callback of the subscriber(ADJsonRpcMgr).
-			notify_subscribers(entry.cltToken,entry.eventNum,entry.eventArg);
+			notify_subscribers(entry.cltToken,entry.eventNum,entry.eventArg,entry.eventArg2);
 	//std::cout << "process_event: clt_token = " <<entry.cltToken<<" evnt_num = "<<entry.eventNum<<" evnt_arg = "<<entry.eventArg <<endl;
 			processEvent.pop_front();
 		}
@@ -106,35 +106,48 @@ cout<<"unsubscribe of srvToken = "<<srv_token<<" success"<<endl;
 	return 0;
 }
 //sequence-1:following function is called by server's own internal code via rpc, notifyThread will then notify other as per subscription entry
-int ADEvntMgr::notify_event(int eventNum,int eventArg)//enumerated event-list(check the service header).
+int ADEvntMgr::notify_event(int eventNum,int eventArg,int eventArg2)//enumerated event-list(check the service header).
 {
 	//notifyEvent.push_back(event);
-	notifyEvent.push_back(EventProcEntry(eventNum,eventArg,0));
+	notifyEvent.push_back(EventProcEntry(eventNum,eventArg,0,eventArg2));
 	EventNotifyThread.wakeup_thread();//tell the worker to start working
 	//after this context is de-coupled and later monoshot_callback_function will be called
 	return 0;
 }
 //sequence-2:thread wakes-up and according subscription list calls following functions defined by sequence-3
 //sequence-3:following function sends events to other services in the context of sender service
-int ADEvntMgr::send_event(EventEntry *pEvent,int event_num,int event_arg)
+int ADEvntMgr::send_event(EventEntry *pEvent,int event_num,int event_arg,int event_arg2)
 {
 	//TODO: in case of port=-1, send the response on existing socket connection
 	ADJsonRpcClient Client;
 	if(Client.rpc_server_connect(pEvent->ip,pEvent->portNum)!=0)
 		return -1;//RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
-	if(Client.set_three_int_type((char*)RPCMGR_RPC_EVENT_PROCESS, //set_integer_type_with_addr_para
+	//if(event_arg2==-1)//incase of second arg is missing
+	//{
+	//if(Client.set_three_int_type((char*)RPCMGR_RPC_EVENT_PROCESS, //set_integer_type_with_addr_para
+	//			     (char*)RPCMGR_RPC_EVENT_ARG_CLTTOK,pEvent->cltToken,
+	//			     (char*)RPCMGR_RPC_EVENT_ARG_EVENTNUM,event_num,
+	//			     (char*)RPCMGR_RPC_EVENT_ARG_EXTRA,event_arg)!=RPC_SRV_RESULT_SUCCESS)
+
+	//	;//TODO: unable to send event:TODO://send eventARG param
+	//}
+	//else
+	//{
+	Client.set_four_int_type((char*)RPCMGR_RPC_EVENT_PROCESS, //set_integer_type_with_addr_para
 				     (char*)RPCMGR_RPC_EVENT_ARG_CLTTOK,pEvent->cltToken,
 				     (char*)RPCMGR_RPC_EVENT_ARG_EVENTNUM,event_num,
-				     (char*)RPCMGR_RPC_EVENT_ARG_EXTRA,event_arg)!=RPC_SRV_RESULT_SUCCESS)
+				     (char*)RPCMGR_RPC_EVENT_ARG_EXTRA,event_arg,
+				     (char*)RPCMGR_RPC_EVENT_ARG2_EXTRA,event_arg2);//!=RPC_SRV_RESULT_SUCCESS)
 
-		;//TODO: unable to send event:TODO://send eventARG param
+	//;//TODO: set_four_int_type
+	//}
 	Client.rpc_server_disconnect();
 	return 0;
 }
 //sequence-4:following function receives cltToken,evntNum,evntArg in the context of receiver service
-int ADEvntMgr::process_event(int event_num,int event_arg,int clt_token)
+int ADEvntMgr::process_event(int event_num,int event_arg,int clt_token,int event_arg2)
 {
-	processEvent.push_back(EventProcEntry(event_num,event_arg,clt_token));
+	processEvent.push_back(EventProcEntry(event_num,event_arg,clt_token,event_arg2));
 	EventProcessThread.wakeup_thread();//tell the worker to start working
 	//after this context is de-coupled and later monoshot_callback_function will be called
 	return 0;

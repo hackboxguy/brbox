@@ -51,7 +51,7 @@ EvntHandler::~ EvntHandler()
 		UNSUBSCRIBE_EVENT("127.0.0.1",EVENT_GPIOCTL,gpioSrvToken);
 }
 /* ------------------------------------------------------------------------- */
-void EvntHandler::ReceiveEvent(int cltToken,int evntNum,int evntArg)
+void EvntHandler::ReceiveEvent(int cltToken,int evntNum,int evntArg,int evntArg2)
 {
 //	std::cout << "EvntHandler::ReceiveEvent: clt_token = " <<cltToken<<" evnt_num = "<<evntNum<<" evnt_arg = "<<evntArg <<endl;
 	if(cltToken==EVENT_SYSMGR && evntNum==ADLIB_EVENT_NUM_SHUT_DOWN)

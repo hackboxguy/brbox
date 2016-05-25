@@ -127,7 +127,7 @@ int GpioCtrlRpc::process_gpio_set(JsonDataCommObj* pReq)
 			pDataCache->gpio_data_prev[pPacket->addr]=pDataCache->gpio_data[pPacket->addr];
 			//gpio value changed, notify subscribers
 			ADEvntNotifier* pNotifier=(ADEvntNotifier*)pDataCache->pEventNotifier;
-			pNotifier->NotifyEvent(EGPIOCTL_EVENT_TYPE_OUTPUT_CHANGED,pPacket->addr,SERVER_JSON_PORT_NUM);
+			pNotifier->NotifyEvent(EGPIOCTL_EVENT_TYPE_OUTPUT_CHANGED,pPacket->addr,SERVER_JSON_PORT_NUM,-1);
 			//NOTIFY_EVENT(EGPIOCTL_EVENT_TYPE_OUTPUT_CHANGED,pPacket->addr,SERVER_JSON_PORT_NUM);
 		}
 	}

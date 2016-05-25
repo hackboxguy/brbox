@@ -27,8 +27,9 @@ struct EventProcEntry
 	int eventNum;  //what is the event number
 	int eventArg;  //used as storing the eventArg
 	int cltToken;  //who sent the event
+	int eventArg2; //used as storing the second eventArg
 public:
-	EventProcEntry(int event_num,int event_arg,int clt_token) :eventNum(event_num),eventArg(event_arg),cltToken(clt_token){}
+	EventProcEntry(int event_num,int event_arg,int clt_token,int evnt_arg2) :eventNum(event_num),eventArg(event_arg),cltToken(clt_token),eventArg2(evnt_arg2){}
 };
 
 
@@ -119,7 +120,7 @@ class ADEvntMgrConsumer //observer
 public:
 //	int notify_custom_sig;
 //	int custom_sig_num;
-	virtual int receive_events(int cltToken,int evntNum,int evntArg)=0;
+	virtual int receive_events(int cltToken,int evntNum,int evntArg,int evntArg2)=0;
 	virtual ~ADEvntMgrConsumer(){};
 };
 /*****************************************************************************/
@@ -127,11 +128,11 @@ class ADEvntMgrProducer
 {
 	std::vector<ADEvntMgrConsumer*> subscribers;
 protected:
-	void notify_subscribers(int cltToken,int evntNum,int evntArg)
+	void notify_subscribers(int cltToken,int evntNum,int evntArg,int evntArg2)
 	{
 		std::vector<ADEvntMgrConsumer*>::iterator iter;
 		for(iter=subscribers.begin();iter != subscribers.end();++iter)
-			(*iter)->receive_events(cltToken,evntNum,evntArg);
+			(*iter)->receive_events(cltToken,evntNum,evntArg,evntArg2);
 	}
 public:
 	virtual ~ADEvntMgrProducer(){};
@@ -162,15 +163,15 @@ class ADEvntMgr : public ADEvntMgrProducer, public ADThreadConsumer
 	virtual int monoshot_callback_function(void* pUserData,ADThreadProducer* pObj);
 	virtual int thread_callback_function(void* pUserData,ADThreadProducer* pObj){return 0;};//we are not using this one..
 
-	int send_event(EventEntry *pEvent,int event_num,int event_arg=-1);//event arg is optional, it could be ident of the inprogress rpc
+	int send_event(EventEntry *pEvent,int event_num,int event_arg=-1,int event_arg2=-1);//event arg is optional, it could be ident of the inprogress rpc
 
 public:
 	ADEvntMgr();
 	~ADEvntMgr();
 	int register_event_subscription(EventEntry *pEvent,int *ack_token);
 	int unregister_event_subscription(int srv_token);
-	int notify_event(int eventNum,int eventArg);
-	int process_event(int event_num,int event_arg,int clt_token);
+	int notify_event(int eventNum,int eventArg,int eventArg2);
+	int process_event(int event_num,int event_arg,int clt_token,int event_arg2);
 };
 #endif
 

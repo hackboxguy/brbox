@@ -1,11 +1,10 @@
 #include "ADTaskWorker.hpp"
 //#include <iostream>
 #include <stdio.h>
-#include "ADJsonRpcClient.hpp"
-
 //#include <string.h>
 //#include <stdlib.h>
 //using namespace std;
+#include "ADJsonRpcClient.hpp"
 /*****************************************************************************/
 int ADTaskWorkerProducer::IDGenerator = 0;//generate Unique ID for every ADGenericChain object
 /*****************************************************************************/
@@ -72,7 +71,7 @@ int ADTaskWorker::monoshot_callback_function(void* pUserData,ADThreadProducer* p
 				//TODO: work_inprog_obj->task_err_message;
 			}
 			work_inprog_chain.chain_unlock();
-			NOTIFY_EVENT(ADLIB_EVENT_NUM_INPROG_DONE,work_obj->taskID,notifyPortNum);//eventNum=0 for asyncTaskDone
+			NOTIFY_EVENT(ADLIB_EVENT_NUM_INPROG_DONE,work_obj->taskID,notifyPortNum,task_result);//eventNum=0 for asyncTaskDone
 		}
 		else
 		{

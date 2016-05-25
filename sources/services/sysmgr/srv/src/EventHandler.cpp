@@ -31,7 +31,7 @@ EventHandler::~ EventHandler()
 		UNSUBSCRIBE_EVENT("127.0.0.1",EVENT_GPIOSRV,srvToken);
 }
 /* ------------------------------------------------------------------------- */
-void EventHandler::ReceiveEvent(int cltToken,int evntNum,int evntArg)
+void EventHandler::ReceiveEvent(int cltToken,int evntNum,int evntArg,int evntArg2)
 {
 	std::cout << "EventHandler::ReceiveEvent: Event Received from(clt_token) = " <<cltToken<<" evnt_num = "<<evntNum<<" evnt_arg = "<<evntArg <<endl;
 	if(cltToken==EVENT_GPIOSRV && evntNum==ADLIB_EVENT_NUM_SHUT_DOWN)

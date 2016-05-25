@@ -221,7 +221,7 @@ int ADTimer::wait_for_exit_signal()//forever-loop, blocks the main() app till ki
 		}
 	}
 	//printf("exiting program\n");
-	NOTIFY_EVENT(ADLIB_EVENT_NUM_SHUT_DOWN,-1,notifyPortNum);//send shutdown event notification before shutdown
+	NOTIFY_EVENT(ADLIB_EVENT_NUM_SHUT_DOWN,-1,notifyPortNum,-1);//send shutdown event notification before shutdown
 	usleep(100000);usleep(100000);usleep(100000);usleep(100000);usleep(100000);//wait 500ms for shutdown notification to be sent
 	return 0;
 }

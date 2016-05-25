@@ -40,10 +40,10 @@ int ADJsonRpcMgr::SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE sts)
 }
 /* ------------------------------------------------------------------------- */
 //external event receiver function
-int ADJsonRpcMgr::receive_events(int cltToken,int evntNum,int evntArg)
+int ADJsonRpcMgr::receive_events(int cltToken,int evntNum,int evntArg,int evntArg2)
 {
 	//std::cout << "receive_events: clt_token = " <<cltToken<<" evnt_num = "<<evntNum<<" evnt_arg = "<<evntArg <<endl;
-	notify_event_recevers(cltToken,evntNum,evntArg);
+	notify_event_receivers(cltToken,evntNum,evntArg,evntArg2);
 	return 0;
 }
 RPC_SRV_RESULT ADJsonRpcMgr::run_work(int cmd,unsigned char* pWorkData,ADTaskWorkerProducer *pTaskWorker)
@@ -708,13 +708,21 @@ int ADJsonRpcMgr::json_to_bin_event_notify(JsonDataCommObj* pReq)
 	}
 	else
 		pPanelCmdObj->eventArg=-1;//-1 indicates no extra arg sent with eventNum
+
+	//optional arg-port: client has passed the port number where even to be sent to(ip is auto read)
+	if(find_single_param((char*)pReq->socket_data,(char*)RPCMGR_RPC_EVENT_ARG2_EXTRA,temp_param)==0)
+	{
+		JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG2_EXTRA,pPanelCmdObj->eventArg2);
+	}
+	else
+		pPanelCmdObj->eventArg2=-1;//-1 indicates no extra arg sent with eventNum
 	return 0;
 }
 int ADJsonRpcMgr::process_event_notify(RPC_SRV_REQ* pReq)
 {
 	RPCMGR_EVENT_PACKET* pPacket;
 	pPacket=(RPCMGR_EVENT_PACKET*)pReq->dataRef;
-	int res = EventMgr.notify_event(pPacket->eventNum,pPacket->eventArg);
+	int res = EventMgr.notify_event(pPacket->eventNum,pPacket->eventArg,pPacket->eventArg2);
 	if(res==0)
 		pReq->result=RPC_SRV_RESULT_SUCCESS;
 	else
@@ -742,13 +750,20 @@ int ADJsonRpcMgr::json_to_bin_event_process(JsonDataCommObj* pReq)
 	}
 	else
 		pPanelCmdObj->eventArg=-1;//-1 indicates no extra arg sent with eventNum
+	//optional arg-port: client has passed the port number where even to be sent to(ip is auto read)
+	if(find_single_param((char*)pReq->socket_data,(char*)RPCMGR_RPC_EVENT_ARG2_EXTRA,temp_param)==0)
+	{
+		JSON_STRING_TO_INT(RPCMGR_RPC_EVENT_ARG2_EXTRA,pPanelCmdObj->eventArg2);
+	}
+	else
+		pPanelCmdObj->eventArg2=-1;//-1 indicates no extra arg sent with eventNum
 	return 0;
 }
 int ADJsonRpcMgr::process_event_process(RPC_SRV_REQ* pReq)
 {
 	RPCMGR_EVENT_PACKET* pPacket;
 	pPacket=(RPCMGR_EVENT_PACKET*)pReq->dataRef;
-	EventMgr.process_event(pPacket->eventNum,pPacket->eventArg,pPacket->cltToken);//actual return value not possible due to thread based de-coupling
+	EventMgr.process_event(pPacket->eventNum,pPacket->eventArg,pPacket->cltToken,pPacket->eventArg2);//actual return value not possible due to thread based de-coupling
 	pReq->result=RPC_SRV_RESULT_SUCCESS; //further processing is needed based on event-number(user callback??)
 	return 0;
 }

@@ -24,9 +24,10 @@ int ADEvntNotifier::monoshot_callback_function(void* pUserData,ADThreadProducer*
 		}
 		else
 		{
-			if(Client.set_integer_type_with_addr_para((char*)RPCMGR_RPC_EVENT_NOTIFY,
+			if(Client.set_three_int_type((char*)RPCMGR_RPC_EVENT_NOTIFY,
 						     (char*)RPCMGR_RPC_EVENT_ARG_EVENTNUM,entry.eventNum,
-						     (char*)RPCMGR_RPC_EVENT_ARG_EXTRA,entry.eventArg)!=RPC_SRV_RESULT_SUCCESS)
+						     (char*)RPCMGR_RPC_EVENT_ARG_EXTRA,entry.eventArg,
+						     (char*)RPCMGR_RPC_EVENT_ARG2_EXTRA,entry.eventArg2)!=RPC_SRV_RESULT_SUCCESS)
 			{
 			LOG_DEBUG_MSG_2_ARG(true,"BRBOX:ADEvntNotifier","Unable send event = %d on port = %d",entry.eventNum,entry.port);
 			}
@@ -36,9 +37,9 @@ int ADEvntNotifier::monoshot_callback_function(void* pUserData,ADThreadProducer*
 	}
 	return 0;
 }
-int ADEvntNotifier::NotifyEvent(int eventNum,int eventArg,int port)
+int ADEvntNotifier::NotifyEvent(int eventNum,int eventArg,int port,int eventArg2)
 {
-	NotifierList.push_back(EvntNotifyEntry(eventNum,eventArg,port));
+	NotifierList.push_back(EvntNotifyEntry(eventNum,eventArg,port,eventArg2));
 	NotifierThread.wakeup_thread();//tell the worker to start working
 	//after this context is de-coupled and later monoshot_callback_function will be called
 	return 0;

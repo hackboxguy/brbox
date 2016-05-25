@@ -147,6 +147,7 @@ typedef struct RPCMGR_EVENT_PACKET_T
 	int sock_id;  //unique client connection ident(needed in case of client connection breaks)
 	char ip[512];
 	int eventArg; //extra optional argument passed with eventNum(ex: sending inProg id)
+	int eventArg2;//extra second argument passed with eventNum(ex: sending inProg id)
 }RPCMGR_EVENT_PACKET;
 /* ------------------------------------------------------------------------- */
 //EJSON_RPCGMGR_TRIGGER_RUN
@@ -198,7 +199,7 @@ public:
 	//virtual int WorkRpc(RPC_SRV_REQ *pPanelReq/*data-cache?*/)=0;
 	virtual int ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pObj)=0;
 	virtual RPC_SRV_RESULT ProcessWorkAsync(int index,unsigned char* pWorkData)=0;
-	virtual void ReceiveEvent(int cltToken,int evntNum,int evntArg)=0;
+	virtual void ReceiveEvent(int cltToken,int evntNum,int evntArg,int evntArg2)=0;
 
 };
 /* ------------------------------------------------------------------------- */
@@ -209,11 +210,11 @@ class ADJsonRpcMgrProducer
 protected:
 	ADTaskWorker AsyncTaskWorker;
 	ADEvntMgr EventMgr;
-	void notify_event_recevers(int cltToken,int evntNum,int evntArg)
+	void notify_event_receivers(int cltToken,int evntNum,int evntArg,int evntArg2)
 	{
 		std::vector<ADJsonRpcMgrConsumer*>::iterator iter;
 		for(iter=eventReceiver.begin();iter != eventReceiver.end();++iter)
-			(*iter)->ReceiveEvent(cltToken,evntNum,evntArg);
+			(*iter)->ReceiveEvent(cltToken,evntNum,evntArg,evntArg2);
 	}
 
 	ADJsonRpcMgrConsumer* getRpcHandler(std::string rpcName) //based on rpc-name string, returns the object ptr
@@ -371,7 +372,7 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	virtual int custom_sig_notification(int signum){return 0;};
 
 	//ADEvntMgrConsumer override
-	virtual int receive_events(int cltToken,int evntNum,int evntArg);
+	virtual int receive_events(int cltToken,int evntNum,int evntArg,int evntArg2);
 
 	int MyMapJsonToBinary(JsonDataCommObj* pReq);
 	int MyMapBinaryToJson(JsonDataCommObj* pReq);
