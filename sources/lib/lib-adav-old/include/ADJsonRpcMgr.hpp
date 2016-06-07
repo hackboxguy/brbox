@@ -231,7 +231,7 @@ public:
 	virtual int ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pObj)=0;
 	virtual RPC_SRV_RESULT ProcessWorkAsync(int index,unsigned char* pWorkData)=0;
 	virtual void ReceiveEvent(int cltToken,int evntNum,int evntArg,int evntArg2)=0;
-
+	virtual RPC_SRV_RESULT ProcessCommonRpc(int index,unsigned char* pWorkData)=0;//common rpc handler override for user
 };
 /* ------------------------------------------------------------------------- */
 class ADJsonRpcMgrProducer

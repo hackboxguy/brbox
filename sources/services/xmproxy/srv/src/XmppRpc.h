@@ -15,6 +15,7 @@ public:
 	virtual int ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pObj);
 	virtual RPC_SRV_RESULT ProcessWorkAsync(int index,unsigned char* pWorkData);
 	virtual void ReceiveEvent(int cltToken,int evntNum,int evntArg,int evntArg2){};
+	virtual RPC_SRV_RESULT ProcessCommonRpc(int index,unsigned char* pWorkData){return RPC_SRV_RESULT_SUCCESS;};
 	XMPROXY_ASYNCTASK_TYPE get_async_task_in_progress();
 
 	int json_to_bin_get_async_task_in_progress(JsonDataCommObj* pReq);
