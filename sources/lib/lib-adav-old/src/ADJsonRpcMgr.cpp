@@ -92,6 +92,8 @@ RPC_SRV_RESULT ADJsonRpcMgr::run_work(int cmd,unsigned char* pWorkData,ADTaskWor
 					ret_val=RPC_SRV_RESULT_SUCCESS;
 				}
 				break;
+			case EJSON_RPCMGR_SET_DEVOP_STATE:
+				break;
 			default:
 				break;
 		}
@@ -124,7 +126,8 @@ int ADJsonRpcMgr::Start(int port,int socket_log,int emulation)
 	JMapper.attach_rpc_method(EJSON_RPCGMGR_EVENT_NOTIFY           ,(char*)RPCMGR_RPC_EVENT_NOTIFY);
 	JMapper.attach_rpc_method(EJSON_RPCGMGR_EVENT_PROCESS          ,(char*)RPCMGR_RPC_EVENT_PROCESS);
 	JMapper.attach_rpc_method(EJSON_RPCGMGR_TRIGGER_RUN            ,(char*)RPCMGR_RPC_TRIG_RUN);
-
+	JMapper.attach_rpc_method(EJSON_RPCMGR_GET_DEVOP_STATE         ,(char*)RPCMGR_RPC_DEVOP_STATE_GET);
+	JMapper.attach_rpc_method(EJSON_RPCMGR_SET_DEVOP_STATE         ,(char*)RPCMGR_RPC_DEVOP_STATE_SET);
 	int total = get_total_attached_rpcs();
 	for(int i=0;i<total;i++) 
 	{
@@ -242,6 +245,8 @@ int ADJsonRpcMgr::MyMapJsonToBinary(JsonDataCommObj* pReq)
 		case EJSON_RPCGMGR_EVENT_NOTIFY           :result=json_to_bin_event_notify(pReq);break;
 		case EJSON_RPCGMGR_EVENT_PROCESS          :result=json_to_bin_event_process(pReq);break;
 		case EJSON_RPCGMGR_TRIGGER_RUN            :result=json_to_bin_trigger_run(pReq);break;
+		case EJSON_RPCMGR_GET_DEVOP_STATE         :result=json_to_bin_get_devop_state(pReq);break;
+		case EJSON_RPCMGR_SET_DEVOP_STATE         :result=json_to_bin_set_devop_state(pReq);break;
 		default:break;
 	}
 	return result;
@@ -269,11 +274,12 @@ int ADJsonRpcMgr::MyMapBinaryToJson(JsonDataCommObj* pReq)
 		case EJSON_RPCGMGR_EVENT_NOTIFY           :result=bin_to_json_event_notify(pReq);break;
 		case EJSON_RPCGMGR_EVENT_PROCESS          :result=bin_to_json_event_process(pReq);break;
 		case EJSON_RPCGMGR_TRIGGER_RUN            :result=bin_to_json_trigger_run(pReq);break;
+		case EJSON_RPCMGR_GET_DEVOP_STATE         :result=bin_to_json_get_devop_state(pReq);break;
+		case EJSON_RPCMGR_SET_DEVOP_STATE         :result=bin_to_json_set_devop_state(pReq);break;
 		default:break;
 	}
 	return result;
 }
-
 /* ------------------------------------------------------------------------- */
 int ADJsonRpcMgr::MyProcessWork(JsonDataCommObj* pReq)
 {
@@ -299,6 +305,8 @@ int ADJsonRpcMgr::MyProcessWork(JsonDataCommObj* pReq)
 		case EJSON_RPCGMGR_EVENT_NOTIFY           :return process_event_notify(pPanelReq);break;
 		case EJSON_RPCGMGR_EVENT_PROCESS          :return process_event_process(pPanelReq);break;
 		case EJSON_RPCGMGR_TRIGGER_RUN            :return process_trigger_run(pPanelReq);break;
+		case EJSON_RPCMGR_GET_DEVOP_STATE         :return process_get_devop_state(pPanelReq);break;
+		case EJSON_RPCMGR_SET_DEVOP_STATE         :return process_set_devop_state(pPanelReq);break;
 		default:break;
 	}
 	return -1;
@@ -801,5 +809,47 @@ int ADJsonRpcMgr::bin_to_json_trigger_run(JsonDataCommObj* pReq)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
-
+//EJSON_RPCMGR_GET_DEVOP_STATE     
+int ADJsonRpcMgr::json_to_bin_get_devop_state(JsonDataCommObj* pReq)
+{
+	RPCMGR_DEVOP_STS_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_DEVOP_STS_PACKET,RPC_SRV_ACT_READ,EJSON_RPCMGR_GET_DEVOP_STATE);
+	return 0;
+}
+int ADJsonRpcMgr::process_get_devop_state(RPC_SRV_REQ* pReq)
+{
+	RPCMGR_DEVOP_STS_PACKET* pPacket;
+	pPacket=(RPCMGR_DEVOP_STS_PACKET*)pReq->dataRef;
+	pPacket->status=ServiceOpState;//TODO: call actual attached rpc-user-object
+	pReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+int ADJsonRpcMgr::bin_to_json_get_devop_state(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_ENUM(RPC_SRV_REQ,RPCMGR_DEVOP_STS_PACKET,RPCMGR_RPC_DEVOP_STATE_ARGSTS,status,RPCMGR_RPC_DEVOP_STATE_ARGSTS_TBL,EJSON_RPCGMGR_DEVOP_STATE_UNKNOWN);
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+//EJSON_RPCMGR_SET_DEVOP_STATE
+int ADJsonRpcMgr::json_to_bin_set_devop_state(JsonDataCommObj* pReq)
+{
+	RPCMGR_DEVOP_STS_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_DEVOP_STS_PACKET,RPC_SRV_ACT_WRITE,EJSON_RPCMGR_SET_DEVOP_STATE);
+	JSON_STRING_TO_ENUM(RPCMGR_RPC_DEVOP_STATE_ARGSTS,RPCMGR_RPC_DEVOP_STATE_ARGSTS_TBL,EJSON_RPCGMGR_DEVOP_STATE,EJSON_RPCGMGR_DEVOP_STATE_UNKNOWN,pPanelCmdObj->status);
+	return 0;
+}
+int ADJsonRpcMgr::process_set_devop_state(RPC_SRV_REQ* pReq)
+{
+	RPCMGR_DEVOP_STS_PACKET* pPacket;
+	pPacket=(RPCMGR_DEVOP_STS_PACKET*)pReq->dataRef;
+	ServiceOpState=pPacket->status;//TODO: call actual attached rpc-user-object(make this set rpc as async type)
+	pReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+int ADJsonRpcMgr::bin_to_json_set_devop_state(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,RPCMGR_DEVOP_STS_PACKET);
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
 

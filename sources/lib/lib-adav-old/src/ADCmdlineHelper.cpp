@@ -49,7 +49,7 @@ int ADCmdlineHelper::init_myself()
 
 	//internal default arguments available for all the clients
 		//abcdefghijklmn p rstuvwx z
-		strcpy(short_options,"hvpiegtdlnskwrabxzucfjmoyq");//--help,--version,--ip,--autotest,--delay,--loopcount,--testnum, --settings
+		strcpy(short_options,"hvpiegtdlnskwrabxzucfjmoyq1");//--help,--version,--ip,--autotest,--delay,--loopcount,--testnum, --settings
 		insert_options_entry((char*)"help"      ,optional_argument,'h',1);
 
 		insert_options_entry((char*)"version"   ,no_argument,'v',1);
@@ -112,6 +112,8 @@ int ADCmdlineHelper::init_myself()
 		insert_options_entry((char*)"evNotify" ,optional_argument,'q',1);
 		insert_help_entry((char*)"--evNotify=evntNum,evntArg (notify event)");
 
+		insert_options_entry((char*)"devop" ,optional_argument,'1',1);
+		insert_help_entry((char*)"--devop=[on/off/idle/reboot/idlenoexthw](read/write device operation state of the service)");
 	}
 	else if(my_mode==CMDLINE_HELPER_MODE_SERVER)
 	{
@@ -338,6 +340,15 @@ int ADCmdlineHelper::parse_cmdline_arguments(int argc, char **argv)
 				//	(char*) RPCMGR_RPC_EVENT_ARG_EVENTNUM,subarg,0);
 				push_double_int_set_command(EJSON_RPCGMGR_EVENT_NOTIFY,RPCMGR_RPC_EVENT_NOTIFY,
 						(char*) RPCMGR_RPC_EVENT_ARG_EVENTNUM, (char*) RPCMGR_RPC_EVENT_ARG_EXTRA,subarg);
+				break;
+			case '1':
+				{
+				const char *table[]   = RPCMGR_RPC_DEVOP_STATE_ARGSTS_TBL;
+				push_single_enum_get_set_command
+				(EJSON_RPCMGR_GET_DEVOP_STATE,EJSON_RPCMGR_SET_DEVOP_STATE,
+				RPCMGR_RPC_DEVOP_STATE_GET,RPCMGR_RPC_DEVOP_STATE_SET,
+				&table[0],EJSON_RPCGMGR_DEVOP_STATE_UNKNOWN,(char*)RPCMGR_RPC_DEVOP_STATE_ARGSTS,subarg);
+				}
 				break;
 			default:if(parse_subscribers_cmdline((arg-CONSUMERS_OPTIONS_ARG_START_BOUNDARY),subarg)!=0) return -1;//remove the offset which was added by me
 				break;

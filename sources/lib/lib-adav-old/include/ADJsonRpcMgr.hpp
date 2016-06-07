@@ -35,6 +35,8 @@ typedef enum EJSON_RPCGMGR_CMD_T
 	EJSON_RPCGMGR_EVENT_NOTIFY=13,       //event notification; for self use within service as local-host rpc client caller
 	EJSON_RPCGMGR_EVENT_PROCESS=14,      //event reception and processing from other service
 	EJSON_RPCGMGR_TRIGGER_RUN=15,        //call this rpc to let the server start full function including subscribing to event..etc
+	EJSON_RPCMGR_GET_DEVOP_STATE=16,     //get service operation state(on/idle/standby/reboot/etc).
+	EJSON_RPCMGR_SET_DEVOP_STATE=17,     //set service operation state(on/idle/standby/reboot/etc).
 	EJSON_RPCGMGR_CMD_END,
 	EJSON_RPCGMGR_CMD_NONE
 }EJSON_RPCGMGR_CMD;
@@ -153,6 +155,33 @@ typedef struct RPCMGR_EVENT_PACKET_T
 //EJSON_RPCGMGR_TRIGGER_RUN
 #define RPCMGR_RPC_TRIG_RUN            "run_now"
 /* ------------------------------------------------------------------------- */
+//EJSON_RPCMGR_GET_DEVOP_STATE     
+//EJSON_RPCMGR_SET_DEVOP_STATE
+#define RPCMGR_RPC_DEVOP_STATE_GET        "get_devop_state"
+#define RPCMGR_RPC_DEVOP_STATE_SET        "set_devop_state"
+#define RPCMGR_RPC_DEVOP_STATE_ARGSTS     "status"
+#define RPCMGR_RPC_DEVOP_STATE_ARGSTS_TBL {"idle","on","laststate","off","reboot","booting","rebooting","switchingoff","boot","idlenoexthw","unknown","none","\0"}
+typedef enum EJSON_RPCGMGR_DEVOP_STATE_T
+{
+	EJSON_RPCGMGR_DEVOP_STATE_IDLE,
+	EJSON_RPCGMGR_DEVOP_STATE_ON,
+	EJSON_RPCGMGR_DEVOP_STATE_LAST_STATE,
+	EJSON_RPCGMGR_DEVOP_STATE_OFF,
+	EJSON_RPCGMGR_DEVOP_STATE_REBOOT,
+	EJSON_RPCGMGR_DEVOP_STATE_BOOTING,
+	EJSON_RPCGMGR_DEVOP_STATE_REBOOTING,
+	EJSON_RPCGMGR_DEVOP_STATE_SWITCHING_OFF,
+	EJSON_RPCGMGR_DEVOP_STATE_BOOT,
+	EJSON_RPCGMGR_DEVOP_STATE_IDLE_NOEXTHW, //idle with no external h/w access
+	EJSON_RPCGMGR_DEVOP_STATE_UNKNOWN,
+	EJSON_RPCGMGR_DEVOP_STATE_NONE
+}EJSON_RPCGMGR_DEVOP_STATE;
+typedef struct RPCMGR_DEVOP_STS_PACKET_T
+{
+	EJSON_RPCGMGR_DEVOP_STATE status;
+	char status_str[512];
+}RPCMGR_DEVOP_STS_PACKET;
+/* ------------------------------------------------------------------------- */
 //to understand this, read C++ subject observer pattern
 class ADJsonRpcMgrProducer; //subject
 class ADJsonRpcMgrConsumer  //observer
@@ -162,6 +191,7 @@ class ADJsonRpcMgrConsumer  //observer
 //	std::string strSetRpc;
 	bool emulation;
 	bool logmsg;
+	bool cmnrpchandler;//this object handles remaining common rpc types like get/set-factory,get/set-devop etc
 public:
 	int parent_index;
 	int index;
@@ -186,12 +216,13 @@ public:
 	//	return 0;
 	//};
 	//ADJsonRpcMgrConsumer(std::string getrpc,std::string setrpc){strGetRpc=getrpc;strSetRpc=setrpc;};
-	ADJsonRpcMgrConsumer(std::string rpc_name,int consumer_index,bool emu,bool log)
+	ADJsonRpcMgrConsumer(std::string rpc_name,int consumer_index,bool emu,bool log, bool cmnhandler=false)
 	{
 		strRpcName=rpc_name;
 		index=consumer_index;
 		emulation=emu;
 		logmsg=log;
+		cmnrpchandler=cmnhandler;
 	};
 	virtual ~ADJsonRpcMgrConsumer(){};
 	virtual int MapJsonToBinary(JsonDataCommObj* pReq,int index)=0;
@@ -357,6 +388,7 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	EJSON_RPCGMGR_READY_STATE ServiceReadyFlag;
 	//EJSON_RPCGMGR_FLAG_STATE  ServiceDebugFlag;
 	bool  ServiceDebugFlag;
+	EJSON_RPCGMGR_DEVOP_STATE ServiceOpState;
 
 	//ADJsonRpcMapConsumer overrides
 	virtual int process_json_to_binary(JsonDataCommObj* pReq);//{return 0;};//only applicable for mapper
@@ -460,6 +492,17 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	int json_to_bin_trigger_run(JsonDataCommObj* pReq);
 	int process_trigger_run(RPC_SRV_REQ* pReq);
 	int bin_to_json_trigger_run(JsonDataCommObj* pReq);
+
+	//EJSON_RPCMGR_GET_DEVOP_STATE
+	int json_to_bin_get_devop_state(JsonDataCommObj* pReq);
+	int process_get_devop_state(RPC_SRV_REQ* pReq);
+	int bin_to_json_get_devop_state(JsonDataCommObj* pReq);
+	
+	//EJSON_RPCMGR_SET_DEVOP_STATE
+	int json_to_bin_set_devop_state(JsonDataCommObj* pReq);
+	int process_set_devop_state(RPC_SRV_REQ* pReq);
+	int bin_to_json_set_devop_state(JsonDataCommObj* pReq);
+
 
 public:
 	ADJsonRpcMgr(int ver,bool debuglog=false,ADCMN_DEV_INFO* pDev=NULL);
