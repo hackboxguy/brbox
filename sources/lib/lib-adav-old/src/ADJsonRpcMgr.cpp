@@ -67,6 +67,7 @@ RPC_SRV_RESULT ADJsonRpcMgr::run_work(int cmd,unsigned char* pWorkData,ADTaskWor
 				break;
 			case EJSON_RPCGMGR_TRIGGER_DATASAVE:
 				{
+//cout<<"ADJsonRpcMgr::run_work:cmn-async-function-call"<<endl;
 					RPCMGR_TASK_STS_PACKET *pPacket;
 					pPacket=(RPCMGR_TASK_STS_PACKET *)pWorkData;
 					//myData->factory_store();TODO
@@ -79,30 +80,37 @@ RPC_SRV_RESULT ADJsonRpcMgr::run_work(int cmd,unsigned char* pWorkData,ADTaskWor
 				{
 					RPCMGR_TASK_STS_PACKET *pPacket;
 					pPacket=(RPCMGR_TASK_STS_PACKET *)pWorkData;
-					//myData->factory_store();TODO
+					ret_val=CmnRpcHandler(cmd,pWorkData);
 					OBJ_MEM_DELETE(pWorkData);
-					ret_val=RPC_SRV_RESULT_SUCCESS;
+					//ret_val=RPC_SRV_RESULT_SUCCESS;
 				}
 				break;
 			case EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE:
 				{
 					RPCMGR_TASK_STS_PACKET *pPacket;
 					pPacket=(RPCMGR_TASK_STS_PACKET *)pWorkData;
-					//myData->factory_restore();TODO
+					ret_val=CmnRpcHandler(cmd,pWorkData);
 					OBJ_MEM_DELETE(pWorkData);
-					ret_val=RPC_SRV_RESULT_SUCCESS;
+					//ret_val=RPC_SRV_RESULT_SUCCESS;
 				}
 				break;
 			case EJSON_RPCGMGR_TRIGGER_RUN:
 				{
 					RPCMGR_TASK_STS_PACKET *pPacket;
 					pPacket=(RPCMGR_TASK_STS_PACKET *)pWorkData;
-					//myData->trigger_run();TODO
+					ret_val=CmnRpcHandler(cmd,pWorkData);
 					OBJ_MEM_DELETE(pWorkData);
-					ret_val=RPC_SRV_RESULT_SUCCESS;
+					//ret_val=RPC_SRV_RESULT_SUCCESS;
 				}
 				break;
 			case EJSON_RPCMGR_SET_DEVOP_STATE:
+				{
+					RPCMGR_TASK_STS_PACKET *pPacket;
+					pPacket=(RPCMGR_TASK_STS_PACKET *)pWorkData;
+					ret_val=CmnRpcHandler(cmd,pWorkData);
+					OBJ_MEM_DELETE(pWorkData);
+					//ret_val=RPC_SRV_RESULT_SUCCESS;
+				}
 				break;
 			default:
 				break;
@@ -302,7 +310,7 @@ int ADJsonRpcMgr::MyProcessWork(JsonDataCommObj* pReq)
 		case EJSON_RPCGMGR_GET_TASK_STS           :return process_get_task_status(pPanelReq);break;
 		case EJSON_RPCGMGR_GET_RPC_SRV_VERSION    :return process_rpc_server_version(pPanelReq);break;
 		case EJSON_RPCGMGR_TRIGGER_DATASAVE       :return process_trigger_datasave(pPanelReq);break;
-		case EJSON_RPCGMGR_GET_SETTINGS_STS       :return process_get_settings_status(pPanelReq);break;
+		case EJSON_RPCGMGR_GET_SETTINGS_STS       :return process_get_settings_status(pPanelReq,pReq);break;//sync-call-back-to-user
 		case EJSON_RPCGMGR_SHUTDOWN_SERVICE       :return process_shutdown_service(pPanelReq);break;
 		case EJSON_RPCGMGR_RESET_TASK_STS         :return process_reset_task_sts(pPanelReq);break;
 		case EJSON_RPCGMGR_GET_READY_STS          :return process_get_ready_status(pPanelReq);break;
@@ -315,7 +323,7 @@ int ADJsonRpcMgr::MyProcessWork(JsonDataCommObj* pReq)
 		case EJSON_RPCGMGR_EVENT_NOTIFY           :return process_event_notify(pPanelReq);break;
 		case EJSON_RPCGMGR_EVENT_PROCESS          :return process_event_process(pPanelReq);break;
 		case EJSON_RPCGMGR_TRIGGER_RUN            :return process_trigger_run(pPanelReq);break;
-		case EJSON_RPCMGR_GET_DEVOP_STATE         :return process_get_devop_state(pPanelReq);break;
+		case EJSON_RPCMGR_GET_DEVOP_STATE         :return process_get_devop_state(pPanelReq,pReq);break;//sync-call-back-to-user
 		case EJSON_RPCMGR_SET_DEVOP_STATE         :return process_set_devop_state(pPanelReq);break;
 		default:break;
 	}
@@ -395,7 +403,7 @@ int ADJsonRpcMgr::process_trigger_datasave(RPC_SRV_REQ* pReq)
 	pPacket=(RPCMGR_TASK_STS_PACKET*)pReq->dataRef;
 	RPCMGR_TASK_STS_PACKET* pWorkData=NULL;
 	OBJECT_MEM_NEW(pWorkData,RPCMGR_TASK_STS_PACKET);//delete this object in run_work() callback function
-	if(AsyncTaskWorker.push_task(EJSON_RPCGMGR_TRIGGER_DATASAVE,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_DELETE)==0)
+	if(AsyncTaskWorker.push_task(EJSON_RPCGMGR_TRIGGER_DATASAVE,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_PRESERVE)==0)
 		pReq->result=RPC_SRV_RESULT_IN_PROG;
 	else
 	{
@@ -406,7 +414,7 @@ int ADJsonRpcMgr::process_trigger_datasave(RPC_SRV_REQ* pReq)
 }
 int ADJsonRpcMgr::bin_to_json_trigger_datasave(JsonDataCommObj* pReq)
 {
-	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,RPCMGR_TASK_STS_PACKET,RPCMGR_RPC_TASK_STS_ARGSTS);
+	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,RPCMGR_TASK_STS_PACKET,RPCMGR_RPC_TASK_STS_ARGID);//RPCMGR_RPC_TASK_STS_ARGSTS);
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
@@ -417,11 +425,12 @@ int ADJsonRpcMgr::json_to_bin_get_settings_sts(JsonDataCommObj* pReq)
 	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_SETTINGS_STS_PACKET,RPC_SRV_ACT_READ,EJSON_RPCGMGR_GET_SETTINGS_STS);
 	return 0;
 }
-int ADJsonRpcMgr::process_get_settings_status(RPC_SRV_REQ* pReq)
+int ADJsonRpcMgr::process_get_settings_status(RPC_SRV_REQ* pReq,JsonDataCommObj* pReqObj)
 {
-	pReq->result=RPC_SRV_RESULT_FEATURE_UNSUPPORTED;
+	//pReq->result=RPC_SRV_RESULT_FEATURE_UNSUPPORTED;
 	//return ProcessWork(pReq);
-	return 0;
+	return ProcessWorkCmnRpc(pReqObj);
+	//return 0;
 }
 int ADJsonRpcMgr::bin_to_json_get_settings_sts(JsonDataCommObj* pReq)
 {
@@ -577,7 +586,7 @@ int ADJsonRpcMgr::process_trigger_factory_store(RPC_SRV_REQ* pReq)
 	pPacket=(RPCMGR_TASK_STS_PACKET*)pReq->dataRef;
 	RPCMGR_TASK_STS_PACKET* pWorkData=NULL;
 	OBJECT_MEM_NEW(pWorkData,RPCMGR_TASK_STS_PACKET);//delete this object in run_work() callback function
-	if(AsyncTaskWorker.push_task(EJSON_RPCGMGR_TRIGGER_FACTORY_STORE,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_DELETE)==0)
+	if(AsyncTaskWorker.push_task(EJSON_RPCGMGR_TRIGGER_FACTORY_STORE,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_PRESERVE)==0)
 		pReq->result=RPC_SRV_RESULT_IN_PROG;
 	else
 	{
@@ -588,7 +597,7 @@ int ADJsonRpcMgr::process_trigger_factory_store(RPC_SRV_REQ* pReq)
 }
 int ADJsonRpcMgr::bin_to_json_trigger_factory_store(JsonDataCommObj* pReq)
 {
-	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,RPCMGR_TASK_STS_PACKET,RPCMGR_RPC_TASK_STS_ARGSTS);
+	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,RPCMGR_TASK_STS_PACKET,RPCMGR_RPC_TASK_STS_ARGID);//RPCMGR_RPC_TASK_STS_ARGSTS);
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
@@ -606,7 +615,7 @@ int ADJsonRpcMgr::process_trigger_factory_restore(RPC_SRV_REQ* pReq)
 	pPacket=(RPCMGR_TASK_STS_PACKET*)pReq->dataRef;
 	RPCMGR_TASK_STS_PACKET* pWorkData=NULL;
 	OBJECT_MEM_NEW(pWorkData,RPCMGR_TASK_STS_PACKET);//delete this object in run_work() callback function
-	if(AsyncTaskWorker.push_task(EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_DELETE)==0)
+	if(AsyncTaskWorker.push_task(EJSON_RPCGMGR_TRIGGER_FACTORY_RESTORE,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_PRESERVE)==0)
 		pReq->result=RPC_SRV_RESULT_IN_PROG;
 	else
 	{
@@ -617,7 +626,7 @@ int ADJsonRpcMgr::process_trigger_factory_restore(RPC_SRV_REQ* pReq)
 }
 int ADJsonRpcMgr::bin_to_json_trigger_factory_restore(JsonDataCommObj* pReq)
 {
-	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,RPCMGR_TASK_STS_PACKET,RPCMGR_RPC_TASK_STS_ARGSTS);
+	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,RPCMGR_TASK_STS_PACKET,RPCMGR_RPC_TASK_STS_ARGID);//RPCMGR_RPC_TASK_STS_ARGSTS);
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
@@ -816,7 +825,7 @@ int ADJsonRpcMgr::process_trigger_run(RPC_SRV_REQ* pReq)
 	pPacket=(RPCMGR_TASK_STS_PACKET*)pReq->dataRef;
 	RPCMGR_TASK_STS_PACKET* pWorkData=NULL;
 	OBJECT_MEM_NEW(pWorkData,RPCMGR_TASK_STS_PACKET);//delete this object in run_work() callback function
-	if(AsyncTaskWorker.push_task(EJSON_RPCGMGR_TRIGGER_RUN,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_DELETE)==0)
+	if(AsyncTaskWorker.push_task(EJSON_RPCGMGR_TRIGGER_RUN,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_PRESERVE)==0)
 		pReq->result=RPC_SRV_RESULT_IN_PROG;
 	else
 	{
@@ -827,7 +836,7 @@ int ADJsonRpcMgr::process_trigger_run(RPC_SRV_REQ* pReq)
 }
 int ADJsonRpcMgr::bin_to_json_trigger_run(JsonDataCommObj* pReq)
 {
-	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,RPCMGR_TASK_STS_PACKET,RPCMGR_RPC_TASK_STS_ARGSTS);
+	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,RPCMGR_TASK_STS_PACKET,RPCMGR_RPC_TASK_STS_ARGID);//RPCMGR_RPC_TASK_STS_ARGSTS);
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
@@ -838,13 +847,14 @@ int ADJsonRpcMgr::json_to_bin_get_devop_state(JsonDataCommObj* pReq)
 	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_DEVOP_STS_PACKET,RPC_SRV_ACT_READ,EJSON_RPCMGR_GET_DEVOP_STATE);
 	return 0;
 }
-int ADJsonRpcMgr::process_get_devop_state(RPC_SRV_REQ* pReq)
+int ADJsonRpcMgr::process_get_devop_state(RPC_SRV_REQ* pReq,JsonDataCommObj* pReqObj)
 {
-	RPCMGR_DEVOP_STS_PACKET* pPacket;
-	pPacket=(RPCMGR_DEVOP_STS_PACKET*)pReq->dataRef;
-	pPacket->status=ServiceOpState;//TODO: call actual attached rpc-user-object
-	pReq->result=RPC_SRV_RESULT_SUCCESS;
-	return 0;
+	//RPCMGR_DEVOP_STS_PACKET* pPacket;
+	//pPacket=(RPCMGR_DEVOP_STS_PACKET*)pReq->dataRef;
+	//pPacket->status=ServiceOpState;//TODO: call actual attached rpc-user-object
+	//pReq->result=RPC_SRV_RESULT_SUCCESS;
+	return ProcessWorkCmnRpc(pReqObj);
+	//return 0;
 }
 int ADJsonRpcMgr::bin_to_json_get_devop_state(JsonDataCommObj* pReq)
 {
@@ -862,10 +872,22 @@ int ADJsonRpcMgr::json_to_bin_set_devop_state(JsonDataCommObj* pReq)
 }
 int ADJsonRpcMgr::process_set_devop_state(RPC_SRV_REQ* pReq)
 {
-	RPCMGR_DEVOP_STS_PACKET* pPacket;
-	pPacket=(RPCMGR_DEVOP_STS_PACKET*)pReq->dataRef;
-	ServiceOpState=pPacket->status;//TODO: call actual attached rpc-user-object(make this set rpc as async type)
-	pReq->result=RPC_SRV_RESULT_SUCCESS;
+	//RPCMGR_DEVOP_STS_PACKET* pPacket;
+	//pPacket=(RPCMGR_DEVOP_STS_PACKET*)pReq->dataRef;
+	//ServiceOpState=pPacket->status;//TODO: call actual attached rpc-user-object(make this set rpc as async type)
+	//pReq->result=RPC_SRV_RESULT_SUCCESS;
+	//return 0;
+	RPCMGR_TASK_STS_PACKET* pPacket;
+	pPacket=(RPCMGR_TASK_STS_PACKET*)pReq->dataRef;
+	RPCMGR_TASK_STS_PACKET* pWorkData=NULL;
+	OBJECT_MEM_NEW(pWorkData,RPCMGR_TASK_STS_PACKET);//delete this object in run_work() callback function
+	if(AsyncTaskWorker.push_task(EJSON_RPCMGR_SET_DEVOP_STATE,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_PRESERVE)==0)
+		pReq->result=RPC_SRV_RESULT_IN_PROG;
+	else
+	{
+		OBJ_MEM_DELETE(pWorkData);
+		pReq->result=RPC_SRV_RESULT_FAIL;
+	}
 	return 0;
 }
 int ADJsonRpcMgr::bin_to_json_set_devop_state(JsonDataCommObj* pReq)

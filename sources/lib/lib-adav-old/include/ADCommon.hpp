@@ -80,6 +80,11 @@ typedef enum ADLIB_SERVICE_READY_STATE_T
 	ADLIB_SERVICE_READY_STATE_NONE
 }ADLIB_SERVICE_READY_STATE;
 
+#define ADLIB_RPC_NAME_TRIGGER_STORE_FACTRY     "trigger_factory_store"
+#define ADLIB_RPC_INDX_TRIGGER_STORE_FACTRY     9
+#define ADLIB_RPC_NAME_TRIGGER_RESTORE_FACTRY   "trigger_factory_restore"
+#define ADLIB_RPC_INDX_TRIGGER_RESTORE_FACTRY   10
+
 //subscribe event
 #define RPCMGR_RPC_EVENT_SUBSCRIBE    "subscribe_event"
 #define RPCMGR_RPC_EVENT_UNSUBSCRIBE  "unsubscribe_event"

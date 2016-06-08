@@ -320,8 +320,12 @@ int ADCmdlineHelper::parse_cmdline_arguments(int argc, char **argv)
 			case 'f'://board-type
 				parse_board_type_opt(subarg);
 				break;
-			case 'j':break;//TODO:store factory
-			case 'm':break;//TODO:restore factory
+			case 'j':
+				push_action_type_noarg_command(ADLIB_RPC_INDX_TRIGGER_STORE_FACTRY,(char*)ADLIB_RPC_NAME_TRIGGER_STORE_FACTRY,(char*)ADLIB_RPC_PARM_TASK_STS_ID);
+				break;
+			case 'm':
+				push_action_type_noarg_command(ADLIB_RPC_INDX_TRIGGER_RESTORE_FACTRY,(char*)ADLIB_RPC_NAME_TRIGGER_RESTORE_FACTRY,(char*)ADLIB_RPC_PARM_TASK_STS_ID);
+				break;//TODO:restore factory
 			case 'o':
 				//push_single_int_get_set_command(EJSON_RPCGMGR_EVENT_SUBSCRIBE,EJSON_RPCGMGR_EVENT_SUBSCRIBE,
 				//	RPCMGR_RPC_EVENT_SUBSCRIBE,RPCMGR_RPC_EVENT_SUBSCRIBE,

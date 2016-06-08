@@ -12,6 +12,7 @@
 #include "SysRpc.h"
 #include "EventHandler.h"
 #include "LogHandler.h"
+#include "CmnRpc.h"
 #define SERVER_JSON_PORT_NUM SYSMGR_JSON_PORT_NUMBER
 #define LOG_FILE_PATH         "/tmp/messages"
 /* ------------------------------------------------------------------------- */
@@ -107,6 +108,10 @@ int main(int argc, const char* argv[])
 	SysRpc GetLogLine(SYSMGR_RPC_LOG_LINE_GET,EJSON_SYSMGR_RPC_GET_LOG_LINE,emulat,dbglog,&DataCache); 
 	RpcMgr.AttachRpc(&GetLogLine);
 
+
+	//common rpc hadler object(eg: trigger-data-save/store-factory/restore-factory..etc)
+	CmnRpc CmnRpcHandler("cmnrpc",0,emulat,dbglog,&DataCache);//common rpc-handler(name and index are ignored)
+	RpcMgr.AttachRpc(&CmnRpcHandler);
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr

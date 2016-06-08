@@ -398,7 +398,8 @@ public:
 		if(pPageHandler==NULL)
 			return -1;
 		else
-			return pPageHandler->ProcessWork(pReq,pPageHandler->index,this);
+			return pPageHandler->ProcessWork(pReq,pReq->cmd_index,this);
+
 	}
 };
 /* ------------------------------------------------------------------------- */
@@ -457,7 +458,7 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 
 	//EJSON_RPCGMGR_GET_SETTINGS_STS
 	int json_to_bin_get_settings_sts(JsonDataCommObj* pReq);
-	int process_get_settings_status(RPC_SRV_REQ* pReq);
+	int process_get_settings_status(RPC_SRV_REQ* pReq,JsonDataCommObj* pReqObj);
 	int bin_to_json_get_settings_sts(JsonDataCommObj* pReq);
 
 	//EJSON_RPCGMGR_SHUTDOWN_SERVICE
@@ -522,7 +523,7 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 
 	//EJSON_RPCMGR_GET_DEVOP_STATE
 	int json_to_bin_get_devop_state(JsonDataCommObj* pReq);
-	int process_get_devop_state(RPC_SRV_REQ* pReq);
+	int process_get_devop_state(RPC_SRV_REQ* pReq,JsonDataCommObj* pReqObj);
 	int bin_to_json_get_devop_state(JsonDataCommObj* pReq);
 	
 	//EJSON_RPCMGR_SET_DEVOP_STATE
