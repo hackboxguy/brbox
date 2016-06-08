@@ -204,6 +204,7 @@ public:
 	bool get_debug_log_flag(){return logmsg;};
 	int  set_debug_log_flag(bool flag){logmsg=flag;return 0;};
 	bool get_emulation_flag(){return emulation;};
+	bool get_cmn_rpc_handler_flag(){return cmnrpchandler;};
 
 	//std::string GetRpcNameSetType(){return strGetRpc;};
 	//std::string GetPageTag(){return Tag;};
@@ -281,6 +282,16 @@ protected:
 		for(iter=rpclist.begin();iter != rpclist.end();++iter)
 			(*iter)->set_debug_log_flag(debuglog);
 		return 0;
+	}
+	ADJsonRpcMgrConsumer* getCmnRpcHandler() //looks if user has attached comman-rpc-handler-object.
+	{
+		std::vector<ADJsonRpcMgrConsumer*>::iterator iter;
+		for(iter=rpclist.begin();iter != rpclist.end();++iter)
+		{
+			if((*iter)->get_cmn_rpc_handler_flag() == true)
+				return (*iter);
+		}
+		return NULL;//user did not attach a common-rpc-handler-object
 	}
 public:
 	virtual ~ADJsonRpcMgrProducer(){};
@@ -372,6 +383,22 @@ public:
 	void TaskWorkerSetPortNumber(int port)
 	{
 		AsyncTaskWorker.notifyPortNum=port;
+	}
+	RPC_SRV_RESULT CmnRpcHandler(int cmd,unsigned char* pWorkData)
+	{
+		ADJsonRpcMgrConsumer* pPageHandler = getCmnRpcHandler();
+		if(pPageHandler==NULL)
+			return RPC_SRV_RESULT_FEATURE_UNSUPPORTED;//RPC_SRV_RESULT_FAIL;
+		else
+			return pPageHandler->ProcessWorkAsync(cmd,pWorkData);
+	}
+	int ProcessWorkCmnRpc(JsonDataCommObj* pReq)
+	{
+		ADJsonRpcMgrConsumer* pPageHandler = getCmnRpcHandler();//pReq->cmd_index-EJSON_RPCGMGR_CMD_END);
+		if(pPageHandler==NULL)
+			return -1;
+		else
+			return pPageHandler->ProcessWork(pReq,pPageHandler->index,this);
 	}
 };
 /* ------------------------------------------------------------------------- */

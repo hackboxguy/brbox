@@ -65,6 +65,16 @@ RPC_SRV_RESULT ADJsonRpcMgr::run_work(int cmd,unsigned char* pWorkData,ADTaskWor
 					ret_val=RPC_SRV_RESULT_SUCCESS;//anway server is going to shutdown, result may not be necessary
 				}
 				break;
+			case EJSON_RPCGMGR_TRIGGER_DATASAVE:
+				{
+					RPCMGR_TASK_STS_PACKET *pPacket;
+					pPacket=(RPCMGR_TASK_STS_PACKET *)pWorkData;
+					//myData->factory_store();TODO
+					ret_val=CmnRpcHandler(cmd,pWorkData);
+					OBJ_MEM_DELETE(pWorkData);
+					//ret_val=RPC_SRV_RESULT_SUCCESS;
+				}
+				break;
 			case EJSON_RPCGMGR_TRIGGER_FACTORY_STORE:
 				{
 					RPCMGR_TASK_STS_PACKET *pPacket;
@@ -380,7 +390,18 @@ int ADJsonRpcMgr::json_to_bin_trigger_datasave(JsonDataCommObj* pReq)
 }
 int ADJsonRpcMgr::process_trigger_datasave(RPC_SRV_REQ* pReq)
 {
-	pReq->result=RPC_SRV_RESULT_FEATURE_UNSUPPORTED;
+	//pReq->result=RPC_SRV_RESULT_FEATURE_UNSUPPORTED;
+	RPCMGR_TASK_STS_PACKET* pPacket;
+	pPacket=(RPCMGR_TASK_STS_PACKET*)pReq->dataRef;
+	RPCMGR_TASK_STS_PACKET* pWorkData=NULL;
+	OBJECT_MEM_NEW(pWorkData,RPCMGR_TASK_STS_PACKET);//delete this object in run_work() callback function
+	if(AsyncTaskWorker.push_task(EJSON_RPCGMGR_TRIGGER_DATASAVE,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_DELETE)==0)
+		pReq->result=RPC_SRV_RESULT_IN_PROG;
+	else
+	{
+		OBJ_MEM_DELETE(pWorkData);
+		pReq->result=RPC_SRV_RESULT_FAIL;
+	}
 	return 0;
 }
 int ADJsonRpcMgr::bin_to_json_trigger_datasave(JsonDataCommObj* pReq)
@@ -399,6 +420,7 @@ int ADJsonRpcMgr::json_to_bin_get_settings_sts(JsonDataCommObj* pReq)
 int ADJsonRpcMgr::process_get_settings_status(RPC_SRV_REQ* pReq)
 {
 	pReq->result=RPC_SRV_RESULT_FEATURE_UNSUPPORTED;
+	//return ProcessWork(pReq);
 	return 0;
 }
 int ADJsonRpcMgr::bin_to_json_get_settings_sts(JsonDataCommObj* pReq)
