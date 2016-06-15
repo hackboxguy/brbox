@@ -1,0 +1,5 @@
+obj-m  := i2c-stub.o
+INCLDIR=$(PWD)/include/linux
+i2c-stub-y := kmod/i2c-stub.o
+ccflags-y := -I$(INCLDIR)
+
