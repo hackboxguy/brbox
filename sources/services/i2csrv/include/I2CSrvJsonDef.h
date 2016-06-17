@@ -31,6 +31,8 @@ typedef struct I2CSRV_CMN_DATA_CACHE_T
 {
 	void *pDevInfo;//device-info-struct(typecast in rpc handlers)
 	void *pEventNotifier;//event notifier object
+	void *pDevAccess;//i2c device access node
+
 	unsigned char pcf8574cache[256];
 	unsigned char pcf8574cache_prev[256];
 	I2CSRV_CMN_DATA_CACHE_T() //constructor(initializer)

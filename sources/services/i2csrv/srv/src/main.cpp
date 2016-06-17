@@ -7,7 +7,7 @@
 #include "SrcControlVersion.h"
 #include "ADTimer.hpp"
 #include "ADEvntNotifier.hpp"
-
+#include "I2CBusAccess.h"
 /* ------------------------------------------------------------------------- */
 #include "I2CSrvJsonDef.h"
 #include "Pcf8574Rpc.h"
@@ -36,6 +36,9 @@ int main(int argc, const char* argv[])
 	ADEvntNotifier EventNotifier;//global event notification object
 	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
 	DataCache.pEventNotifier=(void*)&EventNotifier;
+	I2CBusAccess I2CBus(CmdLine.get_dev_node());
+	DataCache.pDevAccess=(void*)&I2CBus;
+
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
@@ -54,6 +57,7 @@ int main(int argc, const char* argv[])
 	//server is ready to serve rpc's
 	RpcMgr.SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE_READY);
 
+	//cout<<"dev node = "<<CmdLine.get_dev_node()<<endl;
 
 	//wait for sigkill or sigterm signal
 	AppTimer.wait_for_exit_signal();//loop till KILL or TERM signal is received

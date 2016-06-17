@@ -1,12 +1,22 @@
 #include "MyCmdline.h"
 using namespace std;
 /*****************************************************************************/
+typedef enum I2CSRV_CMDLINE_OPT_T
+{
+	I2CSRV_CMDLINE_OPT_DEVICE = 100,
+	I2CSRV_CMDLINE_OPT_UNKNOWN,
+	I2CSRV_CMDLINE_OPT_NONE
+}I2CSRV_CMDLINE_OPT;
+/*****************************************************************************/
 MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_str):CmdlineHelper(cmdline_mode)
 {
+	DevNode="none";
 	port_number=portnum;
 	strcpy(version_number,version_str);
 	CmdlineHelper.attach_helper(this);
 	//note:"hviptdln" are already used by the producer class in library
+	CmdlineHelper.insert_options_entry((char*)"device" ,optional_argument,I2CSRV_CMDLINE_OPT_DEVICE);
+	CmdlineHelper.insert_help_entry((char*)"--devic=/dev/node           (i2c device node)");
 }
 /*****************************************************************************/
 MyCmdline::~MyCmdline()
@@ -16,6 +26,17 @@ MyCmdline::~MyCmdline()
 //override virtual functions of ADGeneric Chain
 int MyCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 {
+	I2CSRV_CMDLINE_OPT command =(I2CSRV_CMDLINE_OPT)arg;
+	switch(command)
+	{
+		case I2CSRV_CMDLINE_OPT_DEVICE:
+			if(CmdlineHelper.get_next_subargument(&sub_arg)==0)//no /dev/tty option passed by user
+				DevNode="none";
+			else
+				DevNode=sub_arg;
+			break;
+		default:return 0;break;	
+	}
 	return 0;
 }
 /*****************************************************************************/
@@ -78,4 +99,10 @@ int MyCmdline::get_dev_info(ADCMN_DEV_INFO *pInfo)
 {
 	return CmdlineHelper.get_dev_info(pInfo);
 }
+/*****************************************************************************/
+std::string MyCmdline::get_dev_node()
+{
+	return DevNode;
+}
+/*****************************************************************************/
 
