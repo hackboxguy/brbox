@@ -37,6 +37,8 @@ typedef enum EJSON_RPCGMGR_CMD_T
 	EJSON_RPCGMGR_TRIGGER_RUN=15,        //call this rpc to let the server start full function including subscribing to event..etc
 	EJSON_RPCMGR_GET_DEVOP_STATE=16,     //get service operation state(on/idle/standby/reboot/etc).
 	EJSON_RPCMGR_SET_DEVOP_STATE=17,     //set service operation state(on/idle/standby/reboot/etc).
+	EJSON_RPCMGR_GET_MW_BYTE=18,     //common middleware read_byte() function.
+	EJSON_RPCMGR_SET_MW_BYTE=19,     //common middleware write_byte() function.
 	EJSON_RPCGMGR_CMD_END,
 	EJSON_RPCGMGR_CMD_NONE
 }EJSON_RPCGMGR_CMD;
@@ -181,6 +183,37 @@ typedef struct RPCMGR_DEVOP_STS_PACKET_T
 	EJSON_RPCGMGR_DEVOP_STATE status;
 	char status_str[512];
 }RPCMGR_DEVOP_STS_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_RPCMGR_GET_MW_BYTE=18,     //common middleware read_byte() function.
+//EJSON_RPCMGR_SET_MW_BYTE=19,     //common middleware write_byte() function.
+#define RPCMGR_RPC_MW_BYTE_GET     "read_byte"
+#define RPCMGR_RPC_MW_BYTE_SET     "write_byte"
+#define RPCMGR_RPC_MW_WORD_GET     "read_word"
+#define RPCMGR_RPC_MW_WORD_SET     "write_word"
+#define RPCMGR_RPC_MW_DWORD_GET    "read_dword"
+#define RPCMGR_RPC_MW_DWORD_SET    "write_dword"
+#define RPCMGR_RPC_MW_ARRAY_GET    "read_array"
+#define RPCMGR_RPC_MW_ARRAY_SET    "write_array"
+#define RPCMGR_RPC_MW_FILE_GET     "read_file"
+#define RPCMGR_RPC_MW_FILE_SET     "write_file"
+#define RPCMGR_RPC_MW_FILE_VERIFY  "verify_file"
+#define RPCMGR_RPC_MW_ARGADDR      "addr"
+#define RPCMGR_RPC_MW_ARGDATA      "data"
+#define RPCMGR_RPC_MW_ARGBUFF      "buff"
+#define RPCMGR_RPC_MW_ARGSIZE      "size"
+#define RPCMGR_RPC_MW_ARGOFFSET    "offset"
+#define RPCMGR_RPC_MW_ARGFILEPATH  "filepath"
+typedef struct RPCMGR_MIDDLEWARE_PACKET_T
+{
+	uint32_t addr;
+	uint32_t offset;
+	uint8_t byte;
+	uint16_t word;
+	uint32_t dword;
+	size_t size;
+	//uint8_t buffer[1400];//becaus of network MTU limitation, max array size is limited to 1400bytes
+	//char filepath[1024];
+}RPCMGR_MIDDLEWARE_PACKET;
 /* ------------------------------------------------------------------------- */
 //to understand this, read C++ subject observer pattern
 class ADJsonRpcMgrProducer; //subject
@@ -530,6 +563,17 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	int json_to_bin_set_devop_state(JsonDataCommObj* pReq);
 	int process_set_devop_state(RPC_SRV_REQ* pReq);
 	int bin_to_json_set_devop_state(JsonDataCommObj* pReq);
+
+	//EJSON_RPCMGR_GET_MW_BYTE
+	int json_to_bin_get_mw_byte(JsonDataCommObj* pReq);
+	int process_get_mw_byte(RPC_SRV_REQ* pReq,JsonDataCommObj* pReqObj);
+	int bin_to_json_get_mw_byte(JsonDataCommObj* pReq);
+
+	//EJSON_RPCMGR_SET_MW_BYTE
+	int json_to_bin_set_mw_byte(JsonDataCommObj* pReq);
+	int process_set_mw_byte(RPC_SRV_REQ* pReq,JsonDataCommObj* pReqObj);
+	int bin_to_json_set_mw_byte(JsonDataCommObj* pReq);
+
 
 
 public:

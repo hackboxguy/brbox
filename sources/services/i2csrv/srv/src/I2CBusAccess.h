@@ -9,11 +9,18 @@ using namespace std;
 class I2CBusAccess
 {
 	int fd;
-	bool DevOpened;
+	RPC_SRV_RESULT DevOpened;
 	std::string node;
 public:
 	I2CBusAccess(std::string DevNode);
 	~I2CBusAccess();
 	RPC_SRV_RESULT SetSlaveAddr(int fd, uint8_t addr);
+
+	RPC_SRV_RESULT read_byte(uint32_t addr, uint8_t *data);
+	RPC_SRV_RESULT write_byte(uint32_t addr, uint8_t data);
+	RPC_SRV_RESULT read_word(uint32_t addr, uint16_t *data);
+	RPC_SRV_RESULT write_word(uint32_t addr, uint16_t data);
+	RPC_SRV_RESULT read_dword(uint32_t addr, uint32_t *data);
+	RPC_SRV_RESULT write_dword(uint32_t addr, uint32_t data);
 };
 #endif

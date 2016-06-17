@@ -11,6 +11,7 @@
 /* ------------------------------------------------------------------------- */
 #include "I2CSrvJsonDef.h"
 #include "Pcf8574Rpc.h"
+#include "CmnRpc.h"
 /* ------------------------------------------------------------------------- */
 using namespace std;
 int main(int argc, const char* argv[])
@@ -49,6 +50,10 @@ int main(int argc, const char* argv[])
 
 	RpcMgr.AttachRpc(&PCF8574Get);
 	RpcMgr.AttachRpc(&PCF8574Set);
+
+	//common rpc hadler object(eg: trigger-data-save/store-factory/restore-factory..etc)
+	CmnRpc CmnRpcHandler("cmnrpc",0,emulat,dbglog,&DataCache);//common rpc-handler(name and index are ignored)
+	RpcMgr.AttachRpc(&CmnRpcHandler);
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr

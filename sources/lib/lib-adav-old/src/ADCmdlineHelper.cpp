@@ -114,6 +114,10 @@ int ADCmdlineHelper::init_myself()
 
 		insert_options_entry((char*)"devop" ,optional_argument,'1',1);
 		insert_help_entry((char*)"--devop=[on/off/idle/reboot/idlenoexthw](read/write device operation state of the service)");
+
+		insert_options_entry((char*)"rwbyte" ,optional_argument,'2',1);
+		insert_help_entry((char*)"--rwbyte=addr,data         (read/write middleware byte from/to given address)");
+
 	}
 	else if(my_mode==CMDLINE_HELPER_MODE_SERVER)
 	{
@@ -352,6 +356,14 @@ int ADCmdlineHelper::parse_cmdline_arguments(int argc, char **argv)
 				(EJSON_RPCMGR_GET_DEVOP_STATE,EJSON_RPCMGR_SET_DEVOP_STATE,
 				RPCMGR_RPC_DEVOP_STATE_GET,RPCMGR_RPC_DEVOP_STATE_SET,
 				&table[0],EJSON_RPCGMGR_DEVOP_STATE_UNKNOWN,(char*)RPCMGR_RPC_DEVOP_STATE_ARGSTS,subarg);
+				}
+				break;
+			case '2':
+				{
+				push_int_get_set_with_dev_addr_arg_command(EJSON_RPCMGR_GET_MW_BYTE,EJSON_RPCMGR_SET_MW_BYTE,
+			        RPCMGR_RPC_MW_BYTE_GET,RPCMGR_RPC_MW_BYTE_SET,
+				(char*)RPCMGR_RPC_MW_ARGDATA,
+				(char*)RPCMGR_RPC_MW_ARGADDR,-1,subarg);
 				}
 				break;
 			default:if(parse_subscribers_cmdline((arg-CONSUMERS_OPTIONS_ARG_START_BOUNDARY),subarg)!=0) return -1;//remove the offset which was added by me

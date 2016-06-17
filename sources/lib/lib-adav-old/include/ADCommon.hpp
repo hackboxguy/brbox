@@ -379,10 +379,12 @@ typedef enum rpc_srv_result_t
 	RPC_SRV_RESULT_FILE_EMPTY, //file exists but data is empty
 	RPC_SRV_RESULT_ITEM_DUPLICATE_FOUND,//event subscription: duplicate subscription found
 	RPC_SRV_RESULT_UNKNOWN_COMMAND,
+	RPC_SRV_RESULT_DEVNODE_ACCERR, //device node access error(run service as sudo to fix this issue)
+	RPC_SRV_RESULT_DEVNODE_OPENERR, //device node open error
 	RPC_SRV_RESULT_UNKNOWN,
 	RPC_SRV_RESULT_NONE
 }RPC_SRV_RESULT;
-#define STR_RPC_SRV_RESULT_STRING_TABLE  {"Success","Fail","InProgress","Busy","NotStarted","Timeout","ArgError","MemError","BusError","ActionBlocked","DeviceError","FileNotFound","FeatureNotAvailable","UnsupportedFeature","taskIDNotFound","valueOutOfRange","FileOpenErr","FileReadErr","FileWriteErr","FileSame","FileNotSame","HostUnreachable","resend","csExposureError","csI2CErr","ItemNotFound","FileError","DevInfoErr","FileEmpty","DuplicateItem","UnknownCmd","Unknown","none","\0"}
+#define STR_RPC_SRV_RESULT_STRING_TABLE  {"Success","Fail","InProgress","Busy","NotStarted","Timeout","ArgError","MemError","BusError","ActionBlocked","DeviceError","FileNotFound","FeatureNotAvailable","UnsupportedFeature","taskIDNotFound","valueOutOfRange","FileOpenErr","FileReadErr","FileWriteErr","FileSame","FileNotSame","HostUnreachable","resend","csExposureError","csI2CErr","ItemNotFound","FileError","DevInfoErr","FileEmpty","DuplicateItem","UnknownCmd","DevNodeAccErr","DevNodeOpenErr","Unknown","none","\0"}
 /*#define STR_RPC_SRV_RESULT_SUCCESS        "Success"    
 #define STR_RPC_SRV_RESULT_FAIL           "Fail"
 #define STR_RPC_SRV_RESULT_IN_PROGRESS    "InProgress"    //request is in progress
