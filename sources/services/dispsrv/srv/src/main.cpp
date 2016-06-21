@@ -9,8 +9,11 @@
 #include "ADEvntNotifier.hpp"
 
 /* ------------------------------------------------------------------------- */
-#include "GpioctlJsonDef.h"
-#include "GpioCtrlRpc.h"
+#include "DispsrvJsonDef.h"
+//#include "GpioCtrlRpc.h"
+/* ------------------------------------------------------------------------- */
+//supported display types
+//--disptype=SSD1306_128x32
 /* ------------------------------------------------------------------------- */
 using namespace std;
 int main(int argc, const char* argv[])
@@ -32,7 +35,7 @@ int main(int argc, const char* argv[])
 	//start 100ms timer
 	ADTimer AppTimer(100,CmdLine.get_port_number());//only one instance per application(or process) must exist
 	//create a common data Cache of the service
-	GPIOCTL_CMN_DATA_CACHE DataCache;
+	DISPSRV_CMN_DATA_CACHE DataCache;
 	ADEvntNotifier EventNotifier;//global event notification object
 	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
 	DataCache.pEventNotifier=(void*)&EventNotifier;
@@ -41,11 +44,10 @@ int main(int argc, const char* argv[])
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 
 	/****************************RPC list*************************************/
-	GpioCtrlRpc GpioGet(GPIOCTL_RPC_IO_GET ,EJSON_GPIOCTL_RPC_IO_GET ,emulat,dbglog,&DataCache);
-	GpioCtrlRpc GpioSet(GPIOCTL_RPC_IO_SET ,EJSON_GPIOCTL_RPC_IO_SET ,emulat,dbglog,&DataCache);
-
-	RpcMgr.AttachRpc(&GpioGet);
-	RpcMgr.AttachRpc(&GpioSet);
+	//GpioCtrlRpc GpioGet(GPIOCTL_RPC_IO_GET ,EJSON_GPIOCTL_RPC_IO_GET ,emulat,dbglog,&DataCache);
+	//GpioCtrlRpc GpioSet(GPIOCTL_RPC_IO_SET ,EJSON_GPIOCTL_RPC_IO_SET ,emulat,dbglog,&DataCache);
+	//RpcMgr.AttachRpc(&GpioGet);
+	//RpcMgr.AttachRpc(&GpioSet);
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr
