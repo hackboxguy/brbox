@@ -1,0 +1,36 @@
+#!/bin/sh
+#
+# Start/stop server script
+#
+SERVER_NAME=/opt/fmw/bin/dispsrv
+DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
+start() {
+	echo -n "Starting $SERVER_NAME Service: "
+	DEV_TYPE=$(cat $DEV_TYPE_FILE)
+	$SERVER_NAME --boardtype=$DEV_TYPE &
+	echo "OK"
+}
+
+stop() {
+	echo -n "Stopping $SERVER_NAME Service:  "
+	killall $SERVER_NAME
+	echo "OK"
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	stop
+	start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
