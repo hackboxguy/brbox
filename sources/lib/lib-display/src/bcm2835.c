@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+//#include <linux/i2c.h>
 #include <linux/i2c-dev.h>
 //#include "i2c-dev.h"
 
@@ -875,14 +876,39 @@ int bcm2835_i2c_write(const char * buf, uint32_t len)
 	// Do simple use of I2C smbus command regarding number of bytes to transfer
 	// Write 1 byte
 	if (len == 2)
-		reason = i2c_smbus_write_byte_data(i2c_fd, buf[0], buf[1]);
+	{
+		//reason = i2c_smbus_write_byte_data(i2c_fd, buf[0], buf[1]);
+		union i2c_smbus_data data;
+		data.byte = buf[1];//value;
+		reason=i2c_smbus_access(i2c_fd,I2C_SMBUS_WRITE,buf[0],
+		                        I2C_SMBUS_BYTE_DATA, &data);
+	}
 	// Write 1 word
 	else if (len == 3)
-		reason = i2c_smbus_write_word_data(i2c_fd, buf[0], (buf[2]<<8) | buf[1] );
+	{
+		//reason = i2c_smbus_write_word_data(i2c_fd, buf[0], (buf[2]<<8) | buf[1] );
+	       union i2c_smbus_data data;
+	       data.word = (buf[2]<<8) | buf[1];//value;
+	       reason= i2c_smbus_access(i2c_fd,I2C_SMBUS_WRITE,buf[0],
+		                        I2C_SMBUS_WORD_DATA, &data);
+
+	}
 	// Write bulk data
 	else 
-		reason = i2c_smbus_write_i2c_block_data(i2c_fd, buf[0], len-1, (const __u8 *) &buf[1]);
+	{
+		//reason = i2c_smbus_write_i2c_block_data(i2c_fd, buf[0], len-1, (const __u8 *) &buf[1]);
+		union i2c_smbus_data data;
+		int i;
+		uint8_t length=len-1;
+		const __u8 *values=(const __u8 *)&buf[1];
+		if (length > 32)
+			length = 32;
+		for (i = 1; i <= length; i++)
+			data.block[i] = values[i-1];
+		data.block[0] = length;
+		reason=i2c_smbus_access(i2c_fd,I2C_SMBUS_WRITE,buf[0],I2C_SMBUS_I2C_BLOCK_BROKEN, &data);
 		
+	}
 	usleep(1);
 
 	return ( reason );
