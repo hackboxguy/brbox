@@ -1,0 +1,16 @@
+config BR2_PACKAGE_BRBOX_DISPSRV
+	bool "Display-Control-Service"
+	default n
+	select BR2_PACKAGE_BRBOX_LIBADDISP
+	select BR2_PACKAGE_BRBOX_LIBADCMNOLD
+	help
+		display control service for accessing oled display via rpc
+
+config BR2_PACKAGE_BRBOX_DISPSRV_INIT_ORDER
+        string "dispsrv init.d order"
+        default "78"
+        depends on BR2_PACKAGE_BRBOX_DISPSRV
+        help
+          At which place in the init.d startup this service should be started. Needs to be a 2-digit integer.
+          Will be prefixed by "S" by buildroot, so e.g. "77" becomes "S77"
+
