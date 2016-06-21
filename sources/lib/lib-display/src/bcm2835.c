@@ -26,6 +26,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <linux/i2c-dev.h>
+//#include "i2c-dev.h"
 
 #include <errno.h>
 #include <sys/mman.h>
