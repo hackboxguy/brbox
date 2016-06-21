@@ -20,7 +20,7 @@ set(INC_ADDISP   "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-display/include")
 set(INC_ADSTTNG  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-settings/include")
 set(INC_ADCOMMN  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-adav-old/include")
 set(INC_SRVCOMMN "${CMAKE_CURRENT_SOURCE_DIR}/../include")
-
+#find_package( libi2c-dev REQUIRED ) #core imgproc highgui )
 # Add #include path of all dependent components
 include_directories(${INC_ADDISP} ${INC_ADSTTNG} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -50,6 +50,15 @@ if(${AUTO_SVN_VERSION})
 else()
 	FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SrcControlVersion.h "#define SRC_CONTROL_VERSION 0001\n")
 endif()
+
+#INCLUDE( FindPkgConfig )
+#pkg_check_modules( I2CDEV i2c-dev )
+#if( NOT I2CDEV_FOUND )
+#	message( FATAL_ERROR "ERROR: could not find libi2c-dev development files" )
+#endif( NOT I2CDEV_FOUND )
+#include_directories( ${I2CDEV_INCLUDE_DIR} )
+#include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/3rd_party )
+#include_directories( ${I2CDEV_INCLUDE_DIRS} )
 
 #for cross compiling
 #cmake -H. -BOutput -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain-arm-backup.cmake -DCMAKE_INSTALL_PREFIX=/home/user/tmp/
