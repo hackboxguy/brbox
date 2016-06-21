@@ -10,7 +10,7 @@
 /* ------------------------------------------------------------------------- */
 #include "DispsrvJsonDef.h"
 //#include "GpioCtrlRpc.h"
-#include <linux/i2c-dev.h>
+//#include <linux/i2c-dev.h>
 //#include "i2c-dev.h"
 #include "ArduiPi_OLED_lib.h"
 #include "Adafruit_GFX.h"
