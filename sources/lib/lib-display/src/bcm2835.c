@@ -865,6 +865,27 @@ void bcm2835_i2c_set_baudrate(uint32_t baudrate)
   bcm2835_peri_write(paddr, divider);
 }
 
+static inline __s32 i2c_smbus_access(int file, char read_write, __u8 command,
+                                     int size, union i2c_smbus_data *data)
+{
+        struct i2c_smbus_ioctl_data args;
+
+        args.read_write = read_write;
+        args.command = command;
+        args.size = size;
+        args.data = data;
+        return ioctl(file,I2C_SMBUS,&args);
+}
+/*static inline __s32 i2c_smbus_read_word_data(int file, __u8 command)
+{
+        union i2c_smbus_data data;
+        if (i2c_smbus_access(file,I2C_SMBUS_READ,command,
+                             I2C_SMBUS_WORD_DATA,&data))
+                return -1;
+        else
+                return 0x0FFFF & data.word;
+}*/
+
 // Writes an number of bytes to I2C
 int bcm2835_i2c_write(const char * buf, uint32_t len)
 {
