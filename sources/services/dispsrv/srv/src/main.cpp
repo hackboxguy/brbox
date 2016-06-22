@@ -87,8 +87,13 @@ int main(int argc, const char* argv[])
                         exit(EXIT_FAILURE);
         }
         display.begin();
-        // init done
         display.clearDisplay(); // clears the screen buffer
+
+	usleep(100000);usleep(100000);usleep(100000);usleep(100000);
+
+        display.begin();
+        display.clearDisplay(); // clears the screen buffer
+
         //char buffer[128];
         display.setTextSize(1);
         display.setTextColor(WHITE);
