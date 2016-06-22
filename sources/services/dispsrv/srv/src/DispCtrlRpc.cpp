@@ -1,5 +1,5 @@
 #include "DispCtrlRpc.h"
-//#include "RaspiIo.h"
+//#include "DispAccess.h"
 #include "ADEvntNotifier.hpp"//for eventing
 /* ------------------------------------------------------------------------- */
 DispCtrlRpc:: DispCtrlRpc(std::string rpcName,int myIndex,bool emu, bool log,DISPSRV_CMN_DATA_CACHE *pData):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
@@ -13,37 +13,40 @@ DispCtrlRpc::~ DispCtrlRpc()
 /* ------------------------------------------------------------------------- */
 int DispCtrlRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 {
-	/*EJSON_GPIOCTL_RPC_TYPES command =(EJSON_GPIOCTL_RPC_TYPES)index;
+	EJSON_DISPSRV_RPC_TYPES command =(EJSON_DISPSRV_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_GPIOCTL_RPC_IO_GET :return json_to_bin_gpio_get(pReq);
-		case EJSON_GPIOCTL_RPC_IO_SET :return json_to_bin_gpio_set(pReq);
+		case EJSON_DISPSRV_RPC_DISP_INIT :break;//return json_to_bin_gpio_get(pReq);
+		case EJSON_DISPSRV_RPC_DISP_CLEAR:break;//return json_to_bin_gpio_set(pReq);
+		case EJSON_DISPSRV_RPC_DISP_PRINT:break;//return json_to_bin_gpio_set(pReq);
 		default:break;
-	}*/
+	}
 	return -1;//0;
 }
 /* ------------------------------------------------------------------------- */
 int DispCtrlRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 {
-	/*EJSON_GPIOCTL_RPC_TYPES command =(EJSON_GPIOCTL_RPC_TYPES)index;
+	EJSON_DISPSRV_RPC_TYPES command =(EJSON_DISPSRV_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_GPIOCTL_RPC_IO_GET :return bin_to_json_gpio_get(pReq);
-		case EJSON_GPIOCTL_RPC_IO_SET :return bin_to_json_gpio_set(pReq);
+		case EJSON_DISPSRV_RPC_DISP_INIT :break;//return json_to_bin_gpio_get(pReq);
+		case EJSON_DISPSRV_RPC_DISP_CLEAR:break;//return json_to_bin_gpio_set(pReq);
+		case EJSON_DISPSRV_RPC_DISP_PRINT:break;//return json_to_bin_gpio_set(pReq);
 		default:break;
-	}*/
+	}
 	return -1;
 }
 /* ------------------------------------------------------------------------- */
 int DispCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pObj)
 {
-	/*EJSON_GPIOCTL_RPC_TYPES command =(EJSON_GPIOCTL_RPC_TYPES)index;
+	EJSON_DISPSRV_RPC_TYPES command =(EJSON_DISPSRV_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_GPIOCTL_RPC_IO_GET :return process_gpio_get(pReq);
-		case EJSON_GPIOCTL_RPC_IO_SET :return process_gpio_set(pReq);
+		case EJSON_DISPSRV_RPC_DISP_INIT :break;//return json_to_bin_gpio_get(pReq);
+		case EJSON_DISPSRV_RPC_DISP_CLEAR:break;//return json_to_bin_gpio_set(pReq);
+		case EJSON_DISPSRV_RPC_DISP_PRINT:break;//return json_to_bin_gpio_set(pReq);
 		default:break;
-	}*/
+	}
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
