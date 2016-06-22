@@ -10,22 +10,7 @@
 /* ------------------------------------------------------------------------- */
 #include "DispsrvJsonDef.h"
 #include "DispAccess.h"
-//#include "ArduiPi_OLED_lib.h"
-//#include "Adafruit_GFX.h"
-//#include "ArduiPi_OLED.h"
-/* ------------------------------------------------------------------------- */
-//supported display types
-//--disptype=SSD1306_128x32
-/*struct s_opts
-{
-        int oled;
-        int verbose;
-} ;
-s_opts opts = 
-{
-	OLED_ADAFRUIT_I2C_128x32, //OLED_ADAFRUIT_SPI_128x32, // Default oled
-	false   // Not verbose
-};*/
+#include "DispCtrlRpc.h"
 /* ------------------------------------------------------------------------- */
 using namespace std;
 int main(int argc, const char* argv[])
@@ -51,51 +36,26 @@ int main(int argc, const char* argv[])
 	ADEvntNotifier EventNotifier;//global event notification object
 	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
 	DataCache.pEventNotifier=(void*)&EventNotifier;
+	DispAccess Disp(CmdLine.get_disp_type());
+	DataCache.pDispAccess=(void*)&Disp;
+	Disp.print_line(1,(char*)"Hello World!!!");
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 
 	/****************************RPC list*************************************/
-	//GpioCtrlRpc GpioGet(GPIOCTL_RPC_IO_GET ,EJSON_GPIOCTL_RPC_IO_GET ,emulat,dbglog,&DataCache);
-	//GpioCtrlRpc GpioSet(GPIOCTL_RPC_IO_SET ,EJSON_GPIOCTL_RPC_IO_SET ,emulat,dbglog,&DataCache);
-	//RpcMgr.AttachRpc(&GpioGet);
-	//RpcMgr.AttachRpc(&GpioSet);
+	DispCtrlRpc DisplayInit (DISPSRV_RPC_DISP_INIT ,EJSON_DISPSRV_RPC_DISP_INIT ,emulat,dbglog,&DataCache);
+	DispCtrlRpc DisplayClear(DISPSRV_RPC_DISP_CLEAR,EJSON_DISPSRV_RPC_DISP_CLEAR,emulat,dbglog,&DataCache);
+	DispCtrlRpc DisplayPrint(DISPSRV_RPC_DISP_PRINT,EJSON_DISPSRV_RPC_DISP_PRINT,emulat,dbglog,&DataCache);
+	RpcMgr.AttachRpc(&DisplayInit);
+	RpcMgr.AttachRpc(&DisplayClear);
+	RpcMgr.AttachRpc(&DisplayPrint);
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr
-	//RpcMgr.SupportShutdownRpc(false);//this is a system-manager, needs to be alive all the time, hence dont support shutdown via rpc
 	RpcMgr.Start(CmdLine.get_port_number(),CmdLine.get_socket_log(),CmdLine.get_emulation_mode());
 	//server is ready to serve rpc's
 	RpcMgr.SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE_READY);
-
-	//display specific stuff
-        /*ArduiPi_OLED display;
-        // SPI
-        if (display.oled_is_spi_proto(opts.oled))
-        {
-                // SPI change parameters to fit to your LCD
-                if ( !display.init(OLED_SPI_DC,OLED_SPI_RESET,OLED_SPI_CS, opts.oled) )
-                        exit(EXIT_FAILURE);
-        }
-        else
-        {
-                // I2C change parameters to fit to your LCD
-                if ( !display.init(OLED_I2C_RESET,opts.oled) )
-                        exit(EXIT_FAILURE);
-        }
-        display.begin();
-        display.clearDisplay(); // clears the screen buffer
-	usleep(100000);usleep(100000);usleep(100000);usleep(100000);
-        display.begin();
-        display.clearDisplay(); // clears the screen buffer
-        display.setTextSize(1);
-        display.setTextColor(WHITE);
-        display.setCursor(0,0);
-        display.print("Hello, world!\n");
-        display.display();*/
-
-	DispAccess Disp(CmdLine.get_disp_type());
-	Disp.print_line(1,"Hello World!!!");
 
 	//wait for sigkill or sigterm signal
 	AppTimer.wait_for_exit_signal();//loop till KILL or TERM signal is received

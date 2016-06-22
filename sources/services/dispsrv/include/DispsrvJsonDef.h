@@ -7,36 +7,40 @@
 /* ------------------------------------------------------------------------- */
 typedef enum EJSON_DISPSRV_RPC_TYPES_T
 {
-	//EJSON_DISPSRV_RPC_IO_GET=0,
-	//EJSON_DISPSRV_RPC_IO_SET,
-	//EJSON_DISPSRV_RPC_IO_CONFIG,
+	EJSON_DISPSRV_RPC_DISP_INIT,
+	EJSON_DISPSRV_RPC_DISP_CLEAR,
+	EJSON_DISPSRV_RPC_DISP_PRINT,
 	EJSON_DISPSRV_RPC_END,
 	EJSON_DISPSRV_RPC_NONE
 }EJSON_DISPSRV_RPC_TYPES;
 /* ------------------------------------------------------------------------- */
-//#define GPIOCTL_RPC_IO_GET       "gpio_get"
-//#define GPIOCTL_RPC_IO_SET       "gpio_set"
-//#define GPIOCTL_RPC_IO_ADDR_ARG  "addr"
-//#define GPIOCTL_RPC_IO_DATA_ARG  "data"
-//typedef struct GPIOCTL_IO_ACCESS_PACKET_T
-//{
-//	unsigned int addr;
-//	unsigned int data;
-//}GPIOCTL_IO_ACCESS_PACKET;
+//EJSON_DISPSRV_RPC_DISP_INIT,
+//EJSON_DISPSRV_RPC_DISP_CLEAR,
+//EJSON_DISPSRV_RPC_DISP_PRINT,
+#define	DISPSRV_RPC_DISP_INIT            "display_init"
+#define	DISPSRV_RPC_DISP_CLEAR           "display_clear"
+#define	DISPSRV_RPC_DISP_PRINT           "display_print"
+#define DISPSRV_RPC_DISP_PRINT_LINE_ARG  "line"
+#define DISPSRV_RPC_DISP_PRINT_MESG_ARG  "msg"
+typedef struct DISPSRV_PRINT_PACKET_T
+{
+	int line;
+	char msg[1024];
+}DISPSRV_PRINT_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to gpioctl-service here
 typedef struct DISPSRV_CMN_DATA_CACHE_T
 {
 	void *pDevInfo;//device-info-struct(typecast in rpc handlers)
 	void *pEventNotifier;//event notifier object
+	void *pDispAccess;//display control object
 	//unsigned int gpio_data[GPIOCTL_MAX_GPIO_PINS];//allow max 64gpio addresses(0 to 63)
 	//unsigned int gpio_data_prev[GPIOCTL_MAX_GPIO_PINS];//comparing the last value for eventing
 	DISPSRV_CMN_DATA_CACHE_T() //constructor(initializer)
 	{
 		pDevInfo=NULL;
 		pEventNotifier=NULL;
-		//for(int i=0;i<GPIOCTL_MAX_GPIO_PINS;i++)
-		//	gpio_data[i]=gpio_data_prev[i]=2;//init with invalid value so that comparision fails and event can be sent
+		pDispAccess=NULL;
 	};
 }DISPSRV_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */

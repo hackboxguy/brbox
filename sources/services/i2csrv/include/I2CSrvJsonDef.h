@@ -39,6 +39,7 @@ typedef struct I2CSRV_CMN_DATA_CACHE_T
 	{
 		pDevInfo=NULL;
 		pEventNotifier=NULL;
+		pDevAccess=NULL;
 		for(int i=0;i<256;i++)
 		{
 			pcf8574cache[i]=0;
