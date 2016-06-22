@@ -9,17 +9,14 @@
 #include "ADEvntNotifier.hpp"
 /* ------------------------------------------------------------------------- */
 #include "DispsrvJsonDef.h"
-//#include "GpioCtrlRpc.h"
-//#include <linux/i2c.h>
-//#include <linux/i2c-dev.h>
-//#include "i2c-dev.h"
-#include "ArduiPi_OLED_lib.h"
-#include "Adafruit_GFX.h"
-#include "ArduiPi_OLED.h"
+#include "DispAccess.h"
+//#include "ArduiPi_OLED_lib.h"
+//#include "Adafruit_GFX.h"
+//#include "ArduiPi_OLED.h"
 /* ------------------------------------------------------------------------- */
 //supported display types
 //--disptype=SSD1306_128x32
-struct s_opts
+/*struct s_opts
 {
         int oled;
         int verbose;
@@ -28,7 +25,7 @@ s_opts opts =
 {
 	OLED_ADAFRUIT_I2C_128x32, //OLED_ADAFRUIT_SPI_128x32, // Default oled
 	false   // Not verbose
-};
+};*/
 /* ------------------------------------------------------------------------- */
 using namespace std;
 int main(int argc, const char* argv[])
@@ -72,7 +69,7 @@ int main(int argc, const char* argv[])
 	RpcMgr.SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE_READY);
 
 	//display specific stuff
-        ArduiPi_OLED display;
+        /*ArduiPi_OLED display;
         // SPI
         if (display.oled_is_spi_proto(opts.oled))
         {
@@ -88,21 +85,17 @@ int main(int argc, const char* argv[])
         }
         display.begin();
         display.clearDisplay(); // clears the screen buffer
-
 	usleep(100000);usleep(100000);usleep(100000);usleep(100000);
-
         display.begin();
         display.clearDisplay(); // clears the screen buffer
-
-        //char buffer[128];
         display.setTextSize(1);
         display.setTextColor(WHITE);
         display.setCursor(0,0);
-        //sprintf(buffer,"%s",argv[1]);
-        //display.print(buffer);//"%s",argv[1]);//Hello, world!\n");
         display.print("Hello, world!\n");
-        display.display();
+        display.display();*/
 
+	DispAccess Disp(CmdLine.get_disp_type());
+	Disp.print_line(1,"Hello World!!!");
 
 	//wait for sigkill or sigterm signal
 	AppTimer.wait_for_exit_signal();//loop till KILL or TERM signal is received

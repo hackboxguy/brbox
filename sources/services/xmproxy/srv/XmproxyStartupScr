@@ -3,7 +3,8 @@
 # Start/stop server script
 #
 CLIENT_NAME=/opt/fmw/bin/xmproxyclt
-SERVER_NAME=/opt/fmw/bin/xmproxysrv
+SERVER_NAME=xmproxysrv
+SERVER_PATH=/opt/fmw/bin/
 DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
 LOGINFILE_NAME=xmpp-login.txt
 ALIAS_LIST_NAME=xmpp-alias-list.txt
@@ -44,9 +45,9 @@ start() {
 	sleep 3 #sleep is needed incase if usbgsm driver is loading is late
 	GSM_NODES=$(cat /proc/tty/driver/usbserial 2>/dev/null | grep "GSM modem"|wc -l)
 	if [ $GSM_NODES = "3" ]; then #if usb-gsm-module is connected, then let xmproxy know
-		$SERVER_NAME --boardtype=$DEV_TYPE --loginfile=$XMPP_LOGIN_DATA --aliaslist=$ALIAS_LIST_DATA --botname=$BOT_NAME_DATA --usbgsm=1 &
+		$SERVER_PATH/$SERVER_NAME --boardtype=$DEV_TYPE --loginfile=$XMPP_LOGIN_DATA --aliaslist=$ALIAS_LIST_DATA --botname=$BOT_NAME_DATA --usbgsm=1 &
 	else
-		$SERVER_NAME --boardtype=$DEV_TYPE --loginfile=$XMPP_LOGIN_DATA --aliaslist=$ALIAS_LIST_DATA --botname=$BOT_NAME_DATA --usbgsm=0 &
+		$SERVER_PATH/$SERVER_NAME --boardtype=$DEV_TYPE --loginfile=$XMPP_LOGIN_DATA --aliaslist=$ALIAS_LIST_DATA --botname=$BOT_NAME_DATA --usbgsm=0 &
 	fi
 	echo "OK"
 }

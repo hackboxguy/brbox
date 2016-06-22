@@ -2,13 +2,14 @@
 #
 # Start/stop server script
 #
-I2CDEVNODE=/dev/i2c-1
-SERVER_NAME=/opt/fmw/bin/i2csrv
+I2CDEVNODE=/dev/i2c-1 #todo: for raspi this works, to be handled correctly for other services
+SERVER_NAME=i2csrv
+SERVER_PATH=/opt/fmw/bin/
 DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
 start() {
 	echo -n "Starting $SERVER_NAME Service: "
 	DEV_TYPE=$(cat $DEV_TYPE_FILE)
-	$SERVER_NAME --boardtype=$DEV_TYPE --device=$I2CDEVNODE &
+	$SERVER_PATH/$SERVER_NAME --boardtype=$DEV_TYPE --device=$I2CDEVNODE &
 	echo "OK"
 }
 

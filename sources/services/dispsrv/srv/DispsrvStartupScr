@@ -2,12 +2,13 @@
 #
 # Start/stop server script
 #
-SERVER_NAME=/opt/fmw/bin/dispsrv
+SERVER_NAME=dispsrv
+SERVER_PATH=/opt/fmw/bin/
 DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
 start() {
 	echo -n "Starting $SERVER_NAME Service: "
 	DEV_TYPE=$(cat $DEV_TYPE_FILE)
-	$SERVER_NAME --boardtype=$DEV_TYPE --disptype=SSD1306_128x32 &
+	$SERVER_PATH/$SERVER_NAME --boardtype=$DEV_TYPE --disptype=SSD1306_128x32 &
 	echo "OK"
 }
 

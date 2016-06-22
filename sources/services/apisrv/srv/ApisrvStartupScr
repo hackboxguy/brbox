@@ -3,13 +3,14 @@
 # Start/stop server script
 #
 CLIENT_NAME=/opt/fmw/bin/apiclt
-SERVER_NAME=/opt/fmw/bin/apisrv
+SERVER_NAME=apisrv
+SERVER_PATH=/opt/fmw/bin/
 DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
 HTTP_PORT=8080
 start() {
 	echo -n "Starting $SERVER_NAME Service: "
 	DEV_TYPE=$(cat $DEV_TYPE_FILE)
-	$SERVER_NAME --boardtype=$DEV_TYPE --httpport=$HTTP_PORT &
+	$SERVER_PATH/$SERVER_NAME --boardtype=$DEV_TYPE --httpport=$HTTP_PORT &
 	echo "OK"
 }
 
