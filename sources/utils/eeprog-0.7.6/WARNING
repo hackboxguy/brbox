@@ -1,0 +1,20 @@
+Writing on unknown EEPROMs can brake your computer. 
+
+DIMMs contain an EEPROM and if you overwrite it somehow your computer 
+will not boot anymore.
+
+Reading using 16bit addressing (i.e. not using the -8 switch) on a 8bit EEPROM 
+can actually WRITE to the EEPROM. Be careful. 
+
+The following chips use 8bit mode:
+	24C01
+	24C02
+	24C04
+	24C08
+	24C16
+
+Bigger ones use 16bit addressing so you must not use -8.
+
+More could need it, check data sheets.
+
+If you are not sure about what you're doing DON'T use this tool.

@@ -1,0 +1,5 @@
+obj-m  := i2c-devantech-iss.o
+INCLDIR=$(PWD)/include/linux
+i2c-devantech-iss-y := kmod/i2c-devantech-iss.o
+ccflags-y := -I$(INCLDIR)
+
