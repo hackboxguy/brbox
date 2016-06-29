@@ -11,6 +11,7 @@
 #include "DispsrvJsonDef.h"
 #include "DispAccess.h"
 #include "DispCtrlRpc.h"
+#include "I2CDualPcfLcd.hpp"
 /* ------------------------------------------------------------------------- */
 using namespace std;
 int main(int argc, const char* argv[])
@@ -36,9 +37,12 @@ int main(int argc, const char* argv[])
 	ADEvntNotifier EventNotifier;//global event notification object
 	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
 	DataCache.pEventNotifier=(void*)&EventNotifier;
-	DispAccess Disp(CmdLine.get_disp_type());
-	DataCache.pDispAccess=(void*)&Disp;
-	Disp.print_line(1,(char*)"Hello World!!!");
+	//DispAccess Disp(CmdLine.get_disp_type());
+	//DataCache.pDispAccess=(void*)&Disp;
+	//Disp.print_line(1,(char*)"Hello World!!!");
+
+	I2CDualPcfLcd lcd("/dev/i2c-8");
+	lcd.print_center(LCD_DISP_LINE_2,"hello world");
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
