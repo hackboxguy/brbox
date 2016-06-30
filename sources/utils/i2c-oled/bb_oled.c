@@ -55,7 +55,7 @@ int main (argc, argv)
 	i2c_oled_fd  = open(I2C_DEVNODE, O_RDWR);
 
 	if (i2c_oled_fd  < 0) {
-		printf("\nError opening file: %s\n","/dev/i2c-1");
+		printf("\nError opening file: %s\n","/dev/i2c-8");
 		return 1;
 	}
 	if (ioctl(i2c_oled_fd, I2C_SLAVE, deviceI2CAddress) < 0) {

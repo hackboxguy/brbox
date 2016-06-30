@@ -44,7 +44,7 @@ int main(int argc, const char* argv[])
 	//DataCache.pDispAccess=(void*)&lcd;
 	DataCache.pDisplay=&lcd;
 	//lcd.print_center(LCD_DISP_LINE_1,"helloworld");
-	DataCache.pDisplay->print_line("hello world!");//,1);
+	DataCache.pDisplay->print_line("hello world!",DISPLAY_LINE_2);//,1);
 	
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
