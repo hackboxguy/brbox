@@ -41,8 +41,8 @@ int main(int argc, const char* argv[])
 	//DataCache.pDispAccess=(void*)&Disp;
 	//Disp.print_line(1,(char*)"Hello World!!!");
 
-	I2CDualPcfLcd lcd("/dev/i2c-8");
-	lcd.print_center(LCD_DISP_LINE_2,"hello world");
+	I2CDualPcfLcd lcd("/dev/i2c-0");
+	lcd.print_center(LCD_DISP_LINE_1,"helloworld");
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler

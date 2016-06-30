@@ -67,34 +67,34 @@ void I2CDualPcfLcd::go_to(uint8_t x)
 	x=x-1;
 	x|=0x80;
 	write_inst(x);
-	usleep(50000);
+//	usleep(50000);
 }
 /*****************************************************************************/
 void I2CDualPcfLcd::go_to_centre(char *ptr,LCD_DISP_LINE line)
 {
 	if(line==LCD_DISP_LINE_2)go_to(((DISPLAY_TYPE-strlen(ptr))/2) +1+DISPLAY_TYPE);
 	else go_to(((DISPLAY_TYPE-strlen(ptr))/2)+1);
-	usleep(10000);//wait(10);
+//	usleep(10000);//wait(10);
 }
 /*****************************************************************************/
 void I2CDualPcfLcd::init_lcd(void)
 {
 	io_ctrl_byte=0xFF;//this byte acts as the cache for pcf_io expander
 	write_byte((uint32_t)LCD_PCF_CTRL_ADDRESS,io_ctrl_byte);
-	usleep(40000);//wait(40);
+//	usleep(40000);//wait(40);
 	write_inst(0x38);
-	usleep(10000);//wait(10);
+//	usleep(10000);//wait(10);
 	write_inst(0x38);
 	write_inst(0x30);
-	usleep(10000);//wait(2);
+//	usleep(10000);//wait(2);
 	write_inst(0x30);
-	usleep(10000);//wait(2);
+//	usleep(10000);//wait(2);
 	write_inst(0x38);
 	write_inst(0x14);
 	write_inst(0x0C);
 	write_inst(0x06);
 	write_inst(0x01);
-	usleep(60000);//wait(60);
+//	usleep(60000);//wait(60);
 }
 /*****************************************************************************/
 void I2CDualPcfLcd::print_lcd(char *ptr)
@@ -122,7 +122,7 @@ void I2CDualPcfLcd::clear_display(LCD_DISP_LINE line)
 			break;
 		case LCD_DISP_LINE_FULL:
 			write_inst(0x01);
-			usleep(10000);
+//			usleep(10000);
 			break;
 		default://arg error
 			break;
