@@ -2,11 +2,11 @@
 #include <unistd.h>
 #include <string.h>
 /*****************************************************************************/
-I2CDualPcfLcd::I2CDualPcfLcd(std::string DevNode):I2CBusAccess(DevNode)
+I2CDualPcfLcd::I2CDualPcfLcd(std::string DevNode):DisplayDevice(DevNode)//,I2CBusAccess(DevNode)
 {
 	io_ctrl_byte=0xff;
 	init_lcd();
-	clear_display(LCD_DISP_LINE_FULL);
+	clear_display_internal(DISPLAY_LINE_FULL);
 }
 I2CDualPcfLcd::~I2CDualPcfLcd()
 {
@@ -70,9 +70,9 @@ void I2CDualPcfLcd::go_to(uint8_t x)
 //	usleep(50000);
 }
 /*****************************************************************************/
-void I2CDualPcfLcd::go_to_centre(char *ptr,LCD_DISP_LINE line)
+void I2CDualPcfLcd::go_to_centre(char *ptr,DISPLAY_LINE line)
 {
-	if(line==LCD_DISP_LINE_2)go_to(((DISPLAY_TYPE-strlen(ptr))/2) +1+DISPLAY_TYPE);
+	if(line==DISPLAY_LINE_2)go_to(((DISPLAY_TYPE-strlen(ptr))/2) +1+DISPLAY_TYPE);
 	else go_to(((DISPLAY_TYPE-strlen(ptr))/2)+1);
 //	usleep(10000);//wait(10);
 }
@@ -108,19 +108,19 @@ void I2CDualPcfLcd::print_lcd(char *ptr)
 	}
 }
 /*****************************************************************************/
-void I2CDualPcfLcd::clear_display(LCD_DISP_LINE line)
+void I2CDualPcfLcd::clear_display_internal(DISPLAY_LINE line)
 {
 	switch (line)
 	{
-		case LCD_DISP_LINE_1:
+		case DISPLAY_LINE_1:
 			go_to(1);
 			print_lcd((char*)"                ");//Blank);
 			break;
-		case LCD_DISP_LINE_2:
+		case DISPLAY_LINE_2:
 			go_to(17);
 			print_lcd((char*)"                ");//Blank);
 			break;
-		case LCD_DISP_LINE_FULL:
+		case DISPLAY_LINE_FULL:
 			write_inst(0x01);
 //			usleep(10000);
 			break;
@@ -129,11 +129,25 @@ void I2CDualPcfLcd::clear_display(LCD_DISP_LINE line)
 	}
 }
 /*****************************************************************************/
-void I2CDualPcfLcd::print_center(LCD_DISP_LINE line,char *string)
+void I2CDualPcfLcd::print_center(DISPLAY_LINE line,char *string)
 {
-	clear_display(line);
+	clear_display_internal(line);
 	go_to_centre(string,line);
 	print_lcd(string);
+}
+/*****************************************************************************/
+//interface functions
+RPC_SRV_RESULT I2CDualPcfLcd::print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNMENT align)
+{
+	switch(align)
+	{
+		case TEXT_ALIGNMENT_LEFT  :print_lcd(msg);break;
+		case TEXT_ALIGNMENT_RIGHT :print_lcd(msg);break;//TODO
+		//case TEXT_ALIGNMENT_CENTER:
+		default:print_center(line,msg);break;
+	}
+	//print_lcd(msg);
+	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
 

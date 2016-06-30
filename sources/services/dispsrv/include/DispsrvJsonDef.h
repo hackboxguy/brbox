@@ -3,6 +3,7 @@
 /* ------------------------------------------------------------------------- */
 #include "ADCmnPortList.h"
 #include "ADCommon.hpp"
+#include "DisplayDevice.hpp"
 #define DISPSRV_JSON_PORT_NUMBER    ADCMN_PORT_DISPSRV
 /* ------------------------------------------------------------------------- */
 typedef enum EJSON_DISPSRV_RPC_TYPES_T
@@ -33,14 +34,16 @@ typedef struct DISPSRV_CMN_DATA_CACHE_T
 {
 	void *pDevInfo;//device-info-struct(typecast in rpc handlers)
 	void *pEventNotifier;//event notifier object
-	void *pDispAccess;//display control object
+	//void *pDispAccess;//display control object
 	//unsigned int gpio_data[GPIOCTL_MAX_GPIO_PINS];//allow max 64gpio addresses(0 to 63)
 	//unsigned int gpio_data_prev[GPIOCTL_MAX_GPIO_PINS];//comparing the last value for eventing
+	DisplayDevice *pDisplay;
 	DISPSRV_CMN_DATA_CACHE_T() //constructor(initializer)
 	{
 		pDevInfo=NULL;
 		pEventNotifier=NULL;
-		pDispAccess=NULL;
+		//pDispAccess=NULL;
+		pDisplay=NULL;
 	};
 }DISPSRV_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */

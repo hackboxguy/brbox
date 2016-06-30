@@ -40,10 +40,12 @@ int main(int argc, const char* argv[])
 	//DispAccess Disp(CmdLine.get_disp_type());
 	//DataCache.pDispAccess=(void*)&Disp;
 	//Disp.print_line(1,(char*)"Hello World!!!");
-
-	I2CDualPcfLcd lcd("/dev/i2c-0");
-	lcd.print_center(LCD_DISP_LINE_1,"helloworld");
-
+	I2CDualPcfLcd lcd(CmdLine.get_dev_node());//"/dev/i2c-0");
+	//DataCache.pDispAccess=(void*)&lcd;
+	DataCache.pDisplay=&lcd;
+	//lcd.print_center(LCD_DISP_LINE_1,"helloworld");
+	DataCache.pDisplay->print_line("hello world!");//,1);
+	
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 
