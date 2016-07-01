@@ -148,6 +148,10 @@ int ADJsonRpcMgr::Start(int port,int socket_log,int emulation)
 	JMapper.attach_rpc_method(EJSON_RPCMGR_SET_DEVOP_STATE         ,(char*)RPCMGR_RPC_DEVOP_STATE_SET);
 	JMapper.attach_rpc_method(EJSON_RPCMGR_GET_MW_BYTE             ,(char*)RPCMGR_RPC_MW_BYTE_GET);
 	JMapper.attach_rpc_method(EJSON_RPCMGR_SET_MW_BYTE             ,(char*)RPCMGR_RPC_MW_BYTE_SET);
+	JMapper.attach_rpc_method(EJSON_RPCMGR_GET_MW_WORD             ,(char*)RPCMGR_RPC_MW_WORD_GET);
+	JMapper.attach_rpc_method(EJSON_RPCMGR_SET_MW_WORD             ,(char*)RPCMGR_RPC_MW_WORD_SET);
+	JMapper.attach_rpc_method(EJSON_RPCMGR_GET_MW_DWORD            ,(char*)RPCMGR_RPC_MW_DWORD_GET);
+	JMapper.attach_rpc_method(EJSON_RPCMGR_SET_MW_DWORD            ,(char*)RPCMGR_RPC_MW_DWORD_SET);
 
 	int total = get_total_attached_rpcs();
 	for(int i=0;i<total;i++) 
@@ -271,6 +275,10 @@ int ADJsonRpcMgr::MyMapJsonToBinary(JsonDataCommObj* pReq)
 		case EJSON_RPCMGR_SET_DEVOP_STATE         :result=json_to_bin_set_devop_state(pReq);break;
 		case EJSON_RPCMGR_GET_MW_BYTE             :result=json_to_bin_get_mw_byte(pReq);break;
 		case EJSON_RPCMGR_SET_MW_BYTE             :result=json_to_bin_set_mw_byte(pReq);break;
+		case EJSON_RPCMGR_GET_MW_WORD             :result=json_to_bin_get_mw_word(pReq);break;
+		case EJSON_RPCMGR_SET_MW_WORD             :result=json_to_bin_set_mw_word(pReq);break;
+		case EJSON_RPCMGR_GET_MW_DWORD            :result=json_to_bin_get_mw_dword(pReq);break;
+		case EJSON_RPCMGR_SET_MW_DWORD            :result=json_to_bin_set_mw_dword(pReq);break;
 		default:break;
 	}
 	return result;
@@ -302,6 +310,10 @@ int ADJsonRpcMgr::MyMapBinaryToJson(JsonDataCommObj* pReq)
 		case EJSON_RPCMGR_SET_DEVOP_STATE         :result=bin_to_json_set_devop_state(pReq);break;
 		case EJSON_RPCMGR_GET_MW_BYTE             :result=bin_to_json_get_mw_byte(pReq);break;
 		case EJSON_RPCMGR_SET_MW_BYTE             :result=bin_to_json_set_mw_byte(pReq);break;
+		case EJSON_RPCMGR_GET_MW_WORD             :result=bin_to_json_get_mw_word(pReq);break;
+		case EJSON_RPCMGR_SET_MW_WORD             :result=bin_to_json_set_mw_word(pReq);break;
+		case EJSON_RPCMGR_GET_MW_DWORD            :result=bin_to_json_get_mw_dword(pReq);break;
+		case EJSON_RPCMGR_SET_MW_DWORD            :result=bin_to_json_set_mw_dword(pReq);break;
 		default:break;
 	}
 	return result;
@@ -335,6 +347,10 @@ int ADJsonRpcMgr::MyProcessWork(JsonDataCommObj* pReq)
 		case EJSON_RPCMGR_SET_DEVOP_STATE         :return process_set_devop_state(pPanelReq);break;
 		case EJSON_RPCMGR_GET_MW_BYTE             :return process_get_mw_byte(pPanelReq,pReq);break;
 		case EJSON_RPCMGR_SET_MW_BYTE             :return process_set_mw_byte(pPanelReq,pReq);break;
+		case EJSON_RPCMGR_GET_MW_WORD             :return process_get_mw_word(pPanelReq,pReq);break;
+		case EJSON_RPCMGR_SET_MW_WORD             :return process_set_mw_word(pPanelReq,pReq);break;
+		case EJSON_RPCMGR_GET_MW_DWORD            :return process_get_mw_dword(pPanelReq,pReq);break;
+		case EJSON_RPCMGR_SET_MW_DWORD            :return process_set_mw_dword(pPanelReq,pReq);break;
 		default:break;
 	}
 	return -1;
@@ -944,6 +960,90 @@ int ADJsonRpcMgr::process_set_mw_byte(RPC_SRV_REQ* pReq,JsonDataCommObj* pReqObj
 	return ProcessWorkCmnRpc(pReqObj);
 }
 int ADJsonRpcMgr::bin_to_json_set_mw_byte(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,RPCMGR_MIDDLEWARE_PACKET);
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int ADJsonRpcMgr::json_to_bin_get_mw_word(JsonDataCommObj* pReq)
+{
+	//cout<<"ADJsonRpcMgr::json_to_bin_get_mw_byte"<<endl;
+	RPCMGR_MIDDLEWARE_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_MIDDLEWARE_PACKET,RPC_SRV_ACT_READ,EJSON_RPCMGR_GET_MW_WORD);
+	long unsigned int tmp;
+	JSON_STRING_TO_ULONG(RPCMGR_RPC_MW_ARGADDR,tmp);//pPanelCmdObj->addr)
+	pPanelCmdObj->addr=(uint32_t)tmp;
+	return 0;
+}
+int ADJsonRpcMgr::process_get_mw_word(RPC_SRV_REQ* pReq,JsonDataCommObj* pReqObj)
+{
+	//cout<<"ADJsonRpcMgr::process_get_mw_byte"<<endl;
+	return ProcessWorkCmnRpc(pReqObj);
+}
+int ADJsonRpcMgr::bin_to_json_get_mw_word(JsonDataCommObj* pReq)
+{
+	//cout<<"ADJsonRpcMgr::bin_to_json_get_mw_byte"<<endl;
+	PREPARE_JSON_RESP_INT(RPC_SRV_REQ,RPCMGR_MIDDLEWARE_PACKET,RPCMGR_RPC_MW_ARGDATA,word);
+	return 0;
+}
+int ADJsonRpcMgr::json_to_bin_set_mw_word(JsonDataCommObj* pReq)
+{
+	RPCMGR_MIDDLEWARE_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_MIDDLEWARE_PACKET,RPC_SRV_ACT_WRITE,EJSON_RPCMGR_SET_MW_WORD);
+	long unsigned int tmp;
+	JSON_STRING_TO_ULONG(RPCMGR_RPC_MW_ARGADDR,tmp);
+	pPanelCmdObj->addr=(uint32_t)tmp;
+	JSON_STRING_TO_ULONG(RPCMGR_RPC_MW_ARGDATA,tmp);
+	pPanelCmdObj->word=(uint8_t)tmp;
+	return 0;
+}
+int ADJsonRpcMgr::process_set_mw_word(RPC_SRV_REQ* pReq,JsonDataCommObj* pReqObj)
+{
+	return ProcessWorkCmnRpc(pReqObj);
+}
+int ADJsonRpcMgr::bin_to_json_set_mw_word(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,RPCMGR_MIDDLEWARE_PACKET);
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int ADJsonRpcMgr::json_to_bin_get_mw_dword(JsonDataCommObj* pReq)
+{
+	//cout<<"ADJsonRpcMgr::json_to_bin_get_mw_byte"<<endl;
+	RPCMGR_MIDDLEWARE_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_MIDDLEWARE_PACKET,RPC_SRV_ACT_READ,EJSON_RPCMGR_GET_MW_DWORD);
+	long unsigned int tmp;
+	JSON_STRING_TO_ULONG(RPCMGR_RPC_MW_ARGADDR,tmp);//pPanelCmdObj->addr)
+	pPanelCmdObj->addr=(uint32_t)tmp;
+	return 0;
+}
+int ADJsonRpcMgr::process_get_mw_dword(RPC_SRV_REQ* pReq,JsonDataCommObj* pReqObj)
+{
+	//cout<<"ADJsonRpcMgr::process_get_mw_byte"<<endl;
+	return ProcessWorkCmnRpc(pReqObj);
+}
+int ADJsonRpcMgr::bin_to_json_get_mw_dword(JsonDataCommObj* pReq)
+{
+	//cout<<"ADJsonRpcMgr::bin_to_json_get_mw_byte"<<endl;
+	PREPARE_JSON_RESP_INT(RPC_SRV_REQ,RPCMGR_MIDDLEWARE_PACKET,RPCMGR_RPC_MW_ARGDATA,dword);
+	return 0;
+}
+int ADJsonRpcMgr::json_to_bin_set_mw_dword(JsonDataCommObj* pReq)
+{
+	RPCMGR_MIDDLEWARE_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,RPCMGR_MIDDLEWARE_PACKET,RPC_SRV_ACT_WRITE,EJSON_RPCMGR_SET_MW_DWORD);
+	long unsigned int tmp;
+	JSON_STRING_TO_ULONG(RPCMGR_RPC_MW_ARGADDR,tmp);
+	pPanelCmdObj->addr=(uint32_t)tmp;
+	JSON_STRING_TO_ULONG(RPCMGR_RPC_MW_ARGDATA,tmp);
+	pPanelCmdObj->dword=(uint8_t)tmp;
+	return 0;
+}
+int ADJsonRpcMgr::process_set_mw_dword(RPC_SRV_REQ* pReq,JsonDataCommObj* pReqObj)
+{
+	return ProcessWorkCmnRpc(pReqObj);
+}
+int ADJsonRpcMgr::bin_to_json_set_mw_dword(JsonDataCommObj* pReq)
 {
 	PREPARE_JSON_RESP(RPC_SRV_REQ,RPCMGR_MIDDLEWARE_PACKET);
 	return 0;

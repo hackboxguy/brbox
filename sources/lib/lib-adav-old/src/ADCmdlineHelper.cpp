@@ -118,6 +118,12 @@ int ADCmdlineHelper::init_myself()
 		insert_options_entry((char*)"rwbyte" ,optional_argument,'2',1);
 		insert_help_entry((char*)"--rwbyte=addr,data         (read/write middleware byte from/to given address)");
 
+		insert_options_entry((char*)"rwword" ,optional_argument,'3',1);
+		insert_help_entry((char*)"--rwword=addr,data         (read/write middleware word from/to given address)");
+
+		insert_options_entry((char*)"rwdword" ,optional_argument,'4',1);
+		insert_help_entry((char*)"--rwdword=addr,data        (read/write middleware dword from/to given address)");
+
 	}
 	else if(my_mode==CMDLINE_HELPER_MODE_SERVER)
 	{
@@ -362,6 +368,22 @@ int ADCmdlineHelper::parse_cmdline_arguments(int argc, char **argv)
 				{
 				push_int_get_set_with_dev_addr_arg_command(EJSON_RPCMGR_GET_MW_BYTE,EJSON_RPCMGR_SET_MW_BYTE,
 			        RPCMGR_RPC_MW_BYTE_GET,RPCMGR_RPC_MW_BYTE_SET,
+				(char*)RPCMGR_RPC_MW_ARGDATA,
+				(char*)RPCMGR_RPC_MW_ARGADDR,-1,subarg);
+				}
+				break;
+			case '3':
+				{
+				push_int_get_set_with_dev_addr_arg_command(EJSON_RPCMGR_GET_MW_WORD,EJSON_RPCMGR_SET_MW_WORD,
+			        RPCMGR_RPC_MW_WORD_GET,RPCMGR_RPC_MW_WORD_SET,
+				(char*)RPCMGR_RPC_MW_ARGDATA,
+				(char*)RPCMGR_RPC_MW_ARGADDR,-1,subarg);
+				}
+				break;
+			case '4':
+				{
+				push_int_get_set_with_dev_addr_arg_command(EJSON_RPCMGR_GET_MW_DWORD,EJSON_RPCMGR_SET_MW_DWORD,
+			        RPCMGR_RPC_MW_DWORD_GET,RPCMGR_RPC_MW_DWORD_SET,
 				(char*)RPCMGR_RPC_MW_ARGDATA,
 				(char*)RPCMGR_RPC_MW_ARGADDR,-1,subarg);
 				}

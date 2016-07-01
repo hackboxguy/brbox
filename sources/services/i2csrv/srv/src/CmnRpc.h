@@ -9,6 +9,10 @@ class  CmnRpc : public ADJsonRpcMgrConsumer, public ADCmnStringProcessor
 	I2CSRV_CMN_DATA_CACHE *pDataCache;
 	int process_get_mw_byte(JsonDataCommObj* pReq);
 	int process_set_mw_byte(JsonDataCommObj* pReq);
+	int process_get_mw_word(JsonDataCommObj* pReq);
+	int process_set_mw_word(JsonDataCommObj* pReq);
+	int process_get_mw_dword(JsonDataCommObj* pReq);
+	int process_set_mw_dword(JsonDataCommObj* pReq);
 public:
 	 CmnRpc(std::string rpcName,int myIndex,bool emu,bool log,I2CSRV_CMN_DATA_CACHE *pData);//getRpc,std::string setRpc);
 	~ CmnRpc();

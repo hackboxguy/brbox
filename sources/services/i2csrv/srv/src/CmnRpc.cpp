@@ -36,6 +36,10 @@ int CmnRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 		//case EJSON_RPCMGR_SET_DEVOP_STATE          :break;
 		case EJSON_RPCMGR_GET_MW_BYTE                :return process_get_mw_byte(pReq);break;//this gets called
 		case EJSON_RPCMGR_SET_MW_BYTE                :return process_set_mw_byte(pReq);break;//this gets called
+		case EJSON_RPCMGR_GET_MW_WORD                :return process_get_mw_word(pReq);break;//this gets called
+		case EJSON_RPCMGR_SET_MW_WORD                :return process_set_mw_word(pReq);break;//this gets called
+		case EJSON_RPCMGR_GET_MW_DWORD               :return process_get_mw_dword(pReq);break;//this gets called
+		case EJSON_RPCMGR_SET_MW_DWORD               :return process_set_mw_dword(pReq);break;//this gets called
 		default:break;
 	}
 	return 0;
@@ -94,5 +98,48 @@ int CmnRpc::process_set_mw_byte(JsonDataCommObj* pReq)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
-
+int CmnRpc::process_get_mw_word(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	RPCMGR_MIDDLEWARE_PACKET* pPacket;
+	pPacket=(RPCMGR_MIDDLEWARE_PACKET*)pPanelReq->dataRef;
+	I2CBusAccess *pI2CBus = (I2CBusAccess *)pDataCache->pDevAccess;
+	pPanelReq->result=pI2CBus->read_word(pPacket->addr,&pPacket->word);
+	return 0;
+}
+int CmnRpc::process_set_mw_word(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	RPCMGR_MIDDLEWARE_PACKET* pPacket;
+	pPacket=(RPCMGR_MIDDLEWARE_PACKET*)pPanelReq->dataRef;
+	I2CBusAccess *pI2CBus = (I2CBusAccess *)pDataCache->pDevAccess;
+	//cout<<"CmnRpc::process_set_mw_byte="<<pPacket->mwbyte<<endl;
+	pPanelReq->result=pI2CBus->write_word(pPacket->addr,pPacket->word);
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int CmnRpc::process_get_mw_dword(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	RPCMGR_MIDDLEWARE_PACKET* pPacket;
+	pPacket=(RPCMGR_MIDDLEWARE_PACKET*)pPanelReq->dataRef;
+	I2CBusAccess *pI2CBus = (I2CBusAccess *)pDataCache->pDevAccess;
+	pPanelReq->result=pI2CBus->read_dword(pPacket->addr,&pPacket->dword);
+	return 0;
+}
+int CmnRpc::process_set_mw_dword(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	RPCMGR_MIDDLEWARE_PACKET* pPacket;
+	pPacket=(RPCMGR_MIDDLEWARE_PACKET*)pPanelReq->dataRef;
+	I2CBusAccess *pI2CBus = (I2CBusAccess *)pDataCache->pDevAccess;
+	//cout<<"CmnRpc::process_set_mw_byte="<<pPacket->mwbyte<<endl;
+	pPanelReq->result=pI2CBus->write_dword(pPacket->addr,pPacket->dword);
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
 

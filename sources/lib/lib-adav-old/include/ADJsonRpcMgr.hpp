@@ -37,8 +37,12 @@ typedef enum EJSON_RPCGMGR_CMD_T
 	EJSON_RPCGMGR_TRIGGER_RUN=15,        //call this rpc to let the server start full function including subscribing to event..etc
 	EJSON_RPCMGR_GET_DEVOP_STATE=16,     //get service operation state(on/idle/standby/reboot/etc).
 	EJSON_RPCMGR_SET_DEVOP_STATE=17,     //set service operation state(on/idle/standby/reboot/etc).
-	EJSON_RPCMGR_GET_MW_BYTE=18,     //common middleware read_byte() function.
-	EJSON_RPCMGR_SET_MW_BYTE=19,     //common middleware write_byte() function.
+	EJSON_RPCMGR_GET_MW_BYTE=18,         //common middleware read_byte() function.
+	EJSON_RPCMGR_SET_MW_BYTE=19,         //common middleware write_byte() function.
+	EJSON_RPCMGR_GET_MW_WORD=20,         //common middleware read_word() function.
+	EJSON_RPCMGR_SET_MW_WORD=21,         //common middleware write_word() function.
+	EJSON_RPCMGR_GET_MW_DWORD=22,        //common middleware read_dword() function.
+	EJSON_RPCMGR_SET_MW_DWORD=23,        //common middleware write_dword() function.
 	EJSON_RPCGMGR_CMD_END,
 	EJSON_RPCGMGR_CMD_NONE
 }EJSON_RPCGMGR_CMD;
@@ -568,12 +572,28 @@ class ADJsonRpcMgr : public ADJsonRpcMgrProducer, public ADJsonRpcMapConsumer, p
 	int json_to_bin_get_mw_byte(JsonDataCommObj* pReq);
 	int process_get_mw_byte(RPC_SRV_REQ* pReq,JsonDataCommObj* pReqObj);
 	int bin_to_json_get_mw_byte(JsonDataCommObj* pReq);
-
 	//EJSON_RPCMGR_SET_MW_BYTE
 	int json_to_bin_set_mw_byte(JsonDataCommObj* pReq);
 	int process_set_mw_byte(RPC_SRV_REQ* pReq,JsonDataCommObj* pReqObj);
 	int bin_to_json_set_mw_byte(JsonDataCommObj* pReq);
 
+	//EJSON_RPCMGR_GET_MW_WORD
+	int json_to_bin_get_mw_word(JsonDataCommObj* pReq);
+	int process_get_mw_word(RPC_SRV_REQ* pReq,JsonDataCommObj* pReqObj);
+	int bin_to_json_get_mw_word(JsonDataCommObj* pReq);
+	//EJSON_RPCMGR_SET_MW_WORD
+	int json_to_bin_set_mw_word(JsonDataCommObj* pReq);
+	int process_set_mw_word(RPC_SRV_REQ* pReq,JsonDataCommObj* pReqObj);
+	int bin_to_json_set_mw_word(JsonDataCommObj* pReq);
+
+	//EJSON_RPCMGR_GET_MW_DWORD
+	int json_to_bin_get_mw_dword(JsonDataCommObj* pReq);
+	int process_get_mw_dword(RPC_SRV_REQ* pReq,JsonDataCommObj* pReqObj);
+	int bin_to_json_get_mw_dword(JsonDataCommObj* pReq);
+	//EJSON_RPCMGR_SET_MW_DWORD
+	int json_to_bin_set_mw_dword(JsonDataCommObj* pReq);
+	int process_set_mw_dword(RPC_SRV_REQ* pReq,JsonDataCommObj* pReqObj);
+	int bin_to_json_set_mw_dword(JsonDataCommObj* pReq);
 
 
 public:
