@@ -4,7 +4,9 @@
 #include "ADCommon.hpp"
 #include <stdint.h>
 #include "I2CBusAccess.h"
+//#include "DispsrvJsonDef.h"
 using namespace std;
+//important: keep enum DISPLAY_LINE and EJSON_DISPSRV_LINE same
 typedef enum DISPLAY_LINE_T
 {
 	DISPLAY_LINE_1,

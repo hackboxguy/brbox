@@ -16,9 +16,9 @@ int DispCtrlRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 	EJSON_DISPSRV_RPC_TYPES command =(EJSON_DISPSRV_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_DISPSRV_RPC_DISP_INIT :break;//return json_to_bin_gpio_get(pReq);
-		case EJSON_DISPSRV_RPC_DISP_CLEAR:break;//return json_to_bin_gpio_set(pReq);
-		case EJSON_DISPSRV_RPC_DISP_PRINT:break;//return json_to_bin_gpio_set(pReq);
+		case EJSON_DISPSRV_RPC_DISP_INIT :return json_to_bin_disp_init(pReq);
+		case EJSON_DISPSRV_RPC_DISP_CLEAR:return json_to_bin_clear_display(pReq);
+		case EJSON_DISPSRV_RPC_DISP_PRINT:return json_to_bin_print_display(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -29,9 +29,9 @@ int DispCtrlRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 	EJSON_DISPSRV_RPC_TYPES command =(EJSON_DISPSRV_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_DISPSRV_RPC_DISP_INIT :break;//return json_to_bin_gpio_get(pReq);
-		case EJSON_DISPSRV_RPC_DISP_CLEAR:break;//return json_to_bin_gpio_set(pReq);
-		case EJSON_DISPSRV_RPC_DISP_PRINT:break;//return json_to_bin_gpio_set(pReq);
+		case EJSON_DISPSRV_RPC_DISP_INIT :return bin_to_json_disp_init(pReq);
+		case EJSON_DISPSRV_RPC_DISP_CLEAR:return bin_to_json_clear_display(pReq);
+		case EJSON_DISPSRV_RPC_DISP_PRINT:return bin_to_json_print_display(pReq);
 		default:break;
 	}
 	return -1;
@@ -42,9 +42,9 @@ int DispCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProduce
 	EJSON_DISPSRV_RPC_TYPES command =(EJSON_DISPSRV_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_DISPSRV_RPC_DISP_INIT :break;//return json_to_bin_gpio_get(pReq);
-		case EJSON_DISPSRV_RPC_DISP_CLEAR:break;//return json_to_bin_gpio_set(pReq);
-		case EJSON_DISPSRV_RPC_DISP_PRINT:break;//return json_to_bin_gpio_set(pReq);
+		case EJSON_DISPSRV_RPC_DISP_INIT :return process_disp_init(pReq,pDataCache);
+		case EJSON_DISPSRV_RPC_DISP_CLEAR:return process_clear_display(pReq,pDataCache);
+		case EJSON_DISPSRV_RPC_DISP_PRINT:return process_print_display(pReq,pDataCache);
 		default:break;
 	}
 	return 0;
@@ -57,85 +57,90 @@ RPC_SRV_RESULT DispCtrlRpc::ProcessWorkAsync(int index,unsigned char* pWorkData)
 	return ret_val;
 }
 /* ------------------------------------------------------------------------- */
-/*int DispCtrlRpc::json_to_bin_gpio_get(JsonDataCommObj* pReq)
+//EJSON_DISPSRV_RPC_DISP_INIT
+int DispCtrlRpc::json_to_bin_disp_init(JsonDataCommObj* pReq)
 {
-	GPIOCTL_IO_ACCESS_PACKET* pPanelCmdObj=NULL;
-	PREPARE_JSON_REQUEST(RPC_SRV_REQ,GPIOCTL_IO_ACCESS_PACKET,RPC_SRV_ACT_READ,EJSON_GPIOCTL_RPC_IO_GET);
-	JSON_STRING_TO_INT(GPIOCTL_RPC_IO_ADDR_ARG,pPanelCmdObj->addr);
+	DISPSRV_PRINT_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,DISPSRV_PRINT_PACKET,RPC_SRV_ACT_WRITE,EJSON_DISPSRV_RPC_DISP_INIT);
 	return 0;
 }
-int DispCtrlRpc::bin_to_json_gpio_get(JsonDataCommObj* pReq)
+int DispCtrlRpc::bin_to_json_disp_init(JsonDataCommObj* pReq)
 {
-	PREPARE_JSON_RESP_INT(RPC_SRV_REQ,GPIOCTL_IO_ACCESS_PACKET,GPIOCTL_RPC_IO_DATA_ARG,data);
+	PREPARE_JSON_RESP(RPC_SRV_REQ,DISPSRV_PRINT_PACKET);
 	return 0;
 }
-int DispCtrlRpc::process_gpio_get(JsonDataCommObj* pReq)
+int DispCtrlRpc::process_disp_init(JsonDataCommObj* pReq,DISPSRV_CMN_DATA_CACHE *pData)
 {
-	RaspiIo Raspi;
+	DisplayDevice *pDisp=pData->pDisplay;
 	RPC_SRV_REQ *pPanelReq=NULL;
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
-	GPIOCTL_IO_ACCESS_PACKET* pPacket;
-	pPacket=(GPIOCTL_IO_ACCESS_PACKET*)pPanelReq->dataRef;
-
-	if(pPacket->addr>=GPIOCTL_MAX_GPIO_PINS)
-	{
-		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;//max allowed gpio pins or 0 to 63
-		return 0;
-	}
-
-	pPacket->data=pDataCache->gpio_data[pPacket->addr];
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
-	//pPanelReq->result=Raspi.ReadGPIO (pPacket->addr,pPacket->data);
-
-	//set debug logging flag
-	//ImgId.logflag=get_debug_log_flag();//get_debug_log_flag() is a function f parent class ADJsonRpcMgrConsumer
-	//pPanelReq->result=ImgId.IdentifyPattern(pPacket->pattern_type,pDataCache->StrImgIdDebugFile);
-	return 0;
-}*/
-/* ------------------------------------------------------------------------- */
-/*int DispCtrlRpc::json_to_bin_gpio_set(JsonDataCommObj* pReq)
-{
-	GPIOCTL_IO_ACCESS_PACKET* pPanelCmdObj=NULL;
-	PREPARE_JSON_REQUEST(RPC_SRV_REQ,GPIOCTL_IO_ACCESS_PACKET,RPC_SRV_ACT_WRITE,EJSON_GPIOCTL_RPC_IO_SET);
-	JSON_STRING_TO_INT(GPIOCTL_RPC_IO_ADDR_ARG,pPanelCmdObj->addr);
-	JSON_STRING_TO_INT(GPIOCTL_RPC_IO_DATA_ARG,pPanelCmdObj->data);
-	return 0;
-}
-int DispCtrlRpc::bin_to_json_gpio_set(JsonDataCommObj* pReq)
-{
-	PREPARE_JSON_RESP(RPC_SRV_REQ,GPIOCTL_IO_ACCESS_PACKET);
-	return 0;
-}
-int DispCtrlRpc::process_gpio_set(JsonDataCommObj* pReq)
-{
-	RPC_SRV_REQ *pPanelReq=NULL;
-	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
-	GPIOCTL_IO_ACCESS_PACKET* pPacket;
-	pPacket=(GPIOCTL_IO_ACCESS_PACKET*)pPanelReq->dataRef;
-	if(pPacket->addr>=GPIOCTL_MAX_GPIO_PINS)
-	{
-		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;//max allowed gpio pins or 0 to 63
-		return 0;
-	}
-	RaspiIo Raspi;
-	if(get_emulation_flag())
-		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;//dummy write to memory
+	DISPSRV_PRINT_PACKET* pPacket;
+	pPacket=(DISPSRV_PRINT_PACKET*)pPanelReq->dataRef;
+	if(pData->pDisplay!=NULL)
+		pPanelReq->result=pDisp->init_display();
 	else
-		pPanelReq->result=Raspi.WriteGPIO(pPacket->addr,pPacket->data);
-	if(pPanelReq->result==RPC_SRV_RESULT_SUCCESS)
-	{
-		pDataCache->gpio_data[pPacket->addr]=pPacket->data;//store last set gpio value in my local-cache
-		if(pDataCache->gpio_data[pPacket->addr]!=pDataCache->gpio_data_prev[pPacket->addr])
-		{
-			pDataCache->gpio_data_prev[pPacket->addr]=pDataCache->gpio_data[pPacket->addr];
-			//gpio value changed, notify subscribers
-			ADEvntNotifier* pNotifier=(ADEvntNotifier*)pDataCache->pEventNotifier;
-			pNotifier->NotifyEvent(EGPIOCTL_EVENT_TYPE_OUTPUT_CHANGED,pPacket->addr,SERVER_JSON_PORT_NUM,-1);
-			//NOTIFY_EVENT(EGPIOCTL_EVENT_TYPE_OUTPUT_CHANGED,pPacket->addr,SERVER_JSON_PORT_NUM);
-		}
-	}
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 	return 0;
-}*/
+}
+/* ------------------------------------------------------------------------- */
+//EJSON_DISPSRV_RPC_DISP_CLEAR
+int DispCtrlRpc::json_to_bin_clear_display(JsonDataCommObj* pReq)
+{
+	DISPSRV_PRINT_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,DISPSRV_PRINT_PACKET,RPC_SRV_ACT_WRITE,EJSON_DISPSRV_RPC_DISP_CLEAR);
+	return 0;
+}
+int DispCtrlRpc::bin_to_json_clear_display(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,DISPSRV_PRINT_PACKET);
+	return 0;
+}
+int DispCtrlRpc::process_clear_display(JsonDataCommObj* pReq,DISPSRV_CMN_DATA_CACHE *pData)
+{
+	DisplayDevice *pDisp=pData->pDisplay;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	DISPSRV_PRINT_PACKET* pPacket;
+	pPacket=(DISPSRV_PRINT_PACKET*)pPanelReq->dataRef;
+	if(pData->pDisplay!=NULL)
+		pPanelReq->result=pDisp->clear_display();
+	else
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+//EJSON_DISPSRV_RPC_DISP_PRINT
+int DispCtrlRpc::json_to_bin_print_display(JsonDataCommObj* pReq)
+{
+	DISPSRV_PRINT_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,DISPSRV_PRINT_PACKET,RPC_SRV_ACT_WRITE,EJSON_DISPSRV_RPC_DISP_PRINT);
+	//after assigning pointer to pPanelReq->dataRef, modify cmd-req-obj with correct client arguments
+JSON_STRING_TO_ENUM(DISPSRV_RPC_DISP_PRINT_LINE_ARG,DISPSRV_RPC_DISP_LINE_ARG_TABL,EJSON_DISPSRV_LINE,EJSON_DISPSRV_LINE_UNKNOWN,pPanelCmdObj->line);
+	//extract targetFilePath
+	JSON_STRING_TO_STRING(DISPSRV_RPC_DISP_PRINT_MESG_ARG,pPanelCmdObj->msg);
+	return 0;
+}
+int DispCtrlRpc::bin_to_json_print_display(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,DISPSRV_PRINT_PACKET);
+	return 0;
+}
+int DispCtrlRpc::process_print_display(JsonDataCommObj* pReq,DISPSRV_CMN_DATA_CACHE *pData)
+{
+	DisplayDevice *pDisp=pData->pDisplay;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	DISPSRV_PRINT_PACKET* pPacket;
+	pPacket=(DISPSRV_PRINT_PACKET*)pPanelReq->dataRef;
+	DISPLAY_LINE myline=(DISPLAY_LINE)pPacket->line;//important: keep enum DISPLAY_LINE and EJSON_DISPSRV_LINE same
+	if(pData->pDisplay!=NULL)
+		pPanelReq->result=pDisp->print_line(pPacket->msg,myline);
+	else
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
 /* ------------------------------------------------------------------------- */
 
 

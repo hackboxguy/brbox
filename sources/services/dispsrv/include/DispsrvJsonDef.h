@@ -23,9 +23,31 @@ typedef enum EJSON_DISPSRV_RPC_TYPES_T
 #define	DISPSRV_RPC_DISP_PRINT           "display_print"
 #define DISPSRV_RPC_DISP_PRINT_LINE_ARG  "line"
 #define DISPSRV_RPC_DISP_PRINT_MESG_ARG  "msg"
+#define DISPSRV_RPC_DISP_LINE_ARG_TABL    {"line1","line2","line3","line4","lineall","none","none","\0"} //
+//important: keep enum DISPLAY_LINE and EJSON_DISPSRV_LINE same
+typedef enum EJSON_DISPSRV_LINE_T
+{
+	EJSON_DISPSRV_LINE_1,
+	EJSON_DISPSRV_LINE_2,
+	EJSON_DISPSRV_LINE_3,
+	EJSON_DISPSRV_LINE_4,
+	EJSON_DISPSRV_LINE_FULL,
+	EJSON_DISPSRV_LINE_UNKNOWN,
+	EJSON_DISPSRV_LINE_NONE
+}EJSON_DISPSRV_LINE;
+/*typedef enum TEXT_ALIGNMENT_T
+{
+	TEXT_ALIGNMENT_LEFT,
+	TEXT_ALIGNMENT_RIGHT,
+	TEXT_ALIGNMENT_CENTER,
+	TEXT_ALIGNMENT_UNKNOWN,
+	TEXT_ALIGNMENT_NONE
+}TEXT_ALIGNMENT;*/
 typedef struct DISPSRV_PRINT_PACKET_T
 {
-	int line;
+	//int line;
+	//DISPLAY_LINE line;
+	EJSON_DISPSRV_LINE line;
 	char msg[1024];
 }DISPSRV_PRINT_PACKET;
 /* ------------------------------------------------------------------------- */

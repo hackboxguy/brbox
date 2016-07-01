@@ -17,13 +17,19 @@ public:
 	virtual void ReceiveEvent(int cltToken,int evntNum,int evntArg,int evntArg2){};
 	virtual RPC_SRV_RESULT ProcessCommonRpc(int index,unsigned char* pWorkData){return RPC_SRV_RESULT_SUCCESS;};
 
-	//int json_to_bin_gpio_get(JsonDataCommObj* pReq);
-	//int bin_to_json_gpio_get(JsonDataCommObj* pReq);
-	//int process_gpio_get(JsonDataCommObj* pReq);
+	int json_to_bin_disp_init(JsonDataCommObj* pReq);
+	int bin_to_json_disp_init(JsonDataCommObj* pReq);
+	int process_disp_init(JsonDataCommObj* pReq,DISPSRV_CMN_DATA_CACHE *pData);
 
-	//int json_to_bin_gpio_set(JsonDataCommObj* pReq);
-	//int bin_to_json_gpio_set(JsonDataCommObj* pReq);
-	//int process_gpio_set(JsonDataCommObj* pReq);
+	int json_to_bin_clear_display(JsonDataCommObj* pReq);
+	int bin_to_json_clear_display(JsonDataCommObj* pReq);
+	int process_clear_display(JsonDataCommObj* pReq,DISPSRV_CMN_DATA_CACHE *pData);
+
+	int json_to_bin_print_display(JsonDataCommObj* pReq);
+	int bin_to_json_print_display(JsonDataCommObj* pReq);
+	int process_print_display(JsonDataCommObj* pReq,DISPSRV_CMN_DATA_CACHE *pData);
+
+
 };
 /* ------------------------------------------------------------------------- */
 
