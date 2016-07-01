@@ -167,13 +167,16 @@ int ADTimer::wait_for_exit_signal()//forever-loop, blocks the main() app till ki
 	//	usleep(10000);
 	//}
 
+	sigemptyset(&sigset);
+	sigfillset(&sigset);
+
 //	sigemptyset(&sigset);
-	sigaddset(&sigset, SIGINT);
+/*	sigaddset(&sigset, SIGINT);
 	sigaddset(&sigset, SIGTERM);
 	sigaddset(&sigset, SIGQUIT);
 	sigaddset(&sigset, SIGIO);
 	sigaddset(&sigset, SIGALRM);
-	sigaddset(&sigset, SIGSEGV);
+	sigaddset(&sigset, SIGSEGV);*/
 //	sigaddset(&sigset, 49);
 //	sigaddset(&sigset, 55);
 	//sigprocmask(SIG_BLOCK, &sigset, NULL);

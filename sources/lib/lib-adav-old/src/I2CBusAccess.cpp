@@ -19,28 +19,9 @@ using namespace std;
 /*****************************************************************************/
 I2CBusAccess::I2CBusAccess(std::string DevNode)
 {
-	DevOpened=RPC_SRV_RESULT_FAIL;
+	node=DevNode;
+/*	DevOpened=RPC_SRV_RESULT_FAIL;
 	fd = open(DevNode.c_str(), O_RDWR);
-	/*if (fd < 0 && (errno == ENOENT || errno == ENOTDIR)) 
-	{
-		sprintf(filename, "/dev/i2c-%d", i2cbus);
-		file = open(filename, O_RDWR);
-	}
-	if (file < 0 && !quiet)
-	{
-		if (errno == ENOENT) 
-		{
-			fprintf(stderr, "Error: Could not open file "
-			"`/dev/i2c-%d' or `/dev/i2c/%d': %s\n",
-			i2cbus, i2cbus, strerror(ENOENT));
-		}
-		else
-		{
-			fprintf(stderr, "Error: Could not open file ""`%s': %s\n", filename, strerror(errno));
-			if (errno == EACCES)
-				fprintf(stderr, "Run as root?\n");
-		}
-	}*/
 	switch(errno)
 	{
 		case ENOENT :DevOpened=RPC_SRV_RESULT_DEVNODE_OPENERR;break;//cout<<"I2CBusAccess: Device Open Error = ENOENT"<<endl;break;
@@ -48,21 +29,13 @@ I2CBusAccess::I2CBusAccess(std::string DevNode)
 		case EACCES :DevOpened=RPC_SRV_RESULT_DEVNODE_ACCERR;break;//cout<<"I2CBusAccess: Device Open Error = EACCES"<<endl;break;
 		default:DevOpened=RPC_SRV_RESULT_SUCCESS;break;
 	}
-
-	//if (fd < 0)
-	//{
-		///* ERROR HANDLING: you can check errno to see what went wrong */
-		//perror("Failed to open the i2c bus");
-		//exit(1);
-	//	cout<<"faild to open device "<<DevNode.c_str()<<endl;
-	//}
-
+*/
 }
 /*****************************************************************************/
 I2CBusAccess::~I2CBusAccess()
 {
-	if(DevOpened)
-		close(fd);
+//	if(DevOpened)
+//		close(fd);
 }
 /*****************************************************************************/
 RPC_SRV_RESULT I2CBusAccess::SetSlaveAddr(uint8_t addr)
@@ -90,6 +63,8 @@ RPC_SRV_RESULT I2CBusAccess::read_byte(uint32_t addr, uint8_t *data)
 }
 RPC_SRV_RESULT I2CBusAccess::write_byte(uint32_t addr, uint8_t data)
 {
+	return test_write_byte((char*)node.c_str(),addr,data);//TODO
+
 	//printf("I2CBusAccess::write_byte addr=%d data=%d\n",addr,data);
 	if(DevOpened!=RPC_SRV_RESULT_SUCCESS)
 		return DevOpened;//i2c-device-node is not open
@@ -105,19 +80,61 @@ RPC_SRV_RESULT I2CBusAccess::write_byte(uint32_t addr, uint8_t data)
 /*****************************************************************************/
 RPC_SRV_RESULT I2CBusAccess::read_word(uint32_t addr, uint16_t *data)
 {
+	if(DevOpened!=RPC_SRV_RESULT_SUCCESS)
+		return DevOpened;//i2c-device-node is not open
+	RPC_SRV_RESULT ret=SetSlaveAddr((uint8_t)addr);
+	if(ret != RPC_SRV_RESULT_SUCCESS)
+		return ret;
+	uint8_t buff[16];
+	if (read(fd,buff,2) != 2)
+		return RPC_SRV_RESULT_FILE_READ_ERR;//device node read error
+	*data=(uint16_t)(buff[0]<<8)|(uint16_t)buff[1];
 	return RPC_SRV_RESULT_SUCCESS;
 }
 RPC_SRV_RESULT I2CBusAccess::write_word(uint32_t addr, uint16_t data)
 {
+	//printf("I2CBusAccess::write_byte addr=%d data=%d\n",addr,data);
+	if(DevOpened!=RPC_SRV_RESULT_SUCCESS)
+		return DevOpened;//i2c-device-node is not open
+	RPC_SRV_RESULT ret=SetSlaveAddr((uint8_t)addr);
+	if(ret != RPC_SRV_RESULT_SUCCESS)
+		return ret;
+	uint8_t buff[16];
+	buff[0]=(uint8_t)(data>>8);
+	buff[1]=data&0x00FF;
+	if (write(fd,buff,2) != 2)
+		return RPC_SRV_RESULT_FILE_WRITE_ERR;//device node write error
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
 RPC_SRV_RESULT I2CBusAccess::read_dword(uint32_t addr, uint32_t *data)
 {
+	if(DevOpened!=RPC_SRV_RESULT_SUCCESS)
+		return DevOpened;//i2c-device-node is not open
+	RPC_SRV_RESULT ret=SetSlaveAddr((uint8_t)addr);
+	if(ret != RPC_SRV_RESULT_SUCCESS)
+		return ret;
+	uint8_t buff[16];
+	if (read(fd,buff,4) != 4)
+		return RPC_SRV_RESULT_FILE_READ_ERR;//device node read error
+	*data=(uint32_t)(buff[0]<<24)|(uint32_t)(buff[1]<<16)|(uint32_t)(buff[2]<<8)|(uint32_t)buff[3];
 	return RPC_SRV_RESULT_SUCCESS;
 }
 RPC_SRV_RESULT I2CBusAccess::write_dword(uint32_t addr, uint32_t data)
 {
+	//printf("I2CBusAccess::write_byte addr=%d data=%d\n",addr,data);
+	if(DevOpened!=RPC_SRV_RESULT_SUCCESS)
+		return DevOpened;//i2c-device-node is not open
+	RPC_SRV_RESULT ret=SetSlaveAddr((uint8_t)addr);
+	if(ret != RPC_SRV_RESULT_SUCCESS)
+		return ret;
+	uint8_t buff[16];
+	buff[0]=(uint8_t)(data>>24);
+	buff[1]=(uint8_t)(data>>16);
+	buff[2]=(uint8_t)(data>>8);
+	buff[3]=data&0x000000FF;
+	if (write(fd,buff,4) != 4)
+		return RPC_SRV_RESULT_FILE_WRITE_ERR;//device node write error
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
@@ -135,4 +152,39 @@ RPC_SRV_RESULT I2CBusAccess::write_array(uint32_t addr, uint8_t *data,uint32_t l
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
+RPC_SRV_RESULT I2CBusAccess::test_write_byte(char* dev,uint8_t addr, uint8_t data)
+{
+	int myfd;
+	myfd = open(dev, O_RDWR);
+	if (myfd < 0) 
+	{
+		printf("I2CBusAccess::test_write_byte:Error opening file: %s\n", strerror(errno));
+		//return RPC_SRV_RESULT_FILE_OPEN_ERR;
+		switch(errno)
+		{
+			case ENOENT :return RPC_SRV_RESULT_FILE_NOT_FOUND;//cout<<"I2CBusAccess: Device Open Error = ENOENT"<<endl;break;
+			case ENOTDIR:return RPC_SRV_RESULT_FAIL;//file is not a directory
+			case EACCES :return RPC_SRV_RESULT_DEVNODE_ACCERR;//DevOpened=RPC_SRV_RESULT_DEVNODE_ACCERR;break;//cout<<"I2CBusAccess: Device Open Error = EACCES"<<endl;break;
+			default:break;
+		}
+	}
+	//fcntl(myfd, F_SETFL,fcntl(myfd, F_GETFL) | O_NONBLOCK);
+	if (ioctl(myfd, I2C_SLAVE, addr) < 0) 
+	{
+		printf("I2CBusAccess::test_write_byte:ioctl error: %s\n", strerror(errno));
+		return RPC_SRV_RESULT_FILE_WRITE_ERR;
+	}
+	uint8_t buff[16];buff[0]=data;
+	//int val=atoi(argv[1]);
+	unsigned int tst=data;
+	int sz=write(myfd, &tst, 1);// != 1) 
+	if(sz!=1)
+	{
+		printf("I2CBusAccess::test_write_byte:Error writing file:written %d bytes, errorno:%s\n",sz,strerror(errno));
+		return RPC_SRV_RESULT_FILE_WRITE_ERR;
+	}
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/*****************************************************************************/
+
 

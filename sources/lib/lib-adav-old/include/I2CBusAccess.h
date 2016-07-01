@@ -11,6 +11,7 @@ class I2CBusAccess
 	int fd;
 	RPC_SRV_RESULT DevOpened;
 	std::string node;
+	RPC_SRV_RESULT test_write_byte(char* dev,uint8_t addr, uint8_t data);
 public:
 	I2CBusAccess(std::string DevNode);
 	~I2CBusAccess();
