@@ -20,22 +20,22 @@ using namespace std;
 I2CBusAccess::I2CBusAccess(std::string DevNode)
 {
 	node=DevNode;
-/*	DevOpened=RPC_SRV_RESULT_FAIL;
+	DevOpened=RPC_SRV_RESULT_FAIL;
 	fd = open(DevNode.c_str(), O_RDWR);
 	switch(errno)
 	{
-		case ENOENT :DevOpened=RPC_SRV_RESULT_DEVNODE_OPENERR;break;//cout<<"I2CBusAccess: Device Open Error = ENOENT"<<endl;break;
-		case ENOTDIR:DevOpened=RPC_SRV_RESULT_DEVNODE_OPENERR;break;//cout<<"I2CBusAccess: Device Open Error = ENOTDIR"<<endl;break;
+		case ENOENT :DevOpened=RPC_SRV_RESULT_FILE_NOT_FOUND;break;//cout<<"I2CBusAccess: Device Open Error = ENOENT"<<endl;break;
+		case ENOTDIR:DevOpened=RPC_SRV_RESULT_FILE_NOT_FOUND;break;//cout<<"I2CBusAccess: Device Open Error = ENOTDIR"<<endl;break;
 		case EACCES :DevOpened=RPC_SRV_RESULT_DEVNODE_ACCERR;break;//cout<<"I2CBusAccess: Device Open Error = EACCES"<<endl;break;
 		default:DevOpened=RPC_SRV_RESULT_SUCCESS;break;
 	}
-*/
+
 }
 /*****************************************************************************/
 I2CBusAccess::~I2CBusAccess()
 {
-//	if(DevOpened)
-//		close(fd);
+	if(DevOpened)
+		close(fd);
 }
 /*****************************************************************************/
 RPC_SRV_RESULT I2CBusAccess::SetSlaveAddr(uint8_t addr)
@@ -63,8 +63,7 @@ RPC_SRV_RESULT I2CBusAccess::read_byte(uint32_t addr, uint8_t *data)
 }
 RPC_SRV_RESULT I2CBusAccess::write_byte(uint32_t addr, uint8_t data)
 {
-	return test_write_byte((char*)node.c_str(),addr,data);//TODO
-
+	//return test_write_byte((char*)node.c_str(),addr,data);//TODO
 	//printf("I2CBusAccess::write_byte addr=%d data=%d\n",addr,data);
 	if(DevOpened!=RPC_SRV_RESULT_SUCCESS)
 		return DevOpened;//i2c-device-node is not open
@@ -158,7 +157,7 @@ RPC_SRV_RESULT I2CBusAccess::test_write_byte(char* dev,uint8_t addr, uint8_t dat
 	myfd = open(dev, O_RDWR);
 	if (myfd < 0) 
 	{
-		printf("I2CBusAccess::test_write_byte:Error opening file: %s\n", strerror(errno));
+		//printf("I2CBusAccess::test_write_byte:Error opening file: %s\n", strerror(errno));
 		//return RPC_SRV_RESULT_FILE_OPEN_ERR;
 		switch(errno)
 		{
@@ -171,7 +170,7 @@ RPC_SRV_RESULT I2CBusAccess::test_write_byte(char* dev,uint8_t addr, uint8_t dat
 	//fcntl(myfd, F_SETFL,fcntl(myfd, F_GETFL) | O_NONBLOCK);
 	if (ioctl(myfd, I2C_SLAVE, addr) < 0) 
 	{
-		printf("I2CBusAccess::test_write_byte:ioctl error: %s\n", strerror(errno));
+		//printf("I2CBusAccess::test_write_byte:ioctl error: %s\n", strerror(errno));
 		return RPC_SRV_RESULT_FILE_WRITE_ERR;
 	}
 	uint8_t buff[16];buff[0]=data;
@@ -180,7 +179,7 @@ RPC_SRV_RESULT I2CBusAccess::test_write_byte(char* dev,uint8_t addr, uint8_t dat
 	int sz=write(myfd, &tst, 1);// != 1) 
 	if(sz!=1)
 	{
-		printf("I2CBusAccess::test_write_byte:Error writing file:written %d bytes, errorno:%s\n",sz,strerror(errno));
+		//printf("I2CBusAccess::test_write_byte:Error writing file:written %d bytes, errorno:%s\n",sz,strerror(errno));
 		return RPC_SRV_RESULT_FILE_WRITE_ERR;
 	}
 	return RPC_SRV_RESULT_SUCCESS;
