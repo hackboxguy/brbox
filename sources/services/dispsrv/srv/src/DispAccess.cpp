@@ -78,17 +78,31 @@ RPC_SRV_RESULT DispAccess::clear_display()
         Display.setTextSize(1);
         Display.setTextColor(WHITE);
         Display.setCursor(0,0);
+	Display.display();
+	Display.display();
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
 //RPC_SRV_RESULT DispAccess::print_line(int line, char* msg)
 RPC_SRV_RESULT DispAccess::print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNMENT align)
 {
+	int tmpline,tmppos=0;
+	switch(line)
+	{
+		case DISPLAY_LINE_1:tmpline=0;break;
+		case DISPLAY_LINE_2:tmpline=1;break;
+		case DISPLAY_LINE_3:tmpline=2;break;
+		case DISPLAY_LINE_4:tmpline=3;break;
+		default:return RPC_SRV_RESULT_ARG_ERROR;
+	}
         Display.setTextSize(1);
         Display.setTextColor(WHITE);
-        Display.setCursor(0,0);
+	//if(align==TEXT_ALIGNMENT_CENTER)
+		tmppos=((21-strlen(msg))/2);
+        Display.setCursor(tmppos*6,tmpline*8);//128x32=21char wide(8pix high)
         Display.print(msg);//"Hello, world!\n");
         Display.display();
+	Display.display();
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/

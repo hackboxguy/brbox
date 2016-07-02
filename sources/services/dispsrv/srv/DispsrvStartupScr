@@ -9,6 +9,12 @@ start() {
 	echo -n "Starting $SERVER_NAME Service: "
 	DEV_TYPE=$(cat $DEV_TYPE_FILE)
 	$SERVER_PATH/$SERVER_NAME --boardtype=$DEV_TYPE --disptype=SSD1306_128x32_PI &
+	#print ipaddr/version/config on 128x32 i2c display
+        IPADDR=$(/opt/fmw/bin/sysmgrclt --ipaddr=eth0 | awk '{print $9}'|sed 's/result=//')
+        FMWVER=$(cat /boot/version-num.txt)
+	CONFIG=$(cat /boot/sysconfig.txt)                                                   
+	sleep 1                          
+        /opt/fmw/bin/dispclt --dispclear --printline=line1,"BRBOX-$FMWVER" --printline=line2,"IP-$IPADDR"  --printline=line3,"Cfg-$CONFIG"
 	echo "OK"
 }
 
