@@ -14,6 +14,7 @@
 #include "I2CDualPcfLcd.hpp"
 /* ------------------------------------------------------------------------- */
 using namespace std;
+DisplayDevice* create_display_device(std::string DevNode,std::string Type);
 int main(int argc, const char* argv[])
 {
 	//cmdline parsing
@@ -37,14 +38,10 @@ int main(int argc, const char* argv[])
 	ADEvntNotifier EventNotifier;//global event notification object
 	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
 	DataCache.pEventNotifier=(void*)&EventNotifier;
-	//DispAccess Disp(CmdLine.get_disp_type());
-	//DataCache.pDispAccess=(void*)&Disp;
-	//Disp.print_line(1,(char*)"Hello World!!!");
-	I2CDualPcfLcd lcd(CmdLine.get_dev_node());//"/dev/i2c-0");
-	//DataCache.pDispAccess=(void*)&lcd;
-	DataCache.pDisplay=&lcd;
-	//lcd.print_center(LCD_DISP_LINE_1,"helloworld");
-	DataCache.pDisplay->print_line((char*)"hello world!",DISPLAY_LINE_2);//,1);
+	//I2CDualPcfLcd lcd(CmdLine.get_dev_node(),CmdLine.get_disp_type());//"/dev/i2c-0");
+	DataCache.pDisplay=create_display_device(CmdLine.get_dev_node(),CmdLine.get_disp_type());
+	if(DataCache.pDisplay!=NULL)
+		DataCache.pDisplay->print_line((char*)"hello world!",DISPLAY_LINE_2);//,1);
 	
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
@@ -68,3 +65,26 @@ int main(int argc, const char* argv[])
 	AppTimer.stop_timer();//stop sending heart-beats to other objects
 	return 0;
 }
+//following function creates a display object based on user passed cmd argument
+DisplayDevice* create_display_device(std::string DevNode,std::string Type)
+{
+	DisplayDevice* pDevice=NULL;
+	ADLIB_DISPLAY_TYPE disp_type;
+	const char *dispTbl[] = ADLIB_DISPLAY_TYPE_TABL;
+	ADCmnStringProcessor string_proc;
+	disp_type=(ADLIB_DISPLAY_TYPE)string_proc.string_to_enum(dispTbl,(char*)Type.c_str(),ADLIB_DISPLAY_TYPE_UNKNOWN);
+	if(disp_type>=ADLIB_DISPLAY_TYPE_UNKNOWN)
+		return NULL;//unable to determine which display object is needed
+	switch(disp_type)
+	{
+		case ADLIB_DISPLAY_TYPE_SSD1306_128x32   :break;
+		case ADLIB_DISPLAY_TYPE_SSD1306_128x64   :break;
+		case ADLIB_DISPLAY_TYPE_SSD1306_128x32_PI:
+		case ADLIB_DISPLAY_TYPE_SSD1306_128x64_PI:pDevice = new DispAccess(DevNode,Type);break;
+		case ADLIB_DISPLAY_TYPE_1602_DUAL_PCF    :pDevice = new I2CDualPcfLcd(DevNode,Type);break;
+		case ADLIB_DISPLAY_TYPE_1602_PCF         :break;
+		default: break;
+	}
+	return pDevice;
+}
+

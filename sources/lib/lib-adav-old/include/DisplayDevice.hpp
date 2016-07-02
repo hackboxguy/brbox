@@ -25,6 +25,20 @@ typedef enum TEXT_ALIGNMENT_T
 	TEXT_ALIGNMENT_UNKNOWN,
 	TEXT_ALIGNMENT_NONE
 }TEXT_ALIGNMENT;
+typedef enum ADLIB_DISPLAY_TYPE_T
+{
+	ADLIB_DISPLAY_TYPE_SSD1306_128x32,
+	ADLIB_DISPLAY_TYPE_SSD1306_128x64,
+	ADLIB_DISPLAY_TYPE_SSD1306_128x32_PI,//pi specific library access(to be removed later)
+	ADLIB_DISPLAY_TYPE_SSD1306_128x64_PI,//pi specific library access(to be removed later)
+	ADLIB_DISPLAY_TYPE_1602_DUAL_PCF,//adav developped board using two pcf8574
+	ADLIB_DISPLAY_TYPE_1602_PCF,//standard converter board sold on ebay
+	ADLIB_DISPLAY_TYPE_UNKNOWN,
+	ADLIB_DISPLAY_TYPE_NONE
+}ADLIB_DISPLAY_TYPE;
+#define ADLIB_DISPLAY_TYPE_TABL  {"SSD1306_128x32","SSD1306_128x64","SSD1306_128x32_PI","SSD1306_128x64_PI",\
+				  "DISPLAY_TYPE_1602_DUAL_PCF","DISPLAY_TYPE_1602_PCF","unknown","none","\0"}
+
 class DisplayDevice : public I2CBusAccess
 {
 public:

@@ -20,7 +20,7 @@ class I2CDualPcfLcd : public DisplayDevice //, public I2CBusAccess
 	void print_lcd(char *ptr);
 	void print_center(DISPLAY_LINE line,char *string);
 public:
-	I2CDualPcfLcd(std::string DevNode);
+	I2CDualPcfLcd(std::string DevNode,std::string DevType);
 	~I2CDualPcfLcd();
 	//interface functions
 	RPC_SRV_RESULT init_display(){init_lcd();return RPC_SRV_RESULT_SUCCESS;};

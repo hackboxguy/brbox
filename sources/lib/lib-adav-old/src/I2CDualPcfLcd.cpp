@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 /*****************************************************************************/
-I2CDualPcfLcd::I2CDualPcfLcd(std::string DevNode):DisplayDevice(DevNode)//,I2CBusAccess(DevNode)
+I2CDualPcfLcd::I2CDualPcfLcd(std::string DevNode,std::string DevType):DisplayDevice(DevNode)//,I2CBusAccess(DevNode)
 {
 	io_ctrl_byte=0xff;
 	init_lcd();

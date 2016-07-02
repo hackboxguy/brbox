@@ -6,19 +6,22 @@
 #include "ArduiPi_OLED_lib.h"
 #include "Adafruit_GFX.h"
 #include "ArduiPi_OLED.h"
+#include "DisplayDevice.hpp"
 using namespace std;
-class DispAccess
+class DispAccess : public DisplayDevice
 {
 	//int fd;
 	RPC_SRV_RESULT DispOpened;
 	std::string DispType;
         ArduiPi_OLED Display;
 public:
-	DispAccess(std::string disptype);
+	DispAccess(std::string DevNode,std::string DevType);
 	~DispAccess();
 	RPC_SRV_RESULT init_display();
 	RPC_SRV_RESULT clear_display();
-	RPC_SRV_RESULT print_line(int line, char* msg);
+	//RPC_SRV_RESULT print_line(int line, char* msg);
+	RPC_SRV_RESULT print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNMENT align);
+
 	//RPC_SRV_RESULT read_byte(uint32_t addr, uint8_t *data);
 	//RPC_SRV_RESULT write_byte(uint32_t addr, uint8_t data);
 	//RPC_SRV_RESULT read_word(uint32_t addr, uint16_t *data);

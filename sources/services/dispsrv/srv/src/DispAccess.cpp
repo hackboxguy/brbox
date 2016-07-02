@@ -24,9 +24,10 @@ struct s_opts
 //	false   // Not verbose
 //};
 /*****************************************************************************/
-DispAccess::DispAccess(std::string disptype)
+DispAccess::DispAccess(std::string DevNode,std::string DevType):DisplayDevice(DevNode)
+//DispAccess::DispAccess(std::string disptype)
 {
-	DispType=disptype;
+	DispType=DevType;
 	DispOpened=init_display();
 }
 /*****************************************************************************/
@@ -40,9 +41,9 @@ RPC_SRV_RESULT DispAccess::init_display()
 {
 	//DispOpened=RPC_SRV_RESULT_FAIL;
 	s_opts opts;opts.verbose=false;	
-	if(DispType=="SSD1306_128x32")
+	if(DispType=="SSD1306_128x32_PI")
 		opts.oled=OLED_ADAFRUIT_I2C_128x32;
-	else if(DispType=="SSD1306_128x64")
+	else if(DispType=="SSD1306_128x64_PI")
 		opts.oled=OLED_ADAFRUIT_I2C_128x64;
 	else
 		opts.oled=OLED_ADAFRUIT_I2C_128x32;
@@ -80,7 +81,8 @@ RPC_SRV_RESULT DispAccess::clear_display()
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
-RPC_SRV_RESULT DispAccess::print_line(int line, char* msg)
+//RPC_SRV_RESULT DispAccess::print_line(int line, char* msg)
+RPC_SRV_RESULT DispAccess::print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNMENT align)
 {
         Display.setTextSize(1);
         Display.setTextColor(WHITE);
