@@ -63,6 +63,8 @@ int main(int argc, const char* argv[])
 	//wait for sigkill or sigterm signal
 	AppTimer.wait_for_exit_signal();//loop till KILL or TERM signal is received
 	AppTimer.stop_timer();//stop sending heart-beats to other objects
+	if(DataCache.pDisplay!=NULL)
+		delete DataCache.pDisplay;
 	return 0;
 }
 //following function creates a display object based on user passed cmd argument

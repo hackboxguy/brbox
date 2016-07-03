@@ -57,7 +57,7 @@ READFILE=$(mktemp)
 dd if=/dev/urandom bs=1 count=$FILESIZE of=$WRITEFILE 2>/dev/null
 x=0
 while [ $x -lt $LOOPCOUNT ]; do
-	RET=$($EEPROGBIN -f -16 -w 0x00  $DEVNODE $DEVADDR 2>/dev/null < $WRITEFILE)
+	RET=$($EEPROGBIN -f -16 -w 0x00 -t 5 $DEVNODE $DEVADDR 2>/dev/null < $WRITEFILE)
 	[ $? != "0" ] && { echo "file write failed  :loop_count=$x" ; break; }
 	RET=$($EEPROGBIN -f -16 $DEVNODE $DEVADDR -r 0:$FILESIZE 2>/dev/null > $READFILE)
 	[ $? != "0" ] && { echo "file read failed   :loop_count=$x" ; break; }
