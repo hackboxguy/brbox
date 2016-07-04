@@ -16,7 +16,7 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 	CmdlineHelper.attach_helper(this);
 	//note:"hviptdln" are already used by the producer class in library
 	CmdlineHelper.insert_options_entry((char*)"device" ,optional_argument,I2CSRV_CMDLINE_OPT_DEVICE);
-	CmdlineHelper.insert_help_entry((char*)"--devic=/dev/node           (i2c device node)");
+	CmdlineHelper.insert_help_entry((char*)"--device=/dev/node         (i2c device node)");
 }
 /*****************************************************************************/
 MyCmdline::~MyCmdline()

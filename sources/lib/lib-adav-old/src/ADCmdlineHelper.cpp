@@ -355,7 +355,7 @@ int ADCmdlineHelper::parse_cmdline_arguments(int argc, char **argv)
 				push_double_int_set_command(EJSON_RPCGMGR_EVENT_NOTIFY,RPCMGR_RPC_EVENT_NOTIFY,
 						(char*) RPCMGR_RPC_EVENT_ARG_EVENTNUM, (char*) RPCMGR_RPC_EVENT_ARG_EXTRA,subarg);
 				break;
-			case '1':
+			case '1'://devoperation
 				{
 				const char *table[]   = RPCMGR_RPC_DEVOP_STATE_ARGSTS_TBL;
 				push_single_enum_get_set_command
@@ -364,7 +364,7 @@ int ADCmdlineHelper::parse_cmdline_arguments(int argc, char **argv)
 				&table[0],EJSON_RPCGMGR_DEVOP_STATE_UNKNOWN,(char*)RPCMGR_RPC_DEVOP_STATE_ARGSTS,subarg);
 				}
 				break;
-			case '2':
+			case '2'://read/write byte
 				{
 				push_int_get_set_with_dev_addr_arg_command(EJSON_RPCMGR_GET_MW_BYTE,EJSON_RPCMGR_SET_MW_BYTE,
 			        RPCMGR_RPC_MW_BYTE_GET,RPCMGR_RPC_MW_BYTE_SET,
@@ -372,7 +372,7 @@ int ADCmdlineHelper::parse_cmdline_arguments(int argc, char **argv)
 				(char*)RPCMGR_RPC_MW_ARGADDR,-1,subarg);
 				}
 				break;
-			case '3':
+			case '3'://read/write word
 				{
 				push_int_get_set_with_dev_addr_arg_command(EJSON_RPCMGR_GET_MW_WORD,EJSON_RPCMGR_SET_MW_WORD,
 			        RPCMGR_RPC_MW_WORD_GET,RPCMGR_RPC_MW_WORD_SET,
@@ -380,7 +380,7 @@ int ADCmdlineHelper::parse_cmdline_arguments(int argc, char **argv)
 				(char*)RPCMGR_RPC_MW_ARGADDR,-1,subarg);
 				}
 				break;
-			case '4':
+			case '4'://read/write dword
 				{
 				push_int_get_set_with_dev_addr_arg_command(EJSON_RPCMGR_GET_MW_DWORD,EJSON_RPCMGR_SET_MW_DWORD,
 			        RPCMGR_RPC_MW_DWORD_GET,RPCMGR_RPC_MW_DWORD_SET,

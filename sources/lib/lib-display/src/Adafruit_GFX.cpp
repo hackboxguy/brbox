@@ -205,14 +205,14 @@ void Adafruit_GFX::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint
   
 	if (steep) 
 	{
-    swap(x0, y0);
-    swap(x1, y1);
+    af_swap(x0, y0);
+    af_swap(x1, y1);
   }
 
   if (x0 > x1) 
 	{
-    swap(x0, x1);
-    swap(y0, y1);
+    af_swap(x0, x1);
+    af_swap(y0, y1);
   }
 
   int16_t dx, dy;
@@ -372,15 +372,15 @@ void Adafruit_GFX::fillTriangle ( int16_t x0, int16_t y0, int16_t x1, int16_t y1
   // Sort coordinates by Y order (y2 >= y1 >= y0)
   if (y0 > y1) 
 	{
-    swap(y0, y1); swap(x0, x1);
+    af_swap(y0, y1); af_swap(x0, x1);
   }
   if (y1 > y2) 
 	{
-    swap(y2, y1); swap(x2, x1);
+    af_swap(y2, y1); af_swap(x2, x1);
   }
   if (y0 > y1) 
 	{
-    swap(y0, y1); swap(x0, x1);
+    af_swap(y0, y1); af_swap(x0, x1);
   }
 
   if(y0 == y2) 
@@ -426,7 +426,7 @@ void Adafruit_GFX::fillTriangle ( int16_t x0, int16_t y0, int16_t x1, int16_t y1
     b = x0 + (x2 - x0) * (y - y0) / (y2 - y0);
     */
     if(a > b) 
-			swap(a,b);
+			af_swap(a,b);
 			
     drawFastHLine(a, y, b-a+1, color);
   }
@@ -446,7 +446,7 @@ void Adafruit_GFX::fillTriangle ( int16_t x0, int16_t y0, int16_t x1, int16_t y1
     b = x0 + (x2 - x0) * (y - y0) / (y2 - y0);
     */
     if(a > b) 
-			swap(a,b);
+			af_swap(a,b);
 			
     drawFastHLine(a, y, b-a+1, color);
   }

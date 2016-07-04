@@ -659,6 +659,12 @@ do			\
 /*****************************************************************************/
 //common data objects for deviceTypes and variants
 /*****************************************************************************/
-
-
+typedef enum ADLIB_DEV_CONN_TYPE_T
+{
+	ADLIB_DEV_CONN_TYPE_DEVNODE,//direct device-node access
+	ADLIB_DEV_CONN_TYPE_NETWORK,//connected via rpc
+	ADLIB_DEV_CONN_TYPE_UNKNOWN,
+	ADLIB_DEV_CONN_TYPE_NONE
+}ADLIB_DEV_CONN_TYPE;
+/*****************************************************************************/
 #endif
