@@ -157,10 +157,18 @@ RPC_SRV_RESULT I2CBusAccess::read_byte(uint32_t addr, uint8_t *data)
 		RPC_SRV_RESULT ret=SetSlaveAddr((uint8_t)addr);
 		if(ret != RPC_SRV_RESULT_SUCCESS)
 			return ret;
-		uint8_t buff[16];
-		if (read(fd,buff,1) != 1)
+
+		//uint8_t buff[16];
+		//if (I2C_READ(fd,buff,1) != 1)
+		//	return RPC_SRV_RESULT_FILE_READ_ERR;//device node read error
+
+		int32_t smret=i2c_smbus_read_byte(fd);
+		if(smret<1)
 			return RPC_SRV_RESULT_FILE_READ_ERR;//device node read error
-		*data=buff[0];
+		else
+			*data=(uint8_t)smret;
+
+		//*data=buff[0];
 		return RPC_SRV_RESULT_SUCCESS;
 	}
 	else if(ConnType==ADLIB_DEV_CONN_TYPE_NETWORK)
@@ -186,10 +194,14 @@ RPC_SRV_RESULT I2CBusAccess::write_byte(uint32_t addr, uint8_t data)
 		RPC_SRV_RESULT ret=SetSlaveAddr((uint8_t)addr);
 		if(ret != RPC_SRV_RESULT_SUCCESS)
 			return ret;
-		uint8_t buff[16];
-		buff[0]=data;
-		if (write(fd,buff,1) != 1)
-			return RPC_SRV_RESULT_FILE_WRITE_ERR;//devantech usb-i2c driver returns 0bytes, raspi returns 1byte.
+		//uint8_t buff[16];
+		//buff[0]=data;
+		//if (I2C_WRITE(fd,buff,1) != 1)
+		//	return RPC_SRV_RESULT_FILE_WRITE_ERR;//devantech usb-i2c driver returns 0bytes, raspi returns 1byte.
+		int32_t smret=i2c_smbus_write_byte(fd,data);
+		if(smret<0) //TODO: write bytes returns 0, although 1byte is written correctly, this is observed with devantech i2c driver.
+			return RPC_SRV_RESULT_FILE_WRITE_ERR;
+
 		return RPC_SRV_RESULT_SUCCESS;
 	}
 	else if(ConnType==ADLIB_DEV_CONN_TYPE_NETWORK)
@@ -214,7 +226,7 @@ RPC_SRV_RESULT I2CBusAccess::read_word(uint32_t addr, uint16_t *data)
 		if(ret != RPC_SRV_RESULT_SUCCESS)
 			return ret;
 		uint8_t buff[16];
-		if (read(fd,buff,2) != 2)
+		if (I2C_READ(fd,buff,2) != 2)
 			return RPC_SRV_RESULT_FILE_READ_ERR;//device node read error
 		*data=(uint16_t)(buff[0]<<8)|(uint16_t)buff[1];
 		return RPC_SRV_RESULT_SUCCESS;
@@ -244,7 +256,7 @@ RPC_SRV_RESULT I2CBusAccess::write_word(uint32_t addr, uint16_t data)
 		uint8_t buff[16];
 		buff[0]=(uint8_t)(data>>8);
 		buff[1]=data&0x00FF;
-		if (write(fd,buff,2) != 2)
+		if (I2C_WRITE(fd,buff,2) != 2)
 			return RPC_SRV_RESULT_FILE_WRITE_ERR;//device node write error
 		return RPC_SRV_RESULT_SUCCESS;
 	}
@@ -266,7 +278,7 @@ RPC_SRV_RESULT I2CBusAccess::read_dword(uint32_t addr, uint32_t *data)
 		if(ret != RPC_SRV_RESULT_SUCCESS)
 			return ret;
 		uint8_t buff[16];
-		if (read(fd,buff,4) != 4)
+		if (I2C_READ(fd,buff,4) != 4)
 			return RPC_SRV_RESULT_FILE_READ_ERR;//device node read error
 		*data=(uint32_t)(buff[0]<<24)|(uint32_t)(buff[1]<<16)|(uint32_t)(buff[2]<<8)|(uint32_t)buff[3];
 		return RPC_SRV_RESULT_SUCCESS;
@@ -297,7 +309,7 @@ RPC_SRV_RESULT I2CBusAccess::write_dword(uint32_t addr, uint32_t data)
 		buff[1]=(uint8_t)(data>>16);
 		buff[2]=(uint8_t)(data>>8);
 		buff[3]=data&0x000000FF;
-		if (write(fd,buff,4) != 4)
+		if (I2C_WRITE(fd,buff,4) != 4)
 			return RPC_SRV_RESULT_FILE_WRITE_ERR;//device node write error
 		return RPC_SRV_RESULT_SUCCESS;
 	}
@@ -318,7 +330,7 @@ RPC_SRV_RESULT I2CBusAccess::write_array(uint32_t addr, uint8_t *data,uint32_t l
 		return ret;
 	//uint8_t buff[16];
 	//buff[0]=data;
-	if (write(fd,data,len) != len)
+	if (I2C_WRITE(fd,data,len) != len)
 		return RPC_SRV_RESULT_FILE_WRITE_ERR;//device node write error
 	return RPC_SRV_RESULT_SUCCESS;
 }
@@ -348,7 +360,7 @@ RPC_SRV_RESULT I2CBusAccess::test_write_byte(char* dev,uint8_t addr, uint8_t dat
 	uint8_t buff[16];buff[0]=data;
 	//int val=atoi(argv[1]);
 	unsigned int tst=data;
-	int sz=write(myfd, &tst, 1);// != 1) 
+	int sz=I2C_WRITE(myfd, &tst, 1);// != 1) 
 	if(sz!=1)
 	{
 		//printf("I2CBusAccess::test_write_byte:Error writing file:written %d bytes, errorno:%s\n",sz,strerror(errno));
@@ -357,5 +369,44 @@ RPC_SRV_RESULT I2CBusAccess::test_write_byte(char* dev,uint8_t addr, uint8_t dat
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
+int32_t I2CBusAccess::i2c_smbus_access(int file, char read_write, uint8_t command,int size, union i2c_smbus_data *data)
+{
+	struct i2c_smbus_ioctl_data args;
+	args.read_write = read_write;
+	args.command = command;
+	args.size = size;
+	args.data = data;
+	return ioctl(file,I2C_SMBUS,&args);
+}
+int32_t I2CBusAccess::i2c_smbus_read_byte(int file)
+{
+#ifdef I2C_ACCESS_TYPE_SMBUS
+	union i2c_smbus_data data;
+	if (i2c_smbus_access(file,I2C_SMBUS_READ,0,I2C_SMBUS_BYTE,&data))
+		return -1;
+	else
+		return 0x0FF & data.byte;
+	return 0;
+#else
+	uint8_t buff[16];
+	return read(file,buff,1);
+#endif
+}
+int32_t I2CBusAccess::i2c_smbus_write_byte(int file,uint8_t value)
+{
+#ifdef I2C_ACCESS_TYPE_SMBUS
+	size_t sz=i2c_smbus_access(file,I2C_SMBUS_WRITE,value,
+	                        I2C_SMBUS_BYTE,NULL);
+	//printf("I2CBusAccess::i2c_smbus_write_byte:error: %s\n", strerror(errno));
+	return sz;
+#else
+	uint8_t buff[16];buff[0]=value;
+	size_t sz=write(file,buff,1);
+	//printf("I2CBusAccess::i2c_smbus_write_byte:error: %s\n", strerror(errno));
+	return sz;
+#endif
+}
+/*****************************************************************************/
+
 
 
