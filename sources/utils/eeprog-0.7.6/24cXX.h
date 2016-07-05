@@ -2,6 +2,9 @@
     copyright            : (C) by 2003-2004 Stefano Barbato
     email                : stefano@codesink.org
 
+    Copyright (C) 2011 by Kris Rusocki <kszysiu@gmail.com>
+    - support for user-defined write cycle time
+
     $Id: 24cXX.h,v 1.6 2004/02/29 11:05:28 tat Exp $
  ***************************************************************************/
 
@@ -27,13 +30,14 @@ struct eeprom
 	int addr;	// i2c address
 	int fd;		// file descriptor
 	int type; 	// eeprom type
+	int write_cycle_time;
 };
 
 /*
  * opens the eeprom device at [dev_fqn] (i.e. /dev/i2c-N) whose address is
  * [addr] and set the eeprom_24c32 [e]
  */
-int eeprom_open(char *dev_fqn, int addr, int type, struct eeprom*);
+int eeprom_open(char *dev_fqn, int addr, int type, int delay, struct eeprom*);
 /*
  * closees the eeprom device [e] 
  */

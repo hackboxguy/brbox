@@ -1,6 +1,17 @@
 /***************************************************************************
     copyright            : (C) by 2003-2004 Stefano Barbato
     email                : stefano@codesink.org
+    
+    Copyright (C) 2011 by Kris Rusocki <kszysiu@gmail.com>
+    - usage/strings cleanup
+    - misc cleanup: use "static" keyword where appropriate
+    - misc cleanup: have confirm_action() return void
+    - support custom input and output files
+    - support user-defined write cycle time
+    - ensure that stdin is a terminal when operating w/o -f
+    - do not allow reading data from a terminal w/o -f
+    - perform complete input validation before taking action
+    - use dedicated exit code when opening I2C device fails
 
     $Id: eeprog.c,v 1.28 2004/02/29 11:06:41 tat Exp $
  ***************************************************************************/
@@ -24,34 +35,43 @@
 #include <sys/stat.h>
 #include "24cXX.h"
 
-#define VERSION 	"0.7.6"
+#define VERSION 	"0.7.6-tear12"
 
 #define ENV_DEV		"EEPROG_DEV"
 #define ENV_I2C_ADDR	"EEPROG_I2C_ADDR"
 
-int g_quiet;
+static int g_quiet;
 
 #define usage_if(a) do { do_usage_if( a , __LINE__); } while(0);
-void do_usage_if(int b, int line)
+static void do_usage_if(int b, int line)
 {
 const static char *eeprog_usage = 
 "eeprog " VERSION ", a 24Cxx EEPROM reader/writer\n"
 "Copyright (c) 2003-2004 by Stefano Barbato - All rights reserved.\n"
-"Usage: eeprog [-fqxdh] [-16|-8] [ -r addr[:count] | -w addr ]  /dev/i2c-N  i2c-address\n" 
+"Copyright (c) 2011 by Kris Rusocki - All rights reserved.\n"
+"Usage:\n"
+"\teeprog [-fqxd] [-16|-8] -r addr[:count] [-o file] /dev/i2c-N  i2c-address\n" 
+"\teeprog [-fqd] [-16|-8] -w addr [-i file] [-t tWC] /dev/i2c-N  i2c-address\n" 
+"\teeprog -h\n"
 "\n"
 "  Address modes: \n"
 "	-8		Use 8bit address mode for 24c0x...24C16 [default]\n"
 "	-16		Use 16bit address mode for 24c32...24C256\n"
 "  Actions: \n"
 "	-r addr[:count]	Read [count] (1 if omitted) bytes from [addr]\n" 
-"			and print them to the standard output\n" 
-"	-w addr		Write input (stdin) at address [addr] of the EEPROM\n"
+"			and print them to the standard output (or file\n"
+"			specified by -o)\n"
+"	-w addr		Write stdin (or file specified by -i) starting\n"
+"			at address [addr] of the EEPROM\n"
 "	-h		Print this help\n"
 "  Options: \n"
+"	-i file		Read input from [file] (for use with -w)\n"
+"	-o file		Write output to [file] (for use with -r)\n"
 "	-x		Set hex output mode\n" 
 "	-d		Dummy mode, display what *would* have been done\n" 
 "	-f		Disable warnings and don't ask confirmation\n"
 "	-q		Quiet mode\n"
+"	-t tWC		Define chip's write cycle time to [tWC] miliseconds\n"
 "\n"
 "The following environment variables could be set instead of the command\n"
 "line arguments:\n"
@@ -67,7 +87,7 @@ const static char *eeprog_usage =
 "		eeprog /dev/i2c-1 0x51 -x -r 0x22:0x20\n"
 "	3- write the current timestamp at address 0x200 of the EEPROM on \n"
 "	   bus 0 at address 0x33 \n"
-"		date | eeprog /dev/i2c-0 0x33 -w 0x200\n";
+"		date | eeprog /dev/i2c-0 0x33 -w 0x200 -f\n";
 
 	if(!b)
 		return;
@@ -76,49 +96,77 @@ const static char *eeprog_usage =
 }
 
 
-#define die_if(a, msg) do { do_die_if( a , msg, __LINE__); } while(0);
-void do_die_if(int b, char* msg, int line)
+#define die_if3(a, msg, code) do { do_die_if( a , msg, __LINE__, code); } while(0)
+#define die_if(a, msg) die_if3(a, msg, 1)
+static void do_die_if(int b, char* msg, int line, int exitcode)
 {
 	if(!b)
 		return;
 	fprintf(stderr, "Error at line %d: %s\n", line, msg);
 	//fprintf(stderr, "	sysmsg: %s\n", strerror(errno));
-	exit(1);
+	exit(exitcode);
 }
 
-#define print_info(args...) do { if(!g_quiet) fprintf(stderr, args); } while(0);
+#define print_info(args...) do { if(!g_quiet) fprintf(stderr, args); } while(0)
 
-void parse_arg(char *arg, int* paddr, int *psize)
+static int parse_arg(char *arg, int* paddr, int *psize)
 {
 	char *end;
-	*paddr = strtoul(arg, &end, 0);
-	if(*end == ':')
-		*psize = strtoul(++end, 0, 0);
+	unsigned int out_paddr, out_psize;
+
+	if(arg[0] == '\0')
+		return -1;
+
+	out_paddr = strtol(arg, &end, 0);
+	if(*end == '\0')
+	{
+		if(paddr)
+			*paddr = out_paddr;
+		return 1;
+	}
+
+	if(*end != ':')
+		return -1;
+
+	if(end[1] == '\0')
+		return -1;
+
+	out_psize = strtol(end + 1, &end, 0);
+	if(*end == '\0')
+	{
+		if (paddr)
+			*paddr = out_paddr;
+		if (psize)
+			*psize = out_psize;
+		return 2;
+	}
+
+	return -1;
 }
 
-int confirm_action()
+static void confirm_action()
 {
 	fprintf(stderr, 
 	"\n"
 	"____________________________WARNING____________________________\n"
 	"Erroneously writing to a system EEPROM (like DIMM SPD modules)\n"
-	"can break your system.  It will NOT boot anymore so you'll not\n"
-	"be able to fix it.\n"
+	"may break your system.  In such event, it will NOT boot anymore\n"
+	"and you may not be able to fix it.\n"
 	"\n"
-	"Reading from 8bit EEPROMs (like that in your DIMM) without using\n"
-	"the -8 switch can also UNEXPECTEDLY write to them, so be sure to\n"
-	"use the -8 command param when required.\n"
+	"Reading from 8bit EEPROMs (like that in your DIMM) while using\n"
+	"-16 option can also UNEXPECTEDLY write to them so be sure to\n"
+	"use -16 option ONLY when required.\n"
 	"\n"
 	"Use -f to disable this warning message\n"
 	"\n"
 	"Press ENTER to continue or hit CTRL-C to exit\n"
 	"\n"
 	);
+
 	getchar();
-	return 1; 
 }
 
-int read_from_eeprom(struct eeprom *e, int addr, int size, int hex)
+static int read_from_eeprom(struct eeprom *e, FILE *fp, int addr, int size, int hex)
 {
 	int ch, i;
 	for(i = 0; i < size; ++i, ++addr)
@@ -127,23 +175,23 @@ int read_from_eeprom(struct eeprom *e, int addr, int size, int hex)
 		if(hex)
 		{
 			if( (i % 16) == 0 ) 
-				printf("\n %.4x|  ", addr);
+				fprintf(fp, "\n %.4x|  ", addr);
 			else if( (i % 8) == 0 ) 
-				printf("  ");
-			printf("%.2x ", ch);
+				fprintf(fp, "  ");
+			fprintf(fp, "%.2x ", ch);
 		} else 
-			putchar(ch);
+			putc(ch, fp);
 	}
 	if(hex)
-		printf("\n\n");
-	fflush(stdout);
+		fprintf(fp, "\n\n");
+	fflush(fp);
 	return 0;
 }
 
-int write_to_eeprom(struct eeprom *e, int addr)
+static int write_to_eeprom(struct eeprom *e, FILE *fp, int addr)
 {
 	int c;
-	while((c = getchar()) != EOF)
+	while((c = fgetc(fp)) != EOF)
 	{
 		print_info(".");
 		fflush(stdout);
@@ -156,15 +204,24 @@ int write_to_eeprom(struct eeprom *e, int addr)
 int main(int argc, char** argv)
 {
 	struct eeprom e;
-	int ret, op, i2c_addr, memaddr, size, want_hex, dummy, force, sixteen;
+	int ret, op, i2c_addr, memaddr, size, want_hex, dummy, force, sixteen, write_cycle_time;
+
+	char *input_file, *output_file;
+	FILE *input_fp, *output_fp;
+
 	char *device, *arg = 0, *i2c_addr_s;
 	struct stat st;
 	int eeprom_type = 0;
 
-	op = want_hex = dummy = force = sixteen = 0;
+	op = want_hex = dummy = force = sixteen = write_cycle_time = 0;
+	size = 1; // default
 	g_quiet = 0;
 
-	while((ret = getopt(argc, argv, "1:8fr:qhw:xd")) != -1)
+	input_file = output_file = NULL;
+	input_fp = stdin;
+	output_fp = stdout;
+
+	while((ret = getopt(argc, argv, "1:8fr:qhw:xdt:i:o:")) != -1)
 	{
 		switch(ret)
 		{
@@ -191,6 +248,15 @@ int main(int argc, char** argv)
 			break;
 		case 'h':
 			usage_if(1);
+			break;
+		case 't':
+			die_if(parse_arg(optarg, &write_cycle_time, NULL) != 1 || write_cycle_time < 0, "-t -- invalid argument");
+			break;
+		case 'i':
+			input_file = optarg;
+			break;
+		case 'o':
+			output_file = optarg;
 			break;
 		default:
 			die_if(op != 0, "Both read and write requested"); 
@@ -228,38 +294,87 @@ int main(int argc, char** argv)
 		usage_if(1);
 	}
 	usage_if(!device || !i2c_addr_s);
-	i2c_addr = strtoul(i2c_addr_s, 0, 0);
+	die_if(parse_arg(i2c_addr_s, &i2c_addr, NULL) != 1 || i2c_addr < 0, "I2C address -- invalid argument");
+	ret = parse_arg(arg, &memaddr, &size);
+	die_if(op == 'r' && (ret == -1 || memaddr < 0 || size < 0), "-r -- invalid argument");
+	die_if(op == 'w' && (ret != 1 || memaddr < 0), "-w -- invalid argument");
 
 	print_info("eeprog %s, a 24Cxx EEPROM reader/writer\n", VERSION);
 	print_info("Copyright (c) 2003-2004 by Stefano Barbato - All rights reserved.\n");
-	print_info("  Bus: %s, Address: 0x%x, Mode: %dbit\n", 
+	print_info("Copyright (c) 2011 by Kris Rusocki - All rights reserved.\n");
+	print_info("  Bus: %s, Address: 0x%02x, Mode: %dbit\n", 
 			device, i2c_addr, 
 			(eeprom_type == EEPROM_TYPE_8BIT_ADDR ? 8 : 16) );
+	if(op == 'r')
+	{
+		print_info("  Operation: read %d bytes from offset %d, Output file: %s\n",
+				size, memaddr, output_file ? output_file : "<stdout>");
+	} else {
+		print_info("  Operation: write at offset %d, Input file: %s\n",
+				memaddr, input_file ? input_file : "<stdin>");
+		if(write_cycle_time != 0)
+			print_info("  Write cycle time: %d milliseconds\n", write_cycle_time);
+	}
+
 	if(dummy)
 	{
 		fprintf(stderr, "Dummy mode selected, nothing done.\n");
 		return 0;
 	}
-	die_if(eeprom_open(device, i2c_addr, eeprom_type, &e) < 0, 
-			"unable to open eeprom device file "
+
+	if (input_file) {
+		die_if((input_fp = fopen(input_file, "rb")) == NULL,
+			"unable to open input file "
 			"(check that the file exists and that it's readable)");
+	} else {
+		input_file = "<stdin>";
+	}
+
+	if (output_file) {
+		die_if((output_fp = fopen(output_file, "wb")) == NULL,
+			"unable to create output file "
+			"(check that you have permissions to write the file)");
+	} else {
+		output_file = "<stdout>";
+	}
+
+	die_if3(eeprom_open(device, i2c_addr, eeprom_type, write_cycle_time, &e) < 0, 
+			"unable to open eeprom device file "
+			"(check that the file exists and that it's readable)",
+			2);
 	switch(op)
 	{
 	case 'r':
-		if(force == 0)
+		if(force == 0) {
+			/* Confirmation must come from a terminal */
+			die_if(isatty(0) == 0,
+				"stdin is not a terminal"
+			);
 			confirm_action();
-		size = 1; // default
-		parse_arg(arg, &memaddr, &size);
+		}
 		print_info("  Reading %d bytes from 0x%x\n", size, memaddr);
-		read_from_eeprom(&e, memaddr, size, want_hex);
+		read_from_eeprom(&e, output_fp, memaddr, size, want_hex);
 		break;
 	case 'w':
-		if(force == 0)
+		if(force == 0) {
+			/* Don't read data from a terminal */
+			die_if(isatty(fileno(input_fp)) == 1,
+				"refusing to read data from a terminal\n"
+				"\n"
+				"Use -i to provide input file or -f to force."
+			);
+
+			/* Confirmation must come from a terminal */
+			die_if(isatty(0) == 0,
+				"stdin is not a terminal"
+				"\n"
+				"Use -f to force."
+			);
 			confirm_action();
-		parse_arg(arg, &memaddr, &size);
-		print_info("  Writing stdin starting at address 0x%x\n", 
-			memaddr);
-		write_to_eeprom(&e, memaddr);
+		}
+		print_info("  Writing %s starting at address 0x%x\n",
+			input_file, memaddr);
+		write_to_eeprom(&e, input_fp, memaddr);
 		break;
 	default:
 		usage_if(1);
