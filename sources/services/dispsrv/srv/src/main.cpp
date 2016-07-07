@@ -12,6 +12,7 @@
 #include "DispAccess.h"
 #include "DispCtrlRpc.h"
 #include "I2CDualPcfLcd.hpp"
+#include "I2CPcfLcd.hpp"
 /* ------------------------------------------------------------------------- */
 using namespace std;
 DisplayDevice* create_display_device(std::string DevNode,std::string Type);
@@ -84,7 +85,7 @@ DisplayDevice* create_display_device(std::string DevNode,std::string Type)
 		case ADLIB_DISPLAY_TYPE_SSD1306_128x32_PI:
 		case ADLIB_DISPLAY_TYPE_SSD1306_128x64_PI:pDevice = new DispAccess(DevNode,Type);break;
 		case ADLIB_DISPLAY_TYPE_1602_DUAL_PCF    :pDevice = new I2CDualPcfLcd(DevNode,Type);break;
-		case ADLIB_DISPLAY_TYPE_1602_PCF         :break;
+		case ADLIB_DISPLAY_TYPE_1602_PCF         :pDevice = new I2CPcfLcd(DevNode,Type);break;
 		default: break;
 	}
 	return pDevice;
