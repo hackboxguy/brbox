@@ -88,6 +88,12 @@ DisplayDevice* create_display_device(std::string DevNode,std::string Type)
 		case ADLIB_DISPLAY_TYPE_1602_PCF         :pDevice = new I2CPcfLcd(DevNode,Type);break;
 		default: break;
 	}
+	//"SSD1306_128x32"
+	//"SSD1306_128x64"
+	//"SSD1306_128x32_PI"
+	//"SSD1306_128x64_PI"
+	//"DISPLAY_TYPE_1602_DUAL_PCF"
+	//"DISPLAY_TYPE_1602_PCF"
 	return pDevice;
 }
 

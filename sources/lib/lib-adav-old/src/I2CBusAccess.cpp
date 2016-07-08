@@ -199,7 +199,7 @@ RPC_SRV_RESULT I2CBusAccess::write_byte(uint32_t addr, uint8_t data)
 		//if (I2C_WRITE(fd,buff,1) != 1)
 		//	return RPC_SRV_RESULT_FILE_WRITE_ERR;//devantech usb-i2c driver returns 0bytes, raspi returns 1byte.
 		int32_t smret=i2c_smbus_write_byte(fd,data);
-		if(smret<0) //TODO: write bytes returns 0, although 1byte is written correctly, this is observed with devantech i2c driver.
+		if(smret<1) //TODO: write bytes returns 0, although 1byte is written correctly, this is observed with devantech i2c driver.
 			return RPC_SRV_RESULT_FILE_WRITE_ERR;
 
 		return RPC_SRV_RESULT_SUCCESS;
