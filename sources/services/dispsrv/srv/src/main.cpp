@@ -13,6 +13,7 @@
 #include "DispCtrlRpc.h"
 #include "I2CDualPcfLcd.hpp"
 #include "I2CPcfLcd.hpp"
+#include "I2CSsd1306.hpp"
 /* ------------------------------------------------------------------------- */
 using namespace std;
 DisplayDevice* create_display_device(std::string DevNode,std::string Type);
@@ -81,7 +82,7 @@ DisplayDevice* create_display_device(std::string DevNode,std::string Type)
 	switch(disp_type)
 	{
 		case ADLIB_DISPLAY_TYPE_SSD1306_128x32   :break;
-		case ADLIB_DISPLAY_TYPE_SSD1306_128x64   :break;
+		case ADLIB_DISPLAY_TYPE_SSD1306_128x64   :pDevice = new I2CSsd1306(DevNode,Type);break;
 		case ADLIB_DISPLAY_TYPE_SSD1306_128x32_PI:
 		case ADLIB_DISPLAY_TYPE_SSD1306_128x64_PI:pDevice = new DispAccess(DevNode,Type);break;
 		case ADLIB_DISPLAY_TYPE_1602_DUAL_PCF    :pDevice = new I2CDualPcfLcd(DevNode,Type);break;
