@@ -38,6 +38,12 @@ class I2CSsd1306 : public DisplayDevice //, public I2CBusAccess
 	bool writeCommand(uint8_t bytes, uint8_t byte1);
 	bool writeCommand(uint8_t bytes, uint8_t byte1,uint8_t byte2);
 	bool writeCommand(uint8_t bytes, uint8_t byte1,uint8_t byte2, uint8_t byte3);
+	uint8_t reverseByte (uint8_t b);
+	bool writeImage (uint8_t* image);
+	void getTileFromBitmap (int index);
+	void setTileInBuffer(int index);
+	void rotateTile();
+
 public:
 	I2CSsd1306(std::string DevNode,std::string DevType);
 	~I2CSsd1306();

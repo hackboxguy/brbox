@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "glcdfont.h"
+#include <math.h>
 /*#define LCD_LINE1 0x80
 #define LCD_LINE2 0xC0
 #define LCD_LINE3 0x94
@@ -175,6 +176,109 @@ bool I2CSsd1306::writeCommand(uint8_t bytes, uint8_t byte1,uint8_t byte2, uint8_
 	uint8_t data[16];data[0]=0x00;data[1]=byte1;data[2]=byte2;data[3]=byte3;
 	write_array((uint32_t) DISPLAY_I2C_ADDR, data,4);
 	return true;
+}
+uint8_t I2CSsd1306::reverseByte (uint8_t b)
+{
+	b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+	b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+	b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+	return b;
+}
+bool I2CSsd1306::writeImage (uint8_t* image)
+{
+	for (int lcv=0; lcv<(WIDTH * HEIGHT); lcv++)
+	{
+		getTileFromBitmap(lcv);
+		// rotate the 8x8 tile
+		rotateTile();
+		//#ifdef DEBUG
+		//cout << "==============temp buffer===========" << endl;
+		//#endif
+		// reverse the bites in the byte
+		for (int i=0; i<TILE_SIZE; i++)
+		{
+			tmp_[i] = reverseByte(tmp_[i]);
+			//#ifdef DEBUG
+			//cout << hex << uppercase << "0x" << (int)tmp_[i] << endl;
+			//#endif
+		}
+		setTileInBuffer(lcv);
+		// FIXME: we can probably skip to the next octect instead of
+		//        doing this for every byte!
+	}
+	return false;
+}
+void I2CSsd1306::getTileFromBitmap (int index)
+{
+	int step = 0;
+	for (int i=0; i<TILE_SIZE; i++, step+=STEP_SIZE)
+	{
+		data_[i] = screenBuf_[index+step];
+		//#if DEBUG
+		//cout << "getting byte at index: " << dec << index+step << " with value: "
+		//<< hex << uppercase << "0x" << (int)screenBuf_[index+step] << endl;
+		//#endif
+	}
+}
+void I2CSsd1306::rotateTile()
+{
+	// process bits for a bytes in data
+	for (int i=0; i<TILE_SIZE; i++)
+	{
+		//#ifdef DEBUG
+		//cout << " process bit " << dec << i << endl;
+		//#endif
+		// process data bytes
+		for (int j=0; j<TILE_SIZE; j++)
+		{
+			//#ifdef DEBUG
+			//cout << " anding data 0x" << hex << uppercase << (int)data_[j]
+			//<< " with 2 to the " << 7-i << endl;
+			//#endif
+			uint8_t temp = data_[j] & (uint8_t)pow(2, 7-i);
+			//#ifdef DEBUG
+			//cout << "\ttemp before shift: " << hex << uppercase << "0x" << (int)temp << endl;
+			//#endif
+			int shift = 7-i-j;
+			uint8_t shifted = 0x0;
+			if (shift < 0)
+			{
+			shift *= -1;
+				//#ifdef DEBUG
+				//cout << "\tshifting temp to the LEFT " << dec << shift << endl;
+				//#endif
+				shifted = temp << shift;
+			}
+			else
+			{
+				//#ifdef DEBUG
+				//cout << "\tshifting temp to the RIGHT " << dec << shift << endl;
+				//#endif
+				shifted = temp >> shift;
+			}
+			//#ifdef DEBUG
+			//cout << "\tshifted temp value: " << hex << uppercase << "0x" << (int)shifted << endl;
+			//cout << "\ttmp[" << dec << i << "] beofre OR: " << hex << uppercase << (int)tmp_[i] << endl;
+			//#endif
+			tmp_[i] |= shifted;
+			//#ifdef DEBUG
+			//cout << "\ttmp[" << dec << i << "] after OR: " << hex << uppercase << "0x" << (int)tmp_[i] << endl;
+			//#endif
+		}
+		tmp_[i] = reverseByte(tmp_[i]);
+	}
+}
+void I2CSsd1306::setTileInBuffer(int index)
+{
+	int step = 0;
+	for (int i=0; i<TILE_SIZE; i++, step+=STEP_SIZE)
+	{
+		screenBuf_[index+step] |= tmp_[i];
+		//#ifdef DEBUG
+		//cout << "setting byte at index: " << dec << index+step << " with value: "
+		//<< hex << uppercase << "0x" << (int)tmp_[i] << endl;
+		//#endif
+	}
 }
 /*****************************************************************************/
 RPC_SRV_RESULT I2CSsd1306::clear_display()
