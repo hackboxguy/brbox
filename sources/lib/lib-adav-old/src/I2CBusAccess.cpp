@@ -334,6 +334,19 @@ RPC_SRV_RESULT I2CBusAccess::write_array(uint32_t addr, uint8_t *data,uint32_t l
 		return RPC_SRV_RESULT_FILE_WRITE_ERR;//device node write error
 	return RPC_SRV_RESULT_SUCCESS;
 }
+RPC_SRV_RESULT I2CBusAccess::read_array(uint32_t addr, uint8_t *data,uint32_t len)
+{
+	if(DevOpened!=RPC_SRV_RESULT_SUCCESS)
+		return DevOpened;//i2c-device-node is not open
+	RPC_SRV_RESULT ret=SetSlaveAddr((uint8_t)addr);
+	if(ret != RPC_SRV_RESULT_SUCCESS)
+		return ret;
+	//uint8_t buff[16];
+	//buff[0]=data;
+	if (I2C_READ(fd,data,len) != len)
+		return RPC_SRV_RESULT_FILE_READ_ERR;//device node write error
+	return RPC_SRV_RESULT_SUCCESS;
+}
 /*****************************************************************************/
 RPC_SRV_RESULT I2CBusAccess::test_write_byte(char* dev,uint8_t addr, uint8_t data)
 {

@@ -81,5 +81,6 @@ public:
 	RPC_SRV_RESULT read_dword(uint32_t addr, uint32_t *data);
 	RPC_SRV_RESULT write_dword(uint32_t addr, uint32_t data);
 	RPC_SRV_RESULT write_array(uint32_t addr, uint8_t *data,uint32_t len);
+	RPC_SRV_RESULT read_array(uint32_t addr, uint8_t *data,uint32_t len);
 };
 #endif
