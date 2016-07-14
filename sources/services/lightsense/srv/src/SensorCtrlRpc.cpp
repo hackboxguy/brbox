@@ -60,26 +60,26 @@ RPC_SRV_RESULT SensorCtrlRpc::ProcessWorkAsync(int index,unsigned char* pWorkDat
 //EJSON_DISPSRV_RPC_DISP_INIT
 int SensorCtrlRpc::json_to_bin_sensor_init(JsonDataCommObj* pReq)
 {
-	//DISPSRV_PRINT_PACKET* pPanelCmdObj=NULL;
-	//PREPARE_JSON_REQUEST(RPC_SRV_REQ,DISPSRV_PRINT_PACKET,RPC_SRV_ACT_WRITE,EJSON_DISPSRV_RPC_DISP_INIT);
+	LIGHTSENSE_MEASUREMENT_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,RPC_SRV_ACT_WRITE,EJSON_LIGHTSENSE_RPC_SENSOR_INIT);
 	return 0;
 }
 int SensorCtrlRpc::bin_to_json_sensor_init(JsonDataCommObj* pReq)
 {
-	//PREPARE_JSON_RESP(RPC_SRV_REQ,DISPSRV_PRINT_PACKET);
+	PREPARE_JSON_RESP(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET);
 	return 0;
 }
-int SensorCtrlRpc::process_sensor_init(JsonDataCommObj* pReq,DISPSRV_CMN_DATA_CACHE *pData)
+int SensorCtrlRpc::process_sensor_init(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData)
 {
-	/*DisplayDevice *pDisp=pData->pDisplay;
+	LightSensor *pSensr=pData->pSensor;
 	RPC_SRV_REQ *pPanelReq=NULL;
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
-	DISPSRV_PRINT_PACKET* pPacket;
-	pPacket=(DISPSRV_PRINT_PACKET*)pPanelReq->dataRef;
-	if(pData->pDisplay!=NULL)
-		pPanelReq->result=pDisp->init_display();
+	LIGHTSENSE_MEASUREMENT_PACKET* pPacket;
+	pPacket=(LIGHTSENSE_MEASUREMENT_PACKET*)pPanelReq->dataRef;
+	if(pData->pSensor!=NULL)
+		pPanelReq->result=pSensr->init_sensor();
 	else
-		pPanelReq->result=RPC_SRV_RESULT_FAIL;*/
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;
 	return 0;
 }
 /* ------------------------------------------------------------------------- */

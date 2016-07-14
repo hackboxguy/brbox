@@ -32,12 +32,13 @@ typedef enum EJSON_LIGHTSENSE_RPC_TYPES_T
 	EJSON_DISPSRV_LINE_FULL,
 	EJSON_DISPSRV_LINE_UNKNOWN,
 	EJSON_DISPSRV_LINE_NONE
-}EJSON_DISPSRV_LINE;
-typedef struct LIGHTSENSE_PRINT_PACKET_T
+}EJSON_DISPSRV_LINE;*/
+typedef struct LIGHTSENSE_MEASUREMENT_PACKET_T
 {
-	EJSON_LIGHTSENSE_LINE line;
-	char msg[1024];
-}LIGHTSENSE_PRINT_PACKET;*/
+	uint16_t red;
+	uint16_t green;
+	uint16_t blue;
+}LIGHTSENSE_MEASUREMENT_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to gpioctl-service here
 typedef struct LIGHTSENSE_CMN_DATA_CACHE_T

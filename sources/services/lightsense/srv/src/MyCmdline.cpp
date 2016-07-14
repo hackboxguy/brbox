@@ -30,7 +30,7 @@ MyCmdline::~MyCmdline()
 //override virtual functions of ADGeneric Chain
 int MyCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 {
-	DISPSRV_CMDLINE_OPT command =(DISPSRV_CMDLINE_OPT)arg;
+	LIGHTSENSE_CMDLINE_OPT command =(LIGHTSENSE_CMDLINE_OPT)arg;
 	switch(command)
 	{
 		case LIGHTSENSE_CMDLINE_OPT_SENSORTYPE:
