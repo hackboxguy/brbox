@@ -18,7 +18,7 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 	CmdlineHelper.attach_helper(this);
 	//note:"hviptdln" are already used by the producer class in library
 	CmdlineHelper.insert_options_entry((char*)"sensortype" ,optional_argument,LIGHTSENSE_CMDLINE_OPT_SENSORTYPE);
-	CmdlineHelper.insert_help_entry((char*)"--sensortype=<type>         (light sesor type[taos3414])");
+	CmdlineHelper.insert_help_entry((char*)"--sensortype=<type>         (light sesor type[taos3414/oosts])");
 	CmdlineHelper.insert_options_entry((char*)"device" ,optional_argument,LIGHTSENSE_CMDLINE_OPT_DEVICE);
 	CmdlineHelper.insert_help_entry((char*)"--device=/dev/i2c-x         (i2c device node if applicable)");
 }

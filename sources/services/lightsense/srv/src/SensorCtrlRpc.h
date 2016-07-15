@@ -21,15 +21,9 @@ public:
 	int bin_to_json_sensor_init(JsonDataCommObj* pReq);
 	int process_sensor_init(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
 
-	//int json_to_bin_clear_display(JsonDataCommObj* pReq);
-	//int bin_to_json_clear_display(JsonDataCommObj* pReq);
-	//int process_clear_display(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
-
-	//int json_to_bin_print_display(JsonDataCommObj* pReq);
-	//int bin_to_json_print_display(JsonDataCommObj* pReq);
-	//int process_print_display(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
-
-
+	int json_to_bin_read_xyz(JsonDataCommObj* pReq);
+	int bin_to_json_read_xyz(JsonDataCommObj* pReq);
+	int process_read_xyz(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
 };
 /* ------------------------------------------------------------------------- */
 

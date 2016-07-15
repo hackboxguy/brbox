@@ -49,7 +49,7 @@ void I2CTAOS3414Sensor::clearInterrupt()
 	write_array((uint32_t)sensorI2CAddr, data,1);
 }
 /*****************************************************************************/
-void I2CTAOS3414Sensor::readRGB()
+RPC_SRV_RESULT I2CTAOS3414Sensor::readRGB()
 {
 	uint8_t data[16];data[0]=REG_BLOCK_READ;
 	write_array((uint32_t)sensorI2CAddr, data,1);
@@ -60,6 +60,11 @@ void I2CTAOS3414Sensor::readRGB()
 	blue_	= readingdata_[5] * 256 + readingdata_[4];
 	clear_	= readingdata_[7] * 256 + readingdata_[6];
 	
+	cout<<"I2CTAOS3414Sensor::readRGB:red   ="<<red_<<endl;
+	cout<<"I2CTAOS3414Sensor::readRGB:green ="<<green_<<endl;
+	cout<<"I2CTAOS3414Sensor::readRGB:blue  ="<<blue_<<endl;
+	cout<<"I2CTAOS3414Sensor::readRGB:white ="<<clear_<<endl;
+	return RPC_SRV_RESULT_SUCCESS;
 	/*Serial.print("The RGB value are: RGB( ");
 	Serial.print(red_,DEC);
 	Serial.print(", ");
@@ -202,6 +207,7 @@ void I2CTAOS3414Sensor::readRGB(int *red, int *green, int *blue)
 /*****************************************************************************/
 RPC_SRV_RESULT I2CTAOS3414Sensor::init_sensor()
 {
+	cout<<"I2CTAOS3414Sensor::init_sensor:called"<<endl;
 	triggerMode_     =INTEG_MODE_FREE | INTEG_PARAM_PULSE_COUNT1;
 	interruptSource_ =INT_SOURCE_CLEAR;
 	interruptMode_   =INTR_LEVEL | INTR_PERSIST_EVERY;

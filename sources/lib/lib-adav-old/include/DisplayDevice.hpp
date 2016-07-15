@@ -36,8 +36,8 @@ typedef enum ADLIB_DISPLAY_TYPE_T
 	ADLIB_DISPLAY_TYPE_UNKNOWN,
 	ADLIB_DISPLAY_TYPE_NONE
 }ADLIB_DISPLAY_TYPE;
-#define ADLIB_DISPLAY_TYPE_TABL  {"SSD1306_128x32","SSD1306_128x64","SSD1306_128x32_PI","SSD1306_128x64_PI",\
-				  "DISPLAY_TYPE_1602_DUAL_PCF","DISPLAY_TYPE_1602_PCF","unknown","none","\0"}
+#define ADLIB_DISPLAY_TYPE_TABL  {"ssd1306_128x32","ssd1306_128x64","ssd1306_128x32_pi","ssd1306_128x64_pi",\
+				  "1602_dual_pcf","1602_pcf","unknown","none","\0"}
 
 class DisplayDevice : public I2CBusAccess
 {

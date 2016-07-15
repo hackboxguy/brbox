@@ -18,7 +18,7 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 	CmdlineHelper.attach_helper(this);
 	//note:"hviptdln" are already used by the producer class in library
 	CmdlineHelper.insert_options_entry((char*)"disptype" ,optional_argument,DISPSRV_CMDLINE_OPT_DISPTYPE);
-	CmdlineHelper.insert_help_entry((char*)"--disptype=<type>           (display type[SSD1306_128x32])");
+	CmdlineHelper.insert_help_entry((char*)"--disptype=<type>           (display type[ssd1306_128x64/ssd1306_128x64_pi/1602_pcf/1602_dual_pcf])");
 	CmdlineHelper.insert_options_entry((char*)"device" ,optional_argument,DISPSRV_CMDLINE_OPT_DEVICE);
 	CmdlineHelper.insert_help_entry((char*)"--device=/dev/i2c-x         (i2c device node if applicable)");
 }

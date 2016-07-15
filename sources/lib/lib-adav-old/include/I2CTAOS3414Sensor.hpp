@@ -30,16 +30,15 @@ class I2CTAOS3414Sensor : public LightSensor
 	// Start ADC of the colour sensor
 	void setEnableADC();
 	void clearInterrupt();
-
+	RPC_SRV_RESULT calculateCoordinate();
+	void readRGB(int *red, int *green, int *blue);
+	RPC_SRV_RESULT readRGB();
 public:
 	I2CTAOS3414Sensor(std::string DevNode,std::string DevType);
 	~I2CTAOS3414Sensor();
 	RPC_SRV_RESULT init_sensor();//{return RPC_SRV_RESULT_SUCCESS;};
+	RPC_SRV_RESULT read_xyz(){return readRGB();};//
 	int ledStatus;
-	void readRGB();
-	RPC_SRV_RESULT calculateCoordinate();
-	void readRGB(int *red, int *green, int *blue);
-
 };
 #endif
 
