@@ -18,7 +18,7 @@ I2CPcfLcd::I2CPcfLcd(std::string DevNode,std::string DevType):DisplayDevice(DevN
 	init_lcd();
 	//clear_display_internal(DISPLAY_LINE_FULL);
 	LCD_goto(1,1);
-	print_lcd("hello world");
+	//print_lcd("hello world");
 }
 I2CPcfLcd::~I2CPcfLcd()
 {

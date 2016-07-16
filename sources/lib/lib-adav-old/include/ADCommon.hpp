@@ -667,4 +667,13 @@ typedef enum ADLIB_DEV_CONN_TYPE_T
 	ADLIB_DEV_CONN_TYPE_NONE
 }ADLIB_DEV_CONN_TYPE;
 /*****************************************************************************/
+//common enumeration types
+#define ADLIB_STATUS_FLAG_TYPE_TABL      {"lo","hi","unknown","none","\0"}
+typedef enum ADLIB_STATUS_FLAG_TYPE_T
+{
+	ADLIB_STATUS_FLAG_TYPE_LO,
+	ADLIB_STATUS_FLAG_TYPE_HI,
+	ADLIB_STATUS_FLAG_TYPE_UNKNOWN,
+	ADLIB_STATUS_FLAG_TYPE_NONE
+}ADLIB_STATUS_FLAG_TYPE;
 #endif

@@ -4,7 +4,7 @@
 #sudo ./testeeprom.sh -d /dev/i2c-0 -l 5 -s 1024 -a 0x52
 #sudo ./testeeprom.sh -d /dev/i2c-0 -l 5 -s 1024 -a 0x54
 #sudo ./testeeprom.sh -d /dev/i2c-0 -l 5 -s 1024 -a 0x56
-
+#y=10000;x=0; while [ $x -lt $y ]; do ./bin/dispclt --printline=line1,"$(date +"%T")"; let x=$x+1; done
 
 SUCCESS=0
 ERR_FILE_OPEN=1

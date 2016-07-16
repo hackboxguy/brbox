@@ -220,4 +220,7 @@ RPC_SRV_RESULT I2CTAOS3414Sensor::init_sensor()
 	I2CTAOS3414Sensor::setEnableADC(); 
 }
 /*****************************************************************************/
+//get/set sync_edge(enum hi/low)
+//get/set integ_mode()
+//get/set integ_time(0-to-16 count value).
 

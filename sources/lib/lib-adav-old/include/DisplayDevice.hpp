@@ -47,6 +47,7 @@ public:
 	virtual RPC_SRV_RESULT init_display()=0;
 	virtual RPC_SRV_RESULT clear_display()=0;
 	virtual RPC_SRV_RESULT print_line(char* msg,DISPLAY_LINE line=DISPLAY_LINE_1,TEXT_ALIGNMENT align=TEXT_ALIGNMENT_CENTER)=0;
+	virtual RPC_SRV_RESULT test_function(){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
 	//RPC_SRV_RESULT init_display();
 	//RPC_SRV_RESULT clear_display();
 	//RPC_SRV_RESULT print_line(int line, char* msg);
