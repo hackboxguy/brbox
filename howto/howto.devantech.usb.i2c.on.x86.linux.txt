@@ -1,0 +1,11 @@
+In this guide, you will find the details about how to use devantech usb-to-i2c converter on ubuntu based linux machine.
+1)git clone https://github.com/hackboxguy/brbox
+2)sudo apt-get install i2c-tools
+3)sudo echo "blacklist cdc-acm" >> /etc/modprobe.d/blacklist.conf
+4)cd brbox/sources/kmods/usb-iss/
+5)make clean;make
+6)sudo insmod i2c-devantech-iss.ko
+7)ls /dev/i2c* (notedown how many i2c nodes present in your system)
+8)connect devantech-usb-i2c converter to usb port of your ubuntu machine.
+9)ls /dev/i2c* (if you see an extra i2c node compared to the list in step 7, then you have a working i2c converter)
+10)sudo i2cdetect -y 8 (8 means /dev/i2c-8, this command scans all available i2c slave addressed on the bus)
