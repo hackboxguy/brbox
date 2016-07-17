@@ -10,40 +10,87 @@ typedef enum EJSON_LIGHTSENSE_RPC_TYPES_T
 {
 	EJSON_LIGHTSENSE_RPC_SENSOR_INIT,
 	EJSON_LIGHTSENSE_RPC_READ_XYZ,
-	//LIGHTSENSE_DISPSRV_RPC_DISP_CLEAR,
-	//LIGHTSENSE_DISPSRV_RPC_DISP_PRINT,
+	EJSON_LIGHTSENSE_GET_INTEGRATION_TIME,
+	EJSON_LIGHTSENSE_SET_INTEGRATION_TIME,
+	EJSON_LIGHTSENSE_SYNC_EDGE_GET,
+	EJSON_LIGHTSENSE_SYNC_EDGE_SET,
+	EJSON_LIGHTSENSE_GET_INTEGRATION_MODE,
+	EJSON_LIGHTSENSE_SET_INTEGRATION_MODE,
+	EJSON_LIGHTSENSE_GET_INTR_STOP_STS,
+	EJSON_LIGHTSENSE_SET_INTR_STOP_STS,
+	EJSON_LIGHTSENSE_GET_INTR_MODE,//get interrupt-mode
+	EJSON_LIGHTSENSE_SET_INTR_MODE,//set interrupt-mode
+	EJSON_LIGHTSENSE_GET_INTR_RATE,
+	EJSON_LIGHTSENSE_SET_INTR_RATE,
+	EJSON_LIGHTSENSE_GET_INTR_SOURCE,
+	EJSON_LIGHTSENSE_SET_INTR_SOURCE,
+	EJSON_LIGHTSENSE_GET_GAIN_MODE,
+	EJSON_LIGHTSENSE_SET_GAIN_MODE,
+	EJSON_LIGHTSENSE_GET_PRESCALER,
+	EJSON_LIGHTSENSE_SET_PRESCALER,
 	EJSON_LIGHTSENSE_RPC_END,
 	EJSON_LIGHTSENSE_RPC_NONE
 }EJSON_LIGHTSENSE_RPC_TYPES;
 /* ------------------------------------------------------------------------- */
 //EJSON_LIGHTSENSE_RPC_DISP_INIT
-#define	LIGHTSENSE_RPC_SENSOR_INIT            "sensor_init"
-
+#define	LIGHTSENSE_RPC_SENSOR_INIT         "sensor_init"
+/* ------------------------------------------------------------------------- */
 //EJSON_LIGHTSENSE_RPC_READ_XYZ
 #define	LIGHTSENSE_RPC_READ_XYZ            "read_xyz"
-
-
-//#define	DISPSRV_RPC_DISP_CLEAR           "display_clear"
-//#define	DISPSRV_RPC_DISP_PRINT           "display_print"
-//#define DISPSRV_RPC_DISP_PRINT_LINE_ARG  "line"
-//#define DISPSRV_RPC_DISP_PRINT_MESG_ARG  "msg"
-//#define DISPSRV_RPC_DISP_LINE_ARG_TABL    {"line1","line2","line3","line4","lineall","none","none","\0"} //
-//important: keep enum DISPLAY_LINE and EJSON_DISPSRV_LINE same
-/*typedef enum EJSON_DISPSRV_LINE_T
-{
-	EJSON_DISPSRV_LINE_1,
-	EJSON_DISPSRV_LINE_2,
-	EJSON_DISPSRV_LINE_3,
-	EJSON_DISPSRV_LINE_4,
-	EJSON_DISPSRV_LINE_FULL,
-	EJSON_DISPSRV_LINE_UNKNOWN,
-	EJSON_DISPSRV_LINE_NONE
-}EJSON_DISPSRV_LINE;*/
+/* ------------------------------------------------------------------------- */
+//EJSON_LIGHTSENSE_GET_INTEGRATION_TIME,
+//EJSON_LIGHTSENSE_SET_INTEGRATION_TIME,
+#define	LIGHTSENSE_RPC_GET_INTEGRATION_TIME      "get_integration_time"
+#define	LIGHTSENSE_RPC_SET_INTEGRATION_TIME      "set_integration_time"
+#define LIGHTSENSE_RPC_SET_INTEGRATION_TIME_ARG  "time"
+/* ------------------------------------------------------------------------- */
+//EJSON_LIGHTSENSE_SYNC_EDGE_GET,
+//EJSON_LIGHTSENSE_SYNC_EDGE_SET,
+#define	LIGHTSENSE_RPC_SYNC_EDGE_GET  "get_sync_edge"
+#define	LIGHTSENSE_RPC_SYNC_EDGE_SET  "set_sync_edge"
+#define LIGHTSENSE_RPC_SYNC_EDGE_ARG  "edge"
+/* ------------------------------------------------------------------------- */
+//EJSON_LIGHTSENSE_GET_INTEGRATION_MODE,
+//EJSON_LIGHTSENSE_SET_INTEGRATION_MODE,
+#define	LIGHTSENSE_RPC_GET_INTEGRATION_MODE "get_integration_mode"
+#define	LIGHTSENSE_RPC_SET_INTEGRATION_MODE "set_integration_mode"
+#define	LIGHTSENSE_RPC_SET_INTEGRATION_MODE_ARG "mode"
+/* ------------------------------------------------------------------------- */
+//EJSON_LIGHTSENSE_GET_INTR_STOP_STS,
+//EJSON_LIGHTSENSE_SET_INTR_STOP_STS,
+#define	LIGHTSENSE_RPC_GET_INTR_STOP_STS "get_intr_stop_sts"
+#define	LIGHTSENSE_RPC_SET_INTR_STOP_STS "set_intr_stop_sts"
+#define	LIGHTSENSE_RPC_SET_INTR_STOP_STS_ARG "status"
+/* ------------------------------------------------------------------------- */
+//EJSON_LIGHTSENSE_GET_INTR_MODE,//get interrupt-mode
+//EJSON_LIGHTSENSE_SET_INTR_MODE,//set interrupt-mode
+/* ------------------------------------------------------------------------- */
+//EJSON_LIGHTSENSE_GET_INTR_RATE,
+//EJSON_LIGHTSENSE_SET_INTR_RATE,
+/* ------------------------------------------------------------------------- */
+//EJSON_LIGHTSENSE_GET_INTR_SOURCE,
+//EJSON_LIGHTSENSE_SET_INTR_SOURCE,
+/* ------------------------------------------------------------------------- */
+//EJSON_LIGHTSENSE_GET_GAIN_MODE,
+//EJSON_LIGHTSENSE_SET_GAIN_MODE,
+/* ------------------------------------------------------------------------- */
+//EJSON_LIGHTSENSE_GET_PRESCALER,
+//EJSON_LIGHTSENSE_SET_PRESCALER,
+/* ------------------------------------------------------------------------- */
 typedef struct LIGHTSENSE_MEASUREMENT_PACKET_T
 {
 	uint16_t red;
 	uint16_t green;
 	uint16_t blue;
+	uint32_t integration_time;
+	ADLIB_STATUS_FLAG_TYPE sync_edge;
+	LS_INTEG_MODE integration_mode;
+	ADLIB_STATUS_FLAG_TYPE intr_stop_sts;
+	LS_INTR_MODE intr_mode;
+	LS_INTR_RATE intr_rate;
+	LS_INTR_SOURCE intr_source;
+	LS_GAIN_MODE gain_mode;
+	LS_PRESCALER prescaler;
 }LIGHTSENSE_MEASUREMENT_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to gpioctl-service here

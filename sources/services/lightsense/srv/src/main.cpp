@@ -44,10 +44,19 @@ int main(int argc, const char* argv[])
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 
 	/****************************RPC list*************************************/
-	SensorCtrlRpc SensorInit (LIGHTSENSE_RPC_SENSOR_INIT ,EJSON_LIGHTSENSE_RPC_SENSOR_INIT ,emulat,dbglog,&DataCache);
-	SensorCtrlRpc ReadXYZ    (LIGHTSENSE_RPC_READ_XYZ    ,EJSON_LIGHTSENSE_RPC_READ_XYZ    ,emulat,dbglog,&DataCache);
+	SensorCtrlRpc SensorInit   (LIGHTSENSE_RPC_SENSOR_INIT ,EJSON_LIGHTSENSE_RPC_SENSOR_INIT ,emulat,dbglog,&DataCache);
+	SensorCtrlRpc ReadXYZ      (LIGHTSENSE_RPC_READ_XYZ    ,EJSON_LIGHTSENSE_RPC_READ_XYZ    ,emulat,dbglog,&DataCache);
+	SensorCtrlRpc IntegrTimeGet(LIGHTSENSE_RPC_GET_INTEGRATION_TIME,EJSON_LIGHTSENSE_GET_INTEGRATION_TIME,emulat,dbglog,&DataCache);
+	SensorCtrlRpc IntegrTimeSet(LIGHTSENSE_RPC_SET_INTEGRATION_TIME,EJSON_LIGHTSENSE_SET_INTEGRATION_TIME,emulat,dbglog,&DataCache);
+	SensorCtrlRpc SyncEdgeGet  (LIGHTSENSE_RPC_SYNC_EDGE_GET,EJSON_LIGHTSENSE_SYNC_EDGE_GET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc SyncEdgeSet  (LIGHTSENSE_RPC_SYNC_EDGE_SET,EJSON_LIGHTSENSE_SYNC_EDGE_SET,emulat,dbglog,&DataCache);
+
 	RpcMgr.AttachRpc(&SensorInit);
 	RpcMgr.AttachRpc(&ReadXYZ);
+	RpcMgr.AttachRpc(&IntegrTimeGet);
+	RpcMgr.AttachRpc(&IntegrTimeSet);
+	RpcMgr.AttachRpc(&SyncEdgeGet);
+	RpcMgr.AttachRpc(&SyncEdgeSet);
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr

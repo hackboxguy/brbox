@@ -110,6 +110,6 @@ public:
 	virtual RPC_SRV_RESULT get_gain_mode(LS_GAIN_MODE &mode){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
 	virtual RPC_SRV_RESULT set_gain_mode(LS_GAIN_MODE mode){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
 	virtual RPC_SRV_RESULT get_prescaler(LS_PRESCALER &mode){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
-	virtual RPC_SRV_RESULT get_prescaler(LS_PRESCALER mode){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
+	virtual RPC_SRV_RESULT set_prescaler(LS_PRESCALER mode){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
 };
 #endif

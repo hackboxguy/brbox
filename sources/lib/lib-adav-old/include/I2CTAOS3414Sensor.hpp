@@ -38,6 +38,8 @@ public:
 	~I2CTAOS3414Sensor();
 	RPC_SRV_RESULT init_sensor();//{return RPC_SRV_RESULT_SUCCESS;};
 	RPC_SRV_RESULT read_xyz(){return readRGB();};//
+	RPC_SRV_RESULT get_integration_time(uint32_t &time);//{return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
+	RPC_SRV_RESULT set_integration_time(uint32_t time);//{return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
 	int ledStatus;
 };
 #endif

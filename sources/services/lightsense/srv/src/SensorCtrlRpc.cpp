@@ -18,6 +18,10 @@ int SensorCtrlRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 	{
 		case EJSON_LIGHTSENSE_RPC_SENSOR_INIT :return json_to_bin_sensor_init(pReq);
 		case EJSON_LIGHTSENSE_RPC_READ_XYZ    :return json_to_bin_read_xyz(pReq);
+		case EJSON_LIGHTSENSE_GET_INTEGRATION_TIME:return json_to_bin_get_integration_time(pReq);
+		case EJSON_LIGHTSENSE_SET_INTEGRATION_TIME:return json_to_bin_set_integration_time(pReq);
+		case EJSON_LIGHTSENSE_SYNC_EDGE_GET   :
+		case EJSON_LIGHTSENSE_SYNC_EDGE_SET   :
 		default:break;
 	}
 	return -1;//0;
@@ -30,6 +34,10 @@ int SensorCtrlRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 	{
 		case EJSON_LIGHTSENSE_RPC_SENSOR_INIT :return bin_to_json_sensor_init(pReq);
 		case EJSON_LIGHTSENSE_RPC_READ_XYZ    :return bin_to_json_read_xyz(pReq);
+		case EJSON_LIGHTSENSE_GET_INTEGRATION_TIME:return bin_to_json_get_integration_time(pReq);
+		case EJSON_LIGHTSENSE_SET_INTEGRATION_TIME:return bin_to_json_set_integration_time(pReq);
+		case EJSON_LIGHTSENSE_SYNC_EDGE_GET   :
+		case EJSON_LIGHTSENSE_SYNC_EDGE_SET   :
 		default:break;
 	}
 	return -1;
@@ -42,6 +50,10 @@ int SensorCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProdu
 	{
 		case EJSON_LIGHTSENSE_RPC_SENSOR_INIT :return process_sensor_init(pReq,pDataCache);
 		case EJSON_LIGHTSENSE_RPC_READ_XYZ    :return process_read_xyz(pReq,pDataCache);
+		case EJSON_LIGHTSENSE_GET_INTEGRATION_TIME:return process_get_integration_time(pReq,pDataCache);
+		case EJSON_LIGHTSENSE_SET_INTEGRATION_TIME:return process_set_integration_time(pReq,pDataCache);
+		case EJSON_LIGHTSENSE_SYNC_EDGE_GET   :
+		case EJSON_LIGHTSENSE_SYNC_EDGE_SET   :
 		default:break;
 	}
 	return 0;
@@ -106,30 +118,69 @@ int SensorCtrlRpc::process_read_xyz(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CA
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
-//EJSON_DISPSRV_RPC_DISP_CLEAR
-/*int SensorCtrlRpc::json_to_bin_clear_display(JsonDataCommObj* pReq)
+//EJSON_LIGHTSENSE_GET_INTEGRATION_TIME
+int SensorCtrlRpc::json_to_bin_get_integration_time(JsonDataCommObj* pReq)
 {
-	DISPSRV_PRINT_PACKET* pPanelCmdObj=NULL;
-	PREPARE_JSON_REQUEST(RPC_SRV_REQ,DISPSRV_PRINT_PACKET,RPC_SRV_ACT_WRITE,EJSON_DISPSRV_RPC_DISP_CLEAR);
+	LIGHTSENSE_MEASUREMENT_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,RPC_SRV_ACT_READ,EJSON_LIGHTSENSE_GET_INTEGRATION_TIME);
 	return 0;
 }
-int SensorCtrlRpc::bin_to_json_clear_display(JsonDataCommObj* pReq)
+int SensorCtrlRpc::bin_to_json_get_integration_time(JsonDataCommObj* pReq)
 {
-	PREPARE_JSON_RESP(RPC_SRV_REQ,DISPSRV_PRINT_PACKET);
+	RPC_SRV_REQ *pPanelReq=NULL;
+        LIGHTSENSE_MEASUREMENT_PACKET* pPanelCmdObj;
+        pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+        pPanelCmdObj=(LIGHTSENSE_MEASUREMENT_PACKET*)pPanelReq->dataRef;
+        if(pPanelReq->result!=RPC_SRV_RESULT_SUCCESS)
+                prepare_result_string(pPanelReq->result,pReq);
+	else
+		prepare_result_string(pPanelReq->result,pReq,(char*)LIGHTSENSE_RPC_SET_INTEGRATION_TIME_ARG,pPanelCmdObj->integration_time);
+	OBJ_MEM_DELETE(pPanelCmdObj);
 	return 0;
 }
-int SensorCtrlRpc::process_clear_display(JsonDataCommObj* pReq,DISPSRV_CMN_DATA_CACHE *pData)
+int SensorCtrlRpc::process_get_integration_time(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData)
 {
-	DisplayDevice *pDisp=pData->pDisplay;
+	LightSensor *pSensr=pData->pSensor;
 	RPC_SRV_REQ *pPanelReq=NULL;
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
-	DISPSRV_PRINT_PACKET* pPacket;
-	pPacket=(DISPSRV_PRINT_PACKET*)pPanelReq->dataRef;
-	if(pData->pDisplay!=NULL)
-		pPanelReq->result=pDisp->clear_display();
+	LIGHTSENSE_MEASUREMENT_PACKET* pPacket;
+	pPacket=(LIGHTSENSE_MEASUREMENT_PACKET*)pPanelReq->dataRef;
+	if(pData->pSensor!=NULL)
+	{
+		uint32_t time;
+		pPanelReq->result=pSensr->get_integration_time(time);
+		pPacket->integration_time=time;
+	}
 	else
 		pPanelReq->result=RPC_SRV_RESULT_FAIL;
 	return 0;
-}*/
+}
+/* ------------------------------------------------------------------------- */
+//EJSON_LIGHTSENSE_SET_INTEGRATION_TIME
+int SensorCtrlRpc::json_to_bin_set_integration_time(JsonDataCommObj* pReq)
+{
+	LIGHTSENSE_MEASUREMENT_PACKET* pPanelCmdObj=NULL;
+        PREPARE_JSON_REQUEST(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,RPC_SRV_ACT_WRITE,EJSON_LIGHTSENSE_SET_INTEGRATION_TIME);
+	JSON_STRING_TO_INT(LIGHTSENSE_RPC_SET_INTEGRATION_TIME_ARG,pPanelCmdObj->integration_time);
+	return 0;
+}
+int SensorCtrlRpc::bin_to_json_set_integration_time(JsonDataCommObj* pReq)
+{
+        PREPARE_JSON_RESP(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET);
+	return 0;
+}
+int SensorCtrlRpc:: process_set_integration_time(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData)
+{
+	LightSensor *pSensr=pData->pSensor;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	LIGHTSENSE_MEASUREMENT_PACKET* pPacket;
+	pPacket=(LIGHTSENSE_MEASUREMENT_PACKET*)pPanelReq->dataRef;
+	if(pData->pSensor!=NULL)
+		pPanelReq->result=pSensr->set_integration_time(pPacket->integration_time);
+	else
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+	return 0;
+}
 /* ------------------------------------------------------------------------- */
 
