@@ -44,12 +44,24 @@ int main(int argc, const char* argv[])
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 
 	/****************************RPC list*************************************/
-	SensorCtrlRpc SensorInit   (LIGHTSENSE_RPC_SENSOR_INIT ,EJSON_LIGHTSENSE_RPC_SENSOR_INIT ,emulat,dbglog,&DataCache);
-	SensorCtrlRpc ReadXYZ      (LIGHTSENSE_RPC_READ_XYZ    ,EJSON_LIGHTSENSE_RPC_READ_XYZ    ,emulat,dbglog,&DataCache);
-	SensorCtrlRpc IntegrTimeGet(LIGHTSENSE_RPC_GET_INTEGRATION_TIME,EJSON_LIGHTSENSE_GET_INTEGRATION_TIME,emulat,dbglog,&DataCache);
-	SensorCtrlRpc IntegrTimeSet(LIGHTSENSE_RPC_SET_INTEGRATION_TIME,EJSON_LIGHTSENSE_SET_INTEGRATION_TIME,emulat,dbglog,&DataCache);
-	SensorCtrlRpc SyncEdgeGet  (LIGHTSENSE_RPC_SYNC_EDGE_GET,EJSON_LIGHTSENSE_SYNC_EDGE_GET,emulat,dbglog,&DataCache);
-	SensorCtrlRpc SyncEdgeSet  (LIGHTSENSE_RPC_SYNC_EDGE_SET,EJSON_LIGHTSENSE_SYNC_EDGE_SET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc SensorInit    (LIGHTSENSE_RPC_SENSOR_INIT ,EJSON_LIGHTSENSE_RPC_SENSOR_INIT ,emulat,dbglog,&DataCache);
+	SensorCtrlRpc ReadXYZ       (LIGHTSENSE_RPC_READ_XYZ    ,EJSON_LIGHTSENSE_RPC_READ_XYZ    ,emulat,dbglog,&DataCache);
+	SensorCtrlRpc IntegrTimeGet (LIGHTSENSE_RPC_GET_INTEGRATION_TIME,EJSON_LIGHTSENSE_GET_INTEGRATION_TIME,emulat,dbglog,&DataCache);
+	SensorCtrlRpc IntegrTimeSet (LIGHTSENSE_RPC_SET_INTEGRATION_TIME,EJSON_LIGHTSENSE_SET_INTEGRATION_TIME,emulat,dbglog,&DataCache);
+	SensorCtrlRpc SyncEdgeGet   (LIGHTSENSE_RPC_SYNC_EDGE_GET,EJSON_LIGHTSENSE_SYNC_EDGE_GET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc SyncEdgeSet   (LIGHTSENSE_RPC_SYNC_EDGE_SET,EJSON_LIGHTSENSE_SYNC_EDGE_SET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc IntgrModeGet  (LIGHTSENSE_RPC_INTEGRATION_MODE_GET,EJSON_LIGHTSENSE_INTEGRATION_MODE_GET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc IntgrModeSet  (LIGHTSENSE_RPC_INTEGRATION_MODE_SET,EJSON_LIGHTSENSE_INTEGRATION_MODE_SET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc IntrStopStsGet(LIGHTSENSE_RPC_INTR_STOP_STS_GET,EJSON_LIGHTSENSE_INTR_STOP_STS_GET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc IntrStopStsSet(LIGHTSENSE_RPC_INTR_STOP_STS_SET,EJSON_LIGHTSENSE_INTR_STOP_STS_SET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc IntrModeGet   (LIGHTSENSE_RPC_INTR_MODE_GET,EJSON_LIGHTSENSE_INTR_MODE_GET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc IntrModeSet   (LIGHTSENSE_RPC_INTR_MODE_SET,EJSON_LIGHTSENSE_INTR_MODE_SET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc IntrRateGet   (LIGHTSENSE_RPC_INTR_RATE_GET,EJSON_LIGHTSENSE_INTR_RATE_GET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc IntrRateSet   (LIGHTSENSE_RPC_INTR_RATE_SET,EJSON_LIGHTSENSE_INTR_RATE_SET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc IntrSourceGet (LIGHTSENSE_RPC_INTR_SOURCE_GET,EJSON_LIGHTSENSE_INTR_SOURCE_GET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc IntrSourceSet (LIGHTSENSE_RPC_INTR_SOURCE_SET,EJSON_LIGHTSENSE_INTR_SOURCE_SET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc GainModeGet   (LIGHTSENSE_RPC_GAIN_MODE_GET,EJSON_LIGHTSENSE_GAIN_MODE_GET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc GainModeSet   (LIGHTSENSE_RPC_GAIN_MODE_SET,EJSON_LIGHTSENSE_GAIN_MODE_SET,emulat,dbglog,&DataCache);
 
 	RpcMgr.AttachRpc(&SensorInit);
 	RpcMgr.AttachRpc(&ReadXYZ);
@@ -57,7 +69,18 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&IntegrTimeSet);
 	RpcMgr.AttachRpc(&SyncEdgeGet);
 	RpcMgr.AttachRpc(&SyncEdgeSet);
-
+	RpcMgr.AttachRpc(&IntgrModeGet);
+	RpcMgr.AttachRpc(&IntgrModeSet);
+	RpcMgr.AttachRpc(&IntrStopStsGet);
+	RpcMgr.AttachRpc(&IntrStopStsSet);
+	RpcMgr.AttachRpc(&IntrModeGet);
+	RpcMgr.AttachRpc(&IntrModeSet);
+	RpcMgr.AttachRpc(&IntrRateGet);
+	RpcMgr.AttachRpc(&IntrRateSet);
+	RpcMgr.AttachRpc(&IntrSourceGet);
+	RpcMgr.AttachRpc(&IntrSourceSet);
+	RpcMgr.AttachRpc(&GainModeGet);
+	RpcMgr.AttachRpc(&GainModeSet);
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr
 	RpcMgr.Start(CmdLine.get_port_number(),CmdLine.get_socket_log(),CmdLine.get_emulation_mode());

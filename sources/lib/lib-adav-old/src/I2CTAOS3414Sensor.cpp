@@ -39,10 +39,16 @@ void I2CTAOS3414Sensor::setInterruptSourceReg()
 	uint8_t data[16];data[0]=REG_INT_SOURCE;data[1]=interruptSource_;
 	write_array((uint32_t)sensorI2CAddr, data,2);
 }
+RPC_SRV_RESULT I2CTAOS3414Sensor::setInterruptSourceReg(uint8_t val)
+{
+	uint8_t data[16];data[0]=REG_INT_SOURCE;data[1]=val;
+	write_array((uint32_t)sensorI2CAddr, data,2);
+	return RPC_SRV_RESULT_SUCCESS;
+}
 RPC_SRV_RESULT I2CTAOS3414Sensor::getInterruptSourceReg(uint8_t &val)
 {
 	uint8_t tmp_data[16];
-	uint8_t data[16];data[0]=REG_INTRCTRL_READ;
+	uint8_t data[16];data[0]=REG_INTRSRC_READ;
 	write_array((uint32_t)sensorI2CAddr, data,1);
 	read_array((uint32_t)sensorI2CAddr, tmp_data,1);
 	val=tmp_data[0];
@@ -54,20 +60,41 @@ void I2CTAOS3414Sensor::setInterruptControlReg()
 	uint8_t data[16];data[0]=REG_INT;data[1]=interruptMode_;
 	write_array((uint32_t)sensorI2CAddr, data,2);
 }
+RPC_SRV_RESULT I2CTAOS3414Sensor::setInterruptControlReg(uint8_t val)
+{
+	uint8_t data[16];data[0]=REG_INT;data[1]=val;
+	write_array((uint32_t)sensorI2CAddr, data,2);
+	return RPC_SRV_RESULT_SUCCESS;
+}
 RPC_SRV_RESULT I2CTAOS3414Sensor::getInterruptControlReg(uint8_t &val)
 {
 	uint8_t tmp_data[16];
-	uint8_t data[16];data[0]=REG_INTRSRC_READ;
+	uint8_t data[16];data[0]=REG_INTRCTRL_READ;
 	write_array((uint32_t)sensorI2CAddr, data,1);
 	read_array((uint32_t)sensorI2CAddr, tmp_data,1);
 	val=tmp_data[0];
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
-void I2CTAOS3414Sensor::setGain()
+void I2CTAOS3414Sensor::setGainReg()
 {
 	uint8_t data[16];data[0]=REG_GAIN;data[1]=gainAndPrescaler_;
 	write_array((uint32_t)sensorI2CAddr, data,2);
+}
+RPC_SRV_RESULT I2CTAOS3414Sensor::setGainReg(uint8_t val)
+{
+	uint8_t data[16];data[0]=REG_GAIN;data[1]=val;
+	write_array((uint32_t)sensorI2CAddr, data,2);
+	return RPC_SRV_RESULT_SUCCESS;
+}
+RPC_SRV_RESULT I2CTAOS3414Sensor::getGainReg(uint8_t &val)
+{
+	uint8_t tmp_data[16];
+	uint8_t data[16];data[0]=REG_GAIN_READ;
+	write_array((uint32_t)sensorI2CAddr, data,1);
+	read_array((uint32_t)sensorI2CAddr, tmp_data,1);
+	val=tmp_data[0];
+	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
 void I2CTAOS3414Sensor::setEnableADC()
@@ -249,17 +276,28 @@ RPC_SRV_RESULT I2CTAOS3414Sensor::init_sensor()
 	I2CTAOS3414Sensor::setTimingReg(); 
 	I2CTAOS3414Sensor::setInterruptSourceReg();  
 	I2CTAOS3414Sensor::setInterruptControlReg(); 
-	I2CTAOS3414Sensor::setGain(); 
+	I2CTAOS3414Sensor::setGainReg(); 
 	I2CTAOS3414Sensor::setEnableADC(); 
 }
 /*****************************************************************************/
 RPC_SRV_RESULT I2CTAOS3414Sensor::get_integration_time(uint32_t &time)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	uint8_t val;
+	RPC_SRV_RESULT ret=getTimingReg(val);
+	val&=0x0F;//bit-3 to 0
+	time=val;
+	return ret;//RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
 }
 RPC_SRV_RESULT I2CTAOS3414Sensor::set_integration_time(uint32_t time)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	uint8_t val,val1;
+	RPC_SRV_RESULT ret=getTimingReg(val);
+	if(ret!=RPC_SRV_RESULT_SUCCESS)
+		return ret;
+	val&=0xF0;//mask bit-3 to 0
+	val1=time;val1&=0x0F;
+	val|=val1;
+	return setTimingReg(val);
 }
 /*****************************************************************************/
 RPC_SRV_RESULT I2CTAOS3414Sensor::get_sync_edge(ADLIB_STATUS_FLAG_TYPE &edge)
@@ -279,66 +317,176 @@ RPC_SRV_RESULT I2CTAOS3414Sensor::set_sync_edge(ADLIB_STATUS_FLAG_TYPE edge)
 	RPC_SRV_RESULT ret=getTimingReg(val);
 	if(ret!=RPC_SRV_RESULT_SUCCESS)
 		return ret;
-	val&=0x40;//bit-6
+	val&=0xBF;//bit-6
 	if(edge==ADLIB_STATUS_FLAG_TYPE_HI)
 		val|=0x40;//make bit-6 high
-	else
-		val&=0xBF;//make bit-6 low
+	//else : bit is already made low 
+		//val&=0xBF;//make bit-6 low
 	return setTimingReg(val);
 }
 /*****************************************************************************/
 RPC_SRV_RESULT I2CTAOS3414Sensor::get_integration_mode(LS_INTEG_MODE &mode)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	uint8_t val;
+	RPC_SRV_RESULT ret=getTimingReg(val);
+	val&=0x30;//bit-5 and bit-4
+	val>>=4;
+	switch(val)
+	{
+		case 0x00:mode=LS_INTEG_MODE_FREE;break;
+		case 0x01:mode=LS_INTEG_MODE_MANUAL;break;
+		case 0x02:mode=LS_INTEG_MODE_SYNC_SINGLE;break;
+		case 0x03:mode=LS_INTEG_MODE_SYNC_MULTI;break;
+		default:mode=LS_INTEG_MODE_UNKNOWN;break;
+	}
+	return ret;//RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
 }
 RPC_SRV_RESULT I2CTAOS3414Sensor::set_integration_mode(LS_INTEG_MODE mode)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	uint8_t val,val1;
+	RPC_SRV_RESULT ret=getTimingReg(val);
+	if(ret!=RPC_SRV_RESULT_SUCCESS)
+		return ret;
+	val&=0xCF;//bit-5 and bit-4
+	val1=mode&0x03;val1<<=4;
+	val|=val1;
+	return setTimingReg(val);
 }
 /*****************************************************************************/
 RPC_SRV_RESULT I2CTAOS3414Sensor::get_intr_stop_sts(ADLIB_STATUS_FLAG_TYPE &sts)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	uint8_t val;
+	RPC_SRV_RESULT ret=getInterruptControlReg(val);
+	val&=0x40;//bit-6
+	if(val==0x40)
+		sts=ADLIB_STATUS_FLAG_TYPE_HI;
+	else
+		sts=ADLIB_STATUS_FLAG_TYPE_LO;
+	return ret;
 }
 RPC_SRV_RESULT I2CTAOS3414Sensor::set_intr_stop_sts(ADLIB_STATUS_FLAG_TYPE sts)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	uint8_t val;
+	RPC_SRV_RESULT ret=getInterruptControlReg(val);
+	if(ret!=RPC_SRV_RESULT_SUCCESS)
+		return ret;
+	val&=0xBF;//bit-6
+	if(sts==ADLIB_STATUS_FLAG_TYPE_HI)
+		val|=0x40;//make bit-6 high
+	//else: bit already made low
+	return setInterruptControlReg(val);
 }
 /*****************************************************************************/
 RPC_SRV_RESULT I2CTAOS3414Sensor::get_intr_mode(LS_INTR_MODE &mode)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	uint8_t val;
+	RPC_SRV_RESULT ret=getInterruptControlReg(val);
+	val&=0x30;//bit-5 and bit-4
+	val>>=4;
+	switch(val)
+	{
+		case 0x00:mode=LS_INTR_MODE_DISABLE;break;
+		case 0x01:mode=LS_INTR_MODE_LEVEL;break;
+		case 0x02:mode=LS_INTR_MODE_SMB_ALERT;break;
+		case 0x03:mode=LS_INTR_MODE_SMB_ALERT_SIMULATE;break;
+		default:mode=LS_INTR_MODE_UNKNOWN;break;
+	}
+	return ret;
 }
 RPC_SRV_RESULT I2CTAOS3414Sensor::set_intr_mode(LS_INTR_MODE mode)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	uint8_t val,val1;
+	RPC_SRV_RESULT ret=getInterruptControlReg(val);
+	if(ret!=RPC_SRV_RESULT_SUCCESS)
+		return ret;
+	val&=0xCF;//bit-5 and bit-4
+	val1=mode&0x03;val1<<=4;
+	val|=val1;
+	return setInterruptControlReg(val);
 }
 /*****************************************************************************/
 RPC_SRV_RESULT I2CTAOS3414Sensor::get_intr_rate(LS_INTR_RATE &rate)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	uint8_t val;
+	RPC_SRV_RESULT ret=getInterruptControlReg(val);
+	val&=0x07;//bit-2 to bit-0
+	//val>>=4;
+	switch(val)
+	{
+		case 0x00:rate=LS_INTR_RATE_EVERY;break;
+		case 0x01:rate=LS_INTR_RATE_SINGLE;break;
+		case 0x02:rate=LS_INTR_RATE_100MS;break;
+		case 0x03:rate=LS_INTR_RATE_SECOND;break;
+		default:rate=LS_INTR_RATE_UNKNOWN;break;
+	}
+	return ret;
 }
 RPC_SRV_RESULT I2CTAOS3414Sensor::set_intr_rate(LS_INTR_RATE rate)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	uint8_t val,val1;
+	RPC_SRV_RESULT ret=getInterruptControlReg(val);
+	if(ret!=RPC_SRV_RESULT_SUCCESS)
+		return ret;
+	val&=0xF8;//bit-5 and bit-4
+	val1=rate&0x07;
+	val|=val1;
+	return setInterruptControlReg(val);
 }
 /*****************************************************************************/
 RPC_SRV_RESULT I2CTAOS3414Sensor::get_intr_source(LS_INTR_SOURCE &src)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	uint8_t val;
+	RPC_SRV_RESULT ret=getInterruptSourceReg(val);
+	val&=0x03;//bit-1 to bit-0
+	//val>>=4;
+	switch(val)
+	{
+		case 0x00:src=LS_INTR_SOURCE_GREEN;break;
+		case 0x01:src=LS_INTR_SOURCE_RED;break;
+		case 0x02:src=LS_INTR_SOURCE_BLUE;break;
+		case 0x03:src=LS_INTR_SOURCE_WHITE;break;
+		default:src=LS_INTR_SOURCE_UNKNOWN;break;
+	}
+	return ret;
 }
 RPC_SRV_RESULT I2CTAOS3414Sensor::set_intr_source(LS_INTR_SOURCE src)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	uint8_t val;//,val1;
+	//RPC_SRV_RESULT ret=getInterruptSourceReg(val);
+	//if(ret!=RPC_SRV_RESULT_SUCCESS)
+	//	return ret;
+	//val&=0xF8;//bit-5 and bit-4
+	//val1=rate&0x07;
+	val=(uint8_t)src&0x03;
+	return setInterruptSourceReg(val);
 }
 /*****************************************************************************/
 RPC_SRV_RESULT I2CTAOS3414Sensor::get_gain_mode(LS_GAIN_MODE &mode)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	uint8_t val;
+	RPC_SRV_RESULT ret=getGainReg(val);
+	val&=0x30;//bit-5 and bit-4
+	val>>=4;
+	switch(val)
+	{
+		case 0x00:mode=LS_GAIN_MODE_1;break;
+		case 0x01:mode=LS_GAIN_MODE_4;break;
+		case 0x02:mode=LS_GAIN_MODE_16;break;
+		case 0x03:mode=LS_GAIN_MODE_64;break;
+		default:mode=LS_GAIN_MODE_UNKNOWN;break;
+	}
+	return ret;
 }
 RPC_SRV_RESULT I2CTAOS3414Sensor::set_gain_mode(LS_GAIN_MODE mode)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	uint8_t val,val1;
+	RPC_SRV_RESULT ret=getGainReg(val);
+	if(ret!=RPC_SRV_RESULT_SUCCESS)
+		return ret;
+	val&=0xCF;//bit-5 and bit-4
+	val1=mode&0x03;val1<<=4;
+	val|=val1;
+	return setGainReg(val);
 }
 /*****************************************************************************/
 RPC_SRV_RESULT I2CTAOS3414Sensor::get_prescaler(LS_PRESCALER &mode)

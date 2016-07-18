@@ -56,6 +56,7 @@
 #define INT_SOURCE_CLEAR 0x03
 
 //Gain Register
+#define REG_GAIN_READ 0xC7
 #define GAIN_1 0x00
 #define GAIN_4 0x10
 #define GAIN_16 0x20

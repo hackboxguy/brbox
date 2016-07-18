@@ -26,7 +26,7 @@ class I2CTAOS3414Sensor : public LightSensor
 	// Set interrupt mode
 	void setInterruptControlReg();
 	// Set gain value and pre-scaler value
-	void setGain();
+	void setGainReg();
 	// Start ADC of the colour sensor
 	void setEnableADC();
 	void clearInterrupt();
@@ -36,11 +36,12 @@ class I2CTAOS3414Sensor : public LightSensor
 
 	RPC_SRV_RESULT setTimingReg(uint8_t val);
 	RPC_SRV_RESULT getTimingReg(uint8_t &val);
-
+	RPC_SRV_RESULT setInterruptSourceReg(uint8_t val);
 	RPC_SRV_RESULT getInterruptSourceReg(uint8_t &val);
+	RPC_SRV_RESULT setInterruptControlReg(uint8_t val);
 	RPC_SRV_RESULT getInterruptControlReg(uint8_t &val);
-
-
+	RPC_SRV_RESULT setGainReg(uint8_t val);
+	RPC_SRV_RESULT getGainReg(uint8_t &val);
 public:
 	I2CTAOS3414Sensor(std::string DevNode,std::string DevType);
 	~I2CTAOS3414Sensor();
