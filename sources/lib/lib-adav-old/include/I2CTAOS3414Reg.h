@@ -26,7 +26,9 @@
 #define CTL_DAT_INIITIATE 0x03
 #define CLR_INT 0xE0
 
+
 //Timing Register
+#define REG_TIMING_READ 0xC1
 #define SYNC_EDGE 0x40
 #define INTEG_MODE_FREE 0x00
 #define INTEG_MODE_MANUAL 0x10
@@ -39,6 +41,7 @@
 #define INTEG_PARAM_PULSE_COUNT8 0x03
 
 //Interrupt Control Register 
+#define REG_INTRCTRL_READ 0xC2
 #define INTR_STOP 40
 #define INTR_DISABLE 0x00
 #define INTR_LEVEL 0x10
@@ -46,6 +49,7 @@
 #define INTR_PERSIST_SINGLE 0x01
 
 //Interrupt Souce Register
+#define REG_INTRSRC_READ 0xC3
 #define INT_SOURCE_GREEN 0x00
 #define INT_SOURCE_RED 0x01
 #define INT_SOURCE_BLUE 0x10
