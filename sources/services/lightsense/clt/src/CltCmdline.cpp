@@ -25,7 +25,8 @@ CltCmdline::CltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--intrsrc=src              [read/write interrupt-source=<green/red/blue/white>]");
 	CmdlineHelper.insert_options_entry((char*)"gainmode" ,optional_argument,EJSON_LIGHTSENSE_GAIN_MODE_GET);
 	CmdlineHelper.insert_help_entry((char*)"--gainmode=mode            [read/write gain-mode=<1/4/16/64>]");
-
+	CmdlineHelper.insert_options_entry((char*)"prescaler" ,optional_argument,EJSON_LIGHTSENSE_PRESCALER_GET);
+	CmdlineHelper.insert_help_entry((char*)"--prescaler=value          [read/write prescaler=<div1/div2/div4/div8/div16/div32/div64>]");
 }
 /*****************************************************************************/
 CltCmdline::~CltCmdline()
@@ -114,6 +115,15 @@ int CltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			CmdlineHelper.push_single_enum_get_set_command(EJSON_LIGHTSENSE_GAIN_MODE_GET,
 			EJSON_LIGHTSENSE_GAIN_MODE_SET,LIGHTSENSE_RPC_GAIN_MODE_GET,LIGHTSENSE_RPC_GAIN_MODE_SET,
 			&table[0],LS_GAIN_MODE_UNKNOWN,(char*)LIGHTSENSE_RPC_GAIN_MODE_ARG,sub_arg);
+			}
+			break;
+		case EJSON_LIGHTSENSE_PRESCALER_GET:
+		case EJSON_LIGHTSENSE_PRESCALER_SET:
+			{
+			const char *table[]   = LS_PRESCALER_TABL;
+			CmdlineHelper.push_single_enum_get_set_command(EJSON_LIGHTSENSE_PRESCALER_GET,
+			EJSON_LIGHTSENSE_PRESCALER_SET,LIGHTSENSE_RPC_PRESCALER_GET,LIGHTSENSE_RPC_PRESCALER_SET,
+			&table[0],LS_PRESCALER_UNKNOWN,(char*)LIGHTSENSE_RPC_PRESCALER_ARG,sub_arg);
 			}
 			break;
 		default:

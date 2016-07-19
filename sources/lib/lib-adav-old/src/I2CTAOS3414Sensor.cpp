@@ -491,11 +491,32 @@ RPC_SRV_RESULT I2CTAOS3414Sensor::set_gain_mode(LS_GAIN_MODE mode)
 /*****************************************************************************/
 RPC_SRV_RESULT I2CTAOS3414Sensor::get_prescaler(LS_PRESCALER &mode)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	uint8_t val;
+	RPC_SRV_RESULT ret=getGainReg(val);
+	val&=0x07;//bit-2 to bit-0
+	switch(val)
+	{
+		case 0x00:mode=LS_PRESCALER_DIV1;break;
+		case 0x01:mode=LS_PRESCALER_DIV2;break;
+		case 0x02:mode=LS_PRESCALER_DIV4;break;
+		case 0x03:mode=LS_PRESCALER_DIV8;break;
+		case 0x04:mode=LS_PRESCALER_DIV16;break;
+		case 0x05:mode=LS_PRESCALER_DIV32;break;
+		case 0x06:mode=LS_PRESCALER_DIV64;break;
+		default:mode=LS_PRESCALER_UNKNOWN;break;
+	}
+	return ret;
 }
 RPC_SRV_RESULT I2CTAOS3414Sensor::set_prescaler(LS_PRESCALER mode)
 {
-	return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	uint8_t val,val1;
+	RPC_SRV_RESULT ret=getGainReg(val);
+	if(ret!=RPC_SRV_RESULT_SUCCESS)
+		return ret;
+	val&=0xF8;
+	val1=(mode&0x07);
+	val|=val1;
+	return setGainReg(val);
 }
 /*****************************************************************************/
 //get/set sync_edge(enum hi/low)

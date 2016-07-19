@@ -62,6 +62,8 @@ int main(int argc, const char* argv[])
 	SensorCtrlRpc IntrSourceSet (LIGHTSENSE_RPC_INTR_SOURCE_SET,EJSON_LIGHTSENSE_INTR_SOURCE_SET,emulat,dbglog,&DataCache);
 	SensorCtrlRpc GainModeGet   (LIGHTSENSE_RPC_GAIN_MODE_GET,EJSON_LIGHTSENSE_GAIN_MODE_GET,emulat,dbglog,&DataCache);
 	SensorCtrlRpc GainModeSet   (LIGHTSENSE_RPC_GAIN_MODE_SET,EJSON_LIGHTSENSE_GAIN_MODE_SET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc PrescalerGet  (LIGHTSENSE_RPC_PRESCALER_GET,EJSON_LIGHTSENSE_PRESCALER_GET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc PrescalerSet  (LIGHTSENSE_RPC_PRESCALER_SET,EJSON_LIGHTSENSE_PRESCALER_SET,emulat,dbglog,&DataCache);
 
 	RpcMgr.AttachRpc(&SensorInit);
 	RpcMgr.AttachRpc(&ReadXYZ);
@@ -81,6 +83,8 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&IntrSourceSet);
 	RpcMgr.AttachRpc(&GainModeGet);
 	RpcMgr.AttachRpc(&GainModeSet);
+	RpcMgr.AttachRpc(&PrescalerGet);
+	RpcMgr.AttachRpc(&PrescalerSet);
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr
 	RpcMgr.Start(CmdLine.get_port_number(),CmdLine.get_socket_log(),CmdLine.get_emulation_mode());

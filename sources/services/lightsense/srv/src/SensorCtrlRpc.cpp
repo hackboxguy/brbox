@@ -34,6 +34,8 @@ int SensorCtrlRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_LIGHTSENSE_INTR_SOURCE_SET     :return json_to_bin_set_intr_source(pReq);
 		case EJSON_LIGHTSENSE_GAIN_MODE_GET       :return json_to_bin_get_gain_mode(pReq);
 		case EJSON_LIGHTSENSE_GAIN_MODE_SET       :return json_to_bin_set_gain_mode(pReq);
+		case EJSON_LIGHTSENSE_PRESCALER_GET       :return json_to_bin_get_prescaler(pReq);
+		case EJSON_LIGHTSENSE_PRESCALER_SET       :return json_to_bin_set_prescaler(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -62,6 +64,8 @@ int SensorCtrlRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_LIGHTSENSE_INTR_SOURCE_SET     :return bin_to_json_set_intr_source(pReq);
 		case EJSON_LIGHTSENSE_GAIN_MODE_GET       :return bin_to_json_get_gain_mode(pReq);
 		case EJSON_LIGHTSENSE_GAIN_MODE_SET       :return bin_to_json_set_gain_mode(pReq);
+		case EJSON_LIGHTSENSE_PRESCALER_GET       :return bin_to_json_get_prescaler(pReq);
+		case EJSON_LIGHTSENSE_PRESCALER_SET       :return bin_to_json_set_prescaler(pReq);
 		default:break;
 	}
 	return -1;
@@ -90,6 +94,8 @@ int SensorCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProdu
 		case EJSON_LIGHTSENSE_INTR_SOURCE_SET     :return process_set_intr_source(pReq,pDataCache);
 		case EJSON_LIGHTSENSE_GAIN_MODE_GET       :return process_get_gain_mode(pReq,pDataCache);
 		case EJSON_LIGHTSENSE_GAIN_MODE_SET       :return process_set_gain_mode(pReq,pDataCache);
+		case EJSON_LIGHTSENSE_PRESCALER_GET       :return process_get_prescaler(pReq,pDataCache);
+		case EJSON_LIGHTSENSE_PRESCALER_SET       :return process_set_prescaler(pReq,pDataCache);
 		default:break;
 	}
 	return 0;
@@ -585,6 +591,59 @@ int SensorCtrlRpc::process_set_gain_mode(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DA
 	pPacket=(LIGHTSENSE_MEASUREMENT_PACKET*)pPanelReq->dataRef;
 	if(pData->pSensor!=NULL)
 		pPanelReq->result=pSensr->set_gain_mode(pPacket->gain_mode);
+	else
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+//EJSON_LIGHTSENSE_PRESCALER_GET
+int SensorCtrlRpc::json_to_bin_get_prescaler(JsonDataCommObj* pReq)
+{
+	LIGHTSENSE_MEASUREMENT_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,RPC_SRV_ACT_READ,EJSON_LIGHTSENSE_PRESCALER_GET);
+	return 0;
+}
+int SensorCtrlRpc::bin_to_json_get_prescaler(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_ENUM(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,LIGHTSENSE_RPC_PRESCALER_ARG,prescaler,LS_PRESCALER_TABL,LS_PRESCALER_UNKNOWN);
+	return 0;
+}
+int SensorCtrlRpc::process_get_prescaler(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData)
+{
+	LightSensor *pSensr=pData->pSensor;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	LIGHTSENSE_MEASUREMENT_PACKET* pPacket;
+	pPacket=(LIGHTSENSE_MEASUREMENT_PACKET*)pPanelReq->dataRef;
+	if(pData->pSensor!=NULL)
+		pPanelReq->result=pSensr->get_prescaler(pPacket->prescaler);
+	else
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+//EJSON_LIGHTSENSE_PRESCALER_SET
+int SensorCtrlRpc::json_to_bin_set_prescaler(JsonDataCommObj* pReq)
+{
+	LIGHTSENSE_MEASUREMENT_PACKET* pPanelCmdObj=NULL;
+        PREPARE_JSON_REQUEST(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,RPC_SRV_ACT_WRITE,EJSON_LIGHTSENSE_PRESCALER_SET);
+	JSON_STRING_TO_ENUM(LIGHTSENSE_RPC_PRESCALER_ARG,LS_PRESCALER_TABL,LS_PRESCALER,LS_PRESCALER_UNKNOWN,pPanelCmdObj->prescaler);
+	return 0;
+}
+int SensorCtrlRpc::bin_to_json_set_prescaler(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET);
+	return 0;
+}
+int SensorCtrlRpc::process_set_prescaler(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData)
+{
+	LightSensor *pSensr=pData->pSensor;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	LIGHTSENSE_MEASUREMENT_PACKET* pPacket;
+	pPacket=(LIGHTSENSE_MEASUREMENT_PACKET*)pPanelReq->dataRef;
+	if(pData->pSensor!=NULL)
+		pPanelReq->result=pSensr->set_prescaler(pPacket->prescaler);
 	else
 		pPanelReq->result=RPC_SRV_RESULT_FAIL;
 	return 0;

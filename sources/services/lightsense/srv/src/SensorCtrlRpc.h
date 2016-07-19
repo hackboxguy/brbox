@@ -89,6 +89,14 @@ public:
 	int json_to_bin_set_gain_mode(JsonDataCommObj* pReq);
 	int bin_to_json_set_gain_mode(JsonDataCommObj* pReq);
 	int process_set_gain_mode(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
+	//EJSON_LIGHTSENSE_PRESCALER_GET
+	int json_to_bin_get_prescaler(JsonDataCommObj* pReq);
+	int bin_to_json_get_prescaler(JsonDataCommObj* pReq);
+	int process_get_prescaler(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
+	//EJSON_LIGHTSENSE_PRESCALER_SET
+	int json_to_bin_set_prescaler(JsonDataCommObj* pReq);
+	int bin_to_json_set_prescaler(JsonDataCommObj* pReq);
+	int process_set_prescaler(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
 
 };
 /* ------------------------------------------------------------------------- */
