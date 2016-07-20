@@ -9,7 +9,7 @@
 typedef enum EJSON_LIGHTSENSE_RPC_TYPES_T
 {
 	EJSON_LIGHTSENSE_RPC_SENSOR_INIT,
-	EJSON_LIGHTSENSE_RPC_READ_XYZ,
+	EJSON_LIGHTSENSE_RPC_START_MEASURE,//READ_XYZ,
 	EJSON_LIGHTSENSE_GET_INTEGRATION_TIME,
 	EJSON_LIGHTSENSE_SET_INTEGRATION_TIME,
 	EJSON_LIGHTSENSE_SYNC_EDGE_GET,
@@ -28,15 +28,16 @@ typedef enum EJSON_LIGHTSENSE_RPC_TYPES_T
 	EJSON_LIGHTSENSE_GAIN_MODE_SET,
 	EJSON_LIGHTSENSE_PRESCALER_GET,
 	EJSON_LIGHTSENSE_PRESCALER_SET,
+	EJSON_LIGHTSENSE_RGBWCOUNT_GET,
 	EJSON_LIGHTSENSE_RPC_END,
 	EJSON_LIGHTSENSE_RPC_NONE
 }EJSON_LIGHTSENSE_RPC_TYPES;
 /* ------------------------------------------------------------------------- */
-//EJSON_LIGHTSENSE_RPC_DISP_INIT
+//EJSON_LIGHTSENSE_RPC_SENSOR_INIT
 #define	LIGHTSENSE_RPC_SENSOR_INIT         "sensor_init"
 /* ------------------------------------------------------------------------- */
-//EJSON_LIGHTSENSE_RPC_READ_XYZ
-#define	LIGHTSENSE_RPC_READ_XYZ            "read_xyz"
+//EJSON_LIGHTSENSE_RPC_START_MEASURE
+#define	LIGHTSENSE_RPC_START_MEASURE       "trigger_measurement"
 /* ------------------------------------------------------------------------- */
 //EJSON_LIGHTSENSE_GET_INTEGRATION_TIME,
 //EJSON_LIGHTSENSE_SET_INTEGRATION_TIME,
@@ -92,11 +93,19 @@ typedef enum EJSON_LIGHTSENSE_RPC_TYPES_T
 #define	LIGHTSENSE_RPC_PRESCALER_SET "set_prescaler"
 #define	LIGHTSENSE_RPC_PRESCALER_ARG "value"
 /* ------------------------------------------------------------------------- */
+//EJSON_LIGHTSENSE_RGBWCOUNT_GET
+#define	LIGHTSENSE_RPC_RGBWCOUNT_GET "get_rgbwcount"
+#define	LIGHTSENSE_RPC_RGBWCOUNT_ARGR "R"
+#define	LIGHTSENSE_RPC_RGBWCOUNT_ARGG "G"
+#define	LIGHTSENSE_RPC_RGBWCOUNT_ARGB "B"
+#define	LIGHTSENSE_RPC_RGBWCOUNT_ARGW "W"
+/* ------------------------------------------------------------------------- */
 typedef struct LIGHTSENSE_MEASUREMENT_PACKET_T
 {
-	uint16_t red;
-	uint16_t green;
-	uint16_t blue;
+	int32_t red;
+	int32_t green;
+	int32_t blue;
+	int32_t white;
 	uint32_t integration_time;
 	ADLIB_STATUS_FLAG_TYPE sync_edge;
 	LS_INTEG_MODE integration_mode;

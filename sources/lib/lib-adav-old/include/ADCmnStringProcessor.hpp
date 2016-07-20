@@ -94,6 +94,13 @@ public:
     						char* name3,float val3,
     						char* name4,float val4);
 	int prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq,
+						char* name1,int val1,
+						char* name2,int val2,
+						char* name3,int val3,
+						char* name4,int val4);
+
+
+	int prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq,
                             char* name1,int val1,
                             char* name2,int val2);
 

@@ -17,7 +17,7 @@ int SensorCtrlRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 	switch(command)
 	{
 		case EJSON_LIGHTSENSE_RPC_SENSOR_INIT     :return json_to_bin_sensor_init(pReq);
-		case EJSON_LIGHTSENSE_RPC_READ_XYZ        :return json_to_bin_read_xyz(pReq);
+		case EJSON_LIGHTSENSE_RPC_START_MEASURE   :return json_to_bin_start_measure(pReq);
 		case EJSON_LIGHTSENSE_GET_INTEGRATION_TIME:return json_to_bin_get_integration_time(pReq);
 		case EJSON_LIGHTSENSE_SET_INTEGRATION_TIME:return json_to_bin_set_integration_time(pReq);
 		case EJSON_LIGHTSENSE_SYNC_EDGE_GET       :return json_to_bin_get_sync_edge(pReq);
@@ -36,6 +36,7 @@ int SensorCtrlRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_LIGHTSENSE_GAIN_MODE_SET       :return json_to_bin_set_gain_mode(pReq);
 		case EJSON_LIGHTSENSE_PRESCALER_GET       :return json_to_bin_get_prescaler(pReq);
 		case EJSON_LIGHTSENSE_PRESCALER_SET       :return json_to_bin_set_prescaler(pReq);
+		case EJSON_LIGHTSENSE_RGBWCOUNT_GET       :return json_to_bin_get_rgbwcount(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -47,7 +48,7 @@ int SensorCtrlRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 	switch(command)
 	{
 		case EJSON_LIGHTSENSE_RPC_SENSOR_INIT     :return bin_to_json_sensor_init(pReq);
-		case EJSON_LIGHTSENSE_RPC_READ_XYZ        :return bin_to_json_read_xyz(pReq);
+		case EJSON_LIGHTSENSE_RPC_START_MEASURE   :return bin_to_json_start_measure(pReq);
 		case EJSON_LIGHTSENSE_GET_INTEGRATION_TIME:return bin_to_json_get_integration_time(pReq);
 		case EJSON_LIGHTSENSE_SET_INTEGRATION_TIME:return bin_to_json_set_integration_time(pReq);
 		case EJSON_LIGHTSENSE_SYNC_EDGE_GET       :return bin_to_json_get_sync_edge(pReq);
@@ -66,6 +67,7 @@ int SensorCtrlRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_LIGHTSENSE_GAIN_MODE_SET       :return bin_to_json_set_gain_mode(pReq);
 		case EJSON_LIGHTSENSE_PRESCALER_GET       :return bin_to_json_get_prescaler(pReq);
 		case EJSON_LIGHTSENSE_PRESCALER_SET       :return bin_to_json_set_prescaler(pReq);
+		case EJSON_LIGHTSENSE_RGBWCOUNT_GET       :return bin_to_json_get_rgbwcount(pReq);
 		default:break;
 	}
 	return -1;
@@ -77,7 +79,7 @@ int SensorCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProdu
 	switch(command)
 	{
 		case EJSON_LIGHTSENSE_RPC_SENSOR_INIT     :return process_sensor_init(pReq,pDataCache);
-		case EJSON_LIGHTSENSE_RPC_READ_XYZ        :return process_read_xyz(pReq,pDataCache);
+		case EJSON_LIGHTSENSE_RPC_START_MEASURE   :return process_start_measure(pReq,pDataCache);
 		case EJSON_LIGHTSENSE_GET_INTEGRATION_TIME:return process_get_integration_time(pReq,pDataCache);
 		case EJSON_LIGHTSENSE_SET_INTEGRATION_TIME:return process_set_integration_time(pReq,pDataCache);
 		case EJSON_LIGHTSENSE_SYNC_EDGE_GET       :return process_get_sync_edge(pReq,pDataCache);
@@ -96,6 +98,7 @@ int SensorCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProdu
 		case EJSON_LIGHTSENSE_GAIN_MODE_SET       :return process_set_gain_mode(pReq,pDataCache);
 		case EJSON_LIGHTSENSE_PRESCALER_GET       :return process_get_prescaler(pReq,pDataCache);
 		case EJSON_LIGHTSENSE_PRESCALER_SET       :return process_set_prescaler(pReq,pDataCache);
+		case EJSON_LIGHTSENSE_RGBWCOUNT_GET       :return process_get_rgbwcount(pReq,pDataCache);
 		default:break;
 	}
 	return 0;
@@ -108,7 +111,7 @@ RPC_SRV_RESULT SensorCtrlRpc::ProcessWorkAsync(int index,unsigned char* pWorkDat
 	return ret_val;
 }
 /* ------------------------------------------------------------------------- */
-//EJSON_DISPSRV_RPC_DISP_INIT
+//EJSON_DISPSRV_RPC_SENSOR_INIT
 int SensorCtrlRpc::json_to_bin_sensor_init(JsonDataCommObj* pReq)
 {
 	LIGHTSENSE_MEASUREMENT_PACKET* pPanelCmdObj=NULL;
@@ -134,19 +137,19 @@ int SensorCtrlRpc::process_sensor_init(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
-//EJSON_LIGHTSENSE_RPC_READ_XYZ
-int SensorCtrlRpc::json_to_bin_read_xyz(JsonDataCommObj* pReq)
+//EJSON_LIGHTSENSE_RPC_START_MEASURE
+int SensorCtrlRpc::json_to_bin_start_measure(JsonDataCommObj* pReq)
 {
 	LIGHTSENSE_MEASUREMENT_PACKET* pPanelCmdObj=NULL;
-	PREPARE_JSON_REQUEST(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,RPC_SRV_ACT_READ,EJSON_LIGHTSENSE_RPC_READ_XYZ);
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,RPC_SRV_ACT_READ,EJSON_LIGHTSENSE_RPC_START_MEASURE);
 	return 0;
 }
-int SensorCtrlRpc::bin_to_json_read_xyz(JsonDataCommObj* pReq)
+int SensorCtrlRpc::bin_to_json_start_measure(JsonDataCommObj* pReq)
 {
 	PREPARE_JSON_RESP(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET);
 	return 0;
 }
-int SensorCtrlRpc::process_read_xyz(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData)
+int SensorCtrlRpc::process_start_measure(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData)
 {
 	LightSensor *pSensr=pData->pSensor;
 	RPC_SRV_REQ *pPanelReq=NULL;
@@ -154,7 +157,7 @@ int SensorCtrlRpc::process_read_xyz(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CA
 	LIGHTSENSE_MEASUREMENT_PACKET* pPacket;
 	pPacket=(LIGHTSENSE_MEASUREMENT_PACKET*)pPanelReq->dataRef;
 	if(pData->pSensor!=NULL)
-		pPanelReq->result=pSensr->read_xyz();
+		pPanelReq->result=pSensr->trigger_measurement();
 	else
 		pPanelReq->result=RPC_SRV_RESULT_FAIL;
 	return 0;
@@ -644,6 +647,46 @@ int SensorCtrlRpc::process_set_prescaler(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DA
 	pPacket=(LIGHTSENSE_MEASUREMENT_PACKET*)pPanelReq->dataRef;
 	if(pData->pSensor!=NULL)
 		pPanelReq->result=pSensr->set_prescaler(pPacket->prescaler);
+	else
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+//EJSON_LIGHTSENSE_RGBWCOUNT_GET
+int SensorCtrlRpc::json_to_bin_get_rgbwcount(JsonDataCommObj* pReq)
+{
+	LIGHTSENSE_MEASUREMENT_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,RPC_SRV_ACT_READ,EJSON_LIGHTSENSE_RGBWCOUNT_GET);
+	return 0;
+}
+int SensorCtrlRpc::bin_to_json_get_rgbwcount(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	LIGHTSENSE_MEASUREMENT_PACKET* pPanelCmdObj;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	pPanelCmdObj=(LIGHTSENSE_MEASUREMENT_PACKET*)pPanelReq->dataRef;
+	if(pPanelReq->result!=RPC_SRV_RESULT_SUCCESS)
+		prepare_result_string(pPanelReq->result,pReq);
+	else
+	{
+		prepare_result_string(pPanelReq->result,pReq,(char*)LIGHTSENSE_RPC_RGBWCOUNT_ARGR,pPanelCmdObj->red,
+				                             (char*)LIGHTSENSE_RPC_RGBWCOUNT_ARGG,pPanelCmdObj->green,
+				                             (char*)LIGHTSENSE_RPC_RGBWCOUNT_ARGB,pPanelCmdObj->blue,
+				                             (char*)LIGHTSENSE_RPC_RGBWCOUNT_ARGW,pPanelCmdObj->white);
+				                             
+	}
+	OBJ_MEM_DELETE(pPanelCmdObj);
+	return 0;
+}
+int SensorCtrlRpc::process_get_rgbwcount(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData)
+{
+	LightSensor *pSensr=pData->pSensor;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	LIGHTSENSE_MEASUREMENT_PACKET* pPacket;
+	pPacket=(LIGHTSENSE_MEASUREMENT_PACKET*)pPanelReq->dataRef;
+	if(pData->pSensor!=NULL)
+		pPanelReq->result=pSensr->get_rgbw_count(pPacket->red,pPacket->green,pPacket->blue,pPacket->white);
 	else
 		pPanelReq->result=RPC_SRV_RESULT_FAIL;
 	return 0;

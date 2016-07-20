@@ -13,6 +13,8 @@ class CltCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 	virtual int run_my_autotest(char* ip,int interval_us,int max_loop,int test_num);
 	virtual int print_my_version();
 	virtual int get_my_server_port();
+	int push_get_set_rgbwcount(char* subarg);
+	int run_get_set_rgbwcount(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);
 public:
 	CltCmdline();
 	~CltCmdline();

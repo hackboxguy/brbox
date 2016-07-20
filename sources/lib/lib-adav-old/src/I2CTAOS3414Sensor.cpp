@@ -109,6 +109,18 @@ void I2CTAOS3414Sensor::clearInterrupt()
 	write_array((uint32_t)sensorI2CAddr, data,1);
 }
 /*****************************************************************************/
+RPC_SRV_RESULT I2CTAOS3414Sensor::trigger_measurement()
+{
+	uint8_t data[16];data[0]=REG_BLOCK_READ;
+	write_array((uint32_t)sensorI2CAddr, data,1);
+	read_array((uint32_t)sensorI2CAddr, readingdata_,8);
+	green_	= readingdata_[1] * 256 + readingdata_[0];
+	red_ 	= readingdata_[3] * 256 + readingdata_[2];
+	blue_	= readingdata_[5] * 256 + readingdata_[4];
+	clear_	= readingdata_[7] * 256 + readingdata_[6];
+	return RPC_SRV_RESULT_SUCCESS;//TODO:return inprogress, wait for measurement-done-interrupt
+}
+/*****************************************************************************/
 RPC_SRV_RESULT I2CTAOS3414Sensor::readRGB()
 {
 	uint8_t data[16];data[0]=REG_BLOCK_READ;
@@ -517,6 +529,15 @@ RPC_SRV_RESULT I2CTAOS3414Sensor::set_prescaler(LS_PRESCALER mode)
 	val1=(mode&0x07);
 	val|=val1;
 	return setGainReg(val);
+}
+/*****************************************************************************/
+RPC_SRV_RESULT I2CTAOS3414Sensor::get_rgbw_count(int32_t &red,int32_t &green,int32_t &blue,int32_t &white)
+{
+	red=red_;
+	green=green_;
+	blue=blue_;
+	white=clear_;
+	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
 //get/set sync_edge(enum hi/low)

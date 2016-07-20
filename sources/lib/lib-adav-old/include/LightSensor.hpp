@@ -89,11 +89,11 @@ class LightSensor : public I2CBusAccess
 public:
 	LightSensor(std::string devnode);
 	~LightSensor();
-	virtual RPC_SRV_RESULT init_sensor()=0;
-	virtual RPC_SRV_RESULT read_xyz()=0;
+	virtual RPC_SRV_RESULT init_sensor()=0;//must-have function for derived class
+	//virtual RPC_SRV_RESULT read_xyz()=0;
+	virtual RPC_SRV_RESULT trigger_measurement()=0;//must-have function for derived class
 	virtual RPC_SRV_RESULT get_integration_time(uint32_t &time){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
 	virtual RPC_SRV_RESULT set_integration_time(uint32_t time){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
-
 	//taos3414 specific functions
 	virtual RPC_SRV_RESULT get_sync_edge(ADLIB_STATUS_FLAG_TYPE &edge){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
 	virtual RPC_SRV_RESULT set_sync_edge(ADLIB_STATUS_FLAG_TYPE edge){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
@@ -111,5 +111,7 @@ public:
 	virtual RPC_SRV_RESULT set_gain_mode(LS_GAIN_MODE mode){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
 	virtual RPC_SRV_RESULT get_prescaler(LS_PRESCALER &mode){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
 	virtual RPC_SRV_RESULT set_prescaler(LS_PRESCALER mode){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
+	virtual RPC_SRV_RESULT get_rgbw_count(int32_t &red,int32_t &green,int32_t &blue,int32_t &white){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
+
 };
 #endif

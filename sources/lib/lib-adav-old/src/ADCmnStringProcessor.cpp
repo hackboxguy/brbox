@@ -143,6 +143,25 @@ int ADCmnStringProcessor::prepare_result_string(RPC_SRV_RESULT result,JsonDataCo
 
 	return 0;
 }
+int ADCmnStringProcessor::prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq,
+						char* name1,int val1,
+						char* name2,int val2,
+						char* name3,int val3,
+						char* name4,int val4)
+{
+	char result_string[512];
+	char floatValue_string[512];
+
+	pReq->rpc_code=result;
+	convert_server_result_to_string(pReq->rpc_code,result_string);
+	pReq->json_resp_obj=json_object_new_object();//remember to delete this object after sending response
+	json_object_object_add(pReq->json_resp_obj,RPC_NAME_ARG_RESULT_PARAM, json_object_new_string(result_string));
+	json_object_object_add(pReq->json_resp_obj, name1, json_object_new_int(val1));//param1-int
+	json_object_object_add(pReq->json_resp_obj, name2, json_object_new_int(val2));//param2-int
+	json_object_object_add(pReq->json_resp_obj, name3, json_object_new_int(val3));//param2-int
+	json_object_object_add(pReq->json_resp_obj, name4, json_object_new_int(val4));//param2-int
+	return 0;
+}
 /*****************************************************************************/
 //following function is used for get_wall_geometry mapper.
 int ADCmnStringProcessor::prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq,

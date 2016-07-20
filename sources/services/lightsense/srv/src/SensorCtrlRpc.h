@@ -16,15 +16,14 @@ public:
 	virtual RPC_SRV_RESULT ProcessWorkAsync(int index,unsigned char* pWorkData);
 	virtual void ReceiveEvent(int cltToken,int evntNum,int evntArg,int evntArg2){};
 	virtual RPC_SRV_RESULT ProcessCommonRpc(int index,unsigned char* pWorkData){return RPC_SRV_RESULT_SUCCESS;};
-
+	//EJSON_LIGHTSENSE_RPC_SENSOR_INIT
 	int json_to_bin_sensor_init(JsonDataCommObj* pReq);
 	int bin_to_json_sensor_init(JsonDataCommObj* pReq);
 	int process_sensor_init(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
-
-	int json_to_bin_read_xyz(JsonDataCommObj* pReq);
-	int bin_to_json_read_xyz(JsonDataCommObj* pReq);
-	int process_read_xyz(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
-
+	//EJSON_LIGHTSENSE_RPC_START_MEASURE
+	int json_to_bin_start_measure(JsonDataCommObj* pReq);
+	int bin_to_json_start_measure(JsonDataCommObj* pReq);
+	int process_start_measure(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
 	//EJSON_LIGHTSENSE_GET_INTEGRATION_TIME
 	int json_to_bin_get_integration_time(JsonDataCommObj* pReq);
 	int bin_to_json_get_integration_time(JsonDataCommObj* pReq);
@@ -97,6 +96,11 @@ public:
 	int json_to_bin_set_prescaler(JsonDataCommObj* pReq);
 	int bin_to_json_set_prescaler(JsonDataCommObj* pReq);
 	int process_set_prescaler(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
+	//EJSON_LIGHTSENSE_RGBWCOUNT_GET
+	int json_to_bin_get_rgbwcount(JsonDataCommObj* pReq);
+	int bin_to_json_get_rgbwcount(JsonDataCommObj* pReq);
+	int process_get_rgbwcount(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
+
 
 };
 /* ------------------------------------------------------------------------- */

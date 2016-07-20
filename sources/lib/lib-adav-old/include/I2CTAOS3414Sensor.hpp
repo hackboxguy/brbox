@@ -47,6 +47,7 @@ public:
 	~I2CTAOS3414Sensor();
 	RPC_SRV_RESULT init_sensor();//{return RPC_SRV_RESULT_SUCCESS;};
 	RPC_SRV_RESULT read_xyz(){return readRGB();};//
+	RPC_SRV_RESULT trigger_measurement();
 	RPC_SRV_RESULT get_integration_time(uint32_t &time);//{return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
 	RPC_SRV_RESULT set_integration_time(uint32_t time);//{return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
 	RPC_SRV_RESULT get_sync_edge(ADLIB_STATUS_FLAG_TYPE &edge);//{return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
@@ -65,6 +66,7 @@ public:
 	RPC_SRV_RESULT set_gain_mode(LS_GAIN_MODE mode);//{return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
 	RPC_SRV_RESULT get_prescaler(LS_PRESCALER &mode);//{return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
 	RPC_SRV_RESULT set_prescaler(LS_PRESCALER mode);//{return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
+	RPC_SRV_RESULT get_rgbw_count(int32_t &red,int32_t &green,int32_t &blue,int32_t &white);
 	int ledStatus;
 };
 #endif
