@@ -1,0 +1,15 @@
+config BR2_PACKAGE_BRBOX_LIGHTSENSE
+	bool "Light-Sensor-Service"
+	default n
+	select BR2_PACKAGE_BRBOX_LIBADCMNOLD
+	help
+		light sensor service for accessing various color/brightness sensors
+
+config BR2_PACKAGE_BRBOX_LIGHTSENSE_INIT_ORDER
+        string "lightsensesrv init.d order"
+        default "79"
+        depends on BR2_PACKAGE_BRBOX_LIGHTSENSE
+        help
+          At which place in the init.d startup this service should be started. Needs to be a 2-digit integer.
+          Will be prefixed by "S" by buildroot, so e.g. "79" becomes "S79"
+

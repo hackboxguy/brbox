@@ -55,4 +55,5 @@ source "package/brbox/brbox_gstreamer_vaapi/Config.in"
 source "package/brbox/brbox_genintrdrv/Config.in"
 source "package/brbox/brbox_i2csrv/Config.in"
 source "package/brbox/brbox_dispsrv/Config.in"
+source "package/brbox/brbox_lightsense/Config.in"
 endmenu
