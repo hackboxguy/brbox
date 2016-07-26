@@ -67,8 +67,11 @@ int ADXmppProxy::connect(char* user,char* password)
 	//j->setCACerts( ca );
 
 	//LogLevelDebug
-	j->logInstance().registerLogHandler( LogLevelWarning, LogAreaAll, this );
-
+	if(DebugLog)
+		j->logInstance().registerLogHandler( LogLevelDebug, LogAreaAll, this );
+	else
+		j->logInstance().registerLogHandler( LogLevelWarning, LogAreaAll, this );
+		
 	HeartBeat=0;
 
 	ConnectionError ce = ConnNoError;
