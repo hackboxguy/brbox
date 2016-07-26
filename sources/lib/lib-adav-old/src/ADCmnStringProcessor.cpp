@@ -108,6 +108,7 @@ int ADCmnStringProcessor::prepare_result_string(RPC_SRV_RESULT result,JsonDataCo
 	json_object_object_add(pReq->json_resp_obj,result_para_name, json_object_new_string(result_para_value));
 	return 0;
 }
+
 int ADCmnStringProcessor::prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq,char* result_para_name,int result_para_value)
 {
 	char result_string[512];
@@ -283,6 +284,36 @@ int ADCmnStringProcessor::prepare_result_string(RPC_SRV_RESULT result,JsonDataCo
     json_object_object_add(pReq->json_resp_obj, name3, json_object_new_int(val3));//param3-int
     return 0;
 }
+
+/*****************************************************************************/
+int ADCmnStringProcessor::prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq,
+                        char* name1,int val1,
+                        char* name2,int val2,
+                        char* name3,int val3,
+                        char* name4,int val4,
+                        char* name5,int val5,
+                        char* name6,int val6,
+                        char* name7,int val7,
+                        char* name8,int val8)
+{
+    char result_string[512];
+    pReq->rpc_code=result;
+    convert_server_result_to_string(pReq->rpc_code,result_string);
+    pReq->json_resp_obj=json_object_new_object();//remember to delete this object after sending response
+    json_object_object_add(pReq->json_resp_obj,RPC_NAME_ARG_RESULT_PARAM, json_object_new_string(result_string));
+    //json_object_object_add(pReq->json_resp_obj,result_para_name, json_object_new_string(result_para_value));
+    json_object_object_add(pReq->json_resp_obj, name1, json_object_new_int(val1));//param1-int
+    json_object_object_add(pReq->json_resp_obj, name2, json_object_new_int(val2));//param2-int
+    json_object_object_add(pReq->json_resp_obj, name3, json_object_new_int(val3));//param3-int
+    json_object_object_add(pReq->json_resp_obj, name4, json_object_new_int(val4));//param3-int
+    json_object_object_add(pReq->json_resp_obj, name5, json_object_new_int(val5));//param3-int
+    json_object_object_add(pReq->json_resp_obj, name6, json_object_new_int(val6));//param3-int
+    json_object_object_add(pReq->json_resp_obj, name7, json_object_new_int(val7));//param3-int
+    json_object_object_add(pReq->json_resp_obj, name8, json_object_new_int(val8));//param3-int
+    
+    return 0;
+}
+
 
 int ADCmnStringProcessor::prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq,
                                 char* name1,int val1,

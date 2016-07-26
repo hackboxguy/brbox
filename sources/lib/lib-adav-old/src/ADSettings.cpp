@@ -34,7 +34,8 @@ int ADSettings::free_chain_element_data(void* element,ADChainProducer* pObj)
 		SETTINGS_ENTRY *objData;
 		objData=(SETTINGS_ENTRY *)element;
 		if(objData->value!=NULL)
-			MEM_DELETE(objData->value);
+			//MEM_DELETE(objData->value);
+			ARRAY_MEM_DELETE(objData->value);
 	}
 	return 0;
 }
@@ -661,7 +662,8 @@ int ADSettings::attach_setting(SETTINGS_ENTRY* pEntry)
 
 	if(SettingsChainLocal.chain_put((void *)pNewEntry)!=0)
 	{
-		OBJ_MEM_DELETE(pNewEntry->value);
+		//OBJ_MEM_DELETE(pNewEntry->value);
+		ARRAY_MEM_DELETE(pNewEntry->value);
 		OBJ_MEM_DELETE(pNewEntry);
 		return -1;
 	}

@@ -39,6 +39,7 @@ int ADCmdlineHelper::init_myself()
 	interval_us=1000;//1ms resolution
 	interval_ms_delay=1;
 	max_loop=1;
+	maxLogfileSize=-1;//128*1024;//131072;//128KBytes
 	test_num=0;
 	strcpy(ip,"127.0.0.1");
 	port=-1;
@@ -294,6 +295,7 @@ int ADCmdlineHelper::parse_cmdline_arguments(int argc, char **argv)
 				if(get_next_subargument(&subarg)!=0)
 					strcpy(settings,subarg);
 				break;
+
 			case 'k'://indx:0:read task status
 				push_get_task_progress_command((char*)ADLIB_RPC_NAME_GET_TASK_STATUS,(char*)ADLIB_RPC_PARM_TASK_STS_ID,(char*)ADLIB_RPC_PARM_TASK_STS,ADLIB_RPC_INDX_GET_TASK_STATUS,subarg);
 				break;
@@ -1415,7 +1417,6 @@ int ADCmdlineHelper::push_double_int_set_command(int setcmd,const char* set_rpc_
 	}
 	//strcpy(pCmdObj->get_rpc_name,get_rpc_name);
 	strcpy(pCmdObj->set_rpc_name,set_rpc_name);
-
 	if(get_next_subargument(&subarg)==0)//user must specify first argument
 	{
 		OBJ_MEM_DELETE(pCmdObj);
@@ -1429,7 +1430,6 @@ int ADCmdlineHelper::push_double_int_set_command(int setcmd,const char* set_rpc_
 		pCmdObj->first_arg_param_int_value=atoi(subarg);
 		strcpy(pCmdObj->first_arg_param_name,param1_name);//"action"
 		pCmdObj->action=RPC_SRV_ACT_WRITE;
-
 		if(get_next_subargument(&subarg)==0)//read
 		{
 			OBJ_MEM_DELETE(pCmdObj);
@@ -1441,7 +1441,6 @@ int ADCmdlineHelper::push_double_int_set_command(int setcmd,const char* set_rpc_
 			pCmdObj->second_arg_param_int_value=atoi(subarg);
 			strcpy(pCmdObj->second_arg_param_name,param2_name);
 		}
-
 	}
 	pCmdObj->cmd_type=CLIENT_CMD_TYPE_DOUBLE_INT_SET;
 	//put the request into chain
@@ -1454,5 +1453,4 @@ int ADCmdlineHelper::push_double_int_set_command(int setcmd,const char* set_rpc_
 	return 0;
 }
 /*****************************************************************************/
-
 

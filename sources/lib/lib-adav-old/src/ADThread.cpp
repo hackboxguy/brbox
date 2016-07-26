@@ -1,4 +1,5 @@
 #include "ADThread.hpp"
+#include <signal.h>
 #include <iostream>
 using namespace std;
 /*****************************************************************************/
@@ -8,6 +9,7 @@ void *thread_function(void *thread_attr)
 {
 	ADThread *pThread;
 	pThread=(ADThread*)thread_attr;
+	signal(SIGALRM,SIG_IGN);
 	int my_id=pthread_self();//get my unique id
 	pThread->my_thread_func(my_id);
 	pthread_exit((void*) thread_attr);
@@ -127,7 +129,6 @@ int ADThread::stop_thread()//thread* th)
 	//destroy the attribute which was created during startup
 	if(pthread_attr_destroy(&attr)!=0)
 		cout<<"unable to destroy thread attribute"<<endl;
-	
 	if(tid!=-1)//if thread was created successfully
 	{
 		pthread_cancel(thread);

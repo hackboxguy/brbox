@@ -85,7 +85,7 @@ int ADNetClient::sock_connect(void)
 	rc = connect(sockfd,(struct sockaddr *)&addr,sizeof(struct sockaddr_in));
 	if (rc < 0)
 	{
-		cout<<ip<<" : unable to connect to socket port = "<<port<<endl;
+        //cout<<ip<<" : unable to connect to socket port = "<<port<<endl;
 		close(sockfd);
 		return -1;
 	}
@@ -155,7 +155,7 @@ int ADNetClient::receive_data_blocking(char* recv_buf,int buf_total_size,int tim
 		}
 		//record time B here
 		time_elapsed=CmdTimer.elapsed();			
-		if(data>=0)recv_buf[data]='\0';
+	        if(data>=0)recv_buf[data]='\0';	
 		return data;
 	}
 	else

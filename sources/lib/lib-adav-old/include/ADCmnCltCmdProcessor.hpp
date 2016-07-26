@@ -2,9 +2,9 @@
 #define __AD_CMN_CLT_CMD_PROCESSOR_H_
 #include "ADCommon.hpp"
 #include "JsonCmnDef.h"
+#include "ADCmnStringProcessor.hpp"
 #include "ADJsonRpcClient.hpp"
 #include "ADGenericChain.hpp"
-#include "ADCmnStringProcessor.hpp"
 
 //#define JSON_RPC_METHOD_NAME_MAX_LENGTH 256
 //#define JSON_RPC_METHOD_REQ_MAX_LENGTH  1100 //considering 1400 MTU limit
@@ -44,6 +44,10 @@ typedef struct CmdExecutionObj_t
 
 	int cmd_int_val;//first_arg_int_value
 	int cmd_enum_val;//first_arg_enum_value
+	
+	int arg_param_int_value[JSON_RPC_METHOD_RESP_MAX_LENGTH];//for rpc types with argument
+
+	double arg_param_ulong_value[JSON_RPC_METHOD_RESP_MAX_LENGTH];//for rpc types with argument
 
 	//char set_rpc_cmd_single_param_name[1024];//for int type set cmd with single parameter type
 	char first_arg_param_name[JSON_RPC_METHOD_RESP_MAX_LENGTH];//for rpc types with argument
@@ -133,7 +137,11 @@ typedef struct CmdExecutionObj_t
 	char seventeen_arg_param_name[JSON_RPC_METHOD_RESP_MAX_LENGTH];//for rpc types with argument
 	char seventeen_arg_param_value[JSON_RPC_METHOD_RESP_MAX_LENGTH];//for rpc types with argument value as string
 	float  seventeen_arg_param_float_value;
-	
+
+	char eighteen_arg_param_name[JSON_RPC_METHOD_RESP_MAX_LENGTH];//for rpc types with argument
+	char eighteen_arg_param_value[JSON_RPC_METHOD_RESP_MAX_LENGTH];//for rpc types with argument value as string
+	float  eighteen_arg_param_float_value;
+
 	RPC_SRV_RESULT result;
 	char rpc_resp_result[JSON_RPC_METHOD_RESP_MAX_LENGTH];//server response string
 	//add further for other data types
@@ -177,6 +185,5 @@ public:
 	int log_print_message(ADJsonRpcClient *pSrvSockConn/*string ip*/,char* rpc_name,RPC_SRV_ACT action,char* result,ADGenericChain *pOutMsgList);
 	int log_print_message(ADJsonRpcClient *pSrvSockConn,char* rpc_method_name,RPC_SRV_ACT action,RPC_SRV_RESULT result,ADGenericChain *pOutMsgList,char* result_val);
 	int run_cmd_type_double_int_set(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList);
-
 };
 #endif

@@ -22,7 +22,11 @@ int ADJsonRpcMapper::monoshot_callback_function(void* pUserData,ADThreadProducer
 
 	ADJsonRpcProxy* pJson;
 	pJson = (ADJsonRpcProxy*)pApiObj->pRpcMethod->pProducer;
-
+	if(pJson==NULL)
+	{
+		cout << (char*)"pApiObj->pRpcMethod->pProducer is NULL"<<endl;
+		return -1;
+	}
 	JsonDataCommObj DataObj;
 	DataObj.req_id                    = pApiObj->req_id;//client provided req id through json string
 	DataObj.cmd_index                 = pApiObj->pRpcMethod->method_index;

@@ -20,7 +20,8 @@ int ADEvntNotifier::monoshot_callback_function(void* pUserData,ADThreadProducer*
 		ADJsonRpcClient Client;
 		if(Client.rpc_server_connect("127.0.0.1",entry.port)!=0)
 		{
-			LOG_DEBUG_MSG_1_ARG(true,"BRBOX:ADEvntNotifier","Unable connect on port = %d",entry.port);
+			//LOG_DEBUG_MSG_1_ARG(true,"BRBOX:ADEvntNotifier","Unable connect on port = %d",entry.port);
+			LOG_ERR_MSG_WITH_ARG("libadav:ADEvntNotifier","Unable connect on port = %d",entry.port);
 		}
 		else
 		{
@@ -29,7 +30,9 @@ int ADEvntNotifier::monoshot_callback_function(void* pUserData,ADThreadProducer*
 						     (char*)RPCMGR_RPC_EVENT_ARG_EXTRA,entry.eventArg,
 						     (char*)RPCMGR_RPC_EVENT_ARG2_EXTRA,entry.eventArg2)!=RPC_SRV_RESULT_SUCCESS)
 			{
-			LOG_DEBUG_MSG_2_ARG(true,"BRBOX:ADEvntNotifier","Unable send event = %d on port = %d",entry.eventNum,entry.port);
+				//LOG_DEBUG_MSG_2_ARG(true,"BRBOX:ADEvntNotifier","Unable send event = %d on port = %d",entry.eventNum,entry.port);
+				LOG_ERR_MSG_WITH_ARG("libadav:ADEvntNotifier","Unable send event = %d",entry.eventNum);
+				LOG_ERR_MSG_WITH_ARG("libadav:ADEvntNotifier","Unable send event on port = %d",entry.port);
 			}
 			Client.rpc_server_disconnect();
 		}

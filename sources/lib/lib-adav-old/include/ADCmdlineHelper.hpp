@@ -131,6 +131,7 @@ class ADCmdlineHelper:public ADCmdlineHelperProducer, public ADChainConsumer ,pu
 	int interval_us;//delay between two commands=1000;//1ms resolution
 	int interval_ms_delay;//=1;
 	int max_loop;//number of loop counts=1;
+	int maxLogfileSize;
 	int test_num;//=0;
 
 	char ip[255];//ipaddr of the server to be connected

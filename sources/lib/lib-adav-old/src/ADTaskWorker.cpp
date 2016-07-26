@@ -88,7 +88,7 @@ int ADTaskWorker::monoshot_callback_function(void* pUserData,ADThreadProducer* p
 	return 0;
 }
 /*****************************************************************************/
-ADTaskWorker::ADTaskWorker()//int portNum):notifyPortNum(portNum)
+ADTaskWorker::ADTaskWorker()
 {
 	notifyPortNum=-1;
 	//initialize worker-thread and chain

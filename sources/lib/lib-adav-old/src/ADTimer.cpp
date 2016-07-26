@@ -14,6 +14,7 @@ int ADTimer::received_user_stop_sig=0;
 int ADTimer::stoptimer=0;
 
 ADTimer* pTmpTimer;//for static member function access(this limits the use of one ADTimer object per linux process)
+
 /*****************************************************************************/
 ADTimer::ADTimer():millisec_time(100),passive_mode(true)//by-default it is a passive timer
 {
@@ -39,7 +40,7 @@ ADTimer::ADTimer(int timer_millisec,int port)
 //	sigaddset(&sigset, SIGQUIT);
 //	sigaddset(&sigset, SIGIO);
 //	sigaddset(&sigset, SIGALRM);
-//	sigprocmask(SIG_BLOCK, &sigset, NULL);
+	pthread_sigmask(SIG_SETMASK , &sigset, NULL);
 
 	//prepare signal worker monoshot threads
 	TimerThreadID=TimerThread.subscribe_thread_callback(this);//remember the ID, coz we only have one callback function, and we need to differentiate
@@ -169,9 +170,7 @@ int ADTimer::wait_for_exit_signal()//forever-loop, blocks the main() app till ki
 
 	sigemptyset(&sigset);
 	sigfillset(&sigset);
-
-//	sigemptyset(&sigset);
-/*	sigaddset(&sigset, SIGINT);
+	/*sigaddset(&sigset, SIGINT);
 	sigaddset(&sigset, SIGTERM);
 	sigaddset(&sigset, SIGQUIT);
 	sigaddset(&sigset, SIGIO);
@@ -212,8 +211,11 @@ int ADTimer::wait_for_exit_signal()//forever-loop, blocks the main() app till ki
 					LOG_ERR_MSG("AdLib","ADTimer received Sementation fault!!!!!!!!!!!!!!!!!!!!!!");
 					break;
 			default     :
+					//printf("ADTimer::wait_for_exit_signal: handling default sig = %d\n",sig);
 					if(notify_registered_signals(sig,&info)!=0)
-						LOG_ERR_MSG_WITH_ARG("AdLib","ADTimer received unknown sig = %d!!!!",sig);
+						printf("ADTimer::wait_for_exit_signal: unregistered signal=%d\n",sig);
+
+						//printf("SDSRV:AdLib","ADTimer received unknown sig = %d!!!!",sig);
 						//LOG_ERR_MSG_WITH_ARG("SDSRV:AdLib","ADTimer received unknown sig = %d!!!!",sig);
 					//printf("wait_for_exit_signal:notifying custom sig = %d info.si_int=%d\n",sig,info.si_int);
 				    //if(sig==custom_sig)
@@ -224,8 +226,11 @@ int ADTimer::wait_for_exit_signal()//forever-loop, blocks the main() app till ki
 		}
 	}
 	//printf("exiting program\n");
+	if(notifyPortNum!=-1) //notify only when user request
+	{
 	NOTIFY_EVENT(ADLIB_EVENT_NUM_SHUT_DOWN,-1,notifyPortNum,-1);//send shutdown event notification before shutdown
 	usleep(100000);usleep(100000);usleep(100000);usleep(100000);usleep(100000);//wait 500ms for shutdown notification to be sent
+	}
 	return 0;
 }
 /*****************************************************************************/
@@ -252,6 +257,7 @@ int ADTimer::register_custom_signal(int custom_sig_num,ADTimerConsumer* pConsume
 //	return sigaction(custom_sig_num,&action1,NULL);
 
 	sigaddset(&sigset, custom_sig_num);
+	pthread_sigmask(SIG_SETMASK, &sigset, NULL);
 	//custom_sig=custom_sig_num;
 	push_custom_sig_registration(custom_sig_num);
 	return 0;
@@ -262,7 +268,7 @@ void ADTimer::custom_signal_handler_new(int sig, siginfo_t * info, void * contex
 	//cout << "sig======================" << endl;
 	//cout << "sig=" << sig << endl;
 	//cout << "sig%%%%%%%%%%%%%%%%%%%%%%" << endl;
-	pTmpTimer->notify_custom_sig_to_subscribers_new(info->si_int);
+	pTmpTimer->notify_custom_sig_to_subscribers_new(info->si_int,sig);
 }
 
 int ADTimer::register_custom_signal_new(int custom_sig_num,ADTimerConsumer* pConsumer)
@@ -278,6 +284,7 @@ int ADTimer::register_custom_signal_new(int custom_sig_num,ADTimerConsumer* pCon
 //	return sigaction(custom_sig_num,&action1,NULL);
 
 	sigaddset(&sigset, custom_sig_num);
+	pthread_sigmask(SIG_SETMASK, &sigset, NULL);
 	//custom_sig=custom_sig_num;
 	push_custom_sig_registration(custom_sig_num);
 	return 0;
@@ -326,6 +333,7 @@ int ADTimer::notify_registered_signals(int sig,siginfo_t * info)
 				if(pSigInfo != NULL)
 				{
 					pSigInfo->sig_num=info->si_int;//sub-signal number is needed in thread-callback
+					pSigInfo->sig_extra=sig;//record main signal
 					if(SigInfoChain.chain_put((void *)pSigInfo)!=0)//push-to-chain
 						OBJ_MEM_DELETE(pSigInfo);
 					else
@@ -355,7 +363,7 @@ int ADTimer::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 		pSigReg=(ADTIMER_CUSTOM_SIG*)SigInfoChain.chain_get();//pull-from-chain
 		if(pSigReg!=NULL)
 		{
-			notify_custom_sig_to_subscribers_new(pSigReg->sig_num);//info->si_int
+			notify_custom_sig_to_subscribers_new(pSigReg->sig_num,pSigReg->sig_extra);//info->si_int
 			OBJ_MEM_DELETE(pSigReg);
 		}
 	}

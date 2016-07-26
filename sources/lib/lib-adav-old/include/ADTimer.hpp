@@ -11,7 +11,8 @@
 
 typedef struct ADTIMER_CUSTOM_SIG_T
 {
-	int sig_num;
+	int sig_num;//signal preset in siginfo_t struct
+	int sig_extra;//actual signal num
 }ADTIMER_CUSTOM_SIG;
 /*****************************************************************************/
 //to understand this, read C++ subject observer pattern
@@ -53,13 +54,13 @@ protected:
 		}
 	}
 	
-	void notify_custom_sig_to_subscribers_new(int signum)
+	void notify_custom_sig_to_subscribers_new(int signum,int sig_extra)
 	{
 		std::vector<ADTimerConsumer*>::iterator iter;
 		for(iter=subscribers.begin();iter != subscribers.end();++iter)
 		{
-			if( (*iter)->notify_custom_sig==1 && (*iter)->custom_sig_num==signum ) //send only to those who requested it
-				(*iter)->custom_sig_notification(signum);
+			if( (*iter)->notify_custom_sig==1) //send only to those who requested it
+				(*iter)->custom_sig_notification(signum);//sig_extra);//signum);
 		}
 	}
 	
@@ -80,6 +81,7 @@ private:
 	struct itimerval timer;
 	//int custom_sig;
 	sigset_t sigset;
+	int notifyPortNum;
 
 	static int stoptimer;
 	int millisec_time;
@@ -97,7 +99,6 @@ private:
 	ADThread TimerThread,CustomSigThread;//worker threads
 	int TimerThreadID,CustomSigThreadID;
 	ADGenericChain SigInfoChain;
-	int notifyPortNum;
 
 	//thread-callback functions
 	virtual int monoshot_callback_function(void* pUserData,ADThreadProducer* pObj);
@@ -105,7 +106,7 @@ private:
 
 public:
 	ADTimer();
-	ADTimer(int timer_millisec,int port);
+	ADTimer(int timer_millisec,int port=-1);
 	~ADTimer();	
 	int test_print();
 	int restart_millisec_timer(int new_millisec);

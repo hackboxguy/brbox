@@ -331,6 +331,15 @@ do			\
 			MSG("ARR_MEM_CREATE():mem could not be allocated for size=%d\n",(int)size);\
 	}\
 } while (0)
+#define ARRAY_MEM_DELETE(pMemory)	\
+	do							\
+	{							\
+		if (pMemory == NULL)\
+			MSG("ARRAY_MEM_DELETE():NULL pointer detected.\n");\
+		else					\
+			delete [] pMemory;	\
+		pMemory = NULL;			\
+	} while (0)
 /*****************************************************************************/
 //rpc communication objects between mapper and worker
 typedef enum rpc_srv_action_t

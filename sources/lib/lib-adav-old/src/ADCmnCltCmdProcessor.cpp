@@ -25,16 +25,20 @@ int ADCmnCltCmdProcessor::copy_cmd_exec_obj(CmdExecutionObj *pCmdObjDest,CmdExec
 	pCmdObjDest->cmd_int_val = pCmdObjSrc->cmd_int_val;//first_arg_int_value
 	pCmdObjDest->cmd_enum_val= pCmdObjSrc->cmd_enum_val;//first_arg_enum_value
 
+	for (int i=0; i< sizeof(pCmdObjSrc->arg_param_int_value); i++)
+		pCmdObjDest->arg_param_int_value[i] =  pCmdObjSrc->arg_param_int_value[i];	
+
+
 	strncpy(pCmdObjDest->first_arg_param_name, pCmdObjSrc->first_arg_param_name, sizeof(pCmdObjSrc->first_arg_param_name) );
 	strncpy(pCmdObjDest->first_arg_param_value, pCmdObjSrc->first_arg_param_value, sizeof(pCmdObjSrc->first_arg_param_value) );
 	pCmdObjDest->first_arg_param_int_value= pCmdObjSrc->first_arg_param_int_value;
-    pCmdObjDest->first_arg_param_double_value=pCmdObjSrc->first_arg_param_double_value;
+   	pCmdObjDest->first_arg_param_double_value=pCmdObjSrc->first_arg_param_double_value;
 
 
 	strncpy(pCmdObjDest->second_arg_param_name, pCmdObjSrc->second_arg_param_name, sizeof(pCmdObjSrc->second_arg_param_name) );
 	strncpy(pCmdObjDest->second_arg_param_value, pCmdObjSrc->second_arg_param_value, sizeof(pCmdObjSrc->second_arg_param_value) );
 	pCmdObjDest->second_arg_param_int_value= pCmdObjSrc->second_arg_param_int_value;
-    pCmdObjDest->second_arg_param_double_value=pCmdObjSrc->second_arg_param_double_value;
+    	pCmdObjDest->second_arg_param_double_value=pCmdObjSrc->second_arg_param_double_value;
 
 
 	strncpy(pCmdObjDest->third_arg_param_name , pCmdObjSrc->third_arg_param_name, sizeof(pCmdObjSrc->third_arg_param_name) );
@@ -339,7 +343,5 @@ int ADCmnCltCmdProcessor::run_cmd_type_double_int_set(CmdExecutionObj *pCmdObj,A
 	}
 	return 0;
 }
-/*****************************************************************************/
-
 
 

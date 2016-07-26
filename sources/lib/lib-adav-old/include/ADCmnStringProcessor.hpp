@@ -87,7 +87,16 @@ public:
                                 char* name1,int val1,
                                 char* name2,int val2,
                                 char* name3,int val3);
-                                
+    int prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq,
+                                char* name1,int val1,
+                        char* name2,int val2,
+                        char* name3,int val3,
+                        char* name4,int val4,
+                        char* name5,int val5,
+                        char* name6,int val6,
+                        char* name7,int val7,
+                        char* name8,int val8);
+						
 	int prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq,
     						char* name1,int val1,
     						char* name2,int val2,
@@ -127,8 +136,9 @@ public:
 
     int prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq,char* name1,char* val1,char* name2,char* val2,
                         char* name3,char* val3,char* name4,char* val4);
-	int prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq,char* result_para_name,int result_para_value);
 
-    int prepare_req_object(JsonDataCommObj* pReq,RPC_SRV_ACT action,int cmd);
+    int prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq,char* result_para_name,int result_para_value);
+
+	int prepare_req_object(JsonDataCommObj* pReq,RPC_SRV_ACT action,int cmd);
 };
 #endif
