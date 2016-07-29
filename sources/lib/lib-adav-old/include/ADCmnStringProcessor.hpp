@@ -17,8 +17,8 @@ public:
 	int prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq);
 	int prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq,char* result_para_name,char* result_para_value);
 	
-	//int prepare_result_string(EDISP_PANEL_RESULT result,JsonDataCommObj* pReq);
-	//int prepare_result_string(EDISP_PANEL_RESULT result,JsonDataCommObj* pReq,char* result_para_name,char* result_para_value);
+	int prepare_result_string(EDISP_PANEL_RESULT result,JsonDataCommObj* pReq);
+	int prepare_result_string(EDISP_PANEL_RESULT result,JsonDataCommObj* pReq,char* result_para_name,char* result_para_value);
 
 	int prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq,char* name1,int   val1,char* name2,int val2,char* name3,int val3,char* name4,int val4,
 											char* name5,char* val5);//,char* name6, char* val6);

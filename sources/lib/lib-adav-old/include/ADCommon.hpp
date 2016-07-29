@@ -234,6 +234,13 @@ do			\
 		closelog ();\
 	}\
 } while (0)
+#define LOG_INFO_MSG(service,msg)\
+do			\
+{			\
+	openlog (service, LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL0);\
+	syslog(LOG_ERR, msg);\
+	closelog ();\
+} while (0)
 /*****************************************************************************/
 //used for creating memory for structures
 // like: obj * pMemory = new (obj)
@@ -685,4 +692,21 @@ typedef enum ADLIB_STATUS_FLAG_TYPE_T
 	ADLIB_STATUS_FLAG_TYPE_UNKNOWN,
 	ADLIB_STATUS_FLAG_TYPE_NONE
 }ADLIB_STATUS_FLAG_TYPE;
+/*****************************************************************************/
+typedef enum display_panel_result_t
+{
+	EDISP_PANEL_RESULT_SUCCESS = 0, //command success
+	EDISP_PANEL_RESULT_FAIL,        //for some reason command failed
+	EDISP_PANEL_RESULT_IN_PROG,     //action is in progress
+	EDISP_PANEL_RESULT_NOT_STARTED, //action has not started
+	EDISP_PANEL_RESULT_TIMEOUT,     //ex: did not receive rx bytes on uart
+	EDISP_PANEL_RESULT_ARG_ERROR,   //user supplied wrong argument
+	EDISP_PANEL_RESULT_MEM_ERROR,   //internal dynamic memory allocation error
+	EDISP_PANEL_RESULT_BUS_ERROR,   //incase of i2c like interface(for fmtr)
+	EDISP_PANEL_RESULT_RESEND,      //
+	EDISP_PANEL_RESULT_FILE_NOT_FOUND, //file passed not found.
+	EDISP_PANEL_RESULT_UNKNOWN,
+	EDISP_PANEL_RESULT_NONE
+}EDISP_PANEL_RESULT;
+/*****************************************************************************/
 #endif

@@ -286,6 +286,7 @@ int ADCmnStringProcessor::prepare_result_string(RPC_SRV_RESULT result,JsonDataCo
 }
 
 /*****************************************************************************/
+//following function is used for get_wall_geometry mapper.
 int ADCmnStringProcessor::prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq,
                         char* name1,int val1,
                         char* name2,int val2,
@@ -568,7 +569,7 @@ int ADCmnStringProcessor::prepare_result_string(RPC_SRV_RESULT result,JsonDataCo
 
 /*****************************************************************************/
 //for sdps related return enum(EDISP_PANEL_RESULT)
-/*int ADCmnStringProcessor::prepare_result_string(EDISP_PANEL_RESULT result,JsonDataCommObj* pReq)
+int ADCmnStringProcessor::prepare_result_string(EDISP_PANEL_RESULT result,JsonDataCommObj* pReq)
 {
 	char result_string[512];
 	switch(result)
@@ -600,7 +601,7 @@ int ADCmnStringProcessor::prepare_result_string(EDISP_PANEL_RESULT result,JsonDa
 	json_object_object_add(pReq->json_resp_obj,RPC_NAME_ARG_RESULT_PARAM, json_object_new_string(result_string));
 	json_object_object_add(pReq->json_resp_obj,result_para_name, json_object_new_string(result_para_value));
 	return 0;
-}*/
+}
 /*****************************************************************************/
 //following function is used for get_runtimes
 int ADCmnStringProcessor::prepare_result_string(RPC_SRV_RESULT result,JsonDataCommObj* pReq,

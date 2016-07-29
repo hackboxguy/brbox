@@ -192,13 +192,13 @@ int ADTimer::wait_for_exit_signal()//forever-loop, blocks the main() app till ki
 		sig=sigwaitinfo(&sigset,&info);
 		switch(sig)
 		{
-			case SIGINT :LOG_ERR_MSG("AdLib","ADTimer received SIGINT");
+			case SIGINT :LOG_INFO_MSG("SDSRV:AdLib","ADTimer received SIGINT");
 					received_user_stop_sig=1;
 					break;
-			case SIGTERM:LOG_ERR_MSG("AdLib","ADTimer received SIGTERM");
+			case SIGTERM:LOG_INFO_MSG("SDSRV:AdLib","ADTimer received SIGTERM");
 					received_user_stop_sig=1;
 					break;
-			case SIGQUIT:LOG_ERR_MSG("AdLib","ADTimer received SIGQUIT");
+			case SIGQUIT:LOG_INFO_MSG("SDSRV:AdLib","ADTimer received SIGQUIT");
 					received_user_stop_sig=1;
 					break;
 			case SIGIO  :notify_sigio_to_subscribers();
@@ -208,7 +208,7 @@ int ADTimer::wait_for_exit_signal()//forever-loop, blocks the main() app till ki
 					TimerThread.wakeup_thread();
 					break;
 			case SIGSEGV :
-					LOG_ERR_MSG("AdLib","ADTimer received Sementation fault!!!!!!!!!!!!!!!!!!!!!!");
+					LOG_INFO_MSG("SDSRV:AdLib","ADTimer received Sementation fault!!!!!!!!!!!!!!!!!!!!!!");
 					break;
 			default     :
 					//printf("ADTimer::wait_for_exit_signal: handling default sig = %d\n",sig);

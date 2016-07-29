@@ -318,6 +318,7 @@ int ADJsonRpcMgr::MyMapBinaryToJson(JsonDataCommObj* pReq)
 	}
 	return result;
 }
+
 /* ------------------------------------------------------------------------- */
 int ADJsonRpcMgr::MyProcessWork(JsonDataCommObj* pReq)
 {

@@ -28,8 +28,10 @@ int ADJsonRpcProxy::on_data_arrival(ADGenericChain* pRxChain,ADNetProducer* pObj
 		{
 			//echo back data
 			//Server.schedule_response(req_obj->sock_descriptor,req_obj->data_buffer, req_obj->data_buffer_len);
-			free(req_obj->data_buffer);
-			free(req_obj);
+			//free(req_obj->data_buffer);
+			ARRAY_MEM_DELETE(req_obj->data_buffer);
+			//free(req_obj);
+			OBJ_MEM_DELETE(req_obj);
 		}
 		//else, json_process_request() is responsible for keeping removed req_obj pointer in different chain
 	}
@@ -76,7 +78,9 @@ int ADJsonRpcProxy::free_chain_element_data(void* element,ADChainProducer* pObj)
 //thread-callback functions
 int ADJsonRpcProxy::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 {
+	
 	json_process_rsponse();
+	
 	return 0;
 }
 //blocking thread-callback not used here
