@@ -2,6 +2,14 @@
 #this script prepares the buildroot and dependencies
 BR_LAST_STABLE_VERSION=2016.02 #2016.05-rc3 #2016.02 #2015.11.1 #2015.08.1 #2015.05 #2015.02
 BR_DOWNLOAD_FOLDER=dl
+
+while getopts v: f
+do
+    case $f in
+	v) BR_LAST_STABLE_VERSION=$OPTARG ;; #override incase if this script is called with -v version
+    esac
+done
+
 ####################checkout buildroot#####################
 git clone git://git.buildroot.net/buildroot
 [ $? != 0 ] && echo "git clone failed!!!" && exit -1
