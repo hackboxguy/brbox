@@ -20,18 +20,21 @@ void I2CTAOS3414Sensor::setTimingReg()
 }
 RPC_SRV_RESULT I2CTAOS3414Sensor::setTimingReg(uint8_t val)
 {
+	RPC_SRV_RESULT ret;
 	uint8_t data[16];data[0]=REG_TIMING;data[1]=val;
-	write_array((uint32_t)sensorI2CAddr, data,2);
-	return RPC_SRV_RESULT_SUCCESS;
+	ret=write_array((uint32_t)sensorI2CAddr, data,2);
+	return ret;//return RPC_SRV_RESULT_SUCCESS;
 }
 RPC_SRV_RESULT I2CTAOS3414Sensor::getTimingReg(uint8_t &val)
 {
+	RPC_SRV_RESULT ret;
 	uint8_t tmp_data[16];
 	uint8_t data[16];data[0]=REG_TIMING_READ;
-	write_array((uint32_t)sensorI2CAddr, data,1);
-	read_array((uint32_t)sensorI2CAddr, tmp_data,1);
+	ret=write_array((uint32_t)sensorI2CAddr, data,1);
+	if(ret!=RPC_SRV_RESULT_SUCCESS)return ret;
+	ret=read_array((uint32_t)sensorI2CAddr, tmp_data,1);
 	val=tmp_data[0];
-	return RPC_SRV_RESULT_SUCCESS;
+	return ret;//RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
 void I2CTAOS3414Sensor::setInterruptSourceReg()
@@ -41,18 +44,21 @@ void I2CTAOS3414Sensor::setInterruptSourceReg()
 }
 RPC_SRV_RESULT I2CTAOS3414Sensor::setInterruptSourceReg(uint8_t val)
 {
+	RPC_SRV_RESULT ret;
 	uint8_t data[16];data[0]=REG_INT_SOURCE;data[1]=val;
-	write_array((uint32_t)sensorI2CAddr, data,2);
-	return RPC_SRV_RESULT_SUCCESS;
+	ret=write_array((uint32_t)sensorI2CAddr, data,2);
+	return ret;//RPC_SRV_RESULT_SUCCESS;
 }
 RPC_SRV_RESULT I2CTAOS3414Sensor::getInterruptSourceReg(uint8_t &val)
 {
+	RPC_SRV_RESULT ret;
 	uint8_t tmp_data[16];
 	uint8_t data[16];data[0]=REG_INTRSRC_READ;
-	write_array((uint32_t)sensorI2CAddr, data,1);
-	read_array((uint32_t)sensorI2CAddr, tmp_data,1);
+	ret=write_array((uint32_t)sensorI2CAddr, data,1);
+	if(ret!=RPC_SRV_RESULT_SUCCESS)return ret;
+	ret=read_array((uint32_t)sensorI2CAddr, tmp_data,1);
 	val=tmp_data[0];
-	return RPC_SRV_RESULT_SUCCESS;
+	return ret;//RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
 void I2CTAOS3414Sensor::setInterruptControlReg()
@@ -62,18 +68,21 @@ void I2CTAOS3414Sensor::setInterruptControlReg()
 }
 RPC_SRV_RESULT I2CTAOS3414Sensor::setInterruptControlReg(uint8_t val)
 {
+	RPC_SRV_RESULT ret;
 	uint8_t data[16];data[0]=REG_INT;data[1]=val;
-	write_array((uint32_t)sensorI2CAddr, data,2);
-	return RPC_SRV_RESULT_SUCCESS;
+	ret=write_array((uint32_t)sensorI2CAddr, data,2);
+	return ret;//RPC_SRV_RESULT_SUCCESS;
 }
 RPC_SRV_RESULT I2CTAOS3414Sensor::getInterruptControlReg(uint8_t &val)
 {
+	RPC_SRV_RESULT ret;
 	uint8_t tmp_data[16];
 	uint8_t data[16];data[0]=REG_INTRCTRL_READ;
-	write_array((uint32_t)sensorI2CAddr, data,1);
-	read_array((uint32_t)sensorI2CAddr, tmp_data,1);
+	ret=write_array((uint32_t)sensorI2CAddr, data,1);
+	if(ret!=RPC_SRV_RESULT_SUCCESS)return ret;
+	ret=read_array((uint32_t)sensorI2CAddr, tmp_data,1);
 	val=tmp_data[0];
-	return RPC_SRV_RESULT_SUCCESS;
+	return ret;//RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
 void I2CTAOS3414Sensor::setGainReg()
@@ -83,18 +92,21 @@ void I2CTAOS3414Sensor::setGainReg()
 }
 RPC_SRV_RESULT I2CTAOS3414Sensor::setGainReg(uint8_t val)
 {
+	RPC_SRV_RESULT ret;
 	uint8_t data[16];data[0]=REG_GAIN;data[1]=val;
-	write_array((uint32_t)sensorI2CAddr, data,2);
-	return RPC_SRV_RESULT_SUCCESS;
+	ret=write_array((uint32_t)sensorI2CAddr, data,2);
+	return ret;//RPC_SRV_RESULT_SUCCESS;
 }
 RPC_SRV_RESULT I2CTAOS3414Sensor::getGainReg(uint8_t &val)
 {
+	RPC_SRV_RESULT ret;
 	uint8_t tmp_data[16];
 	uint8_t data[16];data[0]=REG_GAIN_READ;
-	write_array((uint32_t)sensorI2CAddr, data,1);
-	read_array((uint32_t)sensorI2CAddr, tmp_data,1);
+	ret=write_array((uint32_t)sensorI2CAddr, data,1);
+	if(ret!=RPC_SRV_RESULT_SUCCESS)return ret;
+	ret=read_array((uint32_t)sensorI2CAddr, tmp_data,1);
 	val=tmp_data[0];
-	return RPC_SRV_RESULT_SUCCESS;
+	return ret;//RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
 void I2CTAOS3414Sensor::setEnableADC()
@@ -111,22 +123,25 @@ void I2CTAOS3414Sensor::clearInterrupt()
 /*****************************************************************************/
 RPC_SRV_RESULT I2CTAOS3414Sensor::trigger_measurement()
 {
+	RPC_SRV_RESULT ret;
 	uint8_t data[16];data[0]=REG_BLOCK_READ;
-	write_array((uint32_t)sensorI2CAddr, data,1);
-	read_array((uint32_t)sensorI2CAddr, readingdata_,8);
+	ret=write_array((uint32_t)sensorI2CAddr, data,1);
+	if(ret!=RPC_SRV_RESULT_SUCCESS)return ret;
+	ret=read_array((uint32_t)sensorI2CAddr, readingdata_,8);
 	green_	= readingdata_[1] * 256 + readingdata_[0];
 	red_ 	= readingdata_[3] * 256 + readingdata_[2];
 	blue_	= readingdata_[5] * 256 + readingdata_[4];
 	clear_	= readingdata_[7] * 256 + readingdata_[6];
-	return RPC_SRV_RESULT_SUCCESS;//TODO:return inprogress, wait for measurement-done-interrupt
+	return ret;//RPC_SRV_RESULT_SUCCESS;//TODO:return inprogress, wait for measurement-done-interrupt
 }
 /*****************************************************************************/
 RPC_SRV_RESULT I2CTAOS3414Sensor::readRGB()
 {
+	RPC_SRV_RESULT ret;
 	uint8_t data[16];data[0]=REG_BLOCK_READ;
-	write_array((uint32_t)sensorI2CAddr, data,1);
-	
-	read_array((uint32_t)sensorI2CAddr, readingdata_,8);
+	ret=write_array((uint32_t)sensorI2CAddr, data,1);
+	if(ret!=RPC_SRV_RESULT_SUCCESS)return ret;
+	ret=read_array((uint32_t)sensorI2CAddr, readingdata_,8);
 	green_	= readingdata_[1] * 256 + readingdata_[0];
 	red_ 	= readingdata_[3] * 256 + readingdata_[2];
 	blue_	= readingdata_[5] * 256 + readingdata_[4];
@@ -136,7 +151,7 @@ RPC_SRV_RESULT I2CTAOS3414Sensor::readRGB()
 	cout<<"I2CTAOS3414Sensor::readRGB:green ="<<green_<<endl;
 	cout<<"I2CTAOS3414Sensor::readRGB:blue  ="<<blue_<<endl;
 	cout<<"I2CTAOS3414Sensor::readRGB:white ="<<clear_<<endl;
-	return RPC_SRV_RESULT_SUCCESS;
+	return ret;//RPC_SRV_RESULT_SUCCESS;
 	/*Serial.print("The RGB value are: RGB( ");
 	Serial.print(red_,DEC);
 	Serial.print(", ");
@@ -285,11 +300,12 @@ RPC_SRV_RESULT I2CTAOS3414Sensor::init_sensor()
 	interruptMode_   =INTR_LEVEL | INTR_PERSIST_EVERY;
 	gainAndPrescaler_=GAIN_1 | PRESCALER_1;
 	sensorAddress_   =COLOR_SENSOR_ADDR;
-	I2CTAOS3414Sensor::setTimingReg(); 
+	I2CTAOS3414Sensor::setTimingReg();
 	I2CTAOS3414Sensor::setInterruptSourceReg();  
 	I2CTAOS3414Sensor::setInterruptControlReg(); 
 	I2CTAOS3414Sensor::setGainReg(); 
 	I2CTAOS3414Sensor::setEnableADC(); 
+	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
 RPC_SRV_RESULT I2CTAOS3414Sensor::get_integration_time(uint32_t &time)
