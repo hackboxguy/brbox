@@ -151,8 +151,9 @@ int ADThreadedSockClient::start_command_execution()//char* srv_ip,int srv_port)
 		return -1;//already running
 	}
 	stop_running = 0;
+	running=1;	
 	cmd_thread.start_thread();
-	running=1;//this should have been in thread function, but it is done to ensure that 
+	//running=1;//this should have been in thread function, but it is done to ensure that 
 		  //is_running() function returns correct status to the caller
 	return 0;
 }
