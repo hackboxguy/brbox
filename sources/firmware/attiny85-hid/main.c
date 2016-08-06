@@ -1,4 +1,14 @@
-/* Name: main.c
+/* 
+ * Name: main.c
+ * Project: 4-Key-Keyboard(up/down/enter/escape) 
+ * Author: Albert David(albert dot david at gmail)
+ * Creation Date: 2016-08-07
+ * This code is written for Digispark attiny85 board(http://digistump.com/products/1)
+ * it turns digispark-attiny85-board to act as 4key hid device(key_up/key_dn/key_enter/key_escape)
+*/
+
+/*
+ * many parts of this code is based on following two projects(Christian Starkjohann/Flip van den Berg)
  * Project: Thermostat based on AVR USB driver
  * Author: Christian Starkjohann
  * Creation Date: 2006-04-23
@@ -6,6 +16,11 @@
  * Copyright: (c) 2006 by OBJECTIVE DEVELOPMENT Software GmbH
  * License: Proprietary, free under certain conditions. See Documentation.
  * This Revision: $Id: main.c 537 2008-02-28 21:13:01Z cs $
+ * Project: 4-Key-Keyboard
+ * Author: Flip van den Berg - www.flipwork.nl
+ * Creation Date: February 2010
+ * Based on V-USB drivers from Objective Developments - http://www.obdev.at/products/vusb/index.html
+ *
  */
 /* ------------------------------------------------------------------------- */
 #include <avr/io.h>
@@ -16,49 +31,70 @@
 #include "usbdrv.h"
 #include "oddebug.h"
 /* ------------------------------------------------------------------------- */
-/*
-Pin assignment: Digispark attiny85 board(http://digistump.com/products/1)
-PB0 = key input (active low with pull-up)
-PB1 = LED output (active high)
-PB3 = analog input (ADC3)
-PB3, PB4 = USB data lines
-*/
-#define BIT_LED 1 //4
-#define BIT_KEY 00
-#define UTIL_BIN4(x)        (uchar)((0##x & 01000)/64 + (0##x & 0100)/16 + (0##x & 010)/4 + (0##x & 1))
-#define UTIL_BIN8(hi, lo)   (uchar)(UTIL_BIN4(hi) * 16 + UTIL_BIN4(lo))
-#ifndef NULL
-#define NULL    ((void *)0)
-#endif
+#define BUTTON_PORT_B1 PORTB       /* PORTx - register for BUTTON 1 output */
+#define BUTTON_PIN_B1 PINB         /* PINx - register for BUTTON 1 input */
+#define BUTTON_BIT_B1 PB0 //1          /* bit for BUTTON 1 input/output */
+
+#define BUTTON_PORT_B2 PORTB       /* PORTx - register for BUTTON 2 output */
+#define BUTTON_PIN_B2 PINB         /* PINx - register for BUTTON 2 input */
+#define BUTTON_BIT_B2 PB1 //4          /* bit for BUTTON 2 input/output */
+
+#define BUTTON_PORT_B3 PORTB       /* PORTx - register for BUTTON 3 output */
+#define BUTTON_PIN_B3 PINB         /* PINx - register for BUTTON 3 input */
+#define BUTTON_BIT_B3 PB2 //5          /* bit for BUTTON 3 input/output */
+
+#define BUTTON_PORT_B4 PORTB       /* PORTx - register for BUTTON 4 output */
+#define BUTTON_PIN_B4 PINB         /* PINx - register for BUTTON 4 input */
+#define BUTTON_BIT_B4 PB5 //3          /* bit for BUTTON 4 input/output */
 /* ------------------------------------------------------------------------- */
-static uchar    reportBuffer[2];    /* buffer for HID reports */
+static uchar    reportBuffer[8] = {0,0,0,0,0,0,0,0};    /* buffer for HID reports */
 static uchar    idleRate;           /* in 4 ms units */
-static uchar    adcPending;
-static uchar    isRecording;
-static uchar    valueBuffer[16];
-static uchar    *nextDigit;
+static uchar    newReport = 0;		/* current report */
+static uchar    buttonState_B1 = 3;		/*  stores state of button 0 */
+static uchar    buttonState_B2 = 3;		/*  stores state of button 1 */
+static uchar    buttonState_B3 = 3;		/*  stores state of button 2 */
+static uchar    buttonState_B4 = 3;		/*  stores state of button 3 */
+static uchar    buttonChanged_B1;		
+static uchar    buttonChanged_B2;		
+static uchar    buttonChanged_B3;		
+static uchar    buttonChanged_B4;		
+static uchar	debounceTimeIsOver = 1;	/* for switch debouncing */
 /* ------------------------------------------------------------------------- */
-PROGMEM char usbHidReportDescriptor[USB_CFG_HID_REPORT_DESCRIPTOR_LENGTH] = { /* USB report descriptor */
+PROGMEM char usbHidReportDescriptor[USB_CFG_HID_REPORT_DESCRIPTOR_LENGTH] = {
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x09, 0x06,                    // USAGE (Keyboard)
     0xa1, 0x01,                    // COLLECTION (Application)
-    0x05, 0x07,                    // USAGE_PAGE (Keyboard)
-    0x19, 0xe0,                    // USAGE_MINIMUM (Keyboard LeftControl)
-    0x29, 0xe7,                    // USAGE_MAXIMUM (Keyboard Right GUI)
-    0x15, 0x00,                    // LOGICAL_MINIMUM (0)
-    0x25, 0x01,                    // LOGICAL_MAXIMUM (1)
-    0x75, 0x01,                    // REPORT_SIZE (1)
-    0x95, 0x08,                    // REPORT_COUNT (8)
-    0x81, 0x02,                    // INPUT (Data,Var,Abs)
-    0x95, 0x01,                    // REPORT_COUNT (1)
-    0x75, 0x08,                    // REPORT_SIZE (8)
-    0x25, 0x65,                    // LOGICAL_MAXIMUM (101)
-    0x19, 0x00,                    // USAGE_MINIMUM (Reserved (no event indicated))
-    0x29, 0x65,                    // USAGE_MAXIMUM (Keyboard Application)
-    0x81, 0x00,                    // INPUT (Data,Ary,Abs)
-    0xc0                           // END_COLLECTION
+    0x05, 0x07,                    //   USAGE_PAGE (Keyboard)
+    0x19, 0xe0,                    //   USAGE_MINIMUM (Keyboard LeftControl)
+    0x29, 0xe7,                    //   USAGE_MAXIMUM (Keyboard Right GUI)
+    0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
+    0x25, 0x01,                    //   LOGICAL_MAXIMUM (1)
+    0x75, 0x01,                    //   REPORT_SIZE (1)
+    0x95, 0x08,                    //   REPORT_COUNT (8)
+    0x81, 0x02,                    //   INPUT (Data,Var,Abs)	** Modifier Byte **
+    0x95, 0x01,                    //   REPORT_COUNT (1)
+    0x75, 0x08,                    //   REPORT_SIZE (8)
+    0x81, 0x03,                    //   INPUT (Cnst,Var,Abs)	** Reserved Byte **
+    0x95, 0x05,                    //   REPORT_COUNT (5)
+    0x75, 0x01,                    //   REPORT_SIZE (1)
+    0x05, 0x08,                    //   USAGE_PAGE (LEDs)
+    0x19, 0x01,                    //   USAGE_MINIMUM (Num Lock)
+    0x29, 0x05,                    //   USAGE_MAXIMUM (Kana)
+    0x91, 0x02,                    //   OUTPUT (Data,Var,Abs)	** LED Report **
+    0x95, 0x01,                    //   REPORT_COUNT (1)
+    0x75, 0x03,                    //   REPORT_SIZE (3)
+    0x91, 0x03,                    //   OUTPUT (Cnst,Var,Abs)	** LED Report Padding **
+    0x95, 0x06,                    //   REPORT_COUNT (6)** here we define the maximum number of simultaneous keystrokes we can detect ** 
+    0x75, 0x08,                    //   REPORT_SIZE (8)
+    0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
+    0x25, 0x65,                    //   LOGICAL_MAXIMUM (101)
+    0x05, 0x07,                    //   USAGE_PAGE (Keyboard)
+    0x19, 0x00,                    //   USAGE_MINIMUM (Reserved (no event indicated))
+    0x29, 0x65,                    //   USAGE_MAXIMUM (Keyboard Application)
+    0x81, 0x00,                    //   INPUT (Data,Ary,Abs)	** Key arrays (6 bytes) **
+    0xc0                           // END_COLLECTION  
 };
- /* We use a simplifed keyboard report descriptor which does not support the
+/* We use a simplifed keyboard report descriptor which does not support the
  * boot protocol. We don't allow setting status LEDs and we only allow one
  * simultaneous key press (except modifiers). We can therefore use short
  * 2 byte input reports.
@@ -67,117 +103,127 @@ PROGMEM char usbHidReportDescriptor[USB_CFG_HID_REPORT_DESCRIPTOR_LENGTH] = { /*
  * Redundant entries (such as LOGICAL_MINIMUM and USAGE_PAGE) have been omitted
  * for the second INPUT item.
  */
- /* Keyboard usage values, see usb.org's HID-usage-tables document, chapter
+/* Keyboard usage values, see usb.org's HID-usage-tables document, chapter
  * 10 Keyboard/Keypad Page for more codes.
  */
-#define MOD_CONTROL_LEFT    (1<<0)
-#define MOD_SHIFT_LEFT      (1<<1)
-#define MOD_ALT_LEFT        (1<<2)
-#define MOD_GUI_LEFT        (1<<3)
-#define MOD_CONTROL_RIGHT   (1<<4)
-#define MOD_SHIFT_RIGHT     (1<<5)
-#define MOD_ALT_RIGHT       (1<<6)
-#define MOD_GUI_RIGHT       (1<<7)
-#define KEY_1       30
-#define KEY_2       31
-#define KEY_3       32
-#define KEY_4       33
-#define KEY_5       34
-#define KEY_6       35
-#define KEY_7       36
-#define KEY_8       37
-#define KEY_9       38
-#define KEY_0       39
-#define KEY_RETURN  40
-/* ------------------------------------------------------------------------- */
-static void buildReport(void)
-{
-	uchar   key = 0;
-	if(nextDigit != NULL)
-	{
-		key = *nextDigit;
-	}
-	reportBuffer[0] = 0;    /* no modifiers */
-	reportBuffer[1] = key;
-}
-/* ------------------------------------------------------------------------- */
-static void evaluateADC(unsigned int value)
-{
-	uchar   digit;
-	value += value + (value >> 1);  /* value = value * 2.5 for output in mV */
-	nextDigit = &valueBuffer[sizeof(valueBuffer)];
-	*--nextDigit = 0xff;/* terminate with 0xff */
-	*--nextDigit = 0;
-	*--nextDigit = KEY_RETURN;
-	do
-	{
-		digit = value % 10;
-		value /= 10;
-		*--nextDigit = 0;
-		if(digit == 0)
-		{
-			*--nextDigit = KEY_0;
-		}
-		else
-		{
-			*--nextDigit = KEY_1 - 1 + digit;
-		}
-	}while(value != 0);
-}
-/* ------------------------------------------------------------------------- */
-static void setIsRecording(uchar newValue)
-{
-	isRecording = newValue;
-	if(isRecording)
-	{
-		PORTB |= 1 << BIT_LED;      /* LED on */
-	}
-	else
-	{
-		PORTB &= ~(1 << BIT_LED);   /* LED off */
-	}
-}
-/* ------------------------------------------------------------------------- */
-static void keyPoll(void)
-{
-	static uchar    keyMirror;
-	uchar           key;
-	key = PINB & (1 << BIT_KEY);
-	if(keyMirror != key) /* status changed */
-	{   	
-		keyMirror = key;
-		if(!key) /* key was pressed */
-		{       
-			setIsRecording(!isRecording);
-		}
-	}
-}
-/* ------------------------------------------------------------------------- */
-static void adcPoll(void)
-{
-	if(adcPending && !(ADCSRA & (1 << ADSC)))
-	{
-		adcPending = 0;
-		evaluateADC(ADC);
-	}
-}
+#define KEY_UP_ARROW   0x52
+#define KEY_DN_ARROW   0x51
+#define KEY_ENTER      0x28
+#define KEY_ESCAPE     0x29
+//0x51	Keyboard DownArrow
+//0x52	Keyboard UpArrow
+//0x28	Keyboard Return (ENTER)
+//0x29	Keyboard ESCAPE
+//0x4F	Keyboard RightArrow
+//0x50	Keyboard LeftArrow
 /* ------------------------------------------------------------------------- */
 static void timerPoll(void)
 {
-	static uchar timerCnt;
+	static unsigned int timerCnt;
 	if(TIFR & (1 << TOV1))
 	{
 		TIFR = (1 << TOV1); /* clear overflow */
-		keyPoll();
-		if(++timerCnt >= 63)
-		{       /* ~ 1 second interval */
-			timerCnt = 0;
-			if(isRecording)
-			{
-				adcPending = 1;
-				ADCSRA |= (1 << ADSC);/* start next conversion */
-			}
+		if(++timerCnt >= 5)
+		{       
+		// 5/63 sec delay for switch debouncing
+		timerCnt = 0;
+		debounceTimeIsOver = 1; 
 		}
+	}
+}
+/* ------------------------------------------------------------------------- */
+static void buildReport(void)
+{
+	uchar key; 
+	if(newReport == 0)
+	{	
+		if (buttonChanged_B1 == 1)
+		{
+	        	if (buttonState_B1 != 0)
+			{ // if button 1 is released
+				key = 0; //button released event
+			} 
+			else 
+			{ //if button 1 is pressed
+				key = KEY_UP_ARROW;//30; // key = '1'
+	 	   	}
+			buttonChanged_B1 = 0;
+			reportBuffer[2] = key;
+
+		}
+		if (buttonChanged_B2 == 1)
+		{
+        		if (buttonState_B2 != 0)
+			{ // if button 2 is pressed
+				key = 0; //button released event
+			} 
+			else 
+			{
+				key = KEY_DN_ARROW;//31;  // key = '2'
+			}
+			buttonChanged_B2 = 0;
+    			reportBuffer[3] = key;
+    		}
+		if(buttonChanged_B3 == 1)
+		{
+        		if (buttonState_B3 != 0)
+			{ // if button 3 is pressed
+				key = 0; //button released event
+			} 
+			else
+			{
+				key = KEY_ENTER;//32; // key = '3'
+			}
+			buttonChanged_B3 = 0;
+			reportBuffer[4] = key;
+	    	}
+		if(buttonChanged_B4 == 1)
+		{
+        		if (buttonState_B4 != 0)
+			{ // if button 4 is pressed
+				key = 0; //button released event
+			} 
+			else
+			{
+				key = KEY_ESCAPE;//33;  // key = '4'
+    			}
+			buttonChanged_B4 = 0;
+    			reportBuffer[5] = key;
+    		}
+		newReport = 1;; //if no button has changed, the previous report will be sent
+	}
+}
+/* ------------------------------------------------------------------------- */
+static void checkButtonChange(void) {
+	
+	uchar tempButtonValue_B1 = bit_is_set(BUTTON_PIN_B1, BUTTON_BIT_B1); //status of switch is stored in tempButtonValue 
+	uchar tempButtonValue_B2 = bit_is_set(BUTTON_PIN_B2, BUTTON_BIT_B2); //status of switch is stored in tempButtonValue 
+	uchar tempButtonValue_B3 = bit_is_set(BUTTON_PIN_B3, BUTTON_BIT_B3);  //status of switch is stored in tempButtonValue 
+	uchar tempButtonValue_B4 = bit_is_set(BUTTON_PIN_B4, BUTTON_BIT_B4);  //status of switch is stored in tempButtonValue 
+
+	if (tempButtonValue_B1 != buttonState_B1){ //if status has changed
+		buttonState_B1 = tempButtonValue_B1;	// change buttonState to new state
+		debounceTimeIsOver = 0;	// debounce timer starts
+		newReport = 0; // initiate new report 
+		buttonChanged_B1 = 1;
+	}
+	if (tempButtonValue_B2 != buttonState_B2){ //if status has changed
+		buttonState_B2 = tempButtonValue_B2;	// change buttonState to new state
+		debounceTimeIsOver = 0;	// debounce timer starts
+		newReport = 0; // initiate new report 
+		buttonChanged_B2 = 1;
+	}
+	if (tempButtonValue_B3 != buttonState_B3){ //if status has changed
+		buttonState_B3 = tempButtonValue_B3;	// change buttonState to new state
+		debounceTimeIsOver = 0;	// debounce timer starts
+		newReport = 0; // initiate new report 
+		buttonChanged_B3 = 1;
+	}
+	if (tempButtonValue_B4 != buttonState_B4){ //if status has changed
+		buttonState_B4 = tempButtonValue_B4;	// change buttonState to new state
+		debounceTimeIsOver = 0;	// debounce timer starts
+		newReport = 0; // initiate new report 
+		buttonChanged_B4 = 1;
 	}
 }
 /* ------------------------------------------------------------------------- */
@@ -185,12 +231,6 @@ static void timerInit(void)
 {
 	/* select clock: 16.5M/1k -> overflow rate = 16.5M/256k = 62.94 Hz */
 	TCCR1 = 0x0b;
-}
-/* ------------------------------------------------------------------------- */
-static void adcInit(void)
-{
-	ADMUX = UTIL_BIN8(1001, 0011);  /* Vref=2.56V, measure ADC0 */
-	ADCSRA = UTIL_BIN8(1000, 0111); /* enable ADC, not free running, interrupt disable, rate = 1/128 */
 }
 /* ------------------------------------------------------------------------- */
 /* ------------------------ interface to USB driver ------------------------ */
@@ -274,6 +314,7 @@ void    calibrateOscillator(void)
 void usbEventResetReady(void)
 {
 	calibrateOscillator();
+	//eeprom_write_byte(0, OSCCAL); 
 }
 /* ------------------------------------------------------------------------- */
 /* --------------------------------- main ---------------------------------- */
@@ -283,30 +324,38 @@ int main(void)
 	uchar   i;
 	odDebugInit();
 	usbInit();
-	usbDeviceDisconnect();
-	for(i=0;i<20;i++)
-	{  /* 300 ms disconnect */
-		_delay_ms(15);
+	usbDeviceDisconnect();  //enforce re-enumeration, do this while interrupts are disabled!
+	i = 0;
+	while(--i)
+	{             // fake USB disconnect for > 250 ms
+		wdt_reset();
+		_delay_ms(1);
 	}
 	usbDeviceConnect();
-	DDRB |= 1 << BIT_LED;   /* output for LED */
-	PORTB |= 1 << BIT_KEY;  /* pull-up on key input */
-	wdt_enable(WDTO_1S);
+	wdt_enable(WDTO_2S);
+
+	// turn on internal pull-up resistor for the switches
+	BUTTON_PORT_B1 |= _BV(BUTTON_BIT_B1);
+	BUTTON_PORT_B2 |= _BV(BUTTON_BIT_B2);
+	BUTTON_PORT_B3 |= _BV(BUTTON_BIT_B3);
+	BUTTON_PORT_B4 |= _BV(BUTTON_BIT_B4);
+
 	timerInit();
-	adcInit();
 	sei();
-	for(;;)
-	{    /* main event loop */
+	for(;;) //main event loop
+	{    
 		wdt_reset();
 		usbPoll();
-		if(usbInterruptIsReady() && nextDigit != NULL){ /* we can send another key */
-		buildReport();
-		usbSetInterrupt(reportBuffer, sizeof(reportBuffer));
-		if(*++nextDigit == 0xff)    /* this was terminator character */
-		nextDigit = NULL;
+		if (debounceTimeIsOver == 1)
+		{
+		checkButtonChange();
+		}
+		if(usbInterruptIsReady() && newReport == 0) //we can send another report
+		{ 
+			buildReport();
+			usbSetInterrupt(reportBuffer, sizeof(reportBuffer));
 		}
 		timerPoll();
-		adcPoll();
 	}
 	return 0;
 }
