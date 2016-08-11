@@ -10,7 +10,7 @@ BRBOX_GSTREAMER_VAAPI_SOURCE = brbox_gstreamer_vaapi-$(BRBOX_GSTREAMER_VAAPI_VER
 #BRBOX_GSTREAMER_VAAPI_SITE_METHOD = git_with_submodules
 BRBOX_GSTREAMER_VAAPI_LICENSE = BSD-4c BSD-2c
 BRBOX_GSTREAMER_VAAPI_INSTALL_STAGING = YES
-BRBOX_GSTREAMER_VAAPI_DEPENDENCIES = host-pkgconf libva gstreamer1 gst1-plugins-bad gst1-plugins-ugly gst1-plugins-good libdrm  libglib2
+BRBOX_GSTREAMER_VAAPI_DEPENDENCIES = host-pkgconf libva gstreamer1 gst1-plugins-bad gst1-plugins-ugly gst1-plugins-good libdrm  libglib2 xlib_libX11
 BRBOX_GSTREAMER_VAAPI_CONF_OPTS = --enable-wayland=no --disable-builtin-libvpx
 #BRBOX_GSTREAMER_VAAPI_LIBTOOL_PATCH = YES
 

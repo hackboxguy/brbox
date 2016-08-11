@@ -1,3 +1,12 @@
+/* ---------------------------------------------------------------------------- 
+how to test this utility?
+1)cd ~/sandbox/OE-FMW-FOO/Mercury/trunk/target (do "svn up" if needed)
+2)cmake -H. -BOutput -DCMAKE_INSTALL_PREFIX=~/tmp/barcofmw
+3)cmake --build Output -- install -j5
+4)cd ~/tmp/barcofmw
+5)export LD_LIBRARY_PATH=./lib
+6)./bin/cmnlib
+---------------------------------------------------------------------------- */
 #include <iostream>
 #include <string.h>
 #include <stdio.h>
@@ -14,8 +23,9 @@ int main(int argc, const char* argv[])
 {
 	std::string DevNode=I2C_DEVICE_NODE;
 	std::string Type="none";
-	RTCDevice* pDevice=NULL;
-	pDevice = new I2CDS3231(DevNode,Type);
+	
+	RTCDevice* pDevice=NULL;//interface-class
+	pDevice = new I2CDS3231(DevNode,Type);//actual implementation behind interface-class
 
 	if(pDevice!=NULL)
 	{
@@ -25,7 +35,7 @@ int main(int argc, const char* argv[])
 		RPC_SRV_RESULT res=pDevice->get_date_time(mytm);
 		cout<<"pDevice->get_date_time:returned:"<<table[res]<<endl;
 
-		res=pDevice->get_date_time(mytm);
+		res=pDevice->set_date_time(mytm);
 		cout<<"pDevice->set_date_time:returned:"<<table[res]<<endl;
 	}	
 
