@@ -887,7 +887,6 @@ BR2_PACKAGE_E2FSPROGS_UUIDGEN=y
 #
 # Icons
 #
-# BR2_PACKAGE_ADWAITA_ICON_THEME is not set
 # BR2_PACKAGE_GOOGLE_MATERIAL_DESIGN_ICONS is not set
 # BR2_PACKAGE_HICOLOR_ICON_THEME is not set
 
@@ -900,7 +899,6 @@ BR2_PACKAGE_E2FSPROGS_UUIDGEN=y
 #
 # Themes
 #
-# BR2_PACKAGE_GTK2_ENGINES is not set
 
 #
 # Games
@@ -1316,10 +1314,6 @@ BR2_PACKAGE_XDATA_XBITMAPS=y
 # BR2_PACKAGE_DILLO is not set
 # BR2_PACKAGE_DOCKER is not set
 # BR2_PACKAGE_FEH is not set
-# BR2_PACKAGE_GMPC is not set
-# BR2_PACKAGE_GQVIEW is not set
-# BR2_PACKAGE_GTKPERF is not set
-# BR2_PACKAGE_LEAFPAD is not set
 
 #
 # midori needs libgtk3 and a glibc toolchain w/ C++, gcc >= 4.9
@@ -1334,12 +1328,14 @@ BR2_PACKAGE_XDATA_XBITMAPS=y
 # BR2_PACKAGE_XSCREENSAVER is not set
 BR2_PACKAGE_XTERM=y
 # BR2_PACKAGE_XVKBD is not set
-# BR2_PACKAGE_YAD is not set
+
+#
+# yad needs libgtk2 or libgtk3 w/ X11 backend
+#
 
 #
 # X libraries and helper libraries
 #
-# BR2_PACKAGE_LIBSEXY is not set
 BR2_PACKAGE_XKEYBOARD_CONFIG=y
 
 #
@@ -1347,7 +1343,6 @@ BR2_PACKAGE_XKEYBOARD_CONFIG=y
 #
 # BR2_PACKAGE_FLUXBOX is not set
 # BR2_PACKAGE_MATCHBOX is not set
-# BR2_PACKAGE_METACITY is not set
 # BR2_PACKAGE_OPENBOX is not set
 
 #
@@ -1730,12 +1725,10 @@ BR2_PACKAGE_LIBDRM_INTEL=y
 # BR2_PACKAGE_LIBFREEIMAGE is not set
 # BR2_PACKAGE_LIBGDIPLUS is not set
 # BR2_PACKAGE_LIBGEOTIFF is not set
-BR2_PACKAGE_LIBGLADE=y
 # BR2_PACKAGE_LIBGLEW is not set
 # BR2_PACKAGE_LIBGLFW is not set
 BR2_PACKAGE_LIBGLU=y
-BR2_PACKAGE_LIBGTK2=y
-# BR2_PACKAGE_LIBGTK2_DEMO is not set
+# BR2_PACKAGE_LIBGTK2 is not set
 # BR2_PACKAGE_LIBGTK3 is not set
 # BR2_PACKAGE_LIBMNG is not set
 BR2_PACKAGE_LIBPNG=y
@@ -2151,7 +2144,6 @@ BR2_PACKAGE_PCRE_UCP=y
 # BR2_PACKAGE_LIBESMTP is not set
 # BR2_PACKAGE_MSMTP is not set
 # BR2_PACKAGE_MUTT is not set
-# BR2_PACKAGE_SYLPHEED is not set
 
 #
 # Miscellaneous
