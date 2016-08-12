@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BRBOX_X11STARTUP
+	bool "X11 display server startup script and dependencies for brbox platform"
+	default n
+	depends on BR2_TARGET_BRBOX_PACKAGES
+	help
+	  provides mechanism to auto start X display server on linux bootup.
+
