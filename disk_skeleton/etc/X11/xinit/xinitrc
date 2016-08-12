@@ -57,6 +57,6 @@ xset s noblank &
 xset s off &
 xsetroot -solid darkblue &
 #exec xterm -geometry 0x0+0+0 -name login
-feh /tmp/logo.png &
+feh /etc/X11/logo.png &
 pid=$!
 wait $pid
