@@ -27,6 +27,9 @@ case "$1" in
 	        FMWVER=$(cat /boot/version-num.txt)
 		CONFIG=$(cat /boot/sysconfig.txt)                                                           
 		/opt/fmw/bin/dispclt --dispclear --printline=line1,"BRBOX-$FMWVER" --printline=line2,"no-ip-defconfig"  --printline=line3,"Cfg-$CONFIG"
+		#update X11 desktop screen
+		/etc/X11/draw-desktop-info.sh 
+		export DISPLAY=:0; xdotool key --window "$(xdotool search --class feh | head -n 1)" "r+r"
 		;;
 		
 	leasefail|nak)
@@ -36,7 +39,9 @@ case "$1" in
 	        FMWVER=$(cat /boot/version-num.txt)
 		CONFIG=$(cat /boot/sysconfig.txt)                                                   
         	/opt/fmw/bin/dispclt --dispclear --printline=line1,"BRBOX-$FMWVER" --printline=line2,"no-ip-leasefail"  --printline=line3,"Cfg-$CONFIG"
-		
+		#update X11 desktop screen
+		/etc/X11/draw-desktop-info.sh 
+		export DISPLAY=:0; xdotool key --window "$(xdotool search --class feh | head -n 1)" "r+r"
 		;;
 
 	renew|bound)
@@ -72,6 +77,9 @@ case "$1" in
         	FMWVER=$(cat /boot/version-num.txt)
 		CONFIG=$(cat /boot/sysconfig.txt)                                                   
         	/opt/fmw/bin/dispclt --dispclear --printline=line1,"BRBOX-$FMWVER" --printline=line2,"IP-$IPADDR"  --printline=line3,"Cfg-$CONFIG"
+		#update X11 desktop screen
+		/etc/X11/draw-desktop-info.sh 
+		export DISPLAY=:0; xdotool key --window "$(xdotool search --class feh | head -n 1)" "r+r"
 		;;
 esac
 
