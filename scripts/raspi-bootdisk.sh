@@ -38,6 +38,7 @@ done
 BINARIES_DIR=$BR_OUTPUT_FOLDER/images
 RPI_FMW_DIR=$BINARIES_DIR/rpi-firmware
 RPI_KERNEL=$BINARIES_DIR/zImage
+RPI_DTB=$BINARIES_DIR/*.dtb
 IMAGENAME=$(mktemp)
 MKIMG_TIMESTAMP=$(date +%Y%m%d%H%M%S)
 ROOTFS="$BINARIES_DIR/rootfs.tar.xz"
@@ -101,6 +102,7 @@ printf "Mounting loopdevice root2 partition ..................... "
 printf "copying boot files - this may take some time ............ "
     $SUDO cp $RPI_FMW_DIR/* "$BOOTMOUNTPOINT" 1>/dev/null 2>/dev/null
     $SUDO cp $RPI_KERNEL "$BOOTMOUNTPOINT"
+    $SUDO cp $RPI_DTB "$BOOTMOUNTPOINT"
     $SUDO cp $BOOT_MARKER_RPI "$BOOTMOUNTPOINT"
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
