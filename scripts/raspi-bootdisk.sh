@@ -46,7 +46,7 @@ BOOTMOUNTPOINT=$(mktemp -d)
 ROOTMOUNTPOINT=$(mktemp -d)
 ROOT2MOUNTPOINT=$(mktemp -d)
 BOOT_MARKER_RPI=$(pwd)/sources/scripts/raspi2/boot/cmdline.txt #kernel cmdline args file 
-
+BOOT_CONFIG_RPI=$(pwd)/sources/scripts/raspi2/boot/config.txt
 printf "creating image file ..................................... "
     fallocate -l "$IMAGESIZE" "$IMAGENAME" >/dev/null
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
@@ -104,6 +104,7 @@ printf "copying boot files - this may take some time ............ "
     $SUDO cp $RPI_KERNEL "$BOOTMOUNTPOINT"
     $SUDO cp $RPI_DTB "$BOOTMOUNTPOINT"
     $SUDO cp $BOOT_MARKER_RPI "$BOOTMOUNTPOINT"
+    $SUDO cp $BOOT_CONFIG_RPI "$BOOTMOUNTPOINT"
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "copying root1 files - this may take some time ........... "
