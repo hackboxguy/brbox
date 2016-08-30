@@ -1,1 +1,1 @@
-logo.nologo ro rootwait root=/dev/mmcblk0p2
+logo.nologo ro rootwait root=/dev/mmcblk0p2 console=tty1
