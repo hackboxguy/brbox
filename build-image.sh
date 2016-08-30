@@ -28,6 +28,7 @@ ROOTFS_TYPE_WDB="BrBoxRtWdb"
 
 BOARD_TYPE_BTR="baytrail"                 #base-build
 BOARD_TYPE_BTR_MEDIA="baytrail-media"     #multimedia-application-build
+BOARD_TYPE_RP0="raspi0"                   #base-build
 BOARD_TYPE_RP1="raspi1"                   #base-build
 BOARD_TYPE_RP1_SMSW="raspi1-smartsw"      #relayswitch-application-build
 BOARD_TYPE_RP1_RBOX="raspi1-rbox"         #remote-box-application-build
@@ -52,7 +53,11 @@ done
 
 #	t) BOARD_TYPE=$OPTARG ;;             #board-type= baytrail/raspi2
 #TODO: switch case for br-board-system-config
-if [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1" ]; then
+if [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP0" ]; then
+	BR_BOARD_CONFIG=raspberrypi0_defconfig
+	BR_BOARD_LINUX_CONFIG_PATH=board/raspberrypi/
+	BOOT_IMG_SCRIPT=$(pwd)/scripts/raspi-bootdisk.sh
+elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1" ]; then
 	BR_BOARD_CONFIG=raspberrypi_defconfig
 	BR_BOARD_LINUX_CONFIG_PATH=board/raspberrypi/
 	BOOT_IMG_SCRIPT=$(pwd)/scripts/raspi-bootdisk.sh
@@ -123,7 +128,10 @@ else
 fi
 [ "$BUILD_RESULT" != "0" ] && echo "Error!!! build failed!!!!" && exit 1 
 
-if [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1" ]; then
+if [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP0" ]; then
+	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
+	ROOTFS_TYPE=$ROOTFS_TYPE_RP1
+elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1" ]; then
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 	ROOTFS_TYPE=$ROOTFS_TYPE_RP1
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1_SMSW" ]; then
