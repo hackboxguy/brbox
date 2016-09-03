@@ -107,6 +107,8 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&GetLogCount);
 	SysRpc GetLogLine(SYSMGR_RPC_LOG_LINE_GET,EJSON_SYSMGR_RPC_GET_LOG_LINE,emulat,dbglog,&DataCache); 
 	RpcMgr.AttachRpc(&GetLogLine);
+	SysRpc RunShellCmd(SYSMGR_RPC_RUN_SHELLCMD,EJSON_SYSMGR_RPC_RUN_SHELLCMD,emulat,dbglog,&DataCache); 
+	RpcMgr.AttachRpc(&RunShellCmd);
 
 
 	//common rpc hadler object(eg: trigger-data-save/store-factory/restore-factory..etc)

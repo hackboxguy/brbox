@@ -48,7 +48,9 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{true ,EXMPP_CMD_SLEEP                   , "sleep"        ,"<seconds>"}, //adding delay between multiple commands
 	{true ,EXMPP_CMD_ACCOUNT                 , "account"      ,""}, //xmpp logid ID used for logging into server
 	{true ,EXMPP_CMD_BOTNAME                 , "botname"      ,"[name]"}, //xmpp chat-bot name for identification
-	{true ,EXMPP_CMD_BUDDY_LIST              , "buddylist"    ,""} //prints buddy list
+	{true ,EXMPP_CMD_BUDDY_LIST              , "buddylist"    ,""}, //prints buddy list
+	{true ,EXMPP_CMD_SHELLCMD                , "shellcmd"     ,"<command>"}, //executes remote shell command
+	{true ,EXMPP_CMD_SHELLCMD_RESP           , "shellcmdresp" ,"<command>"}  //executes remote shell command
 };
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
@@ -301,6 +303,8 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_ACCOUNT         :res=proc_cmd_account_name(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_BOTNAME         :res=proc_cmd_bot_name(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_BUDDY_LIST      :res=proc_cmd_buddy_list(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_SHELLCMD        :res=proc_cmd_shellcmd(cmdcmdMsg,returnval,cmd.sender);break;//inProgbreak;
+				case EXMPP_CMD_SHELLCMD_RESP   :res=proc_cmd_shellcmdresp(cmdcmdMsg,returnval,cmd.sender);break;//inProgbreak;
 				default                        :break;
 			}
 			result.pop_front();
@@ -1332,6 +1336,43 @@ RPC_SRV_RESULT XmppMgr::GpioEventCallback(int evntNum,int evntArg)
 			XmppProxy.SendMessageToBuddy(pEntry.subscriber,evntStr,"event");
 	}
 	return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_shellcmd(std::string msg,std::string &returnval,std::string sender)
+{
+	std::string cmd,destArg;//,msgArg;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	//msgstream >> destArg;
+	getline(msgstream, destArg); //get rest of the string!
+
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(destArg.size()<=0)
+		return RPC_SRV_RESULT_ARG_ERROR;
+
+	char tID[255];tID[254]='\0';
+
+	//send shell command to system-manager service
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result=Client.set_single_string_get_single_string_type((char*)"run_shellcmd",
+				(char*)"command",(char*)destArg.c_str(),
+				(char*)"taskId",(char*)tID);
+	Client.rpc_server_disconnect();
+
+	returnval="taskID=";
+	int xmptid=-1;
+	if(result==RPC_SRV_RESULT_IN_PROG)
+		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_SYSMGR,true,&xmptid,sender);
+	sprintf(tID,"%d",xmptid);returnval+=tID;
+	return result;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_shellcmdresp(std::string msg,std::string &returnval,std::string sender)
+{
+	return RPC_SRV_RESULT_FAIL;
 }
 /* ------------------------------------------------------------------------- */
 

@@ -49,6 +49,8 @@ SysmgrCltCmdline::SysmgrCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--getlogcount              [returns total number of log lines available]");
 	CmdlineHelper.insert_options_entry((char*)"getlog" ,optional_argument,EJSON_SYSMGR_RPC_GET_LOG_LINE);
 	CmdlineHelper.insert_help_entry((char*)"--getlog=index             [read the log line of zero based index]");
+	CmdlineHelper.insert_options_entry((char*)"shellcmd" ,optional_argument,EJSON_SYSMGR_RPC_RUN_SHELLCMD);
+	CmdlineHelper.insert_help_entry((char*)"--shellcmd=cmd             [run a command in linux shell]");
 }
 /* ------------------------------------------------------------------------- */
 SysmgrCltCmdline::~SysmgrCltCmdline()
@@ -180,6 +182,9 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			push_get_indexed_msg_command(sub_arg,(char*)SYSMGR_RPC_LOG_LINE_GET,EJSON_SYSMGR_RPC_GET_LOG_LINE,
 						     (char*)SYSMGR_RPC_LOG_ARG_INDX,(char*)SYSMGR_RPC_LOG_ARG_LOGMSG);
 			break;
+		case EJSON_SYSMGR_RPC_RUN_SHELLCMD:
+			push_shell_cmd(sub_arg,EJSON_SYSMGR_RPC_RUN_SHELLCMD,(char*)SYSMGR_RPC_RUN_SHELLCMD);
+			break;
 		default:
 			return 0;
 			break;	
@@ -210,6 +215,9 @@ int SysmgrCltCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *
 			break;
 		case EJSON_SYSMGR_RPC_GET_LOG_LINE:
 			run_get_indexed_msg_command(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
+			break;
+		case EJSON_SYSMGR_RPC_RUN_SHELLCMD:
+			run_shell_cmd(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
 			break;
 		default:return -1;
 			break;
@@ -627,4 +635,61 @@ int SysmgrCltCmdline::run_get_indexed_msg_command(CmdExecutionObj *pCmdObj,ADJso
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
+int SysmgrCltCmdline::push_shell_cmd(char* subarg,EJSON_SYSMGR_RPC_TYPES cmd,char* cmdname)
+{
+	CmdExecutionObj *pCmdObj=NULL;
+	OBJECT_MEM_NEW(pCmdObj,CmdExecutionObj);
+	if(pCmdObj==NULL)
+	{
+		printf("failed create pCmdObj!!!\n");
+		return -1;
+	}
+	strcpy(pCmdObj->get_rpc_name,cmdname);
+	strcpy(pCmdObj->set_rpc_name,cmdname);
+	pCmdObj->command=cmd;
+	pCmdObj->action=RPC_SRV_ACT_WRITE;
+
+	if(CmdlineHelper.get_next_subargument(&subarg)==0)
+	{	
+		printf("for shellcmd,  command must be specified\n");
+		OBJ_MEM_DELETE(pCmdObj);
+		return -1;
+	}
+	else 
+	{
+		strcpy(pCmdObj->first_arg_param_name,SYSMGR_RPC_SHELLCMD_ARG_CMD);
+		strcpy(pCmdObj->first_arg_param_value,subarg);
+		strcpy(pCmdObj->second_arg_param_name,RPCMGR_RPC_TASK_STS_ARGID);//taskID
+	}
+	pCmdObj->cmd_type=CLIENT_CMD_TYPE_USER_DEFINED;
+	//put the request into chain
+	if(CmdlineHelper.CmdChain.chain_put((void *)pCmdObj)!=0)
+	{
+		printf("push_shell_cmd: failed! unable to push json-req-task-obj to chain!\n");
+		OBJ_MEM_DELETE(pCmdObj);
+		return -1;
+	}
+	return 0;
+}
+int SysmgrCltCmdline::run_shell_cmd(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker)
+{
+	ADThreadedSockClient *pOrig = (ADThreadedSockClient*)pWorker;
+	if(pCmdObj->action == RPC_SRV_ACT_WRITE)
+	{
+		pCmdObj->result=pSrvSockConn->set_single_string_get_single_string_type(pCmdObj->set_rpc_name,
+				pCmdObj->first_arg_param_name,pCmdObj->first_arg_param_value,
+				pCmdObj->second_arg_param_name,pCmdObj->second_arg_param_value);
+		pOrig->log_print_message(pSrvSockConn,pCmdObj->set_rpc_name,RPC_SRV_ACT_WRITE,pCmdObj->result,
+				pOutMsgList,pCmdObj->second_arg_param_value);
+	}
+	else
+	{
+		pOrig->my_log_print_message(pSrvSockConn,(char*)"run_shell_cmd",RPC_SRV_ACT_UNKNOWN,
+					(char*)CLIENT_CMD_RESULT_INVALID_ACT,pOutMsgList);
+		return -1;
+	}
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+
 

@@ -3,6 +3,7 @@
 #include "LogHandler.h"
 #include <iostream>
 #include <fstream>
+#define ASYNC_TASK_EVENT_DELAY 200000 //needed because event might go too fast to subscriber before being handled in a proper way
 //#include "SysmgrJsonDef.h"
 /* ------------------------------------------------------------------------- */
 SysRpc:: SysRpc(std::string rpcName,int myIndex,bool emu,bool log,SYSMGR_CMN_DATA_CACHE *pData):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
@@ -43,6 +44,7 @@ int SysRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_SET_UPDATE_LOG  :return json_to_bin_loglist_update(pReq);
 		case EJSON_SYSMGR_RPC_GET_LOG_COUNT   :return json_to_bin_get_logcount(pReq);
 		case EJSON_SYSMGR_RPC_GET_LOG_LINE    :return json_to_bin_get_logline(pReq);
+		case EJSON_SYSMGR_RPC_RUN_SHELLCMD    :return json_to_bin_run_shellcmd(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -73,6 +75,7 @@ int SysRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_SET_UPDATE_LOG  :return bin_to_json_loglist_update(pReq);
 		case EJSON_SYSMGR_RPC_GET_LOG_COUNT   :return bin_to_json_get_logcount(pReq);
 		case EJSON_SYSMGR_RPC_GET_LOG_LINE    :return bin_to_json_get_logline(pReq);
+		case EJSON_SYSMGR_RPC_RUN_SHELLCMD    :return bin_to_json_run_shellcmd(pReq);
 		default: break;
 	}
 	return -1;
@@ -103,6 +106,7 @@ int SysRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 		case EJSON_SYSMGR_RPC_SET_UPDATE_LOG  :return process_loglist_update(pReq,pObj);
 		case EJSON_SYSMGR_RPC_GET_LOG_COUNT   :return process_get_logcount(pReq);
 		case EJSON_SYSMGR_RPC_GET_LOG_LINE    :return process_get_logline(pReq);
+		case EJSON_SYSMGR_RPC_RUN_SHELLCMD    :return process_run_shellcmd(pReq,pObj);
 		default:break;
 	}
 	return 0;
@@ -120,6 +124,7 @@ SYSMGR_ASYNCTASK_TYPE SysRpc::get_async_task_in_progress()
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADFTP :task=SYSMGR_ASYNCTASK_FTPDOWNLOAD;break;
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:task=SYSMGR_ASYNCTASK_TFTPDOWNLOAD;break;
 		case EJSON_SYSMGR_RPC_SET_UPDATE_LOG  :task=SYSMGR_ASYNCTASK_LOGLISTUPDATE;break;
+		case EJSON_SYSMGR_RPC_RUN_SHELLCMD    :task=SYSMGR_ASYNCTASK_SHELLCMD;break;
 		default                               :break;
 	}
 	return task;
@@ -162,6 +167,14 @@ RPC_SRV_RESULT SysRpc::ProcessWorkAsync(int cmd,unsigned char* pWorkData)
 				SYSMGR_LOG_PACKET *pPacket;
 				pPacket=(SYSMGR_LOG_PACKET*)pWorkData;
 				ret_val=process_async_loglist_update(pPacket);
+				OBJ_MEM_DELETE(pWorkData);
+			}
+			break;
+		case EJSON_SYSMGR_RPC_RUN_SHELLCMD    :
+			{
+				SYSMGR_SHELLCMD_PACKET *pPacket;
+				pPacket=(SYSMGR_SHELLCMD_PACKET*)pWorkData;
+				ret_val=process_async_run_shellcmd(pPacket);
 				OBJ_MEM_DELETE(pWorkData);
 			}
 			break;
@@ -1004,6 +1017,54 @@ int SysRpc::process_get_logline(JsonDataCommObj* pReq)
 	//strcpy(pPacket->logmsg,"test brbox msg");
 	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int SysRpc::json_to_bin_run_shellcmd(JsonDataCommObj* pReq)
+{
+	SYSMGR_SHELLCMD_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_SHELLCMD_PACKET,RPC_SRV_ACT_WRITE,EJSON_SYSMGR_RPC_RUN_SHELLCMD);
+	JSON_STRING_TO_STRING(SYSMGR_RPC_SHELLCMD_ARG_CMD,pPanelCmdObj->cmd);
+	return 0;
+}
+int SysRpc::bin_to_json_run_shellcmd(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,SYSMGR_SHELLCMD_PACKET,RPCMGR_RPC_TASK_STS_ARGID);
+	return 0;
+}
+int SysRpc::process_run_shellcmd(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SYSMGR_SHELLCMD_PACKET* pPacket;
+	pPacket=(SYSMGR_SHELLCMD_PACKET*)pPanelReq->dataRef;
+
+	SYSMGR_SHELLCMD_PACKET* pWorkData=NULL;
+	OBJECT_MEM_NEW(pWorkData,SYSMGR_SHELLCMD_PACKET);//delete this object in run_work() callback function
+	if(pWorkData == NULL)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_MEM_ERROR;
+		return -1;
+	}
+	strcpy(pWorkData->cmd,pPacket->cmd);
+	pPanelReq->result=pObj->PushAsyncTask(EJSON_SYSMGR_RPC_RUN_SHELLCMD,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_PRESERVE);
+	if(pPanelReq->result!=RPC_SRV_RESULT_IN_PROG)
+		OBJ_MEM_DELETE(pWorkData);
+	return 0;
+}
+RPC_SRV_RESULT SysRpc::process_async_run_shellcmd(SYSMGR_SHELLCMD_PACKET* pPacket)
+{
+	usleep(ASYNC_TASK_EVENT_DELAY);//needed because event might go too fast to subscriber before being handled in a proper way
+        if(get_emulation_flag()==true)
+                return RPC_SRV_RESULT_SUCCESS;
+	//SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
+	//pMgr->LogFlag=get_debug_log_flag();
+	//if(pMgr->DialVoice(pPacket->destNum)!=0)
+	//	return RPC_SRV_RESULT_FAIL;
+	//else
+	if(system(pPacket->cmd)!=0)
+		return RPC_SRV_RESULT_FAIL;
+	else
+		return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
 

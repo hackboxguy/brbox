@@ -37,6 +37,7 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_SET_NETMASK,    //sets netmask of given "ethX" string
 	//get device type
 	//EJSON_SYSMGR_RPC_IDENTIFY_DEVICE,
+	EJSON_SYSMGR_RPC_RUN_SHELLCMD,    //runs a shell command
 	EJSON_SYSMGR_RPC_END,
 	EJSON_SYSMGR_RPC_NONE
 }EJSON_SYSMGR_RPC_TYPES;
@@ -205,7 +206,7 @@ typedef struct SYSMGR_DOWNLOAD_FILE_PACKET_T
 //EJSON_SYSMGR_RPC_GET_ASYNCTASK //get-async-task-in-progress
 #define SYSMGR_RPC_ASYNCTASK_GET         "get_async_task"
 #define SYSMGR_RPC_ASYNCTASK_ARG         "task"
-#define SYSMGR_RPC_ASYNCTASK_ARG_TABL    {"devop","fupdate","ftpdownload","tftpdownload","loglistupdt","none","none","\0"} //show unknown as none
+#define SYSMGR_RPC_ASYNCTASK_ARG_TABL    {"devop","fupdate","ftpdownload","tftpdownload","loglistupdt","shellcmd","none","none","\0"} //show unknown as none
 typedef enum SYSMGR_ASYNCTASK_TYPE_T
 {
 	SYSMGR_ASYNCTASK_DEVOP,
@@ -213,6 +214,7 @@ typedef enum SYSMGR_ASYNCTASK_TYPE_T
 	SYSMGR_ASYNCTASK_FTPDOWNLOAD,
 	SYSMGR_ASYNCTASK_TFTPDOWNLOAD,
 	SYSMGR_ASYNCTASK_LOGLISTUPDATE,
+	SYSMGR_ASYNCTASK_SHELLCMD,
 	SYSMGR_ASYNCTASK_UNKNOWN,
 	SYSMGR_ASYNCTASK_NONE
 }SYSMGR_ASYNCTASK_TYPE;
@@ -290,6 +292,15 @@ typedef struct SYSMGR_NET_INFO_PACKET_T //common communication object for netinf
 	char addr[512];
 	char eth_name[512];
 }SYSMGR_NET_INFO_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_RUN_SHELLCMD
+#define SYSMGR_RPC_RUN_SHELLCMD      "run_shellcmd"
+#define SYSMGR_RPC_SHELLCMD_ARG_CMD  "command"
+typedef struct SYSMGR_SHELLCMD_PACKET_T
+{
+	char cmd[1024];
+	int taskID;
+}SYSMGR_SHELLCMD_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct SYSMGR_CMN_DATA_CACHE_T

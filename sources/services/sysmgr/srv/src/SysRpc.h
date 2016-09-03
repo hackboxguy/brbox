@@ -98,6 +98,10 @@ public:
 	int bin_to_json_get_logline(JsonDataCommObj* pReq);
 	int process_get_logline(JsonDataCommObj* pReq);
 
+	int json_to_bin_run_shellcmd(JsonDataCommObj* pReq);
+	int bin_to_json_run_shellcmd(JsonDataCommObj* pReq);
+	int process_run_shellcmd(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj);
+	RPC_SRV_RESULT process_async_run_shellcmd(SYSMGR_SHELLCMD_PACKET* pPacket);
 };
 /* ------------------------------------------------------------------------- */
 

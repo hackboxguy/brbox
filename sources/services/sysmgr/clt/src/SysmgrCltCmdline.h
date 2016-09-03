@@ -35,6 +35,9 @@ class SysmgrCltCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcess
 	int run_get_indexed_msg_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,
 					ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);
 
+	int push_shell_cmd(char* subarg,EJSON_SYSMGR_RPC_TYPES cmd,char* cmdname);
+	int run_shell_cmd(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,
+			ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);
 
 public:
 	SysmgrCltCmdline();
