@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 using namespace std;
-#define MODEM_DEV_NODE "/dev/ttyUSB0" //2"
+#define MODEM_DEV_NODE "/dev/ttyUSB2" //0-for 3gdata" //2-sms/ussd"
 #define MODEM_AT_CONN  "at19200"
 
 typedef enum SMS_ACCESS_TYPE_T
