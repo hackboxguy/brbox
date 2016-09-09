@@ -4,8 +4,8 @@
 ###########################################################
 IMAGESIZE=356M
 BOOTSIZE=16M
-ROOT1SIZE=84M
-ROOT2SIZE=84M
+ROOT1SIZE=130M
+ROOT2SIZE=130M
 STTNGSIZE=32M
 USRDATSIZE=40M
 ROOT1_LABEL=ROOT1   #linux-1
@@ -62,12 +62,12 @@ printf "Creating loopdevice ..................................... "
 sudo parted -s $LOOPDEVICE mklabel msdos
 sudo parted -s $LOOPDEVICE unit cyl mkpart primary fat32 -- 0 2  
 sudo parted -s $LOOPDEVICE set 1 boot on  
-sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 2 17  
-sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 17 32  
+sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 2 20  
+sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 20 38  
 
-sudo parted -s $LOOPDEVICE unit cyl mkpart extended -- 32 -2  
-sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 32 38  
-sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 38 -2  
+sudo parted -s $LOOPDEVICE unit cyl mkpart extended -- 38 -2  
+sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 38 41  
+sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 41 -2  
 #TODO: create userData partition as secondary
 printf "Formating boot partition ................................ "
     $SUDO mkfs.vfat -n boot "${LOOPDEVICE}p1" 1>/dev/null 2>/dev/null
