@@ -1,0 +1,32 @@
+#!/bin/sh
+#
+# Start/stop server script
+#
+start() {
+	echo -n "Starting umtskeeper : "
+	/etc/umts-keeper/umtskeeper --sakisoperators "USBINTERFACE='0' OTHER='USBMODEM' USBMODEM='12d1:1001' APN='pinternet.interkom.de' APN_USER='0' APN_PASS='0'" --sakisswitches "--sudo --console" --devicename 'Huawei' --log --nat 'no' &	
+	echo "OK"
+	sleep 90
+}
+
+stop() {
+	echo "OK"
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	stop
+	start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
