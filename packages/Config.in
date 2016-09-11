@@ -34,6 +34,7 @@ source "package/brbox/brbox_libgloox/Config.in"
 source "package/brbox/brbox_libonion/Config.in"
 source "package/brbox/brbox_eeprog/Config.in"
 source "package/brbox/brbox_x11startup/Config.in"
+source "package/brbox/brbox_umtskeeper/Config.in"
 endmenu
 endif
 

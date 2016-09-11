@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BRBOX_UMTSKEEPER
+	bool "3g data connectivity script"
+	default n
+	depends on BR2_TARGET_BRBOX_PACKAGES
+	help
+	  provides 3g data connectivity and monitoring to keep the connection alive.
+
