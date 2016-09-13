@@ -2,11 +2,81 @@
 #
 # Start/stop server script
 #
+BOOT_BRBOX_PART=mmcblk0p1
+LOGINFILE_NAME=xmpp-login.txt
+MODEM_PARAM_DATA=/mnt/settings/etc/$LOGINFILE_NAME
+GetModemParam() #$1-paramname, $2-file
+{
+	PARAM=$(grep $1 $2)
+	[ $? != "0" ] && return 1 #requested param not found
+	echo $PARAM
+	return 0
+}
+GetModemParams() #$-1
+{
+	PARAM1=$(GetModemParam "USBINTERFACE=" $1)
+	[ $? != "0" ] && echo "invalid param-1" && return 1
+	PARAM2=$(GetModemParam "OTHER=" $1)
+	[ $? != "0" ] && echo "invalid param-2" && return 1
+	PARAM3=$(GetModemParam "USBMODEM=" $1)
+	[ $? != "0" ] && echo "invalid param-3" && return 1
+	PARAM4=$(GetModemParam "APN=" $1)
+	[ $? != "0" ] && echo "invalid param-4" && return 1
+	PARAM5=$(GetModemParam "APN_USER=" $1)
+	[ $? != "0" ] && echo "invalid param-5" && return 1
+	PARAM6=$(GetModemParam "APN_PASS=" $1)
+	[ $? != "0" ] && echo "invalid param-6" && return 1
+	PARAM7=$(GetModemParam "devicename" $1)
+	[ $? != "0" ] && echo "invalid param-7" && return 1
+	echo "\"$PARAM1 $PARAM2 $PARAM3 $PARAM4 $PARAM5 $PARAM6\" $PARAM7"
+	return 0
+}
+GetModemSettings() 
+{
+	TEMP_BOOT_MOUNT_POINT=$(mktemp -d)
+	if [ $? != "0" ]; then #unable to create temp mount directory
+		echo "Error: Unable to create temp directory for boot mount!!!"
+		return 1
+	fi
+	BRBOX_BOOT_PARTITION=/dev/$BOOT_BRBOX_PART
+	mount $BRBOX_BOOT_PARTITION $TEMP_BOOT_MOUNT_POINT
+	if [ $? != "0" ]; then #unable mount device, boot-filesystem might be corrupt
+		echo "Error: Unable to mount $BRBOX_BOOT_PARTITION to $TEMP_BOOT_MOUNT_POINT!!!"
+		rm -rf $TEMP_BOOT_MOUNT_POINT
+		return 1
+	fi
+	#if there exist new xmpp.login under boot partition, read the modem settings from this file
+	#else read modem settings from =/mnt/settings/etc/xmpp-login.txt
+	if [ -f "$TEMP_BOOT_MOUNT_POINT/$LOGINFILE_NAME" ]; then
+		MODEMPARAMS=$(GetModemParams "$TEMP_BOOT_MOUNT_POINT/$LOGINFILE_NAME")
+		RES=$?
+	else
+		MODEMPARAMS=$(GetModemParams $MODEM_PARAM_DATA)
+		RES=$?
+	fi	
+	umount $BRBOX_BOOT_PARTITION
+	rm -rf $TEMP_BOOT_MOUNT_POINT
+	[ $RES != "0" ] && return 1
+	echo $MODEMPARAMS
+	return 0
+}
+
 start() {
 	echo -n "Starting umtskeeper : "
-	/etc/umts-keeper/umtskeeper --sakisoperators "USBINTERFACE='0' OTHER='USBMODEM' USBMODEM='12d1:1001' APN='pinternet.interkom.de' APN_USER='0' APN_PASS='0'" --sakisswitches "--sudo --console" --devicename 'Huawei' --log --nat 'no' &	
-	echo "OK"
-	sleep 140
+	GSM_NODES=$(cat /proc/tty/driver/usbserial 2>/dev/null | grep "GSM modem"|wc -l)
+	if [ $GSM_NODES = "3" ]; then
+		MODEM_SETTINGS=$(GetModemSettings)
+		if [ $? = "0" ]; then
+		/etc/umts-keeper/umtskeeper --sakisoperators $MODEM_SETTINGS --sakisswitches "--sudo --console" --log --nat 'no' &	
+			sleep 140 #wait for sakis3g script to connect to internet(python script on raspi0 takes long time)
+			echo "OK"
+		else
+			echo "Missing GSM modem-params!!!!"
+		fi
+	else
+		echo "Missing GSM modem!!!!"
+	fi
+
 }
 
 stop() {
