@@ -67,7 +67,7 @@ start() {
 	if [ $GSM_NODES = "3" ]; then
 		MODEM_SETTINGS=$(GetModemSettings)
 		if [ $? = "0" ]; then
-		/etc/umts-keeper/umtskeeper --sakisoperators "$MODEM_SETTINGS" --sakisswitches "--sudo --console" --log --nat 'no' &	
+			/etc/umts-keeper/umtskeeper --sakisswitches "\"--sudo --console"\" --log --nat 'no' --sakisoperators "\"$MODEM_SETTINGS"\" &
 			sleep 140 #wait for sakis3g script to connect to internet(python script on raspi0 takes long time)
 			echo "OK"
 		else
