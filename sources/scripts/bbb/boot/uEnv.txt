@@ -3,3 +3,4 @@ bootpart=0:1
 bootdir=
 bootfile=zImage
 uenvcmd=run loadimage;run loadramdisk;run findfdt;run loadfdt;run ramboot
+args_mmc=run finduuid;setenv bootargs console=${console} ${optargs} root=/dev/mmcblk0p2 rw
