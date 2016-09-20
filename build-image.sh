@@ -113,6 +113,10 @@ if [ $IMAGE_ONLY = 0 ]; then
 	cp configs/$BR_BOARD_SYSTEM_CONFIG/$BR_BOARD_LINUX_CONFIG   $BR_FOLDER/$BR_BOARD_LINUX_CONFIG_PATH/
 	cp configs/$BR_BOARD_SYSTEM_CONFIG/busybox.config           $BR_FOLDER/package/busybox/
 	#TODO: configs/$BR_BOARD_SYSTEM_CONFIG/uclibc.config        $BR_FOLDER/package/uclibc/
+
+	#!!!!!!!temp solution for bbbmmc-rbox linux patch!!!!!!!!!!!!!!!!!!!!!!!
+	cp sources/patches/bbb-linux-patches/* $BR_FOLDER/board/beaglebone/patches/linux/	
+	
 	pushd .
 	cd $BR_FOLDER
 	make O=$BR_OUTPUT_FOLDER $BR_BOARD_CONFIG BRBOX_RELVERSION=$IMAGE_VERSION BRBOX_BUILDNUM=$TMP_BUILDNUM BRBOX_SYSCONFIG=$BR_BOARD_SYSTEM_CONFIG
