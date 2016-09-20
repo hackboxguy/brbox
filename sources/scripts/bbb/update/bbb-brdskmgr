@@ -82,7 +82,7 @@ ReadBootMarker()  #$/boot/cmdline.txt file
 #	if [ $? != "0" ]; then #unable mount second system, filesystem might be fresh or corrupt
 #		return 1
 #	fi
-	RESULT=$(cat $1 | grep -o "mmcroot=.*" | awk '{print $1}' | sed 's/root=.dev.//')
+	RESULT=$(cat $1 | grep -o "mmcroot=.*" | awk '{print $1}' | sed 's/mmcroot=.dev.//')
 	if [ $? != "0" ]; then
 		#umount /dev/$BOOT_BRBOX_PART
 		#sync
