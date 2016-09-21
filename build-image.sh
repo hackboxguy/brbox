@@ -115,7 +115,7 @@ if [ $IMAGE_ONLY = 0 ]; then
 	#TODO: configs/$BR_BOARD_SYSTEM_CONFIG/uclibc.config        $BR_FOLDER/package/uclibc/
 
 	#!!!!!!!temp solution for bbbmmc-rbox linux patch!!!!!!!!!!!!!!!!!!!!!!!
-	cp sources/patches/bbb-linux-patches/* $BR_FOLDER/board/beaglebone/patches/linux/	
+	#cp sources/patches/bbb-linux-patches/* $BR_FOLDER/board/beaglebone/patches/linux/	
 	
 	pushd .
 	cd $BR_FOLDER
