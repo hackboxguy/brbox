@@ -55,6 +55,7 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_BUDDY_LIST, //returns list of buddies
 	EXMPP_CMD_SHELLCMD,     //executes remote shell command and returns the success/fail value of shell-command
 	EXMPP_CMD_SHELLCMD_RESP,//executes remote shell command and returns the shell-command's text output
+	EXMPP_CMD_DEVIDENT,
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -233,6 +234,8 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_buddy_list(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_shellcmd(std::string msg,std::string &returnval,std::string sender);
 	RPC_SRV_RESULT proc_cmd_shellcmdresp(std::string msg,std::string &returnval,std::string sender);
+	RPC_SRV_RESULT proc_cmd_devident(std::string msg,std::string &returnval,std::string sender);
+
 	std::string print_help();
 
 	RPC_SRV_RESULT LoadAliasList(std::string listFile);

@@ -3,6 +3,7 @@
 #include "LogHandler.h"
 #include <iostream>
 #include <fstream>
+#include "DevIdent.h"
 #define ASYNC_TASK_EVENT_DELAY 200000 //needed because event might go too fast to subscriber before being handled in a proper way
 //#include "SysmgrJsonDef.h"
 /* ------------------------------------------------------------------------- */
@@ -45,6 +46,7 @@ int SysRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_GET_LOG_COUNT   :return json_to_bin_get_logcount(pReq);
 		case EJSON_SYSMGR_RPC_GET_LOG_LINE    :return json_to_bin_get_logline(pReq);
 		case EJSON_SYSMGR_RPC_RUN_SHELLCMD    :return json_to_bin_run_shellcmd(pReq);
+		case EJSON_SYSMGR_RPC_DEVIDENT        :return json_to_bin_devident(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -76,6 +78,7 @@ int SysRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_GET_LOG_COUNT   :return bin_to_json_get_logcount(pReq);
 		case EJSON_SYSMGR_RPC_GET_LOG_LINE    :return bin_to_json_get_logline(pReq);
 		case EJSON_SYSMGR_RPC_RUN_SHELLCMD    :return bin_to_json_run_shellcmd(pReq);
+		case EJSON_SYSMGR_RPC_DEVIDENT        :return bin_to_json_devident(pReq);
 		default: break;
 	}
 	return -1;
@@ -107,6 +110,7 @@ int SysRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 		case EJSON_SYSMGR_RPC_GET_LOG_COUNT   :return process_get_logcount(pReq);
 		case EJSON_SYSMGR_RPC_GET_LOG_LINE    :return process_get_logline(pReq);
 		case EJSON_SYSMGR_RPC_RUN_SHELLCMD    :return process_run_shellcmd(pReq,pObj);
+		case EJSON_SYSMGR_RPC_DEVIDENT        :return process_devident(pReq,pObj);
 		default:break;
 	}
 	return 0;
@@ -125,6 +129,7 @@ SYSMGR_ASYNCTASK_TYPE SysRpc::get_async_task_in_progress()
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP:task=SYSMGR_ASYNCTASK_TFTPDOWNLOAD;break;
 		case EJSON_SYSMGR_RPC_SET_UPDATE_LOG  :task=SYSMGR_ASYNCTASK_LOGLISTUPDATE;break;
 		case EJSON_SYSMGR_RPC_RUN_SHELLCMD    :task=SYSMGR_ASYNCTASK_SHELLCMD;break;
+		case EJSON_SYSMGR_RPC_DEVIDENT        :task=SYSMGR_ASYNCTASK_DEVIDENT;break;
 		default                               :break;
 	}
 	return task;
@@ -175,6 +180,14 @@ RPC_SRV_RESULT SysRpc::ProcessWorkAsync(int cmd,unsigned char* pWorkData)
 				SYSMGR_SHELLCMD_PACKET *pPacket;
 				pPacket=(SYSMGR_SHELLCMD_PACKET*)pWorkData;
 				ret_val=process_async_run_shellcmd(pPacket);
+				OBJ_MEM_DELETE(pWorkData);
+			}
+			break;
+		case EJSON_SYSMGR_RPC_DEVIDENT:
+			{
+				SYSMGR_DEVIDENT_PACKET *pPacket;
+				pPacket=(SYSMGR_DEVIDENT_PACKET*)pWorkData;
+				ret_val=process_async_devident(pPacket);
 				OBJ_MEM_DELETE(pWorkData);
 			}
 			break;
@@ -1065,6 +1078,48 @@ RPC_SRV_RESULT SysRpc::process_async_run_shellcmd(SYSMGR_SHELLCMD_PACKET* pPacke
 		return RPC_SRV_RESULT_FAIL;
 	else
 		return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+int SysRpc::json_to_bin_devident(JsonDataCommObj* pReq)
+{
+	SYSMGR_DEVIDENT_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_DEVIDENT_PACKET,RPC_SRV_ACT_WRITE,EJSON_SYSMGR_RPC_DEVIDENT);
+	return 0;
+}
+int SysRpc::bin_to_json_devident(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_IN_PROG(RPC_SRV_REQ,SYSMGR_DEVIDENT_PACKET,RPCMGR_RPC_TASK_STS_ARGID);
+	return 0;
+}
+int SysRpc::process_devident(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SYSMGR_DEVIDENT_PACKET* pPacket;
+	pPacket=(SYSMGR_DEVIDENT_PACKET*)pPanelReq->dataRef;
+	SYSMGR_DEVIDENT_PACKET* pWorkData=NULL;
+	OBJECT_MEM_NEW(pWorkData,SYSMGR_DEVIDENT_PACKET);//delete this object in run_work() callback function
+	if(pWorkData == NULL)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_MEM_ERROR;
+		return -1;
+	}
+	//pWorkData->operation=pPacket->operation;
+	pPanelReq->result=pObj->PushAsyncTask(EJSON_SYSMGR_RPC_DEVIDENT,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_PRESERVE);
+	if(pPanelReq->result!=RPC_SRV_RESULT_IN_PROG)
+		OBJ_MEM_DELETE(pWorkData);
+	return 0;
+}
+RPC_SRV_RESULT SysRpc::process_async_devident(SYSMGR_DEVIDENT_PACKET* pPacket)
+{
+	usleep(ASYNC_TASK_EVENT_DELAY);//needed because event might go too fast to subscriber before being handled in a proper way
+	if(get_emulation_flag()==true)
+        	return RPC_SRV_RESULT_SUCCESS;
+	if(pDataCache->pDevIdent==NULL)
+		return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	DevIdent *pIdent;
+	pIdent=(DevIdent *)pDataCache->pDevIdent;//interface class
+	return pIdent->device_identify();
 }
 /* ------------------------------------------------------------------------- */
 

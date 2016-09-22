@@ -51,6 +51,8 @@ SysmgrCltCmdline::SysmgrCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--getlog=index             [read the log line of zero based index]");
 	CmdlineHelper.insert_options_entry((char*)"shellcmd" ,optional_argument,EJSON_SYSMGR_RPC_RUN_SHELLCMD);
 	CmdlineHelper.insert_help_entry((char*)"--shellcmd=cmd             [run a command in linux shell]");
+	CmdlineHelper.insert_options_entry((char*)"devident" ,optional_argument,EJSON_SYSMGR_RPC_DEVIDENT);
+	CmdlineHelper.insert_help_entry((char*)"--devident                 [identify board by blinking onboard LED]");
 }
 /* ------------------------------------------------------------------------- */
 SysmgrCltCmdline::~SysmgrCltCmdline()
@@ -184,6 +186,10 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			break;
 		case EJSON_SYSMGR_RPC_RUN_SHELLCMD:
 			push_shell_cmd(sub_arg,EJSON_SYSMGR_RPC_RUN_SHELLCMD,(char*)SYSMGR_RPC_RUN_SHELLCMD);
+			break;
+		case EJSON_SYSMGR_RPC_DEVIDENT:
+			CmdlineHelper.push_action_type_noarg_command(EJSON_SYSMGR_RPC_DEVIDENT,
+				(char*)SYSMGR_RPC_DEVIDENT,(char*)RPCMGR_RPC_TASK_STS_ARGID);
 			break;
 		default:
 			return 0;

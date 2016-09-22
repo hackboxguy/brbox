@@ -7,6 +7,8 @@
 #include "MyCmdline.h"
 #include "SrcControlVersion.h"
 #include "ADTimer.hpp"
+#include "DevIdent.h"
+#include "DevIdentRaspiAZero.h"
 /* ------------------------------------------------------------------------- */
 #include "NetRpc.h"
 #include "SysRpc.h"
@@ -17,6 +19,8 @@
 #define LOG_FILE_PATH         "/tmp/messages"
 /* ------------------------------------------------------------------------- */
 using namespace std;
+DevIdent* create_dev_ident_object(ADCMN_BOARD_TYPE board_type);
+/* ------------------------------------------------------------------------- */
 int main(int argc, const char* argv[])
 {
 	//cmdline parsing
@@ -42,6 +46,9 @@ int main(int argc, const char* argv[])
 	//prepare logger
 	LogHandler Logger(LOG_FILE_PATH);//log handler
 	DataCache.pLogger =(void*)&Logger;//rpc's needs to know the object pointer of sms-handling-object
+
+	//prepare device-identify object
+	DataCache.pDevIdent=(void*)create_dev_ident_object(DevInfo.BoardType);
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
@@ -109,7 +116,8 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&GetLogLine);
 	SysRpc RunShellCmd(SYSMGR_RPC_RUN_SHELLCMD,EJSON_SYSMGR_RPC_RUN_SHELLCMD,emulat,dbglog,&DataCache); 
 	RpcMgr.AttachRpc(&RunShellCmd);
-
+	SysRpc DevIdent (SYSMGR_RPC_DEVIDENT,EJSON_SYSMGR_RPC_DEVIDENT,emulat,dbglog,&DataCache);
+	RpcMgr.AttachRpc(&DevIdent);
 
 	//common rpc hadler object(eg: trigger-data-save/store-factory/restore-factory..etc)
 	CmnRpc CmnRpcHandler("cmnrpc",0,emulat,dbglog,&DataCache);//common rpc-handler(name and index are ignored)
@@ -132,3 +140,30 @@ int main(int argc, const char* argv[])
 	AppTimer.stop_timer();//stop sending heart-beats to other objects
 	return 0;
 }
+
+//following function creates device identify object for board-identify-with-led-blink-functionality
+DevIdent* create_dev_ident_object(ADCMN_BOARD_TYPE board_type)
+{
+	DevIdent* pDevice=NULL;
+	//ADCMN_BOARD_TYPE board_type;
+	//const char *boardTbl[] = ADCMN_BOARD_TYPE_TABLE;
+	//ADCmnStringProcessor string_proc;
+	//board_type=(ADCMN_BOARD_TYPE)string_proc.string_to_enum(boardTbl,(char*)BoardType.c_str(),ADCMN_BOARD_TYPE_UNKNOWN);
+	//if(board_type>=ADCMN_BOARD_TYPE_UNKNOWN)
+	//	return NULL;//unable to determine which devident object is needed
+	switch(board_type)
+	{
+		case ADCMN_BOARD_TYPE_RASPI_A      :pDevice = new DevIdentRaspiAZero;break;
+		case ADCMN_BOARD_TYPE_RASPI_APLUS  :pDevice = new DevIdentRaspiAZero;break;
+		case ADCMN_BOARD_TYPE_RASPI_B      :break;
+		case ADCMN_BOARD_TYPE_RASPI_BPLUS  :break;
+		case ADCMN_BOARD_TYPE_RASPI_B2     :break;
+		case ADCMN_BOARD_TYPE_BAYTRAIL     :break;
+		case ADCMN_BOARD_TYPE_BAYTRAIL_I210:break;
+		case ADCMN_BOARD_TYPE_BBB          :break;
+		case ADCMN_BOARD_TYPE_RASPI_0      :pDevice = new DevIdentRaspiAZero;break;
+		default: break;
+	}
+	return pDevice;
+}
+
