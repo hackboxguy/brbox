@@ -845,7 +845,17 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_get_localip(std::string msg,std::string &re
 	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
 	RPC_SRV_RESULT result = Client.get_string_type_with_string_para((char*)"get_ip_addr",(char*)"iface",(char*)"eth0",
-									temp_str,(char*)"addr");
+									temp_str,(char*)"addr");//first try for eth0
+	if(result!=RPC_SRV_RESULT_SUCCESS)
+	{
+		result = Client.get_string_type_with_string_para((char*)"get_ip_addr",(char*)"iface",(char*)"eth1",
+									temp_str,(char*)"addr");//second try for eth1
+		if(result!=RPC_SRV_RESULT_SUCCESS)
+		{
+		result = Client.get_string_type_with_string_para((char*)"get_ip_addr",(char*)"iface",(char*)"ppp0",
+									temp_str,(char*)"addr");//third try for ppp0
+		}
+	}
 	Client.rpc_server_disconnect();
 	returnval=temp_str;
 	return result;
