@@ -19,6 +19,11 @@ typedef enum ADCMN_BOARD_TYPE_T
 typedef struct ADCMN_DEV_INFO_T
 {
 	ADCMN_BOARD_TYPE BoardType;
+	ADCMN_DEV_INFO_T()
+	{
+		BoardType=ADCMN_BOARD_TYPE_UNKNOWN;
+	};//initialize variables here
+	~ ADCMN_DEV_INFO_T(){};
 }ADCMN_DEV_INFO;
 
 #endif
