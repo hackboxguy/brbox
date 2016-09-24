@@ -1046,6 +1046,7 @@ int SysRpc::bin_to_json_run_shellcmd(JsonDataCommObj* pReq)
 }
 int SysRpc::process_run_shellcmd(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj)
 {
+	char tmpcmd[1024];
 	RPC_SRV_REQ *pPanelReq=NULL;
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	SYSMGR_SHELLCMD_PACKET* pPacket;
@@ -1058,7 +1059,8 @@ int SysRpc::process_run_shellcmd(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pOb
 		pPanelReq->result=RPC_SRV_RESULT_MEM_ERROR;
 		return -1;
 	}
-	strcpy(pWorkData->cmd,pPacket->cmd);
+	sprintf(tmpcmd,"%s > %s",pPacket->cmd,SHELLCMD_RESP_FILE_PATH);//SHELLCMD_RESP_FILE_PATH declared in ADCommon.hpp
+	strcpy(pWorkData->cmd,tmpcmd);//pPacket->cmd);
 	pPanelReq->result=pObj->PushAsyncTask(EJSON_SYSMGR_RPC_RUN_SHELLCMD,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_PRESERVE);
 	if(pPanelReq->result!=RPC_SRV_RESULT_IN_PROG)
 		OBJ_MEM_DELETE(pWorkData);

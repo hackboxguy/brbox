@@ -1,15 +1,11 @@
 #include "XmppMgr.h"
 #include <algorithm>
-//#include <string>
 #include <mutex>
-//#include <iostream>
-//#include <fstream>
-//#include <stdexcept>
-//#include <string.h>
 #include <iostream>
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <cerrno>
 #include "ADCmnStringProcessor.hpp"
 #include "ADJsonRpcClient.hpp"
 #include "ADCmnPortList.h"
@@ -1384,7 +1380,26 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_shellcmd(std::string msg,std::string &returnval
 /* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT XmppMgr::proc_cmd_shellcmdresp(std::string msg,std::string &returnval,std::string sender)
 {
-	return RPC_SRV_RESULT_FAIL;
+	//returnval='\n';
+	//XmppProxy.get_buddy_list(returnval);
+	std::string filename(SHELLCMD_RESP_FILE_PATH);//SHELLCMD_RESP_FILE_PATH declared in ADCommon.hpp
+	std::ifstream in(filename, std::ios::in | std::ios::binary);
+	if (in)
+	{
+		in.seekg(0, std::ios::end);
+		unsigned int length = in.tellg();
+		if(length>SHELLCMD_RESP_MAX_FILE_SIZE)//SHELLCMD_RESP_MAX_FILE_SIZE declared in ADCommon.hpp
+			return RPC_SRV_RESULT_VALUE_OUT_OF_RANGE;
+		returnval.resize(in.tellg());
+		in.seekg(0, std::ios::beg);
+		in.read(&returnval[0], returnval.size());
+		in.close();
+		return RPC_SRV_RESULT_SUCCESS;
+	}
+	else
+		return RPC_SRV_RESULT_FILE_OPEN_ERR;
+	//throw(errno);
+	//return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT XmppMgr::proc_cmd_devident(std::string msg,std::string &returnval,std::string sender)

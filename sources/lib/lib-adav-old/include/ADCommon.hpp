@@ -709,4 +709,7 @@ typedef enum display_panel_result_t
 	EDISP_PANEL_RESULT_NONE
 }EDISP_PANEL_RESULT;
 /*****************************************************************************/
+#define SHELLCMD_RESP_FILE_PATH "/tmp/shellcmd.resp"
+#define SHELLCMD_RESP_MAX_FILE_SIZE 1300 //allow max 1300bytes or shellcmd response
+/*****************************************************************************/
 #endif
