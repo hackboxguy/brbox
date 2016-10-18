@@ -133,7 +133,7 @@
 #define IH_TYPE_BRBOX_ROOT_RP2	14 //raspi2
 #define IH_TYPE_BRBOX_ROOT_BBB	15 //beaglebone black
 #define IH_TYPE_BRBOX_ROOT_WDB	16 //wandboard
-#define IH_TYPE_BRBOX_ROOT_RP2	17 //raspi3
+#define IH_TYPE_BRBOX_ROOT_RP3	17 //raspi3
 
 #define STR_TYPE_BRBOX_PROJ	  "BrBoxProj"  //complete project including all sub-modules
 #define STR_TYPE_BRBOX_STTNG	  "BrBoxSttng" //settings partition
