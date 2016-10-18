@@ -23,6 +23,7 @@ PREPARE_ONLY=0
 ROOTFS_TYPE_BTR="BrBoxRtBtr"
 ROOTFS_TYPE_RP1="BrBoxRtRp1"
 ROOTFS_TYPE_RP2="BrBoxRtRp2"
+ROOTFS_TYPE_RP3="BrBoxRtRp3"
 ROOTFS_TYPE_BBB="BrBoxRtBbb"
 ROOTFS_TYPE_WDB="BrBoxRtWdb"
 
@@ -34,6 +35,7 @@ BOARD_TYPE_RP1_SMSW="raspi1-smartsw"      #relayswitch-application-build
 BOARD_TYPE_RP1_RBOX="raspi1-rbox"         #remote-box-application-build
 BOARD_TYPE_RP1_DSPT="raspi1-disptst"      #display-test-application-build
 BOARD_TYPE_RP2="raspi2"                   #base-build
+BOARD_TYPE_RP3="raspi3"                   #base-build
 BOARD_TYPE_BBB="bbb"                      #base-build
 BOARD_TYPE_BBBMMC="bbbmmc"                #base-build
 BOARD_TYPE_BBBMMC_RBOX="bbbmmc-rbox"      #remote-box-application-build
@@ -76,6 +78,10 @@ elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1_DSPT" ]; then
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP2" ]; then
 	BR_BOARD_CONFIG=raspberrypi2_defconfig
 	BR_BOARD_LINUX_CONFIG_PATH=board/raspberrypi2/
+	BOOT_IMG_SCRIPT=$(pwd)/scripts/raspi-bootdisk.sh
+elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP3" ]; then
+	BR_BOARD_CONFIG=raspberrypi3_defconfig
+	BR_BOARD_LINUX_CONFIG_PATH=board/raspberrypi3/
 	BOOT_IMG_SCRIPT=$(pwd)/scripts/raspi-bootdisk.sh
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_BBB" ]; then
 	BR_BOARD_CONFIG=beaglebone_defconfig
@@ -150,6 +156,9 @@ elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1_DSPT" ]; then
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP2" ]; then
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 	ROOTFS_TYPE=$ROOTFS_TYPE_RP2
+elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP3" ]; then
+	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
+	ROOTFS_TYPE=$ROOTFS_TYPE_RP3
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_BBB" ]; then
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 	ROOTFS_TYPE=$ROOTFS_TYPE_BBB
