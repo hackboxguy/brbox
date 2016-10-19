@@ -162,6 +162,7 @@ DevIdent* create_dev_ident_object(ADCMN_BOARD_TYPE board_type)
 		case ADCMN_BOARD_TYPE_BAYTRAIL_I210:break;
 		case ADCMN_BOARD_TYPE_BBB          :break;
 		case ADCMN_BOARD_TYPE_RASPI_0      :pDevice = new DevIdentRaspiAZero;break;
+		case ADCMN_BOARD_TYPE_RASPI_3      :pDevice = new DevIdentRaspiAZero;break;
 		default: break;
 	}
 	return pDevice;
