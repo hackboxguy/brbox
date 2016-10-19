@@ -1,7 +1,7 @@
 #!/bin/sh
 CPU_TYPE_RP1="0xb76"
 CPU_TYPE_RP2="0xc07"
-CPU_TYPE_RP3="a02082"
+CPU_TYPE_RP3="0xd03" #a02082
 #Board types supported by BrBox
 BD_TYP_RASPI_3="RASPI_3"
 BD_TYP_RASPI_0="RASPI_0"
@@ -81,6 +81,7 @@ if [ $? = "0" ]; then
 	fi
 	[ "$RESULT" = "$CPU_TYPE_RP1" ]  && { ReadRaspiType; return $?; }
 	[ "$RESULT" = "$CPU_TYPE_RP2" ]  && { echo $BD_TYP_RASPI_B2; return 0; } #TODO: raspi-A2??
+	[ "$RESULT" = "$CPU_TYPE_RP3" ]  && { echo $BD_TYP_RASPI_3; return 0; }  
 fi
 
 #look for Baytrail
