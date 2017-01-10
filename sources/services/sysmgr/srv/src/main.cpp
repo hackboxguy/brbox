@@ -155,8 +155,8 @@ DevIdent* create_dev_ident_object(ADCMN_BOARD_TYPE board_type)
 	{
 		case ADCMN_BOARD_TYPE_RASPI_A      :pDevice = new DevIdentRaspiAZero;break;
 		case ADCMN_BOARD_TYPE_RASPI_APLUS  :pDevice = new DevIdentRaspiAZero;break;
-		case ADCMN_BOARD_TYPE_RASPI_B      :break;
-		case ADCMN_BOARD_TYPE_RASPI_BPLUS  :break;
+		case ADCMN_BOARD_TYPE_RASPI_B      :pDevice = new DevIdentRaspiAZero;break;//break;
+		case ADCMN_BOARD_TYPE_RASPI_BPLUS  :pDevice = new DevIdentRaspiAZero;break;//break;
 		case ADCMN_BOARD_TYPE_RASPI_B2     :break;
 		case ADCMN_BOARD_TYPE_BAYTRAIL     :break;
 		case ADCMN_BOARD_TYPE_BAYTRAIL_I210:break;
