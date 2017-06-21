@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-BRBOX_GSTREAMER_VAAPI_VERSION = 1.8.2 #0.7.0 #1.6.0 (1.6.0 source has compile problem)
+BRBOX_GSTREAMER_VAAPI_VERSION = 1.12.1 #1.8.2 #0.7.0 #1.6.0 (1.6.0 source has compile problem)
 BRBOX_GSTREAMER_VAAPI_SITE = http://cgit.freedesktop.org/gstreamer/gstreamer-vaapi/snapshot
 BRBOX_GSTREAMER_VAAPI_SOURCE = brbox_gstreamer_vaapi-$(BRBOX_GSTREAMER_VAAPI_VERSION).tar.gz
 #BRBOX_GSTREAMER_VAAPI_SITE_METHOD = git_with_submodules
