@@ -1,0 +1,11 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9156a90..1e1ce8e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -269,5 +269,5 @@ if (${ONION_USE_TESTS})
+ 	enable_testing()
+ endif(${ONION_USE_TESTS})
+ 
+-add_subdirectory(tests)
++#add_subdirectory(tests)
+ add_subdirectory(manpages)
