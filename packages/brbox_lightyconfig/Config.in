@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BRBOX_LIGHTYCONFIG
+	bool "overwrites default lighttpd configs"
+	default n
+	depends on BR2_TARGET_BRBOX_PACKAGES && BR2_PACKAGE_LIGHTTPD
+	help
+	  overwrites default lighttpd configs with brbox customized config.
+
