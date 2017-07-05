@@ -1,0 +1,33 @@
+#!/bin/sh
+#
+# Set default hostname if desnt exist
+#
+start() {
+	echo -n "Lighty-config startup: "
+	mkdir -p /tmp/downloads
+	echo "OK"
+}
+
+stop() {
+	echo -n "Lighty-config stopping: "
+	rm -rf /tmp/downloads
+	echo "OK"
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	stop
+	start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
