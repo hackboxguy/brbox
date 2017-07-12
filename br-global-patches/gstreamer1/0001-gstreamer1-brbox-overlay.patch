@@ -1,0 +1,236 @@
+diff --git a/package/gstreamer1/gst-omx/gst-omx.hash b/package/gstreamer1/gst-omx/gst-omx.hash
+deleted file mode 100644
+index dff9840..0000000
+--- a/package/gstreamer1/gst-omx/gst-omx.hash
++++ /dev/null
+@@ -1,2 +0,0 @@
+-# From https://gstreamer.freedesktop.org/src/gst-omx/gst-omx-1.10.4.tar.xz.sha256sum
+-sha256 45072925cf262f0fd528fab78f0de52734e46a5a88aa802fae51c67c09c81aa2  gst-omx-1.10.4.tar.xz
+diff --git a/package/gstreamer1/gst-omx/gst-omx.mk b/package/gstreamer1/gst-omx/gst-omx.mk
+index 6ce7baa..95520c7 100644
+--- a/package/gstreamer1/gst-omx/gst-omx.mk
++++ b/package/gstreamer1/gst-omx/gst-omx.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-GST_OMX_VERSION = 1.10.4
++GST_OMX_VERSION = 1.12.0
+ GST_OMX_SOURCE = gst-omx-$(GST_OMX_VERSION).tar.xz
+ GST_OMX_SITE = https://gstreamer.freedesktop.org/src/gst-omx
+ 
+diff --git a/package/gstreamer1/gst1-imx/gst1-imx.hash b/package/gstreamer1/gst1-imx/gst1-imx.hash
+deleted file mode 100644
+index e2e3971..0000000
+--- a/package/gstreamer1/gst1-imx/gst1-imx.hash
++++ /dev/null
+@@ -1,2 +0,0 @@
+-# locally computed hash
+-sha256 999c093e38768e51d14abbe7836c09b666bcb89f03f34dd3697a6e5b5e4a4086  gst1-imx-0.12.3.tar.gz
+diff --git a/package/gstreamer1/gst1-libav/gst1-libav.hash b/package/gstreamer1/gst1-libav/gst1-libav.hash
+deleted file mode 100644
+index cc83429..0000000
+--- a/package/gstreamer1/gst1-libav/gst1-libav.hash
++++ /dev/null
+@@ -1,2 +0,0 @@
+-# From http://gstreamer.freedesktop.org/src/gst-libav/gst-libav-1.10.4.tar.xz.sha256sum
+-sha256 6ca0feca75e3d48315e07f20ec37cf6260ed1e9dde58df355febd5016246268b  gst-libav-1.10.4.tar.xz
+diff --git a/package/gstreamer1/gst1-libav/gst1-libav.mk b/package/gstreamer1/gst1-libav/gst1-libav.mk
+index 5726bb5..514ea74 100644
+--- a/package/gstreamer1/gst1-libav/gst1-libav.mk
++++ b/package/gstreamer1/gst1-libav/gst1-libav.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-GST1_LIBAV_VERSION = 1.10.4
++GST1_LIBAV_VERSION = 1.12.0
+ GST1_LIBAV_SOURCE = gst-libav-$(GST1_LIBAV_VERSION).tar.xz
+ GST1_LIBAV_SITE = https://gstreamer.freedesktop.org/src/gst-libav
+ GST1_LIBAV_CONF_OPTS = --with-system-libav
+diff --git a/package/gstreamer1/gst1-plugins-bad/gst1-plugins-bad.hash b/package/gstreamer1/gst1-plugins-bad/gst1-plugins-bad.hash
+deleted file mode 100644
+index 441afa2..0000000
+--- a/package/gstreamer1/gst1-plugins-bad/gst1-plugins-bad.hash
++++ /dev/null
+@@ -1,2 +0,0 @@
+-# From http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-1.10.4.tar.xz.sha256sum
+-sha256 23ddae506b3a223b94869a0d3eea3e9a12e847f94d2d0e0b97102ce13ecd6966  gst-plugins-bad-1.10.4.tar.xz
+diff --git a/package/gstreamer1/gst1-plugins-bad/gst1-plugins-bad.mk b/package/gstreamer1/gst1-plugins-bad/gst1-plugins-bad.mk
+index 00add02..1181523 100644
+--- a/package/gstreamer1/gst1-plugins-bad/gst1-plugins-bad.mk
++++ b/package/gstreamer1/gst1-plugins-bad/gst1-plugins-bad.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-GST1_PLUGINS_BAD_VERSION = 1.10.4
++GST1_PLUGINS_BAD_VERSION = 1.12.0
+ GST1_PLUGINS_BAD_SOURCE = gst-plugins-bad-$(GST1_PLUGINS_BAD_VERSION).tar.xz
+ GST1_PLUGINS_BAD_SITE = https://gstreamer.freedesktop.org/src/gst-plugins-bad
+ GST1_PLUGINS_BAD_INSTALL_STAGING = YES
+diff --git a/package/gstreamer1/gst1-plugins-base/gst1-plugins-base.hash b/package/gstreamer1/gst1-plugins-base/gst1-plugins-base.hash
+deleted file mode 100644
+index b526b14..0000000
+--- a/package/gstreamer1/gst1-plugins-base/gst1-plugins-base.hash
++++ /dev/null
+@@ -1,2 +0,0 @@
+-# From http://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-1.10.4.tar.xz.sha256sum
+-sha256 f6d245b6b3d4cb733f81ebb021074c525ece83db0c10e932794b339b8d935eb7  gst-plugins-base-1.10.4.tar.xz
+diff --git a/package/gstreamer1/gst1-plugins-base/gst1-plugins-base.mk b/package/gstreamer1/gst1-plugins-base/gst1-plugins-base.mk
+index 6ab63a3..d0ebbbb 100644
+--- a/package/gstreamer1/gst1-plugins-base/gst1-plugins-base.mk
++++ b/package/gstreamer1/gst1-plugins-base/gst1-plugins-base.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-GST1_PLUGINS_BASE_VERSION = 1.10.4
++GST1_PLUGINS_BASE_VERSION = 1.12.0
+ GST1_PLUGINS_BASE_SOURCE = gst-plugins-base-$(GST1_PLUGINS_BASE_VERSION).tar.xz
+ GST1_PLUGINS_BASE_SITE = https://gstreamer.freedesktop.org/src/gst-plugins-base
+ GST1_PLUGINS_BASE_INSTALL_STAGING = YES
+diff --git a/package/gstreamer1/gst1-plugins-good/gst1-plugins-good.hash b/package/gstreamer1/gst1-plugins-good/gst1-plugins-good.hash
+deleted file mode 100644
+index 21ee18d..0000000
+--- a/package/gstreamer1/gst1-plugins-good/gst1-plugins-good.hash
++++ /dev/null
+@@ -1,2 +0,0 @@
+-# From http://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-1.10.4.tar.xz.sha256sum
+-sha256 8a86c61434a8c44665365bd0b3557a040937d1f44bf69caee4e9ea816ce74d7e  gst-plugins-good-1.10.4.tar.xz
+diff --git a/package/gstreamer1/gst1-plugins-good/gst1-plugins-good.mk b/package/gstreamer1/gst1-plugins-good/gst1-plugins-good.mk
+index e25149a..6cc111c 100644
+--- a/package/gstreamer1/gst1-plugins-good/gst1-plugins-good.mk
++++ b/package/gstreamer1/gst1-plugins-good/gst1-plugins-good.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-GST1_PLUGINS_GOOD_VERSION = 1.10.4
++GST1_PLUGINS_GOOD_VERSION = 1.12.0
+ GST1_PLUGINS_GOOD_SOURCE = gst-plugins-good-$(GST1_PLUGINS_GOOD_VERSION).tar.xz
+ GST1_PLUGINS_GOOD_SITE = https://gstreamer.freedesktop.org/src/gst-plugins-good
+ GST1_PLUGINS_GOOD_LICENSE_FILES = COPYING
+diff --git a/package/gstreamer1/gst1-plugins-ugly/gst1-plugins-ugly.hash b/package/gstreamer1/gst1-plugins-ugly/gst1-plugins-ugly.hash
+deleted file mode 100644
+index 9567d9c..0000000
+--- a/package/gstreamer1/gst1-plugins-ugly/gst1-plugins-ugly.hash
++++ /dev/null
+@@ -1,2 +0,0 @@
+-# From http://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-1.10.4.tar.xz.sha256sum
+-sha256 6386c77ca8459cba431ed0b63da780c7062c7cc48055d222024d8eaf198ffa59  gst-plugins-ugly-1.10.4.tar.xz
+diff --git a/package/gstreamer1/gst1-plugins-ugly/gst1-plugins-ugly.mk b/package/gstreamer1/gst1-plugins-ugly/gst1-plugins-ugly.mk
+index d503555..4eb18f4 100644
+--- a/package/gstreamer1/gst1-plugins-ugly/gst1-plugins-ugly.mk
++++ b/package/gstreamer1/gst1-plugins-ugly/gst1-plugins-ugly.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-GST1_PLUGINS_UGLY_VERSION = 1.10.4
++GST1_PLUGINS_UGLY_VERSION = 1.12.0
+ GST1_PLUGINS_UGLY_SOURCE = gst-plugins-ugly-$(GST1_PLUGINS_UGLY_VERSION).tar.xz
+ GST1_PLUGINS_UGLY_SITE = https://gstreamer.freedesktop.org/src/gst-plugins-ugly
+ GST1_PLUGINS_UGLY_LICENSE_FILES = COPYING
+diff --git a/package/gstreamer1/gst1-rtsp-server/gst1-rtsp-server.hash b/package/gstreamer1/gst1-rtsp-server/gst1-rtsp-server.hash
+deleted file mode 100644
+index d4c540d..0000000
+--- a/package/gstreamer1/gst1-rtsp-server/gst1-rtsp-server.hash
++++ /dev/null
+@@ -1,2 +0,0 @@
+-# From https://gstreamer.freedesktop.org/src/gst-rtsp-server/gst-rtsp-server-1.10.4.tar.xz.sha256sum
+-sha256 2f6e12fd4e3568ee190dc24e57e4c3a878971c3a3fb6904a9674404fac256de6  gst-rtsp-server-1.10.4.tar.xz
+diff --git a/package/gstreamer1/gst1-rtsp-server/gst1-rtsp-server.mk b/package/gstreamer1/gst1-rtsp-server/gst1-rtsp-server.mk
+index bfdd4c4..b6c6347 100644
+--- a/package/gstreamer1/gst1-rtsp-server/gst1-rtsp-server.mk
++++ b/package/gstreamer1/gst1-rtsp-server/gst1-rtsp-server.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-GST1_RTSP_SERVER_VERSION = 1.10.4
++GST1_RTSP_SERVER_VERSION = 1.12.0
+ GST1_RTSP_SERVER_SOURCE = gst-rtsp-server-$(GST1_RTSP_SERVER_VERSION).tar.xz
+ GST1_RTSP_SERVER_SITE = http://gstreamer.freedesktop.org/src/gst-rtsp-server
+ GST1_RTSP_SERVER_LICENSE = LGPLv2+
+diff --git a/package/gstreamer1/gst1-validate/gst1-validate.hash b/package/gstreamer1/gst1-validate/gst1-validate.hash
+deleted file mode 100644
+index 10c6667..0000000
+--- a/package/gstreamer1/gst1-validate/gst1-validate.hash
++++ /dev/null
+@@ -1,2 +0,0 @@
+-# From http://gstreamer.freedesktop.org/src/gst-validate/gst-validate-1.10.4.tar.xz.sha256sum
+-sha256 e59c00bf64cca9c477cdb44eb8dd0b3aac5499b17d77bf28ee054fd211e8d73c  gst-validate-1.10.4.tar.xz
+diff --git a/package/gstreamer1/gst1-validate/gst1-validate.mk b/package/gstreamer1/gst1-validate/gst1-validate.mk
+index cf7a8af..2c0af75 100644
+--- a/package/gstreamer1/gst1-validate/gst1-validate.mk
++++ b/package/gstreamer1/gst1-validate/gst1-validate.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-GST1_VALIDATE_VERSION = 1.10.4
++GST1_VALIDATE_VERSION = 1.12.0
+ GST1_VALIDATE_SOURCE = gst-validate-$(GST1_VALIDATE_VERSION).tar.xz
+ GST1_VALIDATE_SITE = https://gstreamer.freedesktop.org/src/gst-validate
+ GST1_VALIDATE_LICENSE = LGPLv2.1+
+diff --git a/package/gstreamer1/gstreamer1/0001-gstconfig.h.in-Fix-unaligned-access-support-for-the-.patch b/package/gstreamer1/gstreamer1/0001-gstconfig.h.in-Fix-unaligned-access-support-for-the-.patch
+deleted file mode 100644
+index 88f3373..0000000
+--- a/package/gstreamer1/gstreamer1/0001-gstconfig.h.in-Fix-unaligned-access-support-for-the-.patch
++++ /dev/null
+@@ -1,33 +0,0 @@
+-From 437b3e38d9127ae021ca8510709c2e6be3e6b819 Mon Sep 17 00:00:00 2001
+-From: Peter Korsgaard <peter@korsgaard.com>
+-Date: Sat, 18 Feb 2017 10:03:24 +0100
+-Subject: [PATCH] gstconfig.h.in: Fix unaligned access support for the openrisc
+- architecture
+-
+-Teach gstconfig.h.in about the openrisc (or1k) architecture.  Fixes
+-buildroot autobuild failure:
+-
+-http://autobuild.buildroot.net/results/717/717d78ce0935749f477bdf3133b6f20057a28c01/build-end.log
+-
+-Submitted-upstream: https://bugzilla.gnome.org/show_bug.cgi?id=778866
+-Signed-off-by: Peter Korsgaard <peter@korsgaard.com>
+----
+- gst/gstconfig.h.in | 2 +-
+- 1 file changed, 1 insertion(+), 1 deletion(-)
+-
+-diff --git a/gst/gstconfig.h.in b/gst/gstconfig.h.in
+-index cf95f61ab..1b2ca64ac 100644
+---- a/gst/gstconfig.h.in
+-+++ b/gst/gstconfig.h.in
+-@@ -104,7 +104,7 @@
+-  * http://docs.oracle.com/cd/E19205-01/820-4155/c++_faq.html#Vers6
+-  * https://software.intel.com/en-us/node/583402
+-  */
+--#if defined(__alpha__) || defined(__arc__) || defined(__arm__) || defined(__aarch64__) || defined(__bfin) || defined(__hppa__) || defined(__nios2__) || defined(__MICROBLAZE__) || defined(__mips__) || defined(__sh__) || defined(__SH4__) || defined(__sparc__) || defined(__sparc) || defined(__ia64__) || defined(_M_ALPHA) || defined(_M_ARM) || defined(_M_IA64) || defined(__xtensa__)
+-+#if defined(__alpha__) || defined(__arc__) || defined(__arm__) || defined(__aarch64__) || defined(__bfin) || defined(__hppa__) || defined(__nios2__) || defined(__MICROBLAZE__) || defined(__mips__) || defined(__or1k__) || defined(__sh__) || defined(__SH4__) || defined(__sparc__) || defined(__sparc) || defined(__ia64__) || defined(_M_ALPHA) || defined(_M_ARM) || defined(_M_IA64) || defined(__xtensa__)
+- #  define GST_HAVE_UNALIGNED_ACCESS 0
+- #elif defined(__i386__) || defined(__i386) || defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__ppc__) || defined(__ppc64__) || defined(__powerpc__) || defined(__powerpc64__) || defined(__m68k__) || defined(_M_IX86) || defined(_M_AMD64) || defined(_M_X64) || defined(__s390__) || defined(__s390x__) || defined(__zarch__)
+- #  define GST_HAVE_UNALIGNED_ACCESS 1
+--- 
+-2.11.0
+-
+diff --git a/package/gstreamer1/gstreamer1/gstreamer1.hash b/package/gstreamer1/gstreamer1/gstreamer1.hash
+deleted file mode 100644
+index 455e7fb..0000000
+--- a/package/gstreamer1/gstreamer1/gstreamer1.hash
++++ /dev/null
+@@ -1,2 +0,0 @@
+-# From http://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.10.4.tar.xz.sha256sum
+-sha256 50c2f5af50a6cc6c0a3f3ed43bdd8b5e2bff00bacfb766d4be139ec06d8b5218  gstreamer-1.10.4.tar.xz
+diff --git a/package/gstreamer1/gstreamer1/gstreamer1.mk b/package/gstreamer1/gstreamer1/gstreamer1.mk
+index 5a0a369..b785113 100644
+--- a/package/gstreamer1/gstreamer1/gstreamer1.mk
++++ b/package/gstreamer1/gstreamer1/gstreamer1.mk
+@@ -4,7 +4,7 @@
+ #
+ ################################################################################
+ 
+-GSTREAMER1_VERSION = 1.10.4
++GSTREAMER1_VERSION = 1.12.0
+ GSTREAMER1_SOURCE = gstreamer-$(GSTREAMER1_VERSION).tar.xz
+ GSTREAMER1_SITE = https://gstreamer.freedesktop.org/src/gstreamer
+ GSTREAMER1_INSTALL_STAGING = YES
