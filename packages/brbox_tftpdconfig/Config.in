@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BRBOX_TFTPDCONFIG
+	bool "overwrites default tftpd config"
+	default n
+	depends on BR2_TARGET_BRBOX_PACKAGES && BR2_PACKAGE_TFTPD
+	help
+	  overwrites default tftpd config with brbox customized config.
+

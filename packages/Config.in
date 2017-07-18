@@ -36,6 +36,7 @@ source "package/brbox/brbox_eeprog/Config.in"
 source "package/brbox/brbox_x11startup/Config.in"
 source "package/brbox/brbox_umtskeeper/Config.in"
 source "package/brbox/brbox_lightyconfig/Config.in"
+source "package/brbox/brbox_tftpdconfig/Config.in"
 endmenu
 endif
 
