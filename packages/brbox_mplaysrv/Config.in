@@ -1,0 +1,15 @@
+config BR2_PACKAGE_BRBOX_MPLAYSRV
+	bool "Media-Player-Service"
+	default n
+	select BR2_PACKAGE_BRBOX_LIBADCMNOLD
+	help
+	  mplayer service for playing multi-media content
+
+config BR2_PACKAGE_BRBOX_MPLAYSRV_INIT_ORDER
+        string "mplaysrv init.d order"
+        default "75"
+        depends on BR2_PACKAGE_BRBOX_MPLAYSRV
+        help
+          At which place in the init.d startup this service should be started. Needs to be a 2-digit integer.
+          Will be prefixed by "S" by buildroot, so e.g. "75" becomes "S75"
+
