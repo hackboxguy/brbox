@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.9)
-set(COMPONENT_NAME hotwiresrv) #set the name of the binary
+set(COMPONENT_NAME mplaysrv) #set the name of the binary
 set(LIB_ADSTTNG AdSttngs)   #settings library
 set(LIB_ADCOMMN AdCmn)      #common library
 
@@ -11,7 +11,7 @@ set(LIB_ADCOMMN AdCmn)      #common library
 project(${COMPONENT_NAME})
 set(AUTO_SVN_VERSION    ON CACHE BOOL ON)  #by default include svn revision numbers
 set(INSTALL_MY_HEADERS  ON CACHE BOOL ON)  #by default install header files to target-install-directory
-set(STARTUP_SCRIPT HotwireStartupScr)         #server startup script
+set(STARTUP_SCRIPT MplaySrvStartupScr) #HotwireStartupScr)         #server startup script
 #set(STARTUP_SCRIPT_ALIAS S71GpioCtl)          #todo: automate numbering of startup scripts
 set(STARTNUM "75" CACHE STRING "75")       #init order number of the service
 file(GLOB SOURCES "src/*.cpp")

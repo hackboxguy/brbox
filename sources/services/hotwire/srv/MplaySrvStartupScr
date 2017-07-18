@@ -2,7 +2,7 @@
 #
 # Start/stop server script
 #
-SERVER_NAME=hotwiresrv
+SERVER_NAME=mplaysrv #hotwiresrv
 SERVER_PATH=/opt/fmw/bin/
 DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
 start() {
