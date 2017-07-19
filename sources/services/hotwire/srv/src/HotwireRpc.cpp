@@ -341,7 +341,7 @@ RPC_SRV_RESULT GpioCtrlRpc::process_show_image(std::string imgfile)
 	char command[1024];
 	if(imgfile=="none")
 	{
-		if(is_screen_image_active()==true)//stop only if fbv image rendering is already running
+		//if(is_screen_image_active()==true)//stop only if fbv image rendering is already running
 		{
 			//stop fbv command which is running in background
 			//sprintf(command,"echo -n q > %s",IMG_RENDER_FIFO_FILE);
@@ -363,7 +363,7 @@ RPC_SRV_RESULT GpioCtrlRpc::process_show_image(std::string imgfile)
 	system(command);
 
 	//using fbv command render the image file
-	sprintf(command,"fbv %s < %s",imgfile.c_str(),IMG_RENDER_FIFO_FILE);
+	sprintf(command,"fbv %s < %s &",imgfile.c_str(),IMG_RENDER_FIFO_FILE);
 	system(command);
 	//with following command, frame is rendered on the screen(need to check why?)
 	sprintf(command,"echo . > %s",IMG_RENDER_FIFO_FILE);

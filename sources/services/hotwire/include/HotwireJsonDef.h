@@ -81,6 +81,12 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 	unsigned int tmpData;
 	GPIOCTL_OMXACT_TYPE ActType;
 	std::string fbimgpath;
+	GPIOCTL_CMN_DATA_CACHE_T()
+	{
+		fbimgpath="none";
+	};//initialize variables here
+	~ GPIOCTL_CMN_DATA_CACHE_T(){};
+
 }GPIOCTL_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */
 
