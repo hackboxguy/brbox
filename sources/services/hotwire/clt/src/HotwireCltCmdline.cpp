@@ -14,7 +14,8 @@ GpioCltCmdline::GpioCltCmdline()
 	//CmdlineHelper.insert_help_entry((char*)"--debugimgfile=filepath    [read/write debug image file path]");
 
 	CmdlineHelper.insert_options_entry((char*)"omxact" ,optional_argument,EJSON_GPIOCTL_RPC_OMXACT_GET);
-	CmdlineHelper.insert_help_entry((char*)"--omxact=type                [get/set omx player action, type=<start/intr/stop/warn/idle>]");
+	CmdlineHelper.insert_help_entry((char*)"--omxact=type              [get/set omx player action, type=<start/intr/stop/warn/idle>]");
+
 }
 /*****************************************************************************/
 GpioCltCmdline::~GpioCltCmdline()

@@ -1,4 +1,5 @@
 #include "HotwireRpc.h"
+#define IMG_RENDER_FIFO_FILE "/tmp/img-renderer-process.fifo"
 /* ------------------------------------------------------------------------- */
 GpioCtrlRpc:: GpioCtrlRpc(std::string rpcName,int myIndex,bool emu, bool log,GPIOCTL_CMN_DATA_CACHE *pData):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
 {
@@ -19,6 +20,8 @@ int GpioCtrlRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		//case EJSON_GPIOCTL_RPC_IO_SET :return json_to_bin_gpio_set(pReq);
 		case EJSON_GPIOCTL_RPC_OMXACT_GET:return json_to_bin_omxact_get(pReq);
 		case EJSON_GPIOCTL_RPC_OMXACT_SET:return json_to_bin_omxact_set(pReq);
+		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET:return json_to_bin_showfbimg_get(pReq);
+		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET:return json_to_bin_showfbimg_set(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -33,6 +36,8 @@ int GpioCtrlRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		//case EJSON_GPIOCTL_RPC_IO_SET :return bin_to_json_gpio_set(pReq);
 		case EJSON_GPIOCTL_RPC_OMXACT_GET:return bin_to_json_omxact_get(pReq);
 		case EJSON_GPIOCTL_RPC_OMXACT_SET:return bin_to_json_omxact_set(pReq);
+		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET:return bin_to_json_showfbimg_get(pReq);
+		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET:return bin_to_json_showfbimg_set(pReq);
 		default:break;
 	}
 	return -1;
@@ -47,6 +52,8 @@ int GpioCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProduce
 		//case EJSON_GPIOCTL_RPC_IO_SET :return process_gpio_set(pReq);
 		case EJSON_GPIOCTL_RPC_OMXACT_GET:return process_omxact_get(pReq);
 		case EJSON_GPIOCTL_RPC_OMXACT_SET:return process_omxact_set(pReq,pObj);
+		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET:return process_showfbimg_get(pReq);
+		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET:return process_showfbimg_set(pReq);
 		default:break;
 	}
 	return 0;
@@ -268,7 +275,115 @@ RPC_SRV_RESULT GpioCtrlRpc::process_omx_action(GPIOCTL_OMXACT_TYPE act)
 bool GpioCtrlRpc::is_omx_running()
 {
 	char command[1024];
-	sprintf(command,"ps acux | grep omxplayer");
+	sprintf(command,"ps cax | grep [o]mxplayer >/dev/null");
+	if (system(command)==0)
+		return true;
+	else
+		return false;
+}
+/* ------------------------------------------------------------------------- */
+int GpioCtrlRpc::json_to_bin_showfbimg_get(JsonDataCommObj* pReq)
+{
+	//GPIOCTL_OMXACT_PACKET* pPanelCmdObj=NULL;
+	//PREPARE_JSON_REQUEST(RPC_SRV_REQ,GPIOCTL_OMXACT_PACKET,RPC_SRV_ACT_READ,EJSON_GPIOCTL_RPC_OMXACT_GET);
+	return 0;
+}
+int GpioCtrlRpc::bin_to_json_showfbimg_get(JsonDataCommObj* pReq)
+{
+//PREPARE_JSON_RESP_ENUM(RPC_SRV_REQ,GPIOCTL_OMXACT_PACKET,GPIOCTL_RPC_OMXACT_ARG,ActType,GPIOCTL_RPC_OMXACT_ARG_TABL,GPIOCTL_OMXACT_UNKNOWN);
+	return 0;
+}
+int GpioCtrlRpc::process_showfbimg_get(JsonDataCommObj* pReq)
+{
+/*	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	GPIOCTL_OMXACT_PACKET* pPacket;
+	pPacket=(GPIOCTL_OMXACT_PACKET*)pPanelReq->dataRef;
+	if(pPanelReq->action!=RPC_SRV_ACT_READ)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+		return 0;
+	}
+	pPacket->ActType=pDataCache->ActType;
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;*/
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int GpioCtrlRpc::json_to_bin_showfbimg_set(JsonDataCommObj* pReq)
+{
+//	GPIOCTL_OMXACT_PACKET* pPanelCmdObj=NULL;
+//	PREPARE_JSON_REQUEST(RPC_SRV_REQ,GPIOCTL_OMXACT_PACKET,RPC_SRV_ACT_WRITE,EJSON_GPIOCTL_RPC_OMXACT_SET);
+//	JSON_STRING_TO_ENUM(GPIOCTL_RPC_OMXACT_ARG,GPIOCTL_RPC_OMXACT_ARG_TABL,GPIOCTL_OMXACT_TYPE,GPIOCTL_OMXACT_UNKNOWN,pPanelCmdObj->ActType);
+	return 0;
+}
+int GpioCtrlRpc::bin_to_json_showfbimg_set(JsonDataCommObj* pReq)
+{
+//	PREPARE_JSON_RESP(RPC_SRV_REQ,GPIOCTL_OMXACT_PACKET);
+	return 0;
+}
+int GpioCtrlRpc::process_showfbimg_set(JsonDataCommObj* pReq)//,ADJsonRpcMgrProducer* pObj)
+{
+/*	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	GPIOCTL_OMXACT_PACKET* pPacket;
+	pPacket=(GPIOCTL_OMXACT_PACKET*)pPanelReq->dataRef;
+
+	//create a copy packet and initialize with supplied values
+	GPIOCTL_OMXACT_PACKET* pWorkData=NULL;
+	OBJECT_MEM_NEW(pWorkData,GPIOCTL_OMXACT_PACKET);//delete this object in run_work() callback function
+	if(pWorkData == NULL)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_MEM_ERROR;
+		return -1;
+	}
+	pWorkData->ActType=pPacket->ActType;
+	pPanelReq->result=pObj->PushAsyncTask(EJSON_GPIOCTL_RPC_OMXACT_SET,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_DELETE);//PRESERVE);
+	if(pPanelReq->result!=RPC_SRV_RESULT_IN_PROG)
+	{
+		OBJ_MEM_DELETE(pWorkData);
+		return 0;
+	}
+	else
+	{
+		//pDataCache->ActType=pPacket->ActType;
+		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	}*/
+	return 0;		
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT GpioCtrlRpc::process_show_image(std::string imgfile)
+{
+	char command[1024];
+	if(imgfile=="none")
+	{
+		if(is_screen_image_active()==true)//stop only if fbv image rendering is already running
+		{
+			//stop fbv command which is running is background
+			sprintf(command,"echo -n q > %s",IMG_RENDER_FIFO_FILE);
+			system(command);
+			//clean framebuffer and turn off blinking cursor
+			sprintf(command,"dd if=/dev/zero of=/dev/fb0;setterm -cursor off >/dev/tty1");
+			system(command);
+		}
+		return RPC_SRV_RESULT_SUCCESS;
+	}
+	//check if image file exists //TODO:
+	sprintf(command,"mkfifo %s",IMG_RENDER_FIFO_FILE);
+	system(command);
+
+	//wake-up sleeping display-output and clear screen
+	sprintf(command,"echo -ne \"\\033[9;2]\">/dev/tty1;dd if=/dev/zero of=/dev/fb0");
+	system(command);
+
+	//using fbv command render the image file
+	sprintf(command,"fbv %s < %s &",imgfile.c_str(),IMG_RENDER_FIFO_FILE);
+	system(command);
+	return RPC_SRV_RESULT_SUCCESS;
+}
+bool GpioCtrlRpc::is_screen_image_active()
+{
+	char command[1024];
+	sprintf(command,"ps cax | grep [f]bv >/dev/null");
 	if (system(command)==0)
 		return true;
 	else

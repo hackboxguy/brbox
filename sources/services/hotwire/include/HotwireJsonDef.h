@@ -1,5 +1,5 @@
-#ifndef __GPIOCTL_JSON_DEF_H_
-#define __GPIOCTL_JSON_DEF_H_
+#ifndef __MPLAYSRV_JSON_DEF_H_
+#define __MPLAYSRV_JSON_DEF_H_
 /* ------------------------------------------------------------------------- */
 #include "ADCmnPortList.h"
 #define GPIOCTL_JSON_PORT_NUMBER    ADCMN_PORT_MPLAYSRV
@@ -17,6 +17,9 @@ typedef enum EJSON_GPIOCTL_RPC_TYPES_T
 	EJSON_GPIOCTL_RPC_OMXACT_GET=0,
 	EJSON_GPIOCTL_RPC_OMXACT_SET,
 
+	EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET,
+	EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET, //frame buffer based image rendering
+
 	EJSON_GPIOCTL_RPC_END,
 	EJSON_GPIOCTL_RPC_NONE
 }EJSON_GPIOCTL_RPC_TYPES;
@@ -29,7 +32,9 @@ typedef enum EJSON_GPIOCTL_RPC_TYPES_T
 #define GPIOCTL_RPC_IO_DATA_ARG  "data"
 typedef struct GPIOCTL_IO_ACCESS_PACKET_T
 {
-	unsigned int addr;
+	unsigned int addr;//EJSON_MPLAYSRV_RPC_SHOWIMG_SET
+//EJSON_MPLAYSRV_RPC_SHOWIMG_GET
+
 	unsigned int data;
 }GPIOCTL_IO_ACCESS_PACKET;
 /* ------------------------------------------------------------------------- */
@@ -55,13 +60,27 @@ typedef struct GPIOCTL_OMXACT_PACKET_T
 	GPIOCTL_OMXACT_TYPE ActType;
 	int taskID;
 }GPIOCTL_OMXACT_PACKET;
+
 /* ------------------------------------------------------------------------- */
-//keep all the data related to gpioctl-service here
+//omx action for hotwire application
+//EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET
+//EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET
+#define MPLAYSRV_RPC_SHOWFBIMG_GET         "get_show_fb_image"
+#define MPLAYSRV_RPC_SHOWFBIMG_SET         "set_show_fb_image"
+#define MPLAYSRV_RPC_SHOWFBIMG_ARG         "imgpath"
+typedef struct MPLAYSRV_SHOWFBIMG_PACKET_T
+{
+	char imgpath[512];//"none" means remove-image or blank-screen(else "/some/path/imgfile.png")
+	//int taskID;
+}MPLAYSRV_SHOWFBIMG_PACKET;
+/* ------------------------------------------------------------------------- */
+//keep all the data related to mplaysrv-service here
 typedef struct GPIOCTL_CMN_DATA_CACHE_T
 {
 	void *pDevInfo;//device-info-struct(typecast in rpc handlers)
 	unsigned int tmpData;
 	GPIOCTL_OMXACT_TYPE ActType;
+	std::string fbimg;
 }GPIOCTL_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */
 

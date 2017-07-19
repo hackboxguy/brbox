@@ -34,6 +34,17 @@ public:
 	int process_omxact_set(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj);
 	RPC_SRV_RESULT process_omx_action(GPIOCTL_OMXACT_TYPE act);
 	bool is_omx_running();
+
+	int json_to_bin_showfbimg_get(JsonDataCommObj* pReq);
+	int bin_to_json_showfbimg_get(JsonDataCommObj* pReq);
+	int process_showfbimg_get(JsonDataCommObj* pReq);//,ADJsonRpcMgrProducer* pObj);
+
+	int json_to_bin_showfbimg_set(JsonDataCommObj* pReq);
+	int bin_to_json_showfbimg_set(JsonDataCommObj* pReq);
+	int process_showfbimg_set(JsonDataCommObj* pReq);//,ADJsonRpcMgrProducer* pObj);
+
+	RPC_SRV_RESULT process_show_image(std::string imgfile);
+	bool is_screen_image_active();
 };
 /* ------------------------------------------------------------------------- */
 
