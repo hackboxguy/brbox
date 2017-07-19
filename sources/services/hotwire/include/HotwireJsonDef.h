@@ -2,7 +2,7 @@
 #define __GPIOCTL_JSON_DEF_H_
 /* ------------------------------------------------------------------------- */
 #include "ADCmnPortList.h"
-#define GPIOCTL_JSON_PORT_NUMBER    ADCMN_PORT_GPIOCTL
+#define GPIOCTL_JSON_PORT_NUMBER    ADCMN_PORT_MPLAYSRV
 /* ------------------------------------------------------------------------- */
 #define GPIOCTL_OMXACT_START_FILE    "/home/pi/videos/start.mp4"
 #define GPIOCTL_OMXACT_STOP_FILE     "/home/pi/videos/stop.mp4"

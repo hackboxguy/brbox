@@ -10,7 +10,7 @@
 /* ------------------------------------------------------------------------- */
 #include "HotwireJsonDef.h"
 #include "HotwireRpc.h"
-#define SERVER_JSON_PORT_NUM GPIOCTL_JSON_PORT_NUMBER
+#define SERVER_JSON_PORT_NUM ADCMN_PORT_MPLAYSRV
 /* ------------------------------------------------------------------------- */
 using namespace std;
 int main(int argc, const char* argv[])
