@@ -45,6 +45,7 @@ int GpioCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			}
 			break;
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET:
+		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET:
 			CmdlineHelper.push_string_get_set_command(EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET,EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET,
 			MPLAYSRV_RPC_SHOWFBIMG_GET,MPLAYSRV_RPC_SHOWFBIMG_SET,(char*)MPLAYSRV_RPC_SHOWFBIMG_ARG,sub_arg);
 			break;

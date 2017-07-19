@@ -331,6 +331,10 @@ int GpioCtrlRpc::process_showfbimg_set(JsonDataCommObj* pReq)//,ADJsonRpcMgrProd
 	pPanelReq->result=process_show_image(pDataCache->fbimgpath);//RPC_SRV_RESULT_SUCCESS;
 	return 0;		
 }
+//show qr code:
+//echo -ne "\033[9;2]" > /dev/tty1;dd if=/dev/zero of=/dev/fb0;fbv /tmp/dp.png
+//remove qr code:
+//dd if=/dev/zero of=/dev/fb0;setterm -cursor off > /dev/tty1
 RPC_SRV_RESULT GpioCtrlRpc::process_show_image(std::string imgfile)
 {
 	//TODO: if video is already playing, then return fail, dont render any image
@@ -339,9 +343,9 @@ RPC_SRV_RESULT GpioCtrlRpc::process_show_image(std::string imgfile)
 	{
 		if(is_screen_image_active()==true)//stop only if fbv image rendering is already running
 		{
-			//stop fbv command which is running is background
-			sprintf(command,"echo -n q > %s",IMG_RENDER_FIFO_FILE);
-			system(command);
+			//stop fbv command which is running in background
+			//sprintf(command,"echo -n q > %s",IMG_RENDER_FIFO_FILE);
+			//system(command);
 			//clean framebuffer and turn off blinking cursor
 			sprintf(command,"dd if=/dev/zero of=/dev/fb0;setterm -cursor off >/dev/tty1");
 			system(command);
@@ -359,8 +363,13 @@ RPC_SRV_RESULT GpioCtrlRpc::process_show_image(std::string imgfile)
 	system(command);
 
 	//using fbv command render the image file
-	sprintf(command,"fbv %s < %s &",imgfile.c_str(),IMG_RENDER_FIFO_FILE);
+	sprintf(command,"fbv %s < %s",imgfile.c_str(),IMG_RENDER_FIFO_FILE);
 	system(command);
+	//with following command, frame is rendered on the screen(need to check why?)
+	sprintf(command,"echo . > %s",IMG_RENDER_FIFO_FILE);
+	system(command);
+
+
 	//pDataCache->fbimgpath=imgfile;
 	return RPC_SRV_RESULT_SUCCESS;
 }
