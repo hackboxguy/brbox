@@ -15,6 +15,8 @@ GpioCltCmdline::GpioCltCmdline()
 
 	CmdlineHelper.insert_options_entry((char*)"omxact" ,optional_argument,EJSON_GPIOCTL_RPC_OMXACT_GET);
 	CmdlineHelper.insert_help_entry((char*)"--omxact=type              [get/set omx player action, type=<start/intr/stop/warn/idle>]");
+	CmdlineHelper.insert_options_entry((char*)"showimg" ,optional_argument,EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET);
+	CmdlineHelper.insert_help_entry((char*)"--showimg                  [get/set image showing on the screen]");
 
 }
 /*****************************************************************************/
@@ -41,6 +43,10 @@ int GpioCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			GPIOCTL_RPC_OMXACT_SET,&table[0],GPIOCTL_OMXACT_UNKNOWN,
 			(char*)GPIOCTL_RPC_OMXACT_ARG,sub_arg);
 			}
+			break;
+		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET:
+			CmdlineHelper.push_string_get_set_command(EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET,EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET,
+			MPLAYSRV_RPC_SHOWFBIMG_GET,MPLAYSRV_RPC_SHOWFBIMG_SET,(char*)MPLAYSRV_RPC_SHOWFBIMG_ARG,sub_arg);
 			break;
 		default:
 			return 0;

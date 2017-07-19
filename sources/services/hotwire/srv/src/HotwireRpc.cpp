@@ -284,75 +284,56 @@ bool GpioCtrlRpc::is_omx_running()
 /* ------------------------------------------------------------------------- */
 int GpioCtrlRpc::json_to_bin_showfbimg_get(JsonDataCommObj* pReq)
 {
-	//GPIOCTL_OMXACT_PACKET* pPanelCmdObj=NULL;
-	//PREPARE_JSON_REQUEST(RPC_SRV_REQ,GPIOCTL_OMXACT_PACKET,RPC_SRV_ACT_READ,EJSON_GPIOCTL_RPC_OMXACT_GET);
+	MPLAYSRV_SHOWFBIMG_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,MPLAYSRV_SHOWFBIMG_PACKET,RPC_SRV_ACT_READ,EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET);
 	return 0;
 }
 int GpioCtrlRpc::bin_to_json_showfbimg_get(JsonDataCommObj* pReq)
 {
-//PREPARE_JSON_RESP_ENUM(RPC_SRV_REQ,GPIOCTL_OMXACT_PACKET,GPIOCTL_RPC_OMXACT_ARG,ActType,GPIOCTL_RPC_OMXACT_ARG_TABL,GPIOCTL_OMXACT_UNKNOWN);
+	PREPARE_JSON_RESP_STRING(RPC_SRV_REQ,MPLAYSRV_SHOWFBIMG_PACKET,MPLAYSRV_RPC_SHOWFBIMG_ARG,fbimgpath);
 	return 0;
 }
 int GpioCtrlRpc::process_showfbimg_get(JsonDataCommObj* pReq)
 {
-/*	RPC_SRV_REQ *pPanelReq=NULL;
+	RPC_SRV_REQ *pPanelReq=NULL;
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
-	GPIOCTL_OMXACT_PACKET* pPacket;
-	pPacket=(GPIOCTL_OMXACT_PACKET*)pPanelReq->dataRef;
+	MPLAYSRV_SHOWFBIMG_PACKET* pPacket;
+	pPacket=(MPLAYSRV_SHOWFBIMG_PACKET*)pPanelReq->dataRef;
 	if(pPanelReq->action!=RPC_SRV_ACT_READ)
 	{
 		pPanelReq->result=RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
 		return 0;
 	}
-	pPacket->ActType=pDataCache->ActType;
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;*/
+	strcpy(pPacket->fbimgpath,pDataCache->fbimgpath.c_str());
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
 int GpioCtrlRpc::json_to_bin_showfbimg_set(JsonDataCommObj* pReq)
 {
-//	GPIOCTL_OMXACT_PACKET* pPanelCmdObj=NULL;
-//	PREPARE_JSON_REQUEST(RPC_SRV_REQ,GPIOCTL_OMXACT_PACKET,RPC_SRV_ACT_WRITE,EJSON_GPIOCTL_RPC_OMXACT_SET);
-//	JSON_STRING_TO_ENUM(GPIOCTL_RPC_OMXACT_ARG,GPIOCTL_RPC_OMXACT_ARG_TABL,GPIOCTL_OMXACT_TYPE,GPIOCTL_OMXACT_UNKNOWN,pPanelCmdObj->ActType);
+	MPLAYSRV_SHOWFBIMG_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,MPLAYSRV_SHOWFBIMG_PACKET,RPC_SRV_ACT_WRITE,EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET);
+	JSON_STRING_TO_STRING(MPLAYSRV_RPC_SHOWFBIMG_ARG,pPanelCmdObj->fbimgpath);
 	return 0;
 }
 int GpioCtrlRpc::bin_to_json_showfbimg_set(JsonDataCommObj* pReq)
 {
-//	PREPARE_JSON_RESP(RPC_SRV_REQ,GPIOCTL_OMXACT_PACKET);
+	PREPARE_JSON_RESP(RPC_SRV_REQ,MPLAYSRV_SHOWFBIMG_PACKET);
 	return 0;
 }
 int GpioCtrlRpc::process_showfbimg_set(JsonDataCommObj* pReq)//,ADJsonRpcMgrProducer* pObj)
 {
-/*	RPC_SRV_REQ *pPanelReq=NULL;
+	RPC_SRV_REQ *pPanelReq=NULL;
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
-	GPIOCTL_OMXACT_PACKET* pPacket;
-	pPacket=(GPIOCTL_OMXACT_PACKET*)pPanelReq->dataRef;
-
-	//create a copy packet and initialize with supplied values
-	GPIOCTL_OMXACT_PACKET* pWorkData=NULL;
-	OBJECT_MEM_NEW(pWorkData,GPIOCTL_OMXACT_PACKET);//delete this object in run_work() callback function
-	if(pWorkData == NULL)
-	{
-		pPanelReq->result=RPC_SRV_RESULT_MEM_ERROR;
-		return -1;
-	}
-	pWorkData->ActType=pPacket->ActType;
-	pPanelReq->result=pObj->PushAsyncTask(EJSON_GPIOCTL_RPC_OMXACT_SET,(unsigned char*)pWorkData,&pPacket->taskID,WORK_CMD_AFTER_DONE_DELETE);//PRESERVE);
-	if(pPanelReq->result!=RPC_SRV_RESULT_IN_PROG)
-	{
-		OBJ_MEM_DELETE(pWorkData);
-		return 0;
-	}
-	else
-	{
-		//pDataCache->ActType=pPacket->ActType;
-		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
-	}*/
+	MPLAYSRV_SHOWFBIMG_PACKET* pPacket;
+	pPacket=(MPLAYSRV_SHOWFBIMG_PACKET*)pPanelReq->dataRef;
+	pDataCache->fbimgpath=pPacket->fbimgpath;
+	pPanelReq->result=process_show_image(pDataCache->fbimgpath);//RPC_SRV_RESULT_SUCCESS;
 	return 0;		
 }
-/* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT GpioCtrlRpc::process_show_image(std::string imgfile)
 {
+	//TODO: if video is already playing, then return fail, dont render any image
 	char command[1024];
 	if(imgfile=="none")
 	{
@@ -364,6 +345,8 @@ RPC_SRV_RESULT GpioCtrlRpc::process_show_image(std::string imgfile)
 			//clean framebuffer and turn off blinking cursor
 			sprintf(command,"dd if=/dev/zero of=/dev/fb0;setterm -cursor off >/dev/tty1");
 			system(command);
+			//pDataCache->fbimgpath="none";
+
 		}
 		return RPC_SRV_RESULT_SUCCESS;
 	}
@@ -378,6 +361,7 @@ RPC_SRV_RESULT GpioCtrlRpc::process_show_image(std::string imgfile)
 	//using fbv command render the image file
 	sprintf(command,"fbv %s < %s &",imgfile.c_str(),IMG_RENDER_FIFO_FILE);
 	system(command);
+	//pDataCache->fbimgpath=imgfile;
 	return RPC_SRV_RESULT_SUCCESS;
 }
 bool GpioCtrlRpc::is_screen_image_active()

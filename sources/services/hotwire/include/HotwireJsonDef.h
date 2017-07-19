@@ -70,7 +70,7 @@ typedef struct GPIOCTL_OMXACT_PACKET_T
 #define MPLAYSRV_RPC_SHOWFBIMG_ARG         "imgpath"
 typedef struct MPLAYSRV_SHOWFBIMG_PACKET_T
 {
-	char imgpath[512];//"none" means remove-image or blank-screen(else "/some/path/imgfile.png")
+	char fbimgpath[512];//"none" means remove-image or blank-screen(else "/some/path/imgfile.png")
 	//int taskID;
 }MPLAYSRV_SHOWFBIMG_PACKET;
 /* ------------------------------------------------------------------------- */
@@ -80,7 +80,7 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 	void *pDevInfo;//device-info-struct(typecast in rpc handlers)
 	unsigned int tmpData;
 	GPIOCTL_OMXACT_TYPE ActType;
-	std::string fbimg;
+	std::string fbimgpath;
 }GPIOCTL_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */
 
