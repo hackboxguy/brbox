@@ -22,6 +22,7 @@ int GpioCtrlRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_GPIOCTL_RPC_OMXACT_SET:return json_to_bin_omxact_set(pReq);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET:return json_to_bin_showfbimg_get(pReq);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET:return json_to_bin_showfbimg_set(pReq);
+		case EJSON_MPLAYSRV_RPC_QRCODEIMG_SET:break;
 		default:break;
 	}
 	return -1;//0;
@@ -38,6 +39,7 @@ int GpioCtrlRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_GPIOCTL_RPC_OMXACT_SET:return bin_to_json_omxact_set(pReq);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET:return bin_to_json_showfbimg_get(pReq);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET:return bin_to_json_showfbimg_set(pReq);
+		case EJSON_MPLAYSRV_RPC_QRCODEIMG_SET:break;
 		default:break;
 	}
 	return -1;
@@ -54,6 +56,7 @@ int GpioCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProduce
 		case EJSON_GPIOCTL_RPC_OMXACT_SET:return process_omxact_set(pReq,pObj);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET:return process_showfbimg_get(pReq);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET:return process_showfbimg_set(pReq);
+		case EJSON_MPLAYSRV_RPC_QRCODEIMG_SET:break;
 		default:break;
 	}
 	return 0;

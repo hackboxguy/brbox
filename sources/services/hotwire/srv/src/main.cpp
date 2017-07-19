@@ -41,14 +41,16 @@ int main(int argc, const char* argv[])
 	/****************************RPC list*************************************/
 	GpioCtrlRpc OmxActGet(GPIOCTL_RPC_OMXACT_GET ,EJSON_GPIOCTL_RPC_OMXACT_GET ,emulat,dbglog,&DataCache);
 	GpioCtrlRpc OmxActSet(GPIOCTL_RPC_OMXACT_SET ,EJSON_GPIOCTL_RPC_OMXACT_SET ,emulat,dbglog,&DataCache);
-
 	GpioCtrlRpc ShowImgGet(MPLAYSRV_RPC_SHOWFBIMG_GET ,EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET ,emulat,dbglog,&DataCache);
 	GpioCtrlRpc ShowImgSet(MPLAYSRV_RPC_SHOWFBIMG_SET ,EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET ,emulat,dbglog,&DataCache);
+	GpioCtrlRpc QrCodeImgSet(MPLAYSRV_RPC_QRCODEIMG_SET ,EJSON_MPLAYSRV_RPC_QRCODEIMG_SET ,emulat,dbglog,&DataCache);
 
 	RpcMgr.AttachRpc(&OmxActGet);
 	RpcMgr.AttachRpc(&OmxActSet);
 	RpcMgr.AttachRpc(&ShowImgGet);
 	RpcMgr.AttachRpc(&ShowImgSet);
+	RpcMgr.AttachRpc(&QrCodeImgSet);
+
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr

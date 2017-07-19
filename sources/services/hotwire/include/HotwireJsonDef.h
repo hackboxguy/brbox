@@ -20,6 +20,8 @@ typedef enum EJSON_GPIOCTL_RPC_TYPES_T
 	EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET,
 	EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET, //frame buffer based image rendering
 
+	EJSON_MPLAYSRV_RPC_QRCODEIMG_SET, //converts given string to qr-code-png-file
+
 	EJSON_GPIOCTL_RPC_END,
 	EJSON_GPIOCTL_RPC_NONE
 }EJSON_GPIOCTL_RPC_TYPES;
@@ -73,6 +75,17 @@ typedef struct MPLAYSRV_SHOWFBIMG_PACKET_T
 	char fbimgpath[512];//"none" means remove-image or blank-screen(else "/some/path/imgfile.png")
 	//int taskID;
 }MPLAYSRV_SHOWFBIMG_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_MPLAYSRV_RPC_QRCODEIMG_SET
+#define MPLAYSRV_RPC_QRCODEIMG_SET          "set_qrcode_image"
+#define MPLAYSRV_RPC_QRCODEIMG_ARG_FILEPATH "filepath"
+#define MPLAYSRV_RPC_QRCODEIMG_ARG_QRSTRING "qrstring"
+typedef struct MPLAYSRV_QRCODEIMG_PACKET_T
+{
+	char qrfilepath[1024];
+	char qrstring[1024];
+	//int taskID;
+}MPLAYSRV_QRCODEIMG_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to mplaysrv-service here
 typedef struct GPIOCTL_CMN_DATA_CACHE_T

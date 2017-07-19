@@ -17,5 +17,8 @@ public:
 	GpioCltCmdline();
 	~GpioCltCmdline();
 	int parse_cmdline_arguments(int argc, char **argv);
+	int push_qrcode_image_cmd(char* subarg);
+	int run_qrcode_image_cmd(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,
+				ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);
 };
 #endif
