@@ -49,6 +49,7 @@ public:
 	int bin_to_json_qrcodeimg_set(JsonDataCommObj* pReq);
 	int process_qrcodeimg_set(JsonDataCommObj* pReq);
 	RPC_SRV_RESULT create_qrcode_image(char* qrfilepath,char* qrstring);
+	RPC_SRV_RESULT auto_scale_qr_size(int qrstrlen,int* qr_size);
 };
 /* ------------------------------------------------------------------------- */
 

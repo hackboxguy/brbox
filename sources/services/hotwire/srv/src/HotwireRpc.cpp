@@ -412,12 +412,33 @@ RPC_SRV_RESULT GpioCtrlRpc::create_qrcode_image(char* qrfilepath,char* qrstring)
 {
 	//qrencode -d 500 -s 37  "DP-3" -o /tmp/image.png :TODO: for the moment, qrcode size is fixed, to be configurable via rpc
 	char command[1024];
+	auto_scale_qr_size(strlen(qrstring),&pDataCache->qr_size);
 	sprintf(command,"qrencode -d %d -s %d \"%s\" -o %s",pDataCache->qr_density,pDataCache->qr_size,qrstring,qrfilepath);
 	if (system(command)==0)
 		return RPC_SRV_RESULT_SUCCESS;
 	else
 		return RPC_SRV_RESULT_FAIL;
 }
+RPC_SRV_RESULT GpioCtrlRpc::auto_scale_qr_size(int qrstrlen,int* qr_size)
+{
+	//following sizes are tested on fullHD screen(based on the string length, this function defines the qrcode size)
+	//char=size
+	//15=37
+	//20=35
+	//25=34
+	//26=35
+	//30=33
+	//34=31
+	//42=30
+	//52=31
+	*qr_size=37;
+	if(qrstrlen<=15)*qr_size=37;
+	else if(qrstrlen>15 && qrstrlen<=20)*qr_size=37;
+	else if(qrstrlen>20 && qrstrlen<=25)*qr_size=34;
+	else if(qrstrlen>25 && qrstrlen<=30)*qr_size=33;
+	else if(qrstrlen>30 && qrstrlen<=35)*qr_size=31;
+	else if(qrstrlen>35)*qr_size=30;
+	return RPC_SRV_RESULT_SUCCESS;
+}
 /* ------------------------------------------------------------------------- */
-
 
