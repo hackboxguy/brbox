@@ -94,9 +94,14 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 	unsigned int tmpData;
 	GPIOCTL_OMXACT_TYPE ActType;
 	std::string fbimgpath;
+	int qr_density;
+	int qr_size;
+
 	GPIOCTL_CMN_DATA_CACHE_T()
 	{
 		fbimgpath="none";
+		qr_density=500;//TODO: configure qr-code-density via rpc
+		qr_size=37;//TODO: configure qr-code-size via rpc
 	};//initialize variables here
 	~ GPIOCTL_CMN_DATA_CACHE_T(){};
 

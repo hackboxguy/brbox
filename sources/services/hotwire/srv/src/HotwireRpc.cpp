@@ -22,7 +22,7 @@ int GpioCtrlRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_GPIOCTL_RPC_OMXACT_SET:return json_to_bin_omxact_set(pReq);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET:return json_to_bin_showfbimg_get(pReq);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET:return json_to_bin_showfbimg_set(pReq);
-		case EJSON_MPLAYSRV_RPC_QRCODEIMG_SET:break;
+		case EJSON_MPLAYSRV_RPC_QRCODEIMG_SET:return json_to_bin_qrcodeimg_set(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -39,7 +39,7 @@ int GpioCtrlRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_GPIOCTL_RPC_OMXACT_SET:return bin_to_json_omxact_set(pReq);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET:return bin_to_json_showfbimg_get(pReq);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET:return bin_to_json_showfbimg_set(pReq);
-		case EJSON_MPLAYSRV_RPC_QRCODEIMG_SET:break;
+		case EJSON_MPLAYSRV_RPC_QRCODEIMG_SET:return bin_to_json_qrcodeimg_set(pReq);
 		default:break;
 	}
 	return -1;
@@ -56,7 +56,7 @@ int GpioCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProduce
 		case EJSON_GPIOCTL_RPC_OMXACT_SET:return process_omxact_set(pReq,pObj);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET:return process_showfbimg_get(pReq);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET:return process_showfbimg_set(pReq);
-		case EJSON_MPLAYSRV_RPC_QRCODEIMG_SET:break;
+		case EJSON_MPLAYSRV_RPC_QRCODEIMG_SET:return process_qrcodeimg_set(pReq);
 		default:break;
 	}
 	return 0;
@@ -386,4 +386,38 @@ bool GpioCtrlRpc::is_screen_image_active()
 		return false;
 }
 /* ------------------------------------------------------------------------- */
+int GpioCtrlRpc::json_to_bin_qrcodeimg_set(JsonDataCommObj* pReq)
+{
+	MPLAYSRV_QRCODEIMG_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,MPLAYSRV_QRCODEIMG_PACKET,RPC_SRV_ACT_WRITE,EJSON_MPLAYSRV_RPC_QRCODEIMG_SET);
+	JSON_STRING_TO_STRING(MPLAYSRV_RPC_QRCODEIMG_ARG_FILEPATH,pPanelCmdObj->qrfilepath);
+	JSON_STRING_TO_STRING(MPLAYSRV_RPC_QRCODEIMG_ARG_QRSTRING,pPanelCmdObj->qrstring);
+	return 0;
+}
+int GpioCtrlRpc::bin_to_json_qrcodeimg_set(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,MPLAYSRV_SHOWFBIMG_PACKET);
+	return 0;
+}
+int GpioCtrlRpc::process_qrcodeimg_set(JsonDataCommObj* pReq)//,ADJsonRpcMgrProducer* pObj)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	MPLAYSRV_QRCODEIMG_PACKET* pPacket;
+	pPacket=(MPLAYSRV_QRCODEIMG_PACKET*)pPanelReq->dataRef;
+	pPanelReq->result=create_qrcode_image(pPacket->qrfilepath,pPacket->qrstring);
+	return 0;		
+}
+RPC_SRV_RESULT GpioCtrlRpc::create_qrcode_image(char* qrfilepath,char* qrstring)
+{
+	//qrencode -d 500 -s 37  "DP-3" -o /tmp/image.png :TODO: for the moment, qrcode size is fixed, to be configurable via rpc
+	char command[1024];
+	sprintf(command,"qrencode -d %d -s %d \"%s\" -o %s",pDataCache->qr_density,pDataCache->qr_size,qrstring,qrfilepath);
+	if (system(command)==0)
+		return RPC_SRV_RESULT_SUCCESS;
+	else
+		return RPC_SRV_RESULT_FAIL;
+}
+/* ------------------------------------------------------------------------- */
+
 

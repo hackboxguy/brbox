@@ -42,9 +42,13 @@ public:
 	int json_to_bin_showfbimg_set(JsonDataCommObj* pReq);
 	int bin_to_json_showfbimg_set(JsonDataCommObj* pReq);
 	int process_showfbimg_set(JsonDataCommObj* pReq);//,ADJsonRpcMgrProducer* pObj);
-
 	RPC_SRV_RESULT process_show_image(std::string imgfile);
 	bool is_screen_image_active();
+
+	int json_to_bin_qrcodeimg_set(JsonDataCommObj* pReq);
+	int bin_to_json_qrcodeimg_set(JsonDataCommObj* pReq);
+	int process_qrcodeimg_set(JsonDataCommObj* pReq);
+	RPC_SRV_RESULT create_qrcode_image(char* qrfilepath,char* qrstring);
 };
 /* ------------------------------------------------------------------------- */
 
