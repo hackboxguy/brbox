@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BRBOX_MISCBINS
+	bool "misc binary images(pattern files etc)"
+	default n
+	depends on BR2_TARGET_BRBOX_PACKAGES
+	help
+	  includes misc binaries to target file system.
+
