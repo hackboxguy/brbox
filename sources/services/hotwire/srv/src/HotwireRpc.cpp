@@ -5,6 +5,9 @@ GpioCtrlRpc:: GpioCtrlRpc(std::string rpcName,int myIndex,bool emu, bool log,GPI
 {
 	pDataCache=pData;
 	pDataCache->ActType=GPIOCTL_OMXACT_IDLE;
+	char command[512];
+	sprintf(command,"dd if=/dev/zero of=/dev/fb0;setterm -cursor off >/dev/tty1");
+	system(command);
 }
 /* ------------------------------------------------------------------------- */
 GpioCtrlRpc::~ GpioCtrlRpc()
