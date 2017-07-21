@@ -45,7 +45,7 @@ typedef struct SMARTEYE_ID_PATTERN_PACKET_T
 #define SMARTEYE_RPC_DEBUG_OUTFILE_GET       "get_debug_outfile"
 #define SMARTEYE_RPC_DEBUG_OUTFILE_SET       "set_debug_outfile"
 #define SMARTEYE_RPC_DEBUG_OUTFILE_ARG       "filepath"
-#define SMARTEYE_RPC_CAPTURE_JPG_IMG         "capture_jpg_image"
+#define SMARTEYE_RPC_CAPTURE_JPG_IMG         "capture_image"
 #define	SMARTEYE_RPC_CHECKWALL_FILE_GET      "get_checkwall_file"
 #define SMARTEYE_RPC_CHECKWALL_FILE_SET      "set_checkwall_file"
 #define	SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET "get_checkwall_base_file"

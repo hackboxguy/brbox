@@ -11,7 +11,7 @@ SmarteyeCltCmdline::SmarteyeCltCmdline()
 	CmdlineHelper.insert_options_entry((char*)"debugimgfile" ,optional_argument,EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET);
 	CmdlineHelper.insert_help_entry((char*)"--debugimgfile=filepath    [read/write debug image file path]");
 	CmdlineHelper.insert_options_entry((char*)"capturejpg" ,optional_argument,EJSON_SMARTEYE_RPC_CAPTURE_JPG_IMG);
-	CmdlineHelper.insert_help_entry((char*)"--capturejpg=filepath      [capture camera frame and save it to filepath]");
+	CmdlineHelper.insert_help_entry((char*)"--captureimg               [capture camera frame and save it debugimgfile_path]");
 	CmdlineHelper.insert_options_entry((char*)"captureRes" ,optional_argument,EJSON_SMARTEYE_RPC_CAPTURE_RESOLUTION_SET);
 	CmdlineHelper.insert_help_entry((char*)"--captureRes=lines,pixels  [set jpg image capture resolution]");
 	CmdlineHelper.insert_options_entry((char*)"chkwallfile",optional_argument,EJSON_SMARTEYE_RPC_CHECKWALL_FILE_GET);
