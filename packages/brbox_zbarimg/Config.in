@@ -1,0 +1,6 @@
+config BR2_PACKAGE_BRBOX_ZBARIMG
+	bool "prebuilt raspi1-zbarimg binary"
+	default n
+	help
+	  includes prebuilt raspi1-zbarimg binary to targetfs.
+
