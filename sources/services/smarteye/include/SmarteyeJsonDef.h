@@ -15,6 +15,7 @@ typedef enum EJSON_SMARTEYE_RPC_TYPES_T
 	EJSON_SMARTEYE_RPC_CHECKWALL_FILE_SET,//on which image EJSON_SMARTEYE_IDPATTERN_CHECK_WALL to be executed?
 	EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET, //base reference image for EJSON_SMARTEYE_IDPATTERN_CHECK_WALL
 	EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET, //base reference image for EJSON_SMARTEYE_IDPATTERN_CHECK_WALL
+	EJSON_SMARTEYE_RPC_SCAN_QRSTRING,
 	EJSON_SMARTEYE_RPC_END,
 	EJSON_SMARTEYE_RPC_NONE
 }EJSON_SMARTEYE_RPC_TYPES;
@@ -64,6 +65,16 @@ typedef struct SMARTEYE_CAPTURE_RESOLUTION_PACKET_T
 	int pixels;
 	int lines;
 }SMARTEYE_CAPTURE_RESOLUTION_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_SMARTEYE_RPC_SCAN_QRSTRING
+#define SMARTEYE_RPC_SCAN_QRSTRING               "scan_qr_string"
+#define SMARTEYE_RPC_SCAN_QRSTRING_ARGFPATH      "filepath"
+#define SMARTEYE_RPC_SCAN_QRSTRING_ARGQRSTR      "qrstring"
+typedef struct SMARTEYE_SCAN_QRSTRING_PACKET_T
+{
+	char filepath[1024];
+	char qrstring[1024];
+}SMARTEYE_SCAN_QRSTRING_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct SMARTEYE_CMN_DATA_CACHE_T
