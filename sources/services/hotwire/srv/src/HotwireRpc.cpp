@@ -369,7 +369,7 @@ RPC_SRV_RESULT GpioCtrlRpc::process_show_image(std::string imgfile)
 	system(command);
 
 	//using fbv command render the image file
-	sprintf(command,"fbv %s < %s &",imgfile.c_str(),IMG_RENDER_FIFO_FILE);
+	sprintf(command,"fbv -f %s < %s &",imgfile.c_str(),IMG_RENDER_FIFO_FILE);
 	system(command);
 	//with following command, frame is rendered on the screen(need to check why?)
 	sprintf(command,"echo . > %s",IMG_RENDER_FIFO_FILE);
