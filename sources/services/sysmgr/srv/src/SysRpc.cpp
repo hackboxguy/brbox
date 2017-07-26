@@ -723,7 +723,11 @@ RPC_SRV_RESULT SysRpc::process_async_download_file(SYSMGR_DOWNLOAD_FILE_PACKET* 
 			ret_val=SysInfo.run_shell_script(cmdline,get_emulation_flag());//backup-fmw will be updated
 			break;
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP :
-			sprintf(cmdline,"tftp -g -r %s -l %s %s",pPacket->sourcefilepath,pPacket->targetfilepath,pPacket->srcurl);
+			//NOTE: becuase of full tftp command, busy-box-tftp command is absolete
+			//sprintf(cmdline,"tftp -g -r %s -l %s %s",pPacket->sourcefilepath,pPacket->targetfilepath,pPacket->srcurl);
+
+			//tftp 192.168.1.1 -c get raspi1-disptst.uimg /tmp/update.bin
+			sprintf(cmdline,"tftp %s -c get %s %s",pPacket->srcurl,pPacket->sourcefilepath,pPacket->targetfilepath);
 			ret_val=SysInfo.run_shell_script(cmdline,get_emulation_flag());//backup-fmw will be updated
 			break;
 		default:
