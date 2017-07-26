@@ -113,8 +113,8 @@ int ADCmdlineHelper::init_myself()
 		insert_options_entry((char*)"evNotify" ,optional_argument,'q',1);
 		insert_help_entry((char*)"--evNotify=evntNum,evntArg (notify event)");
 
-		insert_options_entry((char*)"devop" ,optional_argument,'1',1);
-		insert_help_entry((char*)"--devop=[on/off/idle/reboot/idlenoexthw](read/write device operation state of the service)");
+		insert_options_entry((char*)"srvop" ,optional_argument,'1',1);
+		insert_help_entry((char*)"--srvop=[on/off/idle/reboot/idlenoexthw](read/write device operation state of the service)");
 
 		insert_options_entry((char*)"rwbyte" ,optional_argument,'2',1);
 		insert_help_entry((char*)"--rwbyte=addr,data         (read/write middleware byte from/to given address)");
