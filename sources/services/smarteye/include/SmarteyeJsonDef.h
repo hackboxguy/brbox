@@ -84,6 +84,7 @@ typedef struct SMARTEYE_CMN_DATA_CACHE_T
 	SMARTEYE_CAPTURE_RESOLUTION_PACKET captureRes;//jpg image capture resolution
 	std::string StrImgIdCheckWallFile;//pChar //Char //Int //pInt //Float //Enum
 	std::string StrImgIdCheckWallBaseFile;//pChar //Char //Int //pInt //Float //Enum
+	std::string StrQrFilePath,StrQrString;
 
 	//initialize variables here
 	SMARTEYE_CMN_DATA_CACHE_T()
@@ -92,6 +93,7 @@ typedef struct SMARTEYE_CMN_DATA_CACHE_T
 		captureRes.lines=1080;
 		StrImgIdCheckWallFile="";
 		StrImgIdCheckWallBaseFile="";
+		StrQrFilePath="";StrQrString="";
 	};
 	~ SMARTEYE_CMN_DATA_CACHE_T(){};
 }SMARTEYE_CMN_DATA_CACHE;

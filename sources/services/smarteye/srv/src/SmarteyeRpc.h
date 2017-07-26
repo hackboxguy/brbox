@@ -50,6 +50,9 @@ public:
 	int bin_to_json_set_checkwallbase_file(JsonDataCommObj* pReq);
 	int process_set_checkwallbase_file(JsonDataCommObj* pReq);
 
+	int json_to_bin_scan_qrstring(JsonDataCommObj* pReq);
+	int bin_to_json_scan_qrstring(JsonDataCommObj* pReq);
+	int process_scan_qrstring(JsonDataCommObj* pReq);
 };
 /* ------------------------------------------------------------------------- */
 

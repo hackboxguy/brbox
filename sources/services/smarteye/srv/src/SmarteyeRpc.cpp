@@ -24,6 +24,7 @@ int SmarteyeRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_SMARTEYE_RPC_CHECKWALL_FILE_SET     :return json_to_bin_set_checkwall_file(pReq);
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET:return json_to_bin_get_checkwallbase_file(pReq);
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET:return json_to_bin_set_checkwallbase_file(pReq);
+		case EJSON_SMARTEYE_RPC_SCAN_QRSTRING          :return json_to_bin_scan_qrstring(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -43,6 +44,7 @@ int SmarteyeRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_SMARTEYE_RPC_CHECKWALL_FILE_SET     :return bin_to_json_set_checkwall_file(pReq);
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET:return bin_to_json_get_checkwallbase_file(pReq);
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET:return bin_to_json_set_checkwallbase_file(pReq);
+		case EJSON_SMARTEYE_RPC_SCAN_QRSTRING          :return bin_to_json_scan_qrstring(pReq);
 		default:break;
 	}
 	return -1;
@@ -62,6 +64,7 @@ int SmarteyeRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProduce
 		case EJSON_SMARTEYE_RPC_CHECKWALL_FILE_SET     :return process_set_checkwall_file(pReq);
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET:return process_get_checkwallbase_file(pReq);
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET:return process_set_checkwallbase_file(pReq);
+		case EJSON_SMARTEYE_RPC_SCAN_QRSTRING          :return process_scan_qrstring(pReq);
 		default:break;
 	}
 	return 0;
@@ -296,6 +299,40 @@ int SmarteyeRpc::process_set_checkwallbase_file(JsonDataCommObj* pReq)
 		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;
 	else
 		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int SmarteyeRpc::json_to_bin_scan_qrstring(JsonDataCommObj* pReq)
+{
+	SMARTEYE_SCAN_QRSTRING_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SMARTEYE_SCAN_QRSTRING_PACKET,RPC_SRV_ACT_WRITE,EJSON_SMARTEYE_RPC_SCAN_QRSTRING);
+	JSON_STRING_TO_STRING(SMARTEYE_RPC_SCAN_QRSTRING_ARGFPATH,pPanelCmdObj->filepath);
+	return 0;
+}
+int SmarteyeRpc::bin_to_json_scan_qrstring(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_STRING(RPC_SRV_REQ,SMARTEYE_SCAN_QRSTRING_PACKET,SMARTEYE_RPC_SCAN_QRSTRING_ARGQRSTR,qrstring);
+	return 0;
+}
+int SmarteyeRpc::process_scan_qrstring(JsonDataCommObj* pReq)
+{
+	ImgIdentify ImgId;//opencv based class for image processing
+
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SMARTEYE_SCAN_QRSTRING_PACKET* pPacket;
+	pPacket=(SMARTEYE_SCAN_QRSTRING_PACKET*)pPanelReq->dataRef;
+	pDataCache->StrQrFilePath="";///tmp/test.txt";
+	pDataCache->StrQrFilePath.append(pPacket->filepath);
+	if(pDataCache->StrQrFilePath==" ") //dont accept empty file
+		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;
+	else if(pDataCache->StrQrFilePath=="") //dont accept empty file
+		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;
+	else
+	{
+		pPanelReq->result=ImgId.scan_qr_string(pDataCache->StrQrFilePath,pDataCache->StrQrString);
+		strcpy(pPacket->qrstring,pDataCache->StrQrString.c_str());
+	}
 	return 0;
 }
 /* ------------------------------------------------------------------------- */

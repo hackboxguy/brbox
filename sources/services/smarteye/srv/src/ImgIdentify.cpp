@@ -362,4 +362,35 @@ RPC_SRV_RESULT ImgIdentify::capture_jpg_image(std::string imgPath,int resPix,int
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*---------------------------------------------------------------------------*/
+RPC_SRV_RESULT ImgIdentify::scan_qr_string(std::string filepath,std::string &qrstring)
+{
+	char command[1024];
+	qrstring="";//hello";
+	//return RPC_SRV_RESULT_SUCCESS;
+	sprintf(command,"zbarimg %s 2>&1 | grep \"QR-Code:\" |sed 's/QR-Code://' > %s",filepath.c_str(),"/tmp/temp-qr-string.txt");
+	//zbarimg /tmp/capture-1.png 2>&1 |grep "QR-Code:" |sed 's/QR-Code://'
+
+	if(system(command)!=0)
+		return RPC_SRV_RESULT_FILE_OPEN_ERR;
+	char temp_str[255];
+	FILE *shell;
+	shell= fopen("/tmp/temp-qr-string.txt","r");
+	if(shell == NULL )
+		return RPC_SRV_RESULT_FILE_OPEN_ERR;
+	size_t read_bytes = fread(command,1,100,shell);
+	fclose(shell);
+	if(read_bytes>0)
+	{
+		command[read_bytes]='\0';
+		if(command[strlen(command)-1]=='\n')//remove the carriage return line
+			command[strlen(command)-1]='\0';
+		//strcpy(pPacket->cmn_fname_ver_str,temp_str);
+		qrstring=command;
+		return RPC_SRV_RESULT_SUCCESS;
+	}
+	else
+		return RPC_SRV_RESULT_FILE_READ_ERR;	
+	//return RPC_SRV_RESULT_SUCCESS;//0;
+}
+/*---------------------------------------------------------------------------*/
 

@@ -17,5 +17,8 @@ public:
 	SmarteyeCltCmdline();
 	~SmarteyeCltCmdline();
 	int parse_cmdline_arguments(int argc, char **argv);
+	int push_scan_qrcode_command(char* subarg,char* rpc_name,int rpc_index,char* arg_name,char* result_name);
+	int run_scan_qrcode_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,
+					ADThreadedSockClientProducer *pWorker);
 };
 #endif

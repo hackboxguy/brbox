@@ -18,6 +18,8 @@ SmarteyeCltCmdline::SmarteyeCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--chkwallfile=filepath     [read/write check wall file path]");
 	CmdlineHelper.insert_options_entry((char*)"chkwallbasefile" ,optional_argument,EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET);
 	CmdlineHelper.insert_help_entry((char*)"--chkwallbasefile=filepath [read/write check wall base file path]");
+	CmdlineHelper.insert_options_entry((char*)"scanqrstr" ,optional_argument,EJSON_SMARTEYE_RPC_SCAN_QRSTRING);
+	CmdlineHelper.insert_help_entry((char*)"--scanqrstr=filepath       [scans the qrcode encoded in a given file path]");
 }
 /*****************************************************************************/
 SmarteyeCltCmdline::~SmarteyeCltCmdline()
@@ -66,6 +68,10 @@ int SmarteyeCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET,SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET,
 			(char*)SMARTEYE_RPC_DEBUG_OUTFILE_ARG,sub_arg);
 			break;
+		case EJSON_SMARTEYE_RPC_SCAN_QRSTRING:
+			push_scan_qrcode_command(sub_arg,(char*)SMARTEYE_RPC_SCAN_QRSTRING,EJSON_SMARTEYE_RPC_SCAN_QRSTRING,
+						     (char*)SMARTEYE_RPC_SCAN_QRSTRING_ARGFPATH,(char*)SMARTEYE_RPC_SCAN_QRSTRING_ARGQRSTR);
+			break;
 		default:
 			return 0;
 			break;	
@@ -77,17 +83,20 @@ int SmarteyeCltCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient
 {
 	switch(pCmdObj->command)
 	{
+		case EJSON_SMARTEYE_RPC_SCAN_QRSTRING:
+			run_scan_qrcode_command(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
+			break;
 		default:return -1;
 			break;
 	}
 	return 0;
 }
-/*****************************************************************************/
+/* ------------------------------------------------------------------------- */
 int SmarteyeCltCmdline::run_my_autotest(char* ip,int interval_us,int max_loop,int test_num)
 {
 	return 0;
 }
-/*****************************************************************************/
+/* ------------------------------------------------------------------------- */
 #include "SrcControlVersion.h"
 int SmarteyeCltCmdline::print_my_version()
 {
@@ -98,10 +107,53 @@ int SmarteyeCltCmdline::get_my_server_port()
 {
 	return SMARTEYE_JSON_PORT_NUMBER;
 }
-/*****************************************************************************/
+/* ------------------------------------------------------------------------- */
 int SmarteyeCltCmdline::parse_cmdline_arguments(int argc, char **argv)
 {
 	return CmdlineHelper.parse_cmdline_arguments(argc,argv);
 }
-/*****************************************************************************/
-
+/* ------------------------------------------------------------------------- */
+int SmarteyeCltCmdline::push_scan_qrcode_command(char* subarg,char* rpc_name,int rpc_index,char* arg_name,char* result_name)
+{
+	CmdExecutionObj *pCmdObj=NULL;
+	OBJECT_MEM_NEW(pCmdObj,CmdExecutionObj);
+	if(pCmdObj==NULL)
+	{
+		printf("failed create pCmdObj!!!\n");
+		return -1;
+	}
+	if(CmdlineHelper.get_next_subargument(&subarg)==0)//user must specify png/jpg file path 
+	{
+		OBJ_MEM_DELETE(pCmdObj);
+		printf("please specify correct filepath on target\n");
+		//cout<<"SmarteyeCltCmdline::run_my_commands"<<endl;
+		return -1;
+	}
+	//else 
+	//	return -1;//filepath is a must
+	strcpy(pCmdObj->get_rpc_name,rpc_name);
+	strcpy(pCmdObj->second_arg_param_name,result_name);
+	strcpy(pCmdObj->first_arg_param_name,arg_name);
+	strcpy(pCmdObj->first_arg_param_value,subarg);
+	pCmdObj->command=rpc_index;
+	//pCmdObj->action=RPC_SRV_ACT_WRITE;
+	pCmdObj->cmd_type=CLIENT_CMD_TYPE_USER_DEFINED;
+	//put the request into chain
+	if(CmdlineHelper.CmdChain.chain_put((void *)pCmdObj)!=0)
+	{
+		printf("push_scan_qrcode_command: failed! unable to push json-req-task-obj to chain!\n");
+		OBJ_MEM_DELETE(pCmdObj);
+		return -1;
+	}
+	return 0;
+}
+int SmarteyeCltCmdline::run_scan_qrcode_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker)
+{
+	ADThreadedSockClient *pOrig = (ADThreadedSockClient*)pWorker;
+	{
+	pCmdObj->result=pSrvSockConn->get_string_type_with_string_para(pCmdObj->get_rpc_name,pCmdObj->first_arg_param_name,pCmdObj->first_arg_param_value,pCmdObj->second_arg_param_value,pCmdObj->second_arg_param_name);
+	pOrig->log_print_message(pSrvSockConn,pCmdObj->get_rpc_name,RPC_SRV_ACT_READ,pCmdObj->result,pOutMsgList,pCmdObj->second_arg_param_value);
+	}
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
