@@ -53,6 +53,10 @@ public:
 	int json_to_bin_scan_qrstring(JsonDataCommObj* pReq);
 	int bin_to_json_scan_qrstring(JsonDataCommObj* pReq);
 	int process_scan_qrstring(JsonDataCommObj* pReq);
+
+	int json_to_bin_compare_img(JsonDataCommObj* pReq);
+	int bin_to_json_compare_img(JsonDataCommObj* pReq);
+	int process_compare_img(JsonDataCommObj* pReq);
 };
 /* ------------------------------------------------------------------------- */
 

@@ -45,6 +45,7 @@ int main(int argc, const char* argv[])
 	SmarteyeRpc ChkWallBaseFileGet(SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET ,EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET,emulat,dbglog,&DataCache);
 	SmarteyeRpc ChkWallBaseFileSet(SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET ,EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET,emulat,dbglog,&DataCache);
 	SmarteyeRpc QrStringScan(SMARTEYE_RPC_SCAN_QRSTRING ,EJSON_SMARTEYE_RPC_SCAN_QRSTRING,emulat,dbglog,&DataCache);
+	SmarteyeRpc CompareImages(SMARTEYE_RPC_COMPARE_IMG ,EJSON_SMARTEYE_RPC_COMPARE_IMG,emulat,dbglog,&DataCache);
 
 	RpcMgr.AttachRpc(&PatternGet);
 	RpcMgr.AttachRpc(&DbgFileGet);
@@ -56,6 +57,8 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&ChkWallBaseFileGet);
 	RpcMgr.AttachRpc(&ChkWallBaseFileSet);
 	RpcMgr.AttachRpc(&QrStringScan);
+	RpcMgr.AttachRpc(&CompareImages);
+
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr

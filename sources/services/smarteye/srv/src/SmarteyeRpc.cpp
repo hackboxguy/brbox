@@ -25,6 +25,7 @@ int SmarteyeRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET:return json_to_bin_get_checkwallbase_file(pReq);
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET:return json_to_bin_set_checkwallbase_file(pReq);
 		case EJSON_SMARTEYE_RPC_SCAN_QRSTRING          :return json_to_bin_scan_qrstring(pReq);
+		case EJSON_SMARTEYE_RPC_COMPARE_IMG            :return json_to_bin_compare_img(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -45,6 +46,7 @@ int SmarteyeRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET:return bin_to_json_get_checkwallbase_file(pReq);
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET:return bin_to_json_set_checkwallbase_file(pReq);
 		case EJSON_SMARTEYE_RPC_SCAN_QRSTRING          :return bin_to_json_scan_qrstring(pReq);
+		case EJSON_SMARTEYE_RPC_COMPARE_IMG            :return bin_to_json_compare_img(pReq);
 		default:break;
 	}
 	return -1;
@@ -65,6 +67,7 @@ int SmarteyeRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProduce
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET:return process_get_checkwallbase_file(pReq);
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET:return process_set_checkwallbase_file(pReq);
 		case EJSON_SMARTEYE_RPC_SCAN_QRSTRING          :return process_scan_qrstring(pReq);
+		case EJSON_SMARTEYE_RPC_COMPARE_IMG            :return process_compare_img(pReq);
 		default:break;
 	}
 	return 0;
@@ -332,6 +335,44 @@ int SmarteyeRpc::process_scan_qrstring(JsonDataCommObj* pReq)
 	{
 		pPanelReq->result=ImgId.scan_qr_string(pDataCache->StrQrFilePath,pDataCache->StrQrString);
 		strcpy(pPacket->qrstring,pDataCache->StrQrString.c_str());
+	}
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int SmarteyeRpc::json_to_bin_compare_img(JsonDataCommObj* pReq)
+{
+	SMARTEYE_COMPARE_IMG_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SMARTEYE_COMPARE_IMG_PACKET,RPC_SRV_ACT_WRITE,EJSON_SMARTEYE_RPC_COMPARE_IMG);
+	JSON_STRING_TO_STRING(SMARTEYE_RPC_COMPARE_IMG_ARGIMG1,pPanelCmdObj->filepath1);
+	JSON_STRING_TO_STRING(SMARTEYE_RPC_COMPARE_IMG_ARGIMG2,pPanelCmdObj->filepath2);
+	return 0;
+}
+int SmarteyeRpc::bin_to_json_compare_img(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_STRING(RPC_SRV_REQ,SMARTEYE_COMPARE_IMG_PACKET,SMARTEYE_RPC_COMPARE_IMG_ARGDIFF,imgdiff);//TODO
+	return 0;
+}
+int SmarteyeRpc::process_compare_img(JsonDataCommObj* pReq)
+{
+	ImgIdentify ImgId;//opencv based class for image processing
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SMARTEYE_COMPARE_IMG_PACKET* pPacket;
+	pPacket=(SMARTEYE_COMPARE_IMG_PACKET*)pPanelReq->dataRef;
+
+	pDataCache->CmpImgFilePath1="";
+	pDataCache->CmpImgFilePath1.append(pPacket->filepath1);
+	pDataCache->CmpImgFilePath2="";
+	pDataCache->CmpImgFilePath2.append(pPacket->filepath2);
+
+	if(pDataCache->CmpImgFilePath1==" " || pDataCache->CmpImgFilePath2==" ") //dont accept empty file
+		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;
+	else if(pDataCache->CmpImgFilePath1=="" || pDataCache->CmpImgFilePath2=="") //dont accept empty file
+		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;
+	else
+	{
+		pPanelReq->result=ImgId.compare_images(pDataCache->CmpImgFilePath1,pDataCache->CmpImgFilePath2,pDataCache->CmpImgResult);
+		strcpy(pPacket->imgdiff,pDataCache->CmpImgResult.c_str());
 	}
 	return 0;
 }

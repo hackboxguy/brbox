@@ -20,5 +20,8 @@ public:
 	int push_scan_qrcode_command(char* subarg,char* rpc_name,int rpc_index,char* arg_name,char* result_name);
 	int run_scan_qrcode_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,
 					ADThreadedSockClientProducer *pWorker);
+	int push_compare_img_command(char* subarg,char* rpc_name,int rpc_index,char* arg_name,char* arg_name2,char* result_name);
+	int run_compare_img_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,
+				        ADThreadedSockClientProducer *pWorker);
 };
 #endif

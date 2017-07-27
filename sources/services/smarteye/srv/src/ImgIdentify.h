@@ -36,6 +36,7 @@ public:
 	RPC_SRV_RESULT capture_jpg_image(std::string imgPath,int resPix=1920,int resLines=1080);
 	RPC_SRV_RESULT identify_if_all_tiles_on(std::string inputFile,std::string baseMaskFile);
 	RPC_SRV_RESULT scan_qr_string(std::string filepath,std::string &qrstring);
+	RPC_SRV_RESULT compare_images(std::string filepath1,std::string filepath2,std::string &result);
 };
 /*---------------------------------------------------------------------------*/
 #endif

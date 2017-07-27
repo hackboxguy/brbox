@@ -16,6 +16,7 @@ typedef enum EJSON_SMARTEYE_RPC_TYPES_T
 	EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_GET, //base reference image for EJSON_SMARTEYE_IDPATTERN_CHECK_WALL
 	EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET, //base reference image for EJSON_SMARTEYE_IDPATTERN_CHECK_WALL
 	EJSON_SMARTEYE_RPC_SCAN_QRSTRING,
+	EJSON_SMARTEYE_RPC_COMPARE_IMG, //compare two png or jpg images and returns the result between 0% and 100%
 	EJSON_SMARTEYE_RPC_END,
 	EJSON_SMARTEYE_RPC_NONE
 }EJSON_SMARTEYE_RPC_TYPES;
@@ -76,6 +77,19 @@ typedef struct SMARTEYE_SCAN_QRSTRING_PACKET_T
 	char qrstring[1024];
 }SMARTEYE_SCAN_QRSTRING_PACKET;
 /* ------------------------------------------------------------------------- */
+//EJSON_SMARTEYE_RPC_COMPARE_IMG
+#define SMARTEYE_RPC_COMPARE_IMG              "compare_images"
+#define SMARTEYE_RPC_COMPARE_IMG_ARGIMG1      "image1"
+#define SMARTEYE_RPC_COMPARE_IMG_ARGIMG2      "image2"
+#define SMARTEYE_RPC_COMPARE_IMG_ARGDIFF      "imgdiff" //difference between the images(0 to 100%)
+typedef struct SMARTEYE_COMPARE_IMG_PACKET_T
+{
+	char filepath1[1024];
+	char filepath2[1024];
+	//float imgdiff; TODO
+	char imgdiff[1024];
+}SMARTEYE_COMPARE_IMG_PACKET;
+/* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct SMARTEYE_CMN_DATA_CACHE_T
 {
@@ -85,6 +99,7 @@ typedef struct SMARTEYE_CMN_DATA_CACHE_T
 	std::string StrImgIdCheckWallFile;//pChar //Char //Int //pInt //Float //Enum
 	std::string StrImgIdCheckWallBaseFile;//pChar //Char //Int //pInt //Float //Enum
 	std::string StrQrFilePath,StrQrString;
+	std::string CmpImgFilePath1,CmpImgFilePath2,CmpImgResult;
 
 	//initialize variables here
 	SMARTEYE_CMN_DATA_CACHE_T()
@@ -94,6 +109,7 @@ typedef struct SMARTEYE_CMN_DATA_CACHE_T
 		StrImgIdCheckWallFile="";
 		StrImgIdCheckWallBaseFile="";
 		StrQrFilePath="";StrQrString="";
+		CmpImgFilePath1="";CmpImgFilePath2="";CmpImgResult="";
 	};
 	~ SMARTEYE_CMN_DATA_CACHE_T(){};
 }SMARTEYE_CMN_DATA_CACHE;

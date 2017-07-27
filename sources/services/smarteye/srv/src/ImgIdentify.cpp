@@ -393,4 +393,10 @@ RPC_SRV_RESULT ImgIdentify::scan_qr_string(std::string filepath,std::string &qrs
 	//return RPC_SRV_RESULT_SUCCESS;//0;
 }
 /*---------------------------------------------------------------------------*/
+RPC_SRV_RESULT ImgIdentify::compare_images(std::string filepath1,std::string filepath2,std::string &result)
+{
+	result="20.5";//TODO
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/*---------------------------------------------------------------------------*/
 
