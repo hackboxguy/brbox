@@ -131,13 +131,16 @@ int main(int argc, const char* argv[])
 
  	/****************Prepare event receiver to receive events*****************/
 	//TODO: wait for event-sending-service to be ready
-	//EventHandler EvntReceiver("dummy_rpc",0,emulat,dbglog,&DataCache);
-	//RpcMgr.AttachEventReceiver(&EvntReceiver);
-
 	//monitor the events(for debug purpose)
 	DataCache.EvntMonitorConfigFile=CmdLine.get_monit_cfg_file();
+
+	EventHandler EvntReceiver("dummy_rpc",0,emulat,dbglog,&DataCache);
 	EventMonitor EvntMonit("dummy_rpc",0,emulat,dbglog,&DataCache);
-	RpcMgr.AttachEventReceiver(&EvntMonit);
+
+	if(DataCache.EvntMonitorConfigFile=="") //if event monitor config file is not passed by the user, then do internal event handler
+		RpcMgr.AttachEventReceiver(&EvntReceiver);//default event handler
+	else
+		RpcMgr.AttachEventReceiver(&EvntMonit);//event monitor for debug purpose
 
 	//server is ready to serve rpc's
 	RpcMgr.SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE_READY);

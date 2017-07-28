@@ -31,16 +31,17 @@ void EventMonitor::ReceiveEvent(int myToken,int evntNum,int evntArg,int evntArg2
 {
 	if(pDataCache->EvntMonitorConfigFile=="")//nothing to do here if config file is empty
 		return;
-	char mytimestamp[255];
+	char mytimestamp[255],myarg1[255],myarg2[255];
 
 	std::vector<EvntMonitEntry>::iterator it = find_if(EventMonitList.begin(), EventMonitList.end(), FindMonitEntry(myToken));
 	if(it != EventMonitList.end())
 	{
 		if(evntNum==1) //1 is for shutdown, indicates that server is going bye-bye, hence disable this entry from my list.
 			(*it).subscription_sts=false;
+		sprintf(myarg1,"%04d",evntArg);
+		sprintf(myarg2,"%04d",evntArg2);
 		if(evntNum<=11)//max 11 event types are allowed
-			cout<<get_timestamp(mytimestamp)<<" ip="<<(*it).ip<<" evntType="<<setw(25)<<left<<(*it).EvntName[evntNum]<<" Arg1="<<evntArg<<" Arg2="<<evntArg2<<endl;
-			//printf("%s<--%s\n",get_timestamp(),message);
+			cout<<get_timestamp(mytimestamp)<<" | ip="<<(*it).ip<<" | token="<<(*it).srvToken<<" | evntType="<<setw(25)<<left<<(*it).EvntName[evntNum]<<" | Arg1="<<myarg1<<" | Arg2="<<myarg2<<endl;
 	}
 }
 /* ------------------------------------------------------------------------- */
@@ -83,7 +84,7 @@ RPC_SRV_RESULT EventMonitor::SubscribeEvents(std::vector<EvntMonitEntry> *pList)
 		else
 		{
 			char mytimestamp[255];
-			cout<<get_timestamp(mytimestamp)<<" subscription failed for ip="<<pEntry.ip<<" and token="<<pEntry.srvToken<<endl;
+			cout<<get_timestamp(mytimestamp)<<" | subscription failed for ip="<<pEntry.ip<<" and token="<<pEntry.srvToken<<endl;
 			pEntry.subscription_sts=false;
 		}
 	}
