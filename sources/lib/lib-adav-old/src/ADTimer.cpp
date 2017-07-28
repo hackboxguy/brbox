@@ -211,17 +211,8 @@ int ADTimer::wait_for_exit_signal()//forever-loop, blocks the main() app till ki
 					LOG_INFO_MSG("SDSRV:AdLib","ADTimer received Sementation fault!!!!!!!!!!!!!!!!!!!!!!");
 					break;
 			default     :
-					//printf("ADTimer::wait_for_exit_signal: handling default sig = %d\n",sig);
-					if(notify_registered_signals(sig,&info)!=0)
-						printf("ADTimer::wait_for_exit_signal: unregistered signal=%d\n",sig);
-
-						//printf("SDSRV:AdLib","ADTimer received unknown sig = %d!!!!",sig);
-						//LOG_ERR_MSG_WITH_ARG("SDSRV:AdLib","ADTimer received unknown sig = %d!!!!",sig);
-					//printf("wait_for_exit_signal:notifying custom sig = %d info.si_int=%d\n",sig,info.si_int);
-				    //if(sig==custom_sig)
-					//notify_custom_sig_to_subscribers_new(info.si_int);
-				    //else
-					//LOG_ERR_MSG_WITH_ARG("SDSRV:AdLib","ADTimer received unknown sig = %d!!!!",sig);
+					if(notify_registered_signals(sig,&info)!=0);
+						//printf("ADTimer::wait_for_exit_signal: unregistered signal=%d\n",sig);
 				    break;
 		}
 	}

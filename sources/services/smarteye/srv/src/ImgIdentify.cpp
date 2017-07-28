@@ -395,7 +395,7 @@ RPC_SRV_RESULT ImgIdentify::scan_qr_string(std::string filepath,std::string &qrs
 /*---------------------------------------------------------------------------*/
 RPC_SRV_RESULT ImgIdentify::compare_images(std::string filepath1,std::string filepath2,std::string &result)
 {
-	result="-1";
+	result="-1.0";
 	//magick compare -metric RMSE /tmp/capture-1.png  /tmp/capture-2.png NULL: 2>&1 |grep "("
 	char command[1024];
 	sprintf(command,"magick compare -metric RMSE %s %s NULL: 2>&1 |grep \"(\" |awk '{print $2}' | sed -r 's/[()]//g' > %s",filepath1.c_str(),filepath2.c_str(),"/tmp/temp-compare-result.txt");
@@ -413,8 +413,16 @@ RPC_SRV_RESULT ImgIdentify::compare_images(std::string filepath1,std::string fil
 		command[read_bytes]='\0';
 		if(command[strlen(command)-1]=='\n')//remove the carriage return line
 			command[strlen(command)-1]='\0';
-		result=command;
-		return RPC_SRV_RESULT_SUCCESS;
+		if(strlen(command)>=2)
+		{
+			float flres=atof(command);
+			flres*=100.0;
+			sprintf(command,"%4.2f",flres);
+			result=command;
+			return RPC_SRV_RESULT_SUCCESS;
+		}
+		else
+			return RPC_SRV_RESULT_FAIL;
 	}
 	else
 		return RPC_SRV_RESULT_FILE_READ_ERR;	
