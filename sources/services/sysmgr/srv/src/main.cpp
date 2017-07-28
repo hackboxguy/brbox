@@ -13,6 +13,7 @@
 #include "NetRpc.h"
 #include "SysRpc.h"
 #include "EventHandler.h"
+#include "EventMonitor.h"
 #include "LogHandler.h"
 #include "CmnRpc.h"
 #define SERVER_JSON_PORT_NUM SYSMGR_JSON_PORT_NUMBER
@@ -130,8 +131,13 @@ int main(int argc, const char* argv[])
 
  	/****************Prepare event receiver to receive events*****************/
 	//TODO: wait for event-sending-service to be ready
-	EventHandler EvntReceiver("dummy_rpc",0,emulat,dbglog,&DataCache);
-	RpcMgr.AttachEventReceiver(&EvntReceiver);
+	//EventHandler EvntReceiver("dummy_rpc",0,emulat,dbglog,&DataCache);
+	//RpcMgr.AttachEventReceiver(&EvntReceiver);
+
+	//monitor the events(for debug purpose)
+	DataCache.EvntMonitorConfigFile=CmdLine.get_monit_cfg_file();
+	EventMonitor EvntMonit("dummy_rpc",0,emulat,dbglog,&DataCache);
+	RpcMgr.AttachEventReceiver(&EvntMonit);
 
 	//server is ready to serve rpc's
 	RpcMgr.SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE_READY);

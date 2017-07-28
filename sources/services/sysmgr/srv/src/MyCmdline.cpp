@@ -1,12 +1,22 @@
 #include "MyCmdline.h"
 using namespace std;
 /*****************************************************************************/
+typedef enum SYSMGR_CMDLINE_OPT_T
+{
+	SYSMGR_CMDLINE_OPT_MONITCFG = 100,
+	SYSMGR_CMDLINE_OPT_UNKNOWN,
+	SYSMGR_CMDLINE_OPT_NONE
+}SYSMGR_CMDLINE_OPT;
+/*****************************************************************************/
 MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_str):CmdlineHelper(cmdline_mode)
 {
 	port_number=portnum;
 	strcpy(version_number,version_str);
 	CmdlineHelper.attach_helper(this);
+	MonitCfgFile="";
 	//note:"hviptdln" are already used by the producer class in library
+	CmdlineHelper.insert_options_entry((char*)"evntmonitcfg" ,optional_argument,SYSMGR_CMDLINE_OPT_MONITCFG);
+	CmdlineHelper.insert_help_entry((char*)"--evntmonitcfg=filepath         (config file for monitoring the event)");
 }
 /*****************************************************************************/
 MyCmdline::~MyCmdline()
@@ -16,6 +26,17 @@ MyCmdline::~MyCmdline()
 //override virtual functions of ADGeneric Chain
 int MyCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 {
+	SYSMGR_CMDLINE_OPT command =(SYSMGR_CMDLINE_OPT)arg;
+	switch(command)
+	{
+		case SYSMGR_CMDLINE_OPT_MONITCFG:
+			if(CmdlineHelper.get_next_subargument(&sub_arg)==0)//no /dev/tty option passed by user
+				MonitCfgFile="";
+			else
+				MonitCfgFile=sub_arg;
+			break;
+		default:return 0;break;	
+	}
 	return 0;
 }
 /*****************************************************************************/
@@ -78,4 +99,10 @@ int MyCmdline::get_dev_info(ADCMN_DEV_INFO *pInfo)
 {
 	return CmdlineHelper.get_dev_info(pInfo);
 }
+/*****************************************************************************/
+std::string MyCmdline::get_monit_cfg_file()
+{
+	return MonitCfgFile;
+}
+/*****************************************************************************/
 

@@ -9,6 +9,7 @@ set(LIB_ADCOMMN AdCmn)      #common library
 
 
 project(${COMPONENT_NAME})
+set(CMAKE_CXX_FLAGS "-std=c++11")
 set(AUTO_SVN_VERSION    ON CACHE BOOL ON)  #by default include svn revision numbers
 set(INSTALL_MY_HEADERS  ON CACHE BOOL ON)  #by default install header files to target-install-directory
 set(STARTUP_SCRIPT SysmgrStartupScr)          #server startup script

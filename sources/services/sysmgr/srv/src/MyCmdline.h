@@ -8,6 +8,7 @@ class MyCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 	int port_number;
 	char version_number[255];
 	ADCmdlineHelper CmdlineHelper;
+	std::string MonitCfgFile;
 
 	//Chain-callback functions	
 	virtual int parse_my_cmdline_options(int arg, char* sub_arg);
@@ -27,5 +28,7 @@ public:
 	int get_dev_info(ADCMN_DEV_INFO *pInfo);
 
 	//service specific part
+	std::string get_monit_cfg_file();
+
 };
 #endif

@@ -324,11 +324,13 @@ typedef struct SYSMGR_CMN_DATA_CACHE_T
 	EJSON_SYSMGR_RPC_TYPES AsyncCmdInProgress;
 	void *pLogger;//log message handler
 	void *pDevIdent;//device identify handler interface
+	std::string EvntMonitorConfigFile;
 	SYSMGR_CMN_DATA_CACHE_T()
 	{
 		AsyncCmdInProgress=EJSON_SYSMGR_RPC_NONE;
 		pLogger=NULL;		
 		pDevIdent=NULL;
+		EvntMonitorConfigFile="";
 	};//initialize variables here
 	~ SYSMGR_CMN_DATA_CACHE_T(){};
 }SYSMGR_CMN_DATA_CACHE;
