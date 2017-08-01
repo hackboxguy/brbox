@@ -70,6 +70,7 @@ public:
 	RPC_SRV_RESULT SubscribeEvents(std::vector<EvntMonitEntry> *pList);
 	RPC_SRV_RESULT UnSubscribeEvents(std::vector<EvntMonitEntry> *pList);
 	char* get_timestamp(char* request_timestamp);
+	RPC_SRV_RESULT ReSubscribeEvents();
 };
 /* ------------------------------------------------------------------------- */
 

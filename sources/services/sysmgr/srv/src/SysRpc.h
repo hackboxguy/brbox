@@ -107,6 +107,10 @@ public:
 	int bin_to_json_devident(JsonDataCommObj* pReq);
 	int process_devident(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj);
 	RPC_SRV_RESULT process_async_devident(SYSMGR_DEVIDENT_PACKET* pPacket);
+
+	int json_to_bin_subscribe_events(JsonDataCommObj* pReq);
+	int bin_to_json_subscribe_events(JsonDataCommObj* pReq);
+	int process_subscribe_events(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj);
 };
 /* ------------------------------------------------------------------------- */
 

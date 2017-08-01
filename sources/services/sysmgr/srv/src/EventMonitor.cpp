@@ -77,15 +77,18 @@ RPC_SRV_RESULT EventMonitor::SubscribeEvents(std::vector<EvntMonitEntry> *pList)
 	for(it = pList->begin(); it != pList->end(); it++)
 	{
 		EvntMonitEntry pEntry = (*it);
-		pEntry.subscription=-1;
-		SUBSCRIBE_EVENT(pEntry.ip,pEntry.port,&pEntry.subscription,pEntry.srvToken,pEntry.evntType,40001);
-		if(pEntry.subscription!=-1)
-			pEntry.subscription_sts=true;
-		else
+		if(pEntry.subscription_sts==false)
 		{
-			char mytimestamp[255];
-			cout<<get_timestamp(mytimestamp)<<" | subscription failed for ip="<<pEntry.ip<<" and token="<<pEntry.srvToken<<endl;
-			pEntry.subscription_sts=false;
+			pEntry.subscription=-1;
+			SUBSCRIBE_EVENT(pEntry.ip,pEntry.port,&pEntry.subscription,pEntry.srvToken,pEntry.evntType,40001);
+			if(pEntry.subscription!=-1)
+				pEntry.subscription_sts=true;
+			else
+			{
+				char mytimestamp[255];
+				cout<<get_timestamp(mytimestamp)<<" | subscription failed for ip="<<pEntry.ip<<" and token="<<pEntry.srvToken<<endl;
+				pEntry.subscription_sts=false;
+			}
 		}
 	}
 	return RPC_SRV_RESULT_SUCCESS;
@@ -122,4 +125,8 @@ char* EventMonitor::get_timestamp(char* request_timestamp)
 	return request_timestamp;
 }
 /* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT EventMonitor::ReSubscribeEvents()
+{
+	return SubscribeEvents(&EventMonitList);
+}
 

@@ -53,6 +53,8 @@ SysmgrCltCmdline::SysmgrCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--shellcmd=cmd             [run a command in linux shell]");
 	CmdlineHelper.insert_options_entry((char*)"devident" ,optional_argument,EJSON_SYSMGR_RPC_DEVIDENT);
 	CmdlineHelper.insert_help_entry((char*)"--devident                 [identify board by blinking onboard LED]");
+	CmdlineHelper.insert_options_entry((char*)"evntsubscr" ,optional_argument,EJSON_SYSMGR_RPC_EVNT_SUBSCRIBE);
+	CmdlineHelper.insert_help_entry((char*)"--evntsubscr               [re-subscribe events foe event logging]");
 }
 /* ------------------------------------------------------------------------- */
 SysmgrCltCmdline::~SysmgrCltCmdline()
@@ -190,6 +192,9 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 		case EJSON_SYSMGR_RPC_DEVIDENT:
 			CmdlineHelper.push_action_type_noarg_command(EJSON_SYSMGR_RPC_DEVIDENT,
 				(char*)SYSMGR_RPC_DEVIDENT,(char*)RPCMGR_RPC_TASK_STS_ARGID);
+			break;
+		case EJSON_SYSMGR_RPC_EVNT_SUBSCRIBE:
+			CmdlineHelper.push_action_type_noarg_command(EJSON_SYSMGR_RPC_EVNT_SUBSCRIBE,(char*)SYSMGR_RPC_EVNT_SUBSCRIBE);
 			break;
 		default:
 			return 0;

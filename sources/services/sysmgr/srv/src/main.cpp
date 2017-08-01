@@ -119,6 +119,8 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&RunShellCmd);
 	SysRpc DevIdent (SYSMGR_RPC_DEVIDENT,EJSON_SYSMGR_RPC_DEVIDENT,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&DevIdent);
+	SysRpc EvntSubscr (SYSMGR_RPC_EVNT_SUBSCRIBE,EJSON_SYSMGR_RPC_EVNT_SUBSCRIBE,emulat,dbglog,&DataCache);
+	RpcMgr.AttachRpc(&EvntSubscr);
 
 	//common rpc hadler object(eg: trigger-data-save/store-factory/restore-factory..etc)
 	CmnRpc CmnRpcHandler("cmnrpc",0,emulat,dbglog,&DataCache);//common rpc-handler(name and index are ignored)
@@ -133,20 +135,30 @@ int main(int argc, const char* argv[])
 	//TODO: wait for event-sending-service to be ready
 	//monitor the events(for debug purpose)
 	DataCache.EvntMonitorConfigFile=CmdLine.get_monit_cfg_file();
-
-	EventHandler EvntReceiver("dummy_rpc",0,emulat,dbglog,&DataCache);
-	EventMonitor EvntMonit("dummy_rpc",0,emulat,dbglog,&DataCache);
-
+	EventHandler* pEventHandler=NULL;
+	EventMonitor* pEventMonitor=NULL;
 	if(DataCache.EvntMonitorConfigFile=="") //if event monitor config file is not passed by the user, then do internal event handler
-		RpcMgr.AttachEventReceiver(&EvntReceiver);//default event handler
+	{
+		//EventHandler EvntReceiver("dummy_rpc",0,emulat,dbglog,&DataCache);
+		pEventHandler = new EventHandler("dummy_rpc",0,emulat,dbglog,&DataCache);
+		RpcMgr.AttachEventReceiver(pEventHandler);//default event handler
+		DataCache.pEventDefault=(void*)pEventHandler;
+	}
 	else
-		RpcMgr.AttachEventReceiver(&EvntMonit);//event monitor for debug purpose
+	{
+		//EventMonitor EventMonitor("dummy_rpc",0,emulat,dbglog,&DataCache);
+		pEventMonitor = new EventMonitor("dummy_rpc",0,emulat,dbglog,&DataCache);
+		RpcMgr.AttachEventReceiver(pEventMonitor);//event monitor for debug purpose
+		DataCache.pEventCustom=(void*)pEventMonitor;
+	}
 
 	//server is ready to serve rpc's
 	RpcMgr.SetServiceReadyFlag(EJSON_RPCGMGR_READY_STATE_READY);
 	//wait for sigkill or sigterm signal
 	AppTimer.wait_for_exit_signal();//loop till KILL or TERM signal is received
 	AppTimer.stop_timer();//stop sending heart-beats to other objects
+	if(pEventHandler!=NULL)delete pEventHandler;
+	if(pEventMonitor!=NULL)delete pEventMonitor;
 	return 0;
 }
 

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include "DevIdent.h"
+#include "EventMonitor.h"
 #define ASYNC_TASK_EVENT_DELAY 200000 //needed because event might go too fast to subscriber before being handled in a proper way
 //#include "SysmgrJsonDef.h"
 /* ------------------------------------------------------------------------- */
@@ -47,6 +48,7 @@ int SysRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_GET_LOG_LINE    :return json_to_bin_get_logline(pReq);
 		case EJSON_SYSMGR_RPC_RUN_SHELLCMD    :return json_to_bin_run_shellcmd(pReq);
 		case EJSON_SYSMGR_RPC_DEVIDENT        :return json_to_bin_devident(pReq);
+		case EJSON_SYSMGR_RPC_EVNT_SUBSCRIBE  :return json_to_bin_subscribe_events(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -79,6 +81,7 @@ int SysRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_SYSMGR_RPC_GET_LOG_LINE    :return bin_to_json_get_logline(pReq);
 		case EJSON_SYSMGR_RPC_RUN_SHELLCMD    :return bin_to_json_run_shellcmd(pReq);
 		case EJSON_SYSMGR_RPC_DEVIDENT        :return bin_to_json_devident(pReq);
+		case EJSON_SYSMGR_RPC_EVNT_SUBSCRIBE  :return bin_to_json_subscribe_events(pReq);
 		default: break;
 	}
 	return -1;
@@ -111,6 +114,7 @@ int SysRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* pO
 		case EJSON_SYSMGR_RPC_GET_LOG_LINE    :return process_get_logline(pReq);
 		case EJSON_SYSMGR_RPC_RUN_SHELLCMD    :return process_run_shellcmd(pReq,pObj);
 		case EJSON_SYSMGR_RPC_DEVIDENT        :return process_devident(pReq,pObj);
+		case EJSON_SYSMGR_RPC_EVNT_SUBSCRIBE  :return process_subscribe_events(pReq,pObj);
 		default:break;
 	}
 	return 0;
@@ -1128,5 +1132,33 @@ RPC_SRV_RESULT SysRpc::process_async_devident(SYSMGR_DEVIDENT_PACKET* pPacket)
 	return pIdent->device_identify();
 }
 /* ------------------------------------------------------------------------- */
-
+int SysRpc::json_to_bin_subscribe_events(JsonDataCommObj* pReq)
+{
+	SYSMGR_EVNT_SUBSCR_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_EVNT_SUBSCR_PACKET,RPC_SRV_ACT_WRITE,EJSON_SYSMGR_RPC_EVNT_SUBSCRIBE);
+	return 0;
+}
+int SysRpc::bin_to_json_subscribe_events(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,SYSMGR_EVNT_SUBSCR_PACKET);
+	return 0;
+}
+int SysRpc::process_subscribe_events(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj)
+{
+//	ImgIdentify ImgId;//opencv based class for image processing
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SYSMGR_EVNT_SUBSCR_PACKET* pPacket;
+	pPacket=(SYSMGR_EVNT_SUBSCR_PACKET*)pPanelReq->dataRef;
+	//pPanelReq->result=ImgId.capture_jpg_image(pDataCache->StrImgIdDebugFile,pDataCache->captureRes.pixels,pDataCache->captureRes.lines);
+	if(pDataCache->pEventCustom!=NULL)
+	{
+		EventMonitor *pEvent = (EventMonitor*)pDataCache->pEventCustom;
+		pPanelReq->result=pEvent->ReSubscribeEvents();
+	}
+	else
+		pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
 

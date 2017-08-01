@@ -38,6 +38,7 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	//get device type
 	EJSON_SYSMGR_RPC_RUN_SHELLCMD,    //runs a shell command
 	EJSON_SYSMGR_RPC_DEVIDENT,
+	EJSON_SYSMGR_RPC_EVNT_SUBSCRIBE, //custom event handler to re-subscribe events as per given event-config file(update subscription).
 	EJSON_SYSMGR_RPC_END,
 	EJSON_SYSMGR_RPC_NONE
 }EJSON_SYSMGR_RPC_TYPES;
@@ -311,6 +312,14 @@ typedef struct SYSMGR_DEVIDENT_PACKET_T
 	int taskID;
 }SYSMGR_DEVIDENT_PACKET;
 /* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_EVNT_SUBSCRIBE
+#define SYSMGR_RPC_EVNT_SUBSCRIBE    "re_subscribe_events"
+typedef struct SYSMGR_EVNT_SUBSCR_PACKET_T
+{
+	//char cmd[1024];
+	int taskID;
+}SYSMGR_EVNT_SUBSCR_PACKET;
+/* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct SYSMGR_CMN_DATA_CACHE_T
 {
@@ -325,12 +334,16 @@ typedef struct SYSMGR_CMN_DATA_CACHE_T
 	void *pLogger;//log message handler
 	void *pDevIdent;//device identify handler interface
 	std::string EvntMonitorConfigFile;
+	void *pEventDefault;
+	void *pEventCustom;
 	SYSMGR_CMN_DATA_CACHE_T()
 	{
 		AsyncCmdInProgress=EJSON_SYSMGR_RPC_NONE;
 		pLogger=NULL;		
 		pDevIdent=NULL;
 		EvntMonitorConfigFile="";
+		pEventDefault=NULL;		
+		pEventCustom=NULL;
 	};//initialize variables here
 	~ SYSMGR_CMN_DATA_CACHE_T(){};
 }SYSMGR_CMN_DATA_CACHE;
