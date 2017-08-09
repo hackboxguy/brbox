@@ -413,7 +413,7 @@ RPC_SRV_RESULT ImgIdentify::compare_images(std::string filepath1,std::string fil
 		command[read_bytes]='\0';
 		if(command[strlen(command)-1]=='\n')//remove the carriage return line
 			command[strlen(command)-1]='\0';
-		if(strlen(command)>=2)
+		if(strlen(command)>=1)
 		{
 			float flres=atof(command);
 			flres*=100.0;
