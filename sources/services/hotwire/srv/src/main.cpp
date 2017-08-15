@@ -44,12 +44,16 @@ int main(int argc, const char* argv[])
 	GpioCtrlRpc ShowImgGet(MPLAYSRV_RPC_SHOWFBIMG_GET ,EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET ,emulat,dbglog,&DataCache);
 	GpioCtrlRpc ShowImgSet(MPLAYSRV_RPC_SHOWFBIMG_SET ,EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET ,emulat,dbglog,&DataCache);
 	GpioCtrlRpc QrCodeImgSet(MPLAYSRV_RPC_QRCODEIMG_SET ,EJSON_MPLAYSRV_RPC_QRCODEIMG_SET ,emulat,dbglog,&DataCache);
+	GpioCtrlRpc PatternGet(MPLAYSRV_RPC_PATTERN_GET ,EJSON_MPLAYSRV_RPC_PATTERN_GET ,emulat,dbglog,&DataCache);
+	GpioCtrlRpc PatternSet(MPLAYSRV_RPC_PATTERN_SET ,EJSON_MPLAYSRV_RPC_PATTERN_SET ,emulat,dbglog,&DataCache);
 
 	RpcMgr.AttachRpc(&OmxActGet);
 	RpcMgr.AttachRpc(&OmxActSet);
 	RpcMgr.AttachRpc(&ShowImgGet);
 	RpcMgr.AttachRpc(&ShowImgSet);
 	RpcMgr.AttachRpc(&QrCodeImgSet);
+	RpcMgr.AttachRpc(&PatternGet);
+	RpcMgr.AttachRpc(&PatternSet);
 
 
 	//start listening for rpc-commands
