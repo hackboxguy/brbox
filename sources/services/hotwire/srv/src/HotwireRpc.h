@@ -50,6 +50,15 @@ public:
 	int process_qrcodeimg_set(JsonDataCommObj* pReq);
 	RPC_SRV_RESULT create_qrcode_image(char* qrfilepath,char* qrstring);
 	RPC_SRV_RESULT auto_scale_qr_size(int qrstrlen,int* qr_size);
+
+	int json_to_bin_pattern_get(JsonDataCommObj* pReq);
+	int bin_to_json_pattern_get(JsonDataCommObj* pReq);
+	int process_pattern_get(JsonDataCommObj* pReq);
+
+	int json_to_bin_pattern_set(JsonDataCommObj* pReq);
+	int bin_to_json_pattern_set(JsonDataCommObj* pReq);
+	int process_pattern_set(JsonDataCommObj* pReq);
+	RPC_SRV_RESULT process_show_pattern(MPLAYSRV_PATTERN_TYPE pat);
 };
 /* ------------------------------------------------------------------------- */
 

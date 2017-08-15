@@ -21,6 +21,9 @@ GpioCltCmdline::GpioCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--qrcode=imgfile,qr-string [converts given qr-string to qrcode-png-image file]");
 	CmdlineHelper.insert_options_entry((char*)"qrcode" ,optional_argument,EJSON_MPLAYSRV_RPC_QRCODEIMG_SET);
 
+	CmdlineHelper.insert_options_entry((char*)"pattern" ,optional_argument,EJSON_MPLAYSRV_RPC_PATTERN_GET);
+	CmdlineHelper.insert_help_entry((char*)"--pattern=type             [get/set pattern, type=<red/green/blue/cyan/magenta/yellow/white/black>]");
+
 }
 /*****************************************************************************/
 GpioCltCmdline::~GpioCltCmdline()
@@ -54,6 +57,16 @@ int GpioCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			break;
 		case EJSON_MPLAYSRV_RPC_QRCODEIMG_SET:
 			push_qrcode_image_cmd(sub_arg);//,command);
+			break;
+		case EJSON_MPLAYSRV_RPC_PATTERN_GET:
+		case EJSON_MPLAYSRV_RPC_PATTERN_SET:
+			{
+			const char *table[]   = MPLAYSRV_RPC_PATTERN_ARG_TABL;
+			CmdlineHelper.push_single_enum_get_set_command( EJSON_MPLAYSRV_RPC_PATTERN_GET,
+			EJSON_MPLAYSRV_RPC_PATTERN_SET,MPLAYSRV_RPC_PATTERN_GET,
+			MPLAYSRV_RPC_PATTERN_SET,&table[0],MPLAYSRV_PATTERN_UNKNOWN,
+			(char*)MPLAYSRV_RPC_PATTERN_ARG,sub_arg);
+			}
 			break;
 		default:
 			return 0;

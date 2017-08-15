@@ -10,10 +10,6 @@
 /* ------------------------------------------------------------------------- */
 typedef enum EJSON_GPIOCTL_RPC_TYPES_T
 {
-	//EJSON_GPIOCTL_RPC_IO_GET=0,
-	//EJSON_GPIOCTL_RPC_IO_SET,
-	//EJSON_GPIOCTL_RPC_IO_CONFIG,
-
 	EJSON_GPIOCTL_RPC_OMXACT_GET=0,
 	EJSON_GPIOCTL_RPC_OMXACT_SET,
 
@@ -21,6 +17,9 @@ typedef enum EJSON_GPIOCTL_RPC_TYPES_T
 	EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET, //frame buffer based image rendering
 
 	EJSON_MPLAYSRV_RPC_QRCODEIMG_SET, //converts given string to qr-code-png-file
+
+	EJSON_MPLAYSRV_RPC_PATTERN_GET,
+	EJSON_MPLAYSRV_RPC_PATTERN_SET, //frame buffer based pattern rendering
 
 	EJSON_GPIOCTL_RPC_END,
 	EJSON_GPIOCTL_RPC_NONE
@@ -87,6 +86,30 @@ typedef struct MPLAYSRV_QRCODEIMG_PACKET_T
 	//int taskID;
 }MPLAYSRV_QRCODEIMG_PACKET;
 /* ------------------------------------------------------------------------- */
+//EJSON_MPLAYSRV_RPC_PATTERN_GET,
+//EJSON_MPLAYSRV_RPC_PATTERN_SET, //frame buffer based pattern rendering
+#define MPLAYSRV_RPC_PATTERN_GET         "get_pattern"
+#define MPLAYSRV_RPC_PATTERN_SET         "set_pattern"
+#define MPLAYSRV_RPC_PATTERN_ARG         "pattern"
+#define MPLAYSRV_RPC_PATTERN_ARG_TABL    {"red","green","blue","cyan","magenta","yellow","white","black","unknown","none","\0"}
+typedef enum MPLAYSRV_PATTERN_TYPE_T
+{
+	MPLAYSRV_PATTERN_RED,
+	MPLAYSRV_PATTERN_GREEN,
+	MPLAYSRV_PATTERN_BLUE,
+	MPLAYSRV_PATTERN_CYAN,
+	MPLAYSRV_PATTERN_MAGENTA,
+	MPLAYSRV_PATTERN_YELLOW,
+	MPLAYSRV_PATTERN_WHITE,
+	MPLAYSRV_PATTERN_BLACK,
+	MPLAYSRV_PATTERN_UNKNOWN,
+	MPLAYSRV_PATTERN_NONE
+}MPLAYSRV_PATTERN_TYPE;
+typedef struct MPLAYSRV_PATTERN_PACKET_T
+{
+	MPLAYSRV_PATTERN_TYPE PatType;
+}MPLAYSRV_PATTERN_PACKET;
+/* ------------------------------------------------------------------------- */
 //keep all the data related to mplaysrv-service here
 typedef struct GPIOCTL_CMN_DATA_CACHE_T
 {
@@ -96,12 +119,14 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 	std::string fbimgpath;
 	int qr_density;
 	int qr_size;
+	MPLAYSRV_PATTERN_TYPE pattern;
 
 	GPIOCTL_CMN_DATA_CACHE_T()
 	{
 		fbimgpath="none";
 		qr_density=500;//TODO: configure qr-code-density via rpc
 		qr_size=37;//TODO: configure qr-code-size via rpc
+		pattern=MPLAYSRV_PATTERN_NONE;
 	};//initialize variables here
 	~ GPIOCTL_CMN_DATA_CACHE_T(){};
 

@@ -19,13 +19,13 @@ int GpioCtrlRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 	EJSON_GPIOCTL_RPC_TYPES command =(EJSON_GPIOCTL_RPC_TYPES)index;
 	switch(command)
 	{
-		//case EJSON_GPIOCTL_RPC_IO_GET :return json_to_bin_gpio_get(pReq);
-		//case EJSON_GPIOCTL_RPC_IO_SET :return json_to_bin_gpio_set(pReq);
 		case EJSON_GPIOCTL_RPC_OMXACT_GET:return json_to_bin_omxact_get(pReq);
 		case EJSON_GPIOCTL_RPC_OMXACT_SET:return json_to_bin_omxact_set(pReq);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET:return json_to_bin_showfbimg_get(pReq);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET:return json_to_bin_showfbimg_set(pReq);
 		case EJSON_MPLAYSRV_RPC_QRCODEIMG_SET:return json_to_bin_qrcodeimg_set(pReq);
+		case EJSON_MPLAYSRV_RPC_PATTERN_GET:return json_to_bin_pattern_get(pReq);
+		case EJSON_MPLAYSRV_RPC_PATTERN_SET:return json_to_bin_pattern_set(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -36,13 +36,13 @@ int GpioCtrlRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 	EJSON_GPIOCTL_RPC_TYPES command =(EJSON_GPIOCTL_RPC_TYPES)index;
 	switch(command)
 	{
-		//case EJSON_GPIOCTL_RPC_IO_GET :return bin_to_json_gpio_get(pReq);
-		//case EJSON_GPIOCTL_RPC_IO_SET :return bin_to_json_gpio_set(pReq);
 		case EJSON_GPIOCTL_RPC_OMXACT_GET:return bin_to_json_omxact_get(pReq);
 		case EJSON_GPIOCTL_RPC_OMXACT_SET:return bin_to_json_omxact_set(pReq);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET:return bin_to_json_showfbimg_get(pReq);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET:return bin_to_json_showfbimg_set(pReq);
 		case EJSON_MPLAYSRV_RPC_QRCODEIMG_SET:return bin_to_json_qrcodeimg_set(pReq);
+		case EJSON_MPLAYSRV_RPC_PATTERN_GET:return bin_to_json_pattern_get(pReq);
+		case EJSON_MPLAYSRV_RPC_PATTERN_SET:return bin_to_json_pattern_set(pReq);
 		default:break;
 	}
 	return -1;
@@ -53,13 +53,13 @@ int GpioCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProduce
 	EJSON_GPIOCTL_RPC_TYPES command =(EJSON_GPIOCTL_RPC_TYPES)index;
 	switch(command)
 	{
-		//case EJSON_GPIOCTL_RPC_IO_GET :return process_gpio_get(pReq);
-		//case EJSON_GPIOCTL_RPC_IO_SET :return process_gpio_set(pReq);
 		case EJSON_GPIOCTL_RPC_OMXACT_GET:return process_omxact_get(pReq);
 		case EJSON_GPIOCTL_RPC_OMXACT_SET:return process_omxact_set(pReq,pObj);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET:return process_showfbimg_get(pReq);
 		case EJSON_MPLAYSRV_RPC_SHOWFBIMG_SET:return process_showfbimg_set(pReq);
 		case EJSON_MPLAYSRV_RPC_QRCODEIMG_SET:return process_qrcodeimg_set(pReq);
+		case EJSON_MPLAYSRV_RPC_PATTERN_GET:return process_pattern_get(pReq);
+		case EJSON_MPLAYSRV_RPC_PATTERN_SET:return process_pattern_set(pReq);
 		default:break;
 	}
 	return 0;
@@ -441,6 +441,70 @@ RPC_SRV_RESULT GpioCtrlRpc::auto_scale_qr_size(int qrstrlen,int* qr_size)
 	else if(qrstrlen>25 && qrstrlen<=30)*qr_size=33;
 	else if(qrstrlen>30 && qrstrlen<=35)*qr_size=31;
 	else if(qrstrlen>35)*qr_size=30;
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+int GpioCtrlRpc::json_to_bin_pattern_get(JsonDataCommObj* pReq)
+{
+	MPLAYSRV_PATTERN_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,MPLAYSRV_PATTERN_PACKET,RPC_SRV_ACT_READ,EJSON_MPLAYSRV_RPC_PATTERN_GET);
+	return 0;
+}
+int GpioCtrlRpc::bin_to_json_pattern_get(JsonDataCommObj* pReq)
+{
+PREPARE_JSON_RESP_ENUM(RPC_SRV_REQ,MPLAYSRV_PATTERN_PACKET,MPLAYSRV_RPC_PATTERN_ARG,PatType,MPLAYSRV_RPC_PATTERN_ARG_TABL,MPLAYSRV_PATTERN_UNKNOWN);
+	return 0;
+}
+int GpioCtrlRpc::process_pattern_get(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	MPLAYSRV_PATTERN_PACKET* pPacket;
+	pPacket=(MPLAYSRV_PATTERN_PACKET*)pPanelReq->dataRef;
+	pPacket->PatType=pDataCache->pattern;
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int GpioCtrlRpc::json_to_bin_pattern_set(JsonDataCommObj* pReq)
+{
+	MPLAYSRV_PATTERN_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,MPLAYSRV_PATTERN_PACKET,RPC_SRV_ACT_WRITE,EJSON_MPLAYSRV_RPC_PATTERN_SET);
+	JSON_STRING_TO_ENUM(MPLAYSRV_RPC_PATTERN_ARG,MPLAYSRV_RPC_PATTERN_ARG_TABL,MPLAYSRV_PATTERN_TYPE,MPLAYSRV_PATTERN_UNKNOWN,pPanelCmdObj->PatType);
+	return 0;
+}
+int GpioCtrlRpc::bin_to_json_pattern_set(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,MPLAYSRV_PATTERN_PACKET);
+	return 0;
+}
+int GpioCtrlRpc::process_pattern_set(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	MPLAYSRV_PATTERN_PACKET* pPacket;
+	pPacket=(MPLAYSRV_PATTERN_PACKET*)pPanelReq->dataRef;
+	pDataCache->pattern=pPacket->PatType;
+	pPanelReq->result=process_show_pattern(pDataCache->pattern);
+	return 0;		
+}
+RPC_SRV_RESULT GpioCtrlRpc::process_show_pattern(MPLAYSRV_PATTERN_TYPE pat)
+{
+	char command[1024];char pat_cmd[255];
+	switch(pat)
+	{
+		case MPLAYSRV_PATTERN_RED:sprintf(pat_cmd,"-r");break;
+		case MPLAYSRV_PATTERN_GREEN:sprintf(pat_cmd,"-g");break;
+		case MPLAYSRV_PATTERN_BLUE:sprintf(pat_cmd,"-b");break;
+		case MPLAYSRV_PATTERN_CYAN:sprintf(pat_cmd,"-c");break;
+		case MPLAYSRV_PATTERN_MAGENTA:sprintf(pat_cmd,"-m");break;
+		case MPLAYSRV_PATTERN_YELLOW:sprintf(pat_cmd,"-y");break;
+		case MPLAYSRV_PATTERN_WHITE:sprintf(pat_cmd,"-w");break;
+		case MPLAYSRV_PATTERN_BLACK:sprintf(pat_cmd,"-l");break;
+		default:return RPC_SRV_RESULT_ARG_ERROR;
+	}
+	sprintf(command,"fb-test -f 0 %s>/dev/null",pat_cmd);
+	system(command);
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
