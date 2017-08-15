@@ -1,5 +1,0 @@
-# pack-refs with: peeled fully-peeled 
-063ec650960c2d79ac51f5c5f026cb05343a33e2 refs/heads/master
-063ec650960c2d79ac51f5c5f026cb05343a33e2 refs/tags/rosetta-1.1.0
-c74b5ad2fdaaae53d660ec16ae5e855c39608af2 refs/tags/v1.0.0
-^1547b55320db31eba7af4020f0ca0298ec42cef1
