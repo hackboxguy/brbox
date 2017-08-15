@@ -178,6 +178,18 @@ static void do_fill_screen(struct fb_info *fb_info, int pattern)
 	case 4:
 		fill_screen_solid(fb_info, 0xffffff);
 		break;
+	case 5:
+		fill_screen_solid(fb_info, 0x00ffff);//cyan
+		break;
+	case 6:
+		fill_screen_solid(fb_info, 0xff00ff);//magenta
+		break;
+	case 7:
+		fill_screen_solid(fb_info, 0xffff00);//yellow
+		break;
+	case 8:
+		fill_screen_solid(fb_info, 0x000000);//black
+		break;
 	case 0:
 	default:
 		fill_screen(fb_info);
@@ -187,12 +199,16 @@ static void do_fill_screen(struct fb_info *fb_info, int pattern)
 
 void show_help(void)
 {
-	printf("Usage: fb-test -f fbnum -r -g -b -w -p pattern\n");
+	printf("Usage: fb-test -f fbnum -r -g -b -w -c -m -y -l -p pattern\n");
 	printf("Where -f fbnum   = framebuffer device number\n");
 	printf("      -r         = fill framebuffer with red\n");
 	printf("      -g         = fill framebuffer with green\n");
 	printf("      -b         = fill framebuffer with blue\n");
 	printf("      -w         = fill framebuffer with white\n");
+	printf("      -c         = fill framebuffer with cyan\n");
+	printf("      -m         = fill framebuffer with magenta\n");
+	printf("      -y         = fill framebuffer with yellow\n");
+	printf("      -l         = fill framebuffer with black\n");
 	printf("      -p pattern = fill framebuffer with pattern number\n");
 }
 
@@ -205,7 +221,7 @@ int main(int argc, char **argv)
 	printf("fb-test %d.%d.%d (%s)\n", VERSION, PATCHLEVEL, SUBLEVEL,
 		VERSION_NAME);
 
-	while ((opt = getopt(argc, argv, "hrgbwp:f:")) != -1) {
+	while ((opt = getopt(argc, argv, "hrgbwpcmyl:f:")) != -1) {
 		switch (opt) {
 		case 'f':
 			req_fb = atoi(optarg);
@@ -224,6 +240,18 @@ int main(int argc, char **argv)
 			break;
 		case 'w':
 			req_pattern = 4;
+			break;
+		case 'c':
+			req_pattern = 5;
+			break;
+		case 'm':
+			req_pattern = 6;
+			break;
+		case 'y':
+			req_pattern = 7;
+			break;
+		case 'l':
+			req_pattern = 8;
 			break;
 		case 'h':
 			show_help();
