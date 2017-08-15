@@ -221,7 +221,7 @@ int main(int argc, char **argv)
 	printf("fb-test %d.%d.%d (%s)\n", VERSION, PATCHLEVEL, SUBLEVEL,
 		VERSION_NAME);
 
-	while ((opt = getopt(argc, argv, "hrgbwpcmyl:f:")) != -1) {
+	while ((opt = getopt(argc, argv, "hrgbwp:cmylf:")) != -1) {
 		switch (opt) {
 		case 'f':
 			req_fb = atoi(optarg);
