@@ -1,0 +1,6 @@
+config BR2_PACKAGE_BRBOX_FBTESTAPP
+	bool "brbox-fb-test-app"
+	help
+	  Test suite for Linux framebuffer cloned from. 
+
+	  https://github.com/prpplague/fb-test-app
