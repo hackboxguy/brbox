@@ -8,6 +8,7 @@ GpioCtrlRpc:: GpioCtrlRpc(std::string rpcName,int myIndex,bool emu, bool log,GPI
 	char command[512];
 	sprintf(command,"dd if=/dev/zero of=/dev/fb0;setterm -cursor off >/dev/tty1");
 	system(command);
+	process_show_pattern(pDataCache->StartupBkgnd);//on bootup, show solid color
 }
 /* ------------------------------------------------------------------------- */
 GpioCtrlRpc::~ GpioCtrlRpc()

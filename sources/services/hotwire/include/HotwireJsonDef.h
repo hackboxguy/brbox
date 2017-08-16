@@ -120,6 +120,7 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 	int qr_density;
 	int qr_size;
 	MPLAYSRV_PATTERN_TYPE pattern;
+	MPLAYSRV_PATTERN_TYPE StartupBkgnd;
 
 	GPIOCTL_CMN_DATA_CACHE_T()
 	{
@@ -127,6 +128,7 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 		qr_density=500;//TODO: configure qr-code-density via rpc
 		qr_size=37;//TODO: configure qr-code-size via rpc
 		pattern=MPLAYSRV_PATTERN_NONE;
+		StartupBkgnd=MPLAYSRV_PATTERN_BLUE;//TODO: read from user setting
 	};//initialize variables here
 	~ GPIOCTL_CMN_DATA_CACHE_T(){};
 
