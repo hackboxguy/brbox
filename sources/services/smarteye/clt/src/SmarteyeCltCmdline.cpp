@@ -22,6 +22,16 @@ SmarteyeCltCmdline::SmarteyeCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--scanqrstr=filepath       [scans the qrcode encoded in a given file path]");
 	CmdlineHelper.insert_options_entry((char*)"cmpimg" ,optional_argument,EJSON_SMARTEYE_RPC_COMPARE_IMG);
 	CmdlineHelper.insert_help_entry((char*)"--cmpimg=imgpath1,imgpath2 [compares two images and returns result in %]");
+
+	CmdlineHelper.insert_options_entry((char*)"autoexposure" ,optional_argument,EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_GET);
+	CmdlineHelper.insert_help_entry((char*)"--autoexposure=type        [get/set auto-exposure, type=<enable/disable>]");
+	CmdlineHelper.insert_options_entry((char*)"exposure" ,optional_argument,EJSON_SMARTEYE_RPC_EXPOSURE_GET);
+	CmdlineHelper.insert_help_entry((char*)"--exposure=type            [get/set exposure-value<0 to 250, steps-1]");
+	CmdlineHelper.insert_options_entry((char*)"autofocus" ,optional_argument,EJSON_SMARTEYE_RPC_AUTO_FOCUS_GET);
+	CmdlineHelper.insert_help_entry((char*)"--autofocus=type           [get/set auto-focus, type=<enable/disable>]");
+	CmdlineHelper.insert_options_entry((char*)"focus" ,optional_argument,EJSON_SMARTEYE_RPC_FOCUS_GET);
+	CmdlineHelper.insert_help_entry((char*)"--focus=type               [get/set vocus-value<0 to 250, steps-5]");
+
 }
 /*****************************************************************************/
 SmarteyeCltCmdline::~SmarteyeCltCmdline()
@@ -78,6 +88,38 @@ int SmarteyeCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			push_compare_img_command(sub_arg,(char*)SMARTEYE_RPC_COMPARE_IMG,EJSON_SMARTEYE_RPC_COMPARE_IMG,
 						     (char*)SMARTEYE_RPC_COMPARE_IMG_ARGIMG1,(char*)SMARTEYE_RPC_COMPARE_IMG_ARGIMG2,
 						     (char*)SMARTEYE_RPC_COMPARE_IMG_ARGDIFF);
+			break;
+		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_GET:
+		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_SET:
+			{
+			const char *table[]   = SMARTEYE_RPC_AUTO_EXPOSURE_ARG_TABL;
+			CmdlineHelper.push_single_enum_get_set_command( EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_GET,
+			EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_SET,SMARTEYE_RPC_AUTO_EXPOSURE_GET,
+			SMARTEYE_RPC_AUTO_EXPOSURE_SET,&table[0],SMARTEYE_AUTO_EXPOSURE_UNKNOWN,
+			(char*)SMARTEYE_RPC_AUTO_EXPOSURE_ARG,sub_arg);
+			}
+			break;
+		case EJSON_SMARTEYE_RPC_EXPOSURE_GET:
+		case EJSON_SMARTEYE_RPC_EXPOSURE_SET:
+			CmdlineHelper.push_single_int_get_set_command(EJSON_SMARTEYE_RPC_EXPOSURE_GET,EJSON_SMARTEYE_RPC_EXPOSURE_SET,
+					SMARTEYE_RPC_EXPOSURE_GET,SMARTEYE_RPC_EXPOSURE_SET,
+					(char*)SMARTEYE_RPC_EXPOSURE_ARG,sub_arg,1);
+			break;
+		case EJSON_SMARTEYE_RPC_AUTO_FOCUS_GET:
+		case EJSON_SMARTEYE_RPC_AUTO_FOCUS_SET:
+			{
+			const char *table[]   = SMARTEYE_RPC_AUTO_FOCUS_ARG_TABL;
+			CmdlineHelper.push_single_enum_get_set_command( EJSON_SMARTEYE_RPC_AUTO_FOCUS_GET,
+			EJSON_SMARTEYE_RPC_AUTO_FOCUS_SET,SMARTEYE_RPC_AUTO_FOCUS_GET,
+			SMARTEYE_RPC_AUTO_FOCUS_SET,&table[0],SMARTEYE_AUTO_FOCUS_UNKNOWN,
+			(char*)SMARTEYE_RPC_AUTO_FOCUS_ARG,sub_arg);
+			}
+			break;
+		case EJSON_SMARTEYE_RPC_FOCUS_GET:
+		case EJSON_SMARTEYE_RPC_FOCUS_SET:
+			CmdlineHelper.push_single_int_get_set_command(EJSON_SMARTEYE_RPC_FOCUS_GET,EJSON_SMARTEYE_RPC_FOCUS_SET,
+					SMARTEYE_RPC_FOCUS_GET,SMARTEYE_RPC_FOCUS_SET,
+					(char*)SMARTEYE_RPC_FOCUS_ARG,sub_arg,1);
 			break;
 		default:
 			return 0;

@@ -47,6 +47,15 @@ int main(int argc, const char* argv[])
 	SmarteyeRpc QrStringScan(SMARTEYE_RPC_SCAN_QRSTRING ,EJSON_SMARTEYE_RPC_SCAN_QRSTRING,emulat,dbglog,&DataCache);
 	SmarteyeRpc CompareImages(SMARTEYE_RPC_COMPARE_IMG ,EJSON_SMARTEYE_RPC_COMPARE_IMG,emulat,dbglog,&DataCache);
 
+	SmarteyeRpc AutoExposureGet(SMARTEYE_RPC_AUTO_EXPOSURE_GET ,EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_GET,emulat,dbglog,&DataCache);
+	SmarteyeRpc AutoExposureSet(SMARTEYE_RPC_AUTO_EXPOSURE_SET ,EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_SET,emulat,dbglog,&DataCache);
+	SmarteyeRpc ExposureGet    (SMARTEYE_RPC_EXPOSURE_GET ,EJSON_SMARTEYE_RPC_EXPOSURE_GET,emulat,dbglog,&DataCache);
+	SmarteyeRpc ExposureSet    (SMARTEYE_RPC_EXPOSURE_SET ,EJSON_SMARTEYE_RPC_EXPOSURE_SET,emulat,dbglog,&DataCache);
+	SmarteyeRpc AutoFocusGet(SMARTEYE_RPC_AUTO_FOCUS_GET ,EJSON_SMARTEYE_RPC_AUTO_FOCUS_GET,emulat,dbglog,&DataCache);
+	SmarteyeRpc AutoFocusSet(SMARTEYE_RPC_AUTO_FOCUS_SET ,EJSON_SMARTEYE_RPC_AUTO_FOCUS_SET,emulat,dbglog,&DataCache);
+	SmarteyeRpc FocusGet    (SMARTEYE_RPC_FOCUS_GET ,EJSON_SMARTEYE_RPC_FOCUS_GET,emulat,dbglog,&DataCache);
+	SmarteyeRpc FocusSet    (SMARTEYE_RPC_FOCUS_SET ,EJSON_SMARTEYE_RPC_FOCUS_SET,emulat,dbglog,&DataCache);
+
 	RpcMgr.AttachRpc(&PatternGet);
 	RpcMgr.AttachRpc(&DbgFileGet);
 	RpcMgr.AttachRpc(&DbgFileSet);
@@ -58,6 +67,15 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&ChkWallBaseFileSet);
 	RpcMgr.AttachRpc(&QrStringScan);
 	RpcMgr.AttachRpc(&CompareImages);
+
+	RpcMgr.AttachRpc(&AutoExposureGet);
+	RpcMgr.AttachRpc(&AutoExposureSet);
+	RpcMgr.AttachRpc(&ExposureGet);
+	RpcMgr.AttachRpc(&ExposureSet);
+	RpcMgr.AttachRpc(&AutoFocusGet);
+	RpcMgr.AttachRpc(&AutoFocusSet);
+	RpcMgr.AttachRpc(&FocusGet);
+	RpcMgr.AttachRpc(&FocusSet);
 
 
 	//start listening for rpc-commands

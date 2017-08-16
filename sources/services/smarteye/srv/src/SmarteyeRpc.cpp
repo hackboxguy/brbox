@@ -26,6 +26,10 @@ int SmarteyeRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET:return json_to_bin_set_checkwallbase_file(pReq);
 		case EJSON_SMARTEYE_RPC_SCAN_QRSTRING          :return json_to_bin_scan_qrstring(pReq);
 		case EJSON_SMARTEYE_RPC_COMPARE_IMG            :return json_to_bin_compare_img(pReq);
+		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_GET      :
+		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_SET      :
+		case EJSON_SMARTEYE_RPC_EXPOSURE_GET           :
+		case EJSON_SMARTEYE_RPC_EXPOSURE_SET           :
 		default:break;
 	}
 	return -1;//0;
@@ -47,6 +51,10 @@ int SmarteyeRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET:return bin_to_json_set_checkwallbase_file(pReq);
 		case EJSON_SMARTEYE_RPC_SCAN_QRSTRING          :return bin_to_json_scan_qrstring(pReq);
 		case EJSON_SMARTEYE_RPC_COMPARE_IMG            :return bin_to_json_compare_img(pReq);
+		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_GET      :
+		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_SET      :
+		case EJSON_SMARTEYE_RPC_EXPOSURE_GET           :
+		case EJSON_SMARTEYE_RPC_EXPOSURE_SET           :
 		default:break;
 	}
 	return -1;
@@ -68,6 +76,10 @@ int SmarteyeRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProduce
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET:return process_set_checkwallbase_file(pReq);
 		case EJSON_SMARTEYE_RPC_SCAN_QRSTRING          :return process_scan_qrstring(pReq);
 		case EJSON_SMARTEYE_RPC_COMPARE_IMG            :return process_compare_img(pReq);
+		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_GET      :
+		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_SET      :
+		case EJSON_SMARTEYE_RPC_EXPOSURE_GET           :
+		case EJSON_SMARTEYE_RPC_EXPOSURE_SET           :
 		default:break;
 	}
 	return 0;
