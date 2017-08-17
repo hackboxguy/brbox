@@ -418,8 +418,9 @@ int SmarteyeRpc::process_auto_exposure_get(JsonDataCommObj* pReq)
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	SMARTEYE_EXPOSURE_PACKET* pPacket;
 	pPacket=(SMARTEYE_EXPOSURE_PACKET*)pPanelReq->dataRef;
-	pPacket->AutoExposure=pDataCache->AutoExposure;//TODO: do v4l2-ctl call
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	//pPacket->AutoExposure=pDataCache->AutoExposure;//TODO: do v4l2-ctl call
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	pPanelReq->result=get_auto_exposure(pPacket->AutoExposure);
 	return 0;
 }
 int SmarteyeRpc::json_to_bin_auto_exposure_set(JsonDataCommObj* pReq)
@@ -440,14 +441,16 @@ int SmarteyeRpc::process_auto_exposure_set(JsonDataCommObj* pReq)
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	SMARTEYE_EXPOSURE_PACKET* pPacket;
 	pPacket=(SMARTEYE_EXPOSURE_PACKET*)pPanelReq->dataRef;
-	pDataCache->AutoExposure=pPacket->AutoExposure;
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;//process_show_pattern(pDataCache->pattern);//TODO: do v4l2-ctl call
+	//pDataCache->AutoExposure=pPacket->AutoExposure;
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;//process_show_pattern(pDataCache->pattern);//TODO: do v4l2-ctl call
+	pPanelReq->result=set_auto_exposure(pPacket->AutoExposure);
 	return 0;		
 }
 RPC_SRV_RESULT SmarteyeRpc::get_auto_exposure(SMARTEYE_AUTO_EXPOSURE_TYPE &exposure)
 {
-	/*char command[1024];
-	sprintf(command,"v4l2-ctl --get-ctrl=exposure_absolute | awk '{print $2}' > %s","/tmp/temp-v4l2-result.txt");
+	//v4l2-ctl --set-ctrl=exposure_auto
+	char command[1024];
+	sprintf(command,"v4l2-ctl --get-ctrl=exposure_auto | awk '{print $2}' > %s","/tmp/temp-v4l2-result.txt");
 	if(system(command)!=0)
 		return RPC_SRV_RESULT_FILE_OPEN_ERR;
 	char temp_str[255];
@@ -464,23 +467,36 @@ RPC_SRV_RESULT SmarteyeRpc::get_auto_exposure(SMARTEYE_AUTO_EXPOSURE_TYPE &expos
 			command[strlen(command)-1]='\0';
 		if(strlen(command)>=1)
 		{
-			*exposure=atoi(command);
+			int exp=atoi(command);
+			if(exp=3)
+				exposure=SMARTEYE_AUTO_EXPOSURE_ENABLE;
+			else if(exp=1)
+				exposure=SMARTEYE_AUTO_EXPOSURE_DISABLE;
+			else
+				exposure=SMARTEYE_AUTO_EXPOSURE_UNKNOWN;
 			return RPC_SRV_RESULT_SUCCESS;
 		}
 		else
 			return RPC_SRV_RESULT_FAIL;
 	}
-	else*/
+	else
 		return RPC_SRV_RESULT_FILE_READ_ERR;	
 }
 RPC_SRV_RESULT SmarteyeRpc::set_auto_exposure(SMARTEYE_AUTO_EXPOSURE_TYPE exposure)
 {
-	//v4l2-ctl --set-ctrl=exposure_absolute=200
-	/*char command[512];
-	sprintf(command,"v4l2-ctl --set-ctrl=exposure_absolute=%d>/dev/null",exposure);
+	//v4l2-ctl --set-ctrl=exposure_auto=3 //enable
+	//v4l2-ctl --set-ctrl=exposure_auto=1 //disable
+	char command[512];
+	if(exposure==SMARTEYE_AUTO_EXPOSURE_DISABLE)
+		sprintf(command,"v4l2-ctl --set-ctrl=exposure_auto=1>/dev/null");
+	else if(exposure==SMARTEYE_AUTO_EXPOSURE_ENABLE)
+		sprintf(command,"v4l2-ctl --set-ctrl=exposure_auto=3>/dev/null");
+	else
+		return RPC_SRV_RESULT_ARG_ERROR;
+
 	if (system(command)==0)
 		return RPC_SRV_RESULT_SUCCESS;
-	else*/
+	else
 		return RPC_SRV_RESULT_FAIL;
 }
 /* ------------------------------------------------------------------------- */
@@ -595,8 +611,9 @@ int SmarteyeRpc::process_auto_focus_get(JsonDataCommObj* pReq)
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	SMARTEYE_FOCUS_PACKET* pPacket;
 	pPacket=(SMARTEYE_FOCUS_PACKET*)pPanelReq->dataRef;
-	pPacket->AutoFocus=pDataCache->AutoFocus;//TODO: do v4l2-ctl call
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	//pPacket->AutoFocus=pDataCache->AutoFocus;//TODO: do v4l2-ctl call
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	pPanelReq->result=get_auto_focus(pPacket->AutoFocus);
 	return 0;
 }
 int SmarteyeRpc::json_to_bin_auto_focus_set(JsonDataCommObj* pReq)
@@ -617,9 +634,63 @@ int SmarteyeRpc::process_auto_focus_set(JsonDataCommObj* pReq)
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	SMARTEYE_FOCUS_PACKET* pPacket;
 	pPacket=(SMARTEYE_FOCUS_PACKET*)pPanelReq->dataRef;
-	pDataCache->AutoFocus=pPacket->AutoFocus;
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;//process_show_pattern(pDataCache->pattern);//TODO: do v4l2-ctl call
+	//pDataCache->AutoFocus=pPacket->AutoFocus;
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;//process_show_pattern(pDataCache->pattern);//TODO: do v4l2-ctl call
+	pPanelReq->result=set_auto_focus(pPacket->AutoFocus);
 	return 0;		
+}
+RPC_SRV_RESULT SmarteyeRpc::get_auto_focus(SMARTEYE_AUTO_FOCUS_TYPE &focus)
+{
+	//v4l2-ctl --set-ctrl=exposure_auto
+	char command[1024];
+	sprintf(command,"v4l2-ctl --get-ctrl=focus_auto | awk '{print $2}' > %s","/tmp/temp-v4l2-result.txt");
+	if(system(command)!=0)
+		return RPC_SRV_RESULT_FILE_OPEN_ERR;
+	char temp_str[255];
+	FILE *shell;
+	shell= fopen("/tmp/temp-v4l2-result.txt","r");
+	if(shell == NULL )
+		return RPC_SRV_RESULT_FILE_OPEN_ERR;
+	size_t read_bytes = fread(command,1,100,shell);
+	fclose(shell);
+	if(read_bytes>0)
+	{
+		command[read_bytes]='\0';
+		if(command[strlen(command)-1]=='\n')//remove the carriage return line
+			command[strlen(command)-1]='\0';
+		if(strlen(command)>=1)
+		{
+			int foc=atoi(command);
+			if(foc=1)
+				focus=SMARTEYE_AUTO_FOCUS_ENABLE;
+			else if(foc=0)
+				focus=SMARTEYE_AUTO_FOCUS_DISABLE;
+			else
+				focus=SMARTEYE_AUTO_FOCUS_UNKNOWN;
+			return RPC_SRV_RESULT_SUCCESS;
+		}
+		else
+			return RPC_SRV_RESULT_FAIL;
+	}
+	else
+		return RPC_SRV_RESULT_FILE_READ_ERR;	
+}
+RPC_SRV_RESULT SmarteyeRpc::set_auto_focus(SMARTEYE_AUTO_FOCUS_TYPE focus)
+{
+	//v4l2-ctl --set-ctrl=focus_auto=1 //enable
+	//v4l2-ctl --set-ctrl=focus_auto=0 //disable
+	char command[512];
+	if(focus==SMARTEYE_AUTO_FOCUS_DISABLE)
+		sprintf(command,"v4l2-ctl --set-ctrl=focus_auto=0>/dev/null");
+	else if(focus==SMARTEYE_AUTO_FOCUS_ENABLE)
+		sprintf(command,"v4l2-ctl --set-ctrl=focus_auto=1>/dev/null");
+	else
+		return RPC_SRV_RESULT_ARG_ERROR;
+
+	if (system(command)==0)
+		return RPC_SRV_RESULT_SUCCESS;
+	else
+		return RPC_SRV_RESULT_FAIL;
 }
 /* ------------------------------------------------------------------------- */
 int SmarteyeRpc::json_to_bin_get_focus(JsonDataCommObj* pReq)

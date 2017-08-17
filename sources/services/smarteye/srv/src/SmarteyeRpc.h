@@ -82,6 +82,8 @@ public:
 	int json_to_bin_auto_focus_set(JsonDataCommObj* pReq);
 	int bin_to_json_auto_focus_set(JsonDataCommObj* pReq);
 	int process_auto_focus_set(JsonDataCommObj* pReq);
+	RPC_SRV_RESULT get_auto_focus(SMARTEYE_AUTO_FOCUS_TYPE &focus);
+	RPC_SRV_RESULT set_auto_focus(SMARTEYE_AUTO_FOCUS_TYPE focus);
 
 	int json_to_bin_get_focus(JsonDataCommObj* pReq);
 	int bin_to_json_get_focus(JsonDataCommObj* pReq);
