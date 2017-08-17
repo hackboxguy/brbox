@@ -26,10 +26,14 @@ int SmarteyeRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET:return json_to_bin_set_checkwallbase_file(pReq);
 		case EJSON_SMARTEYE_RPC_SCAN_QRSTRING          :return json_to_bin_scan_qrstring(pReq);
 		case EJSON_SMARTEYE_RPC_COMPARE_IMG            :return json_to_bin_compare_img(pReq);
-		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_GET      :
-		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_SET      :
-		case EJSON_SMARTEYE_RPC_EXPOSURE_GET           :
-		case EJSON_SMARTEYE_RPC_EXPOSURE_SET           :
+		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_GET      :return json_to_bin_auto_exposure_get(pReq);
+		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_SET      :return json_to_bin_auto_exposure_set(pReq);
+		case EJSON_SMARTEYE_RPC_EXPOSURE_GET           :return json_to_bin_get_exposure(pReq);
+		case EJSON_SMARTEYE_RPC_EXPOSURE_SET           :return json_to_bin_set_exposure(pReq);
+		case EJSON_SMARTEYE_RPC_AUTO_FOCUS_GET         :return json_to_bin_auto_focus_get(pReq);
+		case EJSON_SMARTEYE_RPC_AUTO_FOCUS_SET         :return json_to_bin_auto_focus_set(pReq);
+		case EJSON_SMARTEYE_RPC_FOCUS_GET              :return json_to_bin_get_focus(pReq);
+		case EJSON_SMARTEYE_RPC_FOCUS_SET              :return json_to_bin_set_focus(pReq);;
 		default:break;
 	}
 	return -1;//0;
@@ -51,10 +55,14 @@ int SmarteyeRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET:return bin_to_json_set_checkwallbase_file(pReq);
 		case EJSON_SMARTEYE_RPC_SCAN_QRSTRING          :return bin_to_json_scan_qrstring(pReq);
 		case EJSON_SMARTEYE_RPC_COMPARE_IMG            :return bin_to_json_compare_img(pReq);
-		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_GET      :
-		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_SET      :
-		case EJSON_SMARTEYE_RPC_EXPOSURE_GET           :
-		case EJSON_SMARTEYE_RPC_EXPOSURE_SET           :
+		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_GET      :return bin_to_json_auto_exposure_get(pReq);
+		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_SET      :return bin_to_json_auto_exposure_set(pReq);
+		case EJSON_SMARTEYE_RPC_EXPOSURE_GET           :return bin_to_json_get_exposure(pReq);
+		case EJSON_SMARTEYE_RPC_EXPOSURE_SET           :return bin_to_json_set_exposure(pReq);
+		case EJSON_SMARTEYE_RPC_AUTO_FOCUS_GET         :return bin_to_json_auto_focus_get(pReq);
+		case EJSON_SMARTEYE_RPC_AUTO_FOCUS_SET         :return bin_to_json_auto_focus_set(pReq);
+		case EJSON_SMARTEYE_RPC_FOCUS_GET              :return bin_to_json_get_focus(pReq);
+		case EJSON_SMARTEYE_RPC_FOCUS_SET              :return bin_to_json_set_focus(pReq);
 		default:break;
 	}
 	return -1;
@@ -76,10 +84,14 @@ int SmarteyeRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProduce
 		case EJSON_SMARTEYE_RPC_CHECKWALL_BASE_FILE_SET:return process_set_checkwallbase_file(pReq);
 		case EJSON_SMARTEYE_RPC_SCAN_QRSTRING          :return process_scan_qrstring(pReq);
 		case EJSON_SMARTEYE_RPC_COMPARE_IMG            :return process_compare_img(pReq);
-		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_GET      :
-		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_SET      :
-		case EJSON_SMARTEYE_RPC_EXPOSURE_GET           :
-		case EJSON_SMARTEYE_RPC_EXPOSURE_SET           :
+		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_GET      :return process_auto_exposure_get(pReq);
+		case EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_SET      :return process_auto_exposure_set(pReq);
+		case EJSON_SMARTEYE_RPC_EXPOSURE_GET           :return process_get_exposure(pReq);
+		case EJSON_SMARTEYE_RPC_EXPOSURE_SET           :return process_set_exposure(pReq);
+		case EJSON_SMARTEYE_RPC_AUTO_FOCUS_GET         :return process_auto_focus_get(pReq);
+		case EJSON_SMARTEYE_RPC_AUTO_FOCUS_SET         :return process_auto_focus_set(pReq);
+		case EJSON_SMARTEYE_RPC_FOCUS_GET              :return process_get_focus(pReq);
+		case EJSON_SMARTEYE_RPC_FOCUS_SET              :return process_set_focus(pReq);
 		default:break;
 	}
 	return 0;
@@ -389,7 +401,323 @@ int SmarteyeRpc::process_compare_img(JsonDataCommObj* pReq)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
+int SmarteyeRpc::json_to_bin_auto_exposure_get(JsonDataCommObj* pReq)
+{
+	SMARTEYE_EXPOSURE_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SMARTEYE_EXPOSURE_PACKET,RPC_SRV_ACT_READ,EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_GET);
+	return 0;
+}
+int SmarteyeRpc::bin_to_json_auto_exposure_get(JsonDataCommObj* pReq)
+{
+PREPARE_JSON_RESP_ENUM(RPC_SRV_REQ,SMARTEYE_EXPOSURE_PACKET,SMARTEYE_RPC_AUTO_EXPOSURE_ARG,AutoExposure,SMARTEYE_RPC_AUTO_EXPOSURE_ARG_TABL,SMARTEYE_AUTO_EXPOSURE_UNKNOWN);
+	return 0;
+}
+int SmarteyeRpc::process_auto_exposure_get(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SMARTEYE_EXPOSURE_PACKET* pPacket;
+	pPacket=(SMARTEYE_EXPOSURE_PACKET*)pPanelReq->dataRef;
+	pPacket->AutoExposure=pDataCache->AutoExposure;//TODO: do v4l2-ctl call
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+int SmarteyeRpc::json_to_bin_auto_exposure_set(JsonDataCommObj* pReq)
+{
+	SMARTEYE_EXPOSURE_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SMARTEYE_EXPOSURE_PACKET,RPC_SRV_ACT_WRITE,EJSON_SMARTEYE_RPC_AUTO_EXPOSURE_SET);
+	JSON_STRING_TO_ENUM(SMARTEYE_RPC_AUTO_EXPOSURE_ARG,SMARTEYE_RPC_AUTO_EXPOSURE_ARG_TABL,SMARTEYE_AUTO_EXPOSURE_TYPE,SMARTEYE_AUTO_EXPOSURE_UNKNOWN,pPanelCmdObj->AutoExposure);
+	return 0;
+}
+int SmarteyeRpc::bin_to_json_auto_exposure_set(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,SMARTEYE_EXPOSURE_PACKET);
+	return 0;
+}
+int SmarteyeRpc::process_auto_exposure_set(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SMARTEYE_EXPOSURE_PACKET* pPacket;
+	pPacket=(SMARTEYE_EXPOSURE_PACKET*)pPanelReq->dataRef;
+	pDataCache->AutoExposure=pPacket->AutoExposure;
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;//process_show_pattern(pDataCache->pattern);//TODO: do v4l2-ctl call
+	return 0;		
+}
+RPC_SRV_RESULT SmarteyeRpc::get_auto_exposure(SMARTEYE_AUTO_EXPOSURE_TYPE &exposure)
+{
+	/*char command[1024];
+	sprintf(command,"v4l2-ctl --get-ctrl=exposure_absolute | awk '{print $2}' > %s","/tmp/temp-v4l2-result.txt");
+	if(system(command)!=0)
+		return RPC_SRV_RESULT_FILE_OPEN_ERR;
+	char temp_str[255];
+	FILE *shell;
+	shell= fopen("/tmp/temp-v4l2-result.txt","r");
+	if(shell == NULL )
+		return RPC_SRV_RESULT_FILE_OPEN_ERR;
+	size_t read_bytes = fread(command,1,100,shell);
+	fclose(shell);
+	if(read_bytes>0)
+	{
+		command[read_bytes]='\0';
+		if(command[strlen(command)-1]=='\n')//remove the carriage return line
+			command[strlen(command)-1]='\0';
+		if(strlen(command)>=1)
+		{
+			*exposure=atoi(command);
+			return RPC_SRV_RESULT_SUCCESS;
+		}
+		else
+			return RPC_SRV_RESULT_FAIL;
+	}
+	else*/
+		return RPC_SRV_RESULT_FILE_READ_ERR;	
+}
+RPC_SRV_RESULT SmarteyeRpc::set_auto_exposure(SMARTEYE_AUTO_EXPOSURE_TYPE exposure)
+{
+	//v4l2-ctl --set-ctrl=exposure_absolute=200
+	/*char command[512];
+	sprintf(command,"v4l2-ctl --set-ctrl=exposure_absolute=%d>/dev/null",exposure);
+	if (system(command)==0)
+		return RPC_SRV_RESULT_SUCCESS;
+	else*/
+		return RPC_SRV_RESULT_FAIL;
+}
+/* ------------------------------------------------------------------------- */
+int SmarteyeRpc::json_to_bin_get_exposure(JsonDataCommObj* pReq)
+{
+	SMARTEYE_EXPOSURE_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SMARTEYE_EXPOSURE_PACKET,RPC_SRV_ACT_READ,EJSON_SMARTEYE_RPC_EXPOSURE_GET);
+	return 0;
+}
+int SmarteyeRpc::bin_to_json_get_exposure(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+        SMARTEYE_EXPOSURE_PACKET* pPanelCmdObj;
+        pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+        pPanelCmdObj=(SMARTEYE_EXPOSURE_PACKET*)pPanelReq->dataRef;
+        if(pPanelReq->result!=RPC_SRV_RESULT_SUCCESS)
+              prepare_result_string(pPanelReq->result,pReq);
+	else
+	      prepare_result_string(pPanelReq->result,pReq,(char*)SMARTEYE_RPC_EXPOSURE_ARG,pPanelCmdObj->Exposure);
+	OBJ_MEM_DELETE(pPanelCmdObj);
+	return 0;
+}
+int SmarteyeRpc::process_get_exposure(JsonDataCommObj* pReq)//,LIGHTSENSE_CMN_DATA_CACHE *pData)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SMARTEYE_EXPOSURE_PACKET* pPacket;
+	pPacket=(SMARTEYE_EXPOSURE_PACKET*)pPanelReq->dataRef;
+	//pPacket->Exposure=pDataCache->Exposure;//TODO: do v4l2-ctl call
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	pPanelReq->result=get_exposure(&pPacket->Exposure);
+	return 0;
+}
+int SmarteyeRpc::json_to_bin_set_exposure(JsonDataCommObj* pReq)
+{
+	SMARTEYE_EXPOSURE_PACKET* pPanelCmdObj=NULL;
+        PREPARE_JSON_REQUEST(RPC_SRV_REQ,SMARTEYE_EXPOSURE_PACKET,RPC_SRV_ACT_WRITE,EJSON_SMARTEYE_RPC_EXPOSURE_SET);
+	JSON_STRING_TO_INT(SMARTEYE_RPC_EXPOSURE_ARG,pPanelCmdObj->Exposure);
+	return 0;
+}
+int SmarteyeRpc::bin_to_json_set_exposure(JsonDataCommObj* pReq)
+{
+        PREPARE_JSON_RESP(RPC_SRV_REQ,SMARTEYE_EXPOSURE_PACKET);
+	return 0;
+}
+int SmarteyeRpc:: process_set_exposure(JsonDataCommObj* pReq)//,LIGHTSENSE_CMN_DATA_CACHE *pData)
+{
+	//LightSensor *pSensr=pData->pSensor;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SMARTEYE_EXPOSURE_PACKET* pPacket;
+	pPacket=(SMARTEYE_EXPOSURE_PACKET*)pPanelReq->dataRef;
+	//pDataCache->Exposure=pPacket->Exposure;//TODO: do v4l2-ctl call
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	pPanelReq->result=set_exposure(pPacket->Exposure);
+	return 0;
+}
+RPC_SRV_RESULT SmarteyeRpc::get_exposure(int* exposure)
+{
+	char command[1024];
+	sprintf(command,"v4l2-ctl --get-ctrl=exposure_absolute | awk '{print $2}' > %s","/tmp/temp-v4l2-result.txt");
+	if(system(command)!=0)
+		return RPC_SRV_RESULT_FILE_OPEN_ERR;
+	char temp_str[255];
+	FILE *shell;
+	shell= fopen("/tmp/temp-v4l2-result.txt","r");
+	if(shell == NULL )
+		return RPC_SRV_RESULT_FILE_OPEN_ERR;
+	size_t read_bytes = fread(command,1,100,shell);
+	fclose(shell);
+	if(read_bytes>0)
+	{
+		command[read_bytes]='\0';
+		if(command[strlen(command)-1]=='\n')//remove the carriage return line
+			command[strlen(command)-1]='\0';
+		if(strlen(command)>=1)
+		{
+			*exposure=atoi(command);
+			return RPC_SRV_RESULT_SUCCESS;
+		}
+		else
+			return RPC_SRV_RESULT_FAIL;
+	}
+	else
+		return RPC_SRV_RESULT_FILE_READ_ERR;	
+}
+RPC_SRV_RESULT SmarteyeRpc::set_exposure(int exposure)
+{
+	//v4l2-ctl --set-ctrl=exposure_absolute=200
+	char command[512];
+	sprintf(command,"v4l2-ctl --set-ctrl=exposure_absolute=%d>/dev/null",exposure);
+	if (system(command)==0)
+		return RPC_SRV_RESULT_SUCCESS;
+	else
+		return RPC_SRV_RESULT_FAIL;
+}
+/* ------------------------------------------------------------------------- */
+int SmarteyeRpc::json_to_bin_auto_focus_get(JsonDataCommObj* pReq)
+{
+	SMARTEYE_FOCUS_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SMARTEYE_FOCUS_PACKET,RPC_SRV_ACT_READ,EJSON_SMARTEYE_RPC_AUTO_FOCUS_GET);
+	return 0;
+}
+int SmarteyeRpc::bin_to_json_auto_focus_get(JsonDataCommObj* pReq)
+{
+PREPARE_JSON_RESP_ENUM(RPC_SRV_REQ,SMARTEYE_FOCUS_PACKET,SMARTEYE_RPC_AUTO_FOCUS_ARG,AutoFocus,SMARTEYE_RPC_AUTO_FOCUS_ARG_TABL,SMARTEYE_AUTO_FOCUS_UNKNOWN);
+	return 0;
+}
+int SmarteyeRpc::process_auto_focus_get(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SMARTEYE_FOCUS_PACKET* pPacket;
+	pPacket=(SMARTEYE_FOCUS_PACKET*)pPanelReq->dataRef;
+	pPacket->AutoFocus=pDataCache->AutoFocus;//TODO: do v4l2-ctl call
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+int SmarteyeRpc::json_to_bin_auto_focus_set(JsonDataCommObj* pReq)
+{
+	SMARTEYE_FOCUS_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SMARTEYE_FOCUS_PACKET,RPC_SRV_ACT_WRITE,EJSON_SMARTEYE_RPC_AUTO_FOCUS_SET);
+	JSON_STRING_TO_ENUM(SMARTEYE_RPC_AUTO_FOCUS_ARG,SMARTEYE_RPC_AUTO_FOCUS_ARG_TABL,SMARTEYE_AUTO_FOCUS_TYPE,SMARTEYE_AUTO_FOCUS_UNKNOWN,pPanelCmdObj->AutoFocus);
+	return 0;
+}
+int SmarteyeRpc::bin_to_json_auto_focus_set(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,SMARTEYE_FOCUS_PACKET);
+	return 0;
+}
+int SmarteyeRpc::process_auto_focus_set(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SMARTEYE_FOCUS_PACKET* pPacket;
+	pPacket=(SMARTEYE_FOCUS_PACKET*)pPanelReq->dataRef;
+	pDataCache->AutoFocus=pPacket->AutoFocus;
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;//process_show_pattern(pDataCache->pattern);//TODO: do v4l2-ctl call
+	return 0;		
+}
+/* ------------------------------------------------------------------------- */
+int SmarteyeRpc::json_to_bin_get_focus(JsonDataCommObj* pReq)
+{
+	SMARTEYE_EXPOSURE_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SMARTEYE_EXPOSURE_PACKET,RPC_SRV_ACT_READ,EJSON_SMARTEYE_RPC_EXPOSURE_GET);
+	return 0;
+}
+int SmarteyeRpc::bin_to_json_get_focus(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+        SMARTEYE_FOCUS_PACKET* pPanelCmdObj;
+        pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+        pPanelCmdObj=(SMARTEYE_FOCUS_PACKET*)pPanelReq->dataRef;
+        if(pPanelReq->result!=RPC_SRV_RESULT_SUCCESS)
+              prepare_result_string(pPanelReq->result,pReq);
+	else
+	      prepare_result_string(pPanelReq->result,pReq,(char*)SMARTEYE_RPC_FOCUS_ARG,pPanelCmdObj->Focus);
+	OBJ_MEM_DELETE(pPanelCmdObj);
+	return 0;
+}
+int SmarteyeRpc::process_get_focus(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SMARTEYE_FOCUS_PACKET* pPacket;
+	pPacket=(SMARTEYE_FOCUS_PACKET*)pPanelReq->dataRef;
+	//pPacket->Focus=pDataCache->Focus;//TODO: do v4l2-ctl call
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	pPanelReq->result=get_focus(&pPacket->Focus);
+	return 0;
+}
+int SmarteyeRpc::json_to_bin_set_focus(JsonDataCommObj* pReq)
+{
+	SMARTEYE_FOCUS_PACKET* pPanelCmdObj=NULL;
+        PREPARE_JSON_REQUEST(RPC_SRV_REQ,SMARTEYE_FOCUS_PACKET,RPC_SRV_ACT_WRITE,EJSON_SMARTEYE_RPC_FOCUS_SET);
+	JSON_STRING_TO_INT(SMARTEYE_RPC_FOCUS_ARG,pPanelCmdObj->Focus);
+	return 0;
+}
+int SmarteyeRpc::bin_to_json_set_focus(JsonDataCommObj* pReq)
+{
+        PREPARE_JSON_RESP(RPC_SRV_REQ,SMARTEYE_FOCUS_PACKET);
+	return 0;
+}
+int SmarteyeRpc:: process_set_focus(JsonDataCommObj* pReq)
+{
+	//LightSensor *pSensr=pData->pSensor;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	SMARTEYE_FOCUS_PACKET* pPacket;
+	pPacket=(SMARTEYE_FOCUS_PACKET*)pPanelReq->dataRef;
+	//pDataCache->Focus=pPacket->Focus;//TODO: do v4l2-ctl call
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	pPanelReq->result=set_focus(pPacket->Focus);
+	return 0;
+}
+RPC_SRV_RESULT SmarteyeRpc::get_focus(int* focus)
+{
+	//v4l2-ctl --get-ctrl=focus_absolute
+	char command[1024];
+	sprintf(command,"v4l2-ctl --get-ctrl=focus_absolute | awk '{print $2}' > %s","/tmp/temp-v4l2-result.txt");
+	if(system(command)!=0)
+		return RPC_SRV_RESULT_FILE_OPEN_ERR;
+	char temp_str[255];
+	FILE *shell;
+	shell= fopen("/tmp/temp-v4l2-result.txt","r");
+	if(shell == NULL )
+		return RPC_SRV_RESULT_FILE_OPEN_ERR;
+	size_t read_bytes = fread(command,1,100,shell);
+	fclose(shell);
+	if(read_bytes>0)
+	{
+		command[read_bytes]='\0';
+		if(command[strlen(command)-1]=='\n')//remove the carriage return line
+			command[strlen(command)-1]='\0';
+		if(strlen(command)>=1)
+		{
+			*focus=atoi(command);
+			return RPC_SRV_RESULT_SUCCESS;
+		}
+		else
+			return RPC_SRV_RESULT_FAIL;
+	}
+	else
+		return RPC_SRV_RESULT_FILE_READ_ERR;	
+}
+RPC_SRV_RESULT SmarteyeRpc::set_focus(int focus)
+{
+	//v4l2-ctl --set-ctrl=exposure_absolute=200
+	char command[512];
+	sprintf(command,"v4l2-ctl --set-ctrl=focus_absolute=%d>/dev/null",focus);
+	if (system(command)==0)
+		return RPC_SRV_RESULT_SUCCESS;
+	else
+		return RPC_SRV_RESULT_FAIL;
+}
 
+/* ------------------------------------------------------------------------- */
 
 
 

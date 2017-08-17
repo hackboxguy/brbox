@@ -57,6 +57,40 @@ public:
 	int json_to_bin_compare_img(JsonDataCommObj* pReq);
 	int bin_to_json_compare_img(JsonDataCommObj* pReq);
 	int process_compare_img(JsonDataCommObj* pReq);
+
+	int json_to_bin_auto_exposure_get(JsonDataCommObj* pReq);
+	int bin_to_json_auto_exposure_get(JsonDataCommObj* pReq);
+	int process_auto_exposure_get(JsonDataCommObj* pReq);
+	int json_to_bin_auto_exposure_set(JsonDataCommObj* pReq);
+	int bin_to_json_auto_exposure_set(JsonDataCommObj* pReq);
+	int process_auto_exposure_set(JsonDataCommObj* pReq);
+	RPC_SRV_RESULT get_auto_exposure(SMARTEYE_AUTO_EXPOSURE_TYPE &exposure);
+	RPC_SRV_RESULT set_auto_exposure(SMARTEYE_AUTO_EXPOSURE_TYPE exposure);
+
+	int json_to_bin_get_exposure(JsonDataCommObj* pReq);
+	int bin_to_json_get_exposure(JsonDataCommObj* pReq);
+	int process_get_exposure(JsonDataCommObj* pReq);
+	int json_to_bin_set_exposure(JsonDataCommObj* pReq);
+	int bin_to_json_set_exposure(JsonDataCommObj* pReq);
+	int process_set_exposure(JsonDataCommObj* pReq);
+	RPC_SRV_RESULT get_exposure(int* exposure);
+	RPC_SRV_RESULT set_exposure(int exposure);
+
+	int json_to_bin_auto_focus_get(JsonDataCommObj* pReq);
+	int bin_to_json_auto_focus_get(JsonDataCommObj* pReq);
+	int process_auto_focus_get(JsonDataCommObj* pReq);
+	int json_to_bin_auto_focus_set(JsonDataCommObj* pReq);
+	int bin_to_json_auto_focus_set(JsonDataCommObj* pReq);
+	int process_auto_focus_set(JsonDataCommObj* pReq);
+
+	int json_to_bin_get_focus(JsonDataCommObj* pReq);
+	int bin_to_json_get_focus(JsonDataCommObj* pReq);
+	int process_get_focus(JsonDataCommObj* pReq);
+	int json_to_bin_set_focus(JsonDataCommObj* pReq);
+	int bin_to_json_set_focus(JsonDataCommObj* pReq);
+	int process_set_focus(JsonDataCommObj* pReq);
+	RPC_SRV_RESULT get_focus(int* focus);
+	RPC_SRV_RESULT set_focus(int focus);
 };
 /* ------------------------------------------------------------------------- */
 

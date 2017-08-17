@@ -123,7 +123,7 @@ typedef struct SMARTEYE_EXPOSURE_PACKET_T
 {
 	SMARTEYE_AUTO_EXPOSURE_TYPE AutoExposure;
 	int Exposure;
-}SMARTEYE_EXPOSURE_PACKET_T;
+}SMARTEYE_EXPOSURE_PACKET;
 /* ------------------------------------------------------------------------- */
 //EJSON_SMARTEYE_RPC_AUTO_FOCUS_GET,
 //EJSON_SMARTEYE_RPC_AUTO_FOCUS_SET,
@@ -147,7 +147,7 @@ typedef struct SMARTEYE_FOCUS_PACKET_T
 {
 	SMARTEYE_AUTO_FOCUS_TYPE AutoFocus;
 	int Focus;
-}SMARTEYE_FOCUS_PACKET_T;
+}SMARTEYE_FOCUS_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct SMARTEYE_CMN_DATA_CACHE_T
@@ -159,6 +159,10 @@ typedef struct SMARTEYE_CMN_DATA_CACHE_T
 	std::string StrImgIdCheckWallBaseFile;//pChar //Char //Int //pInt //Float //Enum
 	std::string StrQrFilePath,StrQrString;
 	std::string CmpImgFilePath1,CmpImgFilePath2,CmpImgResult;
+
+	SMARTEYE_AUTO_EXPOSURE_TYPE AutoExposure;
+	SMARTEYE_AUTO_FOCUS_TYPE AutoFocus;
+	int Exposure,Focus;
 
 	//initialize variables here
 	SMARTEYE_CMN_DATA_CACHE_T()

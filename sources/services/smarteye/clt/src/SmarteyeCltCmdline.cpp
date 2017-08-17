@@ -103,7 +103,7 @@ int SmarteyeCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 		case EJSON_SMARTEYE_RPC_EXPOSURE_SET:
 			CmdlineHelper.push_single_int_get_set_command(EJSON_SMARTEYE_RPC_EXPOSURE_GET,EJSON_SMARTEYE_RPC_EXPOSURE_SET,
 					SMARTEYE_RPC_EXPOSURE_GET,SMARTEYE_RPC_EXPOSURE_SET,
-					(char*)SMARTEYE_RPC_EXPOSURE_ARG,sub_arg,1);
+					(char*)SMARTEYE_RPC_EXPOSURE_ARG,sub_arg,0);
 			break;
 		case EJSON_SMARTEYE_RPC_AUTO_FOCUS_GET:
 		case EJSON_SMARTEYE_RPC_AUTO_FOCUS_SET:
@@ -119,7 +119,7 @@ int SmarteyeCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 		case EJSON_SMARTEYE_RPC_FOCUS_SET:
 			CmdlineHelper.push_single_int_get_set_command(EJSON_SMARTEYE_RPC_FOCUS_GET,EJSON_SMARTEYE_RPC_FOCUS_SET,
 					SMARTEYE_RPC_FOCUS_GET,SMARTEYE_RPC_FOCUS_SET,
-					(char*)SMARTEYE_RPC_FOCUS_ARG,sub_arg,1);
+					(char*)SMARTEYE_RPC_FOCUS_ARG,sub_arg,0);
 			break;
 		default:
 			return 0;
