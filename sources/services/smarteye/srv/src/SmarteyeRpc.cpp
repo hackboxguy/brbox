@@ -468,9 +468,9 @@ RPC_SRV_RESULT SmarteyeRpc::get_auto_exposure(SMARTEYE_AUTO_EXPOSURE_TYPE &expos
 		if(strlen(command)>=1)
 		{
 			int exp=atoi(command);
-			if(exp=3)
+			if(exp==3)
 				exposure=SMARTEYE_AUTO_EXPOSURE_ENABLE;
-			else if(exp=1)
+			else if(exp==1)
 				exposure=SMARTEYE_AUTO_EXPOSURE_DISABLE;
 			else
 				exposure=SMARTEYE_AUTO_EXPOSURE_UNKNOWN;
@@ -661,9 +661,9 @@ RPC_SRV_RESULT SmarteyeRpc::get_auto_focus(SMARTEYE_AUTO_FOCUS_TYPE &focus)
 		if(strlen(command)>=1)
 		{
 			int foc=atoi(command);
-			if(foc=1)
+			if(foc==1)
 				focus=SMARTEYE_AUTO_FOCUS_ENABLE;
-			else if(foc=0)
+			else if(foc==0)
 				focus=SMARTEYE_AUTO_FOCUS_DISABLE;
 			else
 				focus=SMARTEYE_AUTO_FOCUS_UNKNOWN;
