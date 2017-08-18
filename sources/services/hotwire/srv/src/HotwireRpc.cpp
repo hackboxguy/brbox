@@ -225,6 +225,18 @@ int GpioCtrlRpc::process_omxact_set(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* 
 //echo . > /tmp/cmd
 //echo -n p > /tmp/cmd (pause)
 //echo -n q > /tmp/cmd (quit)
+
+//raspi without xwindows
+//http://www.instructables.com/id/Raspberry-Pi-Wall-Display-Without-X-Windows/
+//framebuffer based slideshow
+//sudo fbi -a --noverbose -T 1 -t 10 image1.jpg image2.jpg image3.jpg
+
+//omxplayer -b --layer 2 -r -o both /tmp/1.h264
+//fbset -depth 8 && fbset -depth 16 (re-enables /dev/fb0 output)
+
+//omxplayer documentation:
+//https://www.raspberrypi.org/documentation/raspbian/applications/omxplayer.md
+
 RPC_SRV_RESULT GpioCtrlRpc::process_omx_action(GPIOCTL_OMXACT_TYPE act)
 {
 	char command[1024];

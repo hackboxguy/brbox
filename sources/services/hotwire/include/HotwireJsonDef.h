@@ -21,6 +21,13 @@ typedef enum EJSON_GPIOCTL_RPC_TYPES_T
 	EJSON_MPLAYSRV_RPC_PATTERN_GET,
 	EJSON_MPLAYSRV_RPC_PATTERN_SET, //frame buffer based pattern rendering
 
+	EJSON_MPLAYSRV_RPC_MEDIAFILE_GET,
+	EJSON_MPLAYSRV_RPC_MEDIAFILE_SET,
+	//EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_GET,
+	//EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_SET,
+	EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET, //start/stop/pause video
+	EJSON_MPLAYSRV_RPC_SCREENSTS_GET,   //read the status of video/graphics output
+
 	EJSON_GPIOCTL_RPC_END,
 	EJSON_GPIOCTL_RPC_NONE
 }EJSON_GPIOCTL_RPC_TYPES;
@@ -109,6 +116,64 @@ typedef struct MPLAYSRV_PATTERN_PACKET_T
 {
 	MPLAYSRV_PATTERN_TYPE PatType;
 }MPLAYSRV_PATTERN_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_GET,
+//EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_SET,
+#define MPLAYSRV_RPC_MEDIAFILE_TYPE_GET         "get_media_file_type"
+#define MPLAYSRV_RPC_MEDIAFILE_TYPE_SET         "set_media_file_type"
+#define MPLAYSRV_RPC_MEDIAFILE_TYPE_ARG         "filetype"
+#define MPLAYSRV_RPC_MEDIAFILE_TYPE_ARG_TABL    {"media","playlist","unknown","none","\0"}
+typedef enum MPLAYSRV_MEDIAFILE_TYPE_T
+{
+	MPLAYSRV_MEDIAFILE_TYPE_MEDIA,
+	MPLAYSRV_MEDIAFILE_TYPE_PLAYLIST,
+	MPLAYSRV_MEDIAFILE_TYPE_UNKNOWN,
+	MPLAYSRV_MEDIAFILE_TYPE_NONE
+}MPLAYSRV_MEDIAFILE_TYPE;
+
+//EJSON_MPLAYSRV_RPC_MEDIAFILE_GET,
+//EJSON_MPLAYSRV_RPC_MEDIAFILE_SET,
+#define MPLAYSRV_RPC_MEDIAFILE_GET         "get_media_file_path"
+#define MPLAYSRV_RPC_MEDIAFILE_SET         "set_media_file_path"
+#define MPLAYSRV_RPC_MEDIAFILE_ARG         "filepath"
+
+//EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET, //start/stop/pause video
+#define MPLAYSRV_RPC_MEDIA_ACTION_SET         "set_media_action"
+#define MPLAYSRV_RPC_MEDIA_ACTION_ARG         "action"
+#define MPLAYSRV_RPC_MEDIA_ACTION_ARG_TABL    {"start","pause","stop","unknown","none","\0"}
+typedef enum MPLAYSRV_MEDIA_ACTION_T
+{
+	MPLAYSRV_MEDIA_ACTION_START,
+	MPLAYSRV_MEDIA_ACTION_PAUSE,
+	MPLAYSRV_MEDIA_ACTION_STOP,
+	MPLAYSRV_MEDIA_ACTION_UNKNOWN,
+	MPLAYSRV_MEDIA_ACTION_NONE
+}MPLAYSRV_MEDIA_ACTION;
+
+//mplay/mpause/pattern/image/blank/off
+//EJSON_MPLAYSRV_RPC_SCREENSTS_GET,   //read the status of video/graphics output
+#define MPLAYSRV_RPC_SCREENSTS_GET         "get_screen_status"
+#define MPLAYSRV_RPC_SCREENSTS_ARG         "status"
+#define MPLAYSRV_RPC_SCREENSTS_ARG_TABL    {"mplay","mpause","pattern","image","blank","off","unknown","none","\0"}
+typedef enum MPLAYSRV_SCREENSTS_T
+{
+	MPLAYSRV_SCREENSTS_MPLAY,
+	MPLAYSRV_SCREENSTS_MPAUSE,
+	MPLAYSRV_SCREENSTS_PATTERN,
+	MPLAYSRV_SCREENSTS_IMAGE,
+	MPLAYSRV_SCREENSTS_BLANK,
+	MPLAYSRV_SCREENSTS_OFF,
+	MPLAYSRV_SCREENSTS_UNKNOWN,
+	MPLAYSRV_SCREENSTS_NONE
+}MPLAYSRV_SCREENSTS;
+
+typedef struct MPLAYSRV_MEDIA_PACKET_T
+{
+	MPLAYSRV_MEDIAFILE_TYPE MediaFileType;
+	char MediaFilePath[1023];
+	MPLAYSRV_MEDIA_ACTION MediaAction;
+	MPLAYSRV_SCREENSTS ScreenSts;
+}MPLAYSRV_MEDIA_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to mplaysrv-service here
 typedef struct GPIOCTL_CMN_DATA_CACHE_T

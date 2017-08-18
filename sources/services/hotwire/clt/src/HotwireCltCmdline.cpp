@@ -23,7 +23,13 @@ GpioCltCmdline::GpioCltCmdline()
 
 	CmdlineHelper.insert_options_entry((char*)"pattern" ,optional_argument,EJSON_MPLAYSRV_RPC_PATTERN_GET);
 	CmdlineHelper.insert_help_entry((char*)"--pattern=type             [get/set pattern, type=<red/green/blue/cyan/magenta/yellow/white/black>]");
-
+	//--moverlay=enable/disable (show/hide overlay file on media)
+	//--moverlayfile=/some/file.png (overlay file: ex.pngfile)
+	//--mfiletype=playlist/media (mfile is of type play-list.txt or mp3/mp4/h264 media binary)
+	//--mfile=/some/file.xyz
+	//--mloop=enable/disable
+	//--maction=play/pause/stop
+	//--screensts=mplay/mpause/pattern/image/blank/off
 }
 /*****************************************************************************/
 GpioCltCmdline::~GpioCltCmdline()
