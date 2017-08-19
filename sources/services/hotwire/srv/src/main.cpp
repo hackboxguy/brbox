@@ -47,6 +47,13 @@ int main(int argc, const char* argv[])
 	GpioCtrlRpc PatternGet(MPLAYSRV_RPC_PATTERN_GET ,EJSON_MPLAYSRV_RPC_PATTERN_GET ,emulat,dbglog,&DataCache);
 	GpioCtrlRpc PatternSet(MPLAYSRV_RPC_PATTERN_SET ,EJSON_MPLAYSRV_RPC_PATTERN_SET ,emulat,dbglog,&DataCache);
 
+	GpioCtrlRpc MFileTypeGet(MPLAYSRV_RPC_MEDIAFILE_TYPE_GET,EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_GET,emulat,dbglog,&DataCache);
+	GpioCtrlRpc MFileTypeSet(MPLAYSRV_RPC_MEDIAFILE_TYPE_SET,EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_SET,emulat,dbglog,&DataCache);
+	GpioCtrlRpc MFileGet(MPLAYSRV_RPC_MEDIAFILE_GET,EJSON_MPLAYSRV_RPC_MEDIAFILE_GET,emulat,dbglog,&DataCache);
+	GpioCtrlRpc MFileSet(MPLAYSRV_RPC_MEDIAFILE_SET,EJSON_MPLAYSRV_RPC_MEDIAFILE_SET,emulat,dbglog,&DataCache);
+	GpioCtrlRpc MActionSet(MPLAYSRV_RPC_MEDIA_ACTION_SET,EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET,emulat,dbglog,&DataCache);
+	GpioCtrlRpc ScreenStsGet(MPLAYSRV_RPC_SCREENSTS_GET,EJSON_MPLAYSRV_RPC_SCREENSTS_GET,emulat,dbglog,&DataCache);
+
 	RpcMgr.AttachRpc(&OmxActGet);
 	RpcMgr.AttachRpc(&OmxActSet);
 	RpcMgr.AttachRpc(&ShowImgGet);
@@ -54,7 +61,12 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&QrCodeImgSet);
 	RpcMgr.AttachRpc(&PatternGet);
 	RpcMgr.AttachRpc(&PatternSet);
-
+	RpcMgr.AttachRpc(&MFileTypeGet);
+	RpcMgr.AttachRpc(&MFileTypeSet);
+	RpcMgr.AttachRpc(&MFileGet);
+	RpcMgr.AttachRpc(&MFileSet);
+	RpcMgr.AttachRpc(&MActionSet);
+	RpcMgr.AttachRpc(&ScreenStsGet);
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr

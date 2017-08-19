@@ -23,6 +23,19 @@ GpioCltCmdline::GpioCltCmdline()
 
 	CmdlineHelper.insert_options_entry((char*)"pattern" ,optional_argument,EJSON_MPLAYSRV_RPC_PATTERN_GET);
 	CmdlineHelper.insert_help_entry((char*)"--pattern=type             [get/set pattern, type=<red/green/blue/cyan/magenta/yellow/white/black>]");
+
+	CmdlineHelper.insert_options_entry((char*)"mfiletype" ,optional_argument,EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_GET);
+	CmdlineHelper.insert_help_entry((char*)"--mfiletype=type           [get/set media file type, type=<playlist/media>]");
+
+	CmdlineHelper.insert_options_entry((char*)"mfile" ,optional_argument,EJSON_MPLAYSRV_RPC_MEDIAFILE_GET);
+	CmdlineHelper.insert_help_entry((char*)"--mfile=filepath           [get/set media file path]");
+
+	CmdlineHelper.insert_options_entry((char*)"maction" ,optional_argument,EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET);
+	CmdlineHelper.insert_help_entry((char*)"--maction=type             [set media play action, type=<start/pause/stop>]");
+
+	CmdlineHelper.insert_options_entry((char*)"screensts" ,optional_argument,EJSON_MPLAYSRV_RPC_SCREENSTS_GET);
+	CmdlineHelper.insert_help_entry((char*)"--screensts                [read current screen status<mplay/mpause/pattern/image/blank/off>]");
+
 	//--moverlay=enable/disable (show/hide overlay file on media)
 	//--moverlayfile=/some/file.png (overlay file: ex.pngfile)
 	//--mfiletype=playlist/media (mfile is of type play-list.txt or mp3/mp4/h264 media binary)
@@ -72,6 +85,39 @@ int GpioCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			EJSON_MPLAYSRV_RPC_PATTERN_SET,MPLAYSRV_RPC_PATTERN_GET,
 			MPLAYSRV_RPC_PATTERN_SET,&table[0],MPLAYSRV_PATTERN_UNKNOWN,
 			(char*)MPLAYSRV_RPC_PATTERN_ARG,sub_arg);
+			}
+			break;
+		case EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_GET:	
+		case EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_SET:
+			{
+			const char *table[]   = MPLAYSRV_RPC_MEDIAFILE_TYPE_ARG_TABL;
+			CmdlineHelper.push_single_enum_get_set_command( EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_GET,
+			EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_SET,MPLAYSRV_RPC_MEDIAFILE_TYPE_GET,
+			MPLAYSRV_RPC_MEDIAFILE_TYPE_SET,&table[0],MPLAYSRV_MEDIAFILE_TYPE_UNKNOWN,
+			(char*)MPLAYSRV_RPC_MEDIAFILE_TYPE_ARG,sub_arg);
+			}
+			break;
+		case EJSON_MPLAYSRV_RPC_MEDIAFILE_GET:
+		case EJSON_MPLAYSRV_RPC_MEDIAFILE_SET:
+			CmdlineHelper.push_string_get_set_command(EJSON_MPLAYSRV_RPC_MEDIAFILE_GET,EJSON_MPLAYSRV_RPC_MEDIAFILE_SET,
+			MPLAYSRV_RPC_MEDIAFILE_GET,MPLAYSRV_RPC_MEDIAFILE_SET,(char*)MPLAYSRV_RPC_MEDIAFILE_ARG,sub_arg);
+			break;
+		case EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET:
+			{
+			const char *table[]   = MPLAYSRV_RPC_MEDIA_ACTION_ARG_TABL;
+			CmdlineHelper.push_single_enum_get_set_command( EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET,
+			EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET,MPLAYSRV_RPC_MEDIA_ACTION_SET,
+			MPLAYSRV_RPC_MEDIA_ACTION_SET,&table[0],MPLAYSRV_MEDIA_ACTION_UNKNOWN,
+			(char*)MPLAYSRV_RPC_MEDIA_ACTION_ARG,sub_arg);
+			}
+			break;
+		case EJSON_MPLAYSRV_RPC_SCREENSTS_GET:
+			{
+			const char *table[]   = MPLAYSRV_RPC_SCREENSTS_ARG_TABL;
+			CmdlineHelper.push_single_enum_get_set_command( EJSON_MPLAYSRV_RPC_SCREENSTS_GET,
+			EJSON_MPLAYSRV_RPC_SCREENSTS_GET,MPLAYSRV_RPC_SCREENSTS_GET,
+			MPLAYSRV_RPC_SCREENSTS_GET,&table[0],MPLAYSRV_SCREENSTS_UNKNOWN,
+			(char*)MPLAYSRV_RPC_SCREENSTS_ARG,sub_arg);
 			}
 			break;
 		default:

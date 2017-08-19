@@ -27,6 +27,11 @@ int GpioCtrlRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_MPLAYSRV_RPC_QRCODEIMG_SET:return json_to_bin_qrcodeimg_set(pReq);
 		case EJSON_MPLAYSRV_RPC_PATTERN_GET:return json_to_bin_pattern_get(pReq);
 		case EJSON_MPLAYSRV_RPC_PATTERN_SET:return json_to_bin_pattern_set(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_GET:return json_to_bin_mediafile_type_get(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_SET:return json_to_bin_mediafile_type_set(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIAFILE_GET:return json_to_bin_mediafile_get(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIAFILE_SET:return json_to_bin_mediafile_set(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET:return json_to_bin_media_action_set(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -44,6 +49,11 @@ int GpioCtrlRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_MPLAYSRV_RPC_QRCODEIMG_SET:return bin_to_json_qrcodeimg_set(pReq);
 		case EJSON_MPLAYSRV_RPC_PATTERN_GET:return bin_to_json_pattern_get(pReq);
 		case EJSON_MPLAYSRV_RPC_PATTERN_SET:return bin_to_json_pattern_set(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_GET:return bin_to_json_mediafile_type_get(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_SET:return bin_to_json_mediafile_type_set(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIAFILE_GET:return bin_to_json_mediafile_get(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIAFILE_SET:return bin_to_json_mediafile_set(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET:return bin_to_json_media_action_set(pReq);
 		default:break;
 	}
 	return -1;
@@ -61,6 +71,11 @@ int GpioCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProduce
 		case EJSON_MPLAYSRV_RPC_QRCODEIMG_SET:return process_qrcodeimg_set(pReq);
 		case EJSON_MPLAYSRV_RPC_PATTERN_GET:return process_pattern_get(pReq);
 		case EJSON_MPLAYSRV_RPC_PATTERN_SET:return process_pattern_set(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_GET:return process_mediafile_type_get(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_SET:return process_mediafile_type_set(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIAFILE_GET:return process_mediafile_get(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIAFILE_SET:return process_mediafile_set(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET:return process_media_action_set(pReq);
 		default:break;
 	}
 	return 0;
@@ -519,6 +534,178 @@ RPC_SRV_RESULT GpioCtrlRpc::process_show_pattern(MPLAYSRV_PATTERN_TYPE pat)
 	sprintf(command,"fb-test -f 0 %s>/dev/null",pat_cmd);
 	system(command);
 	return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+int GpioCtrlRpc::json_to_bin_mediafile_type_get(JsonDataCommObj* pReq)
+{
+	MPLAYSRV_MEDIA_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,MPLAYSRV_MEDIA_PACKET,RPC_SRV_ACT_READ,EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_GET);
+	return 0;
+}
+int GpioCtrlRpc::bin_to_json_mediafile_type_get(JsonDataCommObj* pReq)
+{
+PREPARE_JSON_RESP_ENUM(RPC_SRV_REQ,MPLAYSRV_MEDIA_PACKET,MPLAYSRV_RPC_MEDIAFILE_TYPE_ARG,MediaFileType,MPLAYSRV_RPC_MEDIAFILE_TYPE_ARG_TABL,MPLAYSRV_MEDIAFILE_TYPE_UNKNOWN);
+	return 0;
+}
+int GpioCtrlRpc::process_mediafile_type_get(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	MPLAYSRV_MEDIA_PACKET* pPacket;
+	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
+	pPacket->MediaFileType=pDataCache->MediaFileType;//TODO
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+int GpioCtrlRpc::json_to_bin_mediafile_type_set(JsonDataCommObj* pReq)
+{
+	MPLAYSRV_MEDIA_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,MPLAYSRV_MEDIA_PACKET,RPC_SRV_ACT_WRITE,EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_SET);
+	JSON_STRING_TO_ENUM(MPLAYSRV_RPC_MEDIAFILE_TYPE_ARG,MPLAYSRV_RPC_MEDIAFILE_TYPE_ARG_TABL,MPLAYSRV_MEDIAFILE_TYPE,MPLAYSRV_MEDIAFILE_TYPE_UNKNOWN,pPanelCmdObj->MediaFileType);
+	return 0;
+}
+int GpioCtrlRpc::bin_to_json_mediafile_type_set(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,MPLAYSRV_MEDIA_PACKET);
+	return 0;
+}
+int GpioCtrlRpc::process_mediafile_type_set(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	MPLAYSRV_MEDIA_PACKET* pPacket;
+	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
+	pDataCache->MediaFileType=pPacket->MediaFileType;//TODO
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int GpioCtrlRpc::json_to_bin_mediafile_get(JsonDataCommObj* pReq)
+{
+	MPLAYSRV_MEDIA_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,MPLAYSRV_MEDIA_PACKET,RPC_SRV_ACT_READ,EJSON_MPLAYSRV_RPC_MEDIAFILE_GET);
+	return 0;
+}
+int GpioCtrlRpc::bin_to_json_mediafile_get(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_STRING(RPC_SRV_REQ,MPLAYSRV_MEDIA_PACKET,MPLAYSRV_RPC_MEDIAFILE_ARG,MediaFilePath);
+	return 0;
+}
+int GpioCtrlRpc::process_mediafile_get(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	MPLAYSRV_MEDIA_PACKET* pPacket;
+	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
+	if(pPanelReq->action!=RPC_SRV_ACT_READ)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+		return 0;
+	}
+	strcpy(pPacket->MediaFilePath,pDataCache->MediaFilePath.c_str());
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+int GpioCtrlRpc::json_to_bin_mediafile_set(JsonDataCommObj* pReq)
+{
+	MPLAYSRV_MEDIA_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,MPLAYSRV_MEDIA_PACKET,RPC_SRV_ACT_WRITE,EJSON_MPLAYSRV_RPC_MEDIAFILE_SET);
+	JSON_STRING_TO_STRING(MPLAYSRV_RPC_MEDIAFILE_ARG,pPanelCmdObj->MediaFilePath);
+	return 0;
+}
+int GpioCtrlRpc::bin_to_json_mediafile_set(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,MPLAYSRV_SHOWFBIMG_PACKET);
+	return 0;
+}
+int GpioCtrlRpc::process_mediafile_set(JsonDataCommObj* pReq)//,ADJsonRpcMgrProducer* pObj)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	MPLAYSRV_MEDIA_PACKET* pPacket;
+	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
+	pDataCache->MediaFilePath=pPacket->MediaFilePath;
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;//TODO//=process_show_image(pDataCache->fbimgpath);//RPC_SRV_RESULT_SUCCESS;
+	return 0;		
+}
+/* ------------------------------------------------------------------------- */
+int GpioCtrlRpc::json_to_bin_media_action_set(JsonDataCommObj* pReq)
+{
+	MPLAYSRV_MEDIA_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,MPLAYSRV_MEDIA_PACKET,RPC_SRV_ACT_WRITE,EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET);
+	JSON_STRING_TO_ENUM(MPLAYSRV_RPC_MEDIA_ACTION_ARG,MPLAYSRV_RPC_MEDIA_ACTION_ARG_TABL,MPLAYSRV_MEDIA_ACTION,MPLAYSRV_MEDIA_ACTION_UNKNOWN,pPanelCmdObj->MediaAction);
+	return 0;
+}
+int GpioCtrlRpc::bin_to_json_media_action_set(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,MPLAYSRV_MEDIA_PACKET);
+	return 0;
+}
+int GpioCtrlRpc::process_media_action_set(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	MPLAYSRV_MEDIA_PACKET* pPacket;
+	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
+	//pDataCache->MediaAction=pPacket->MediaAction;//TODO
+	pPanelReq->result=process_media_action(pPacket->MediaAction);//RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
+{
+	char command[1024];
+	bool omx_sts=false;
+	sprintf(command,"pgrep omxplayer");
+	if(system(command)==0)
+		omx_sts=true;
+	else
+		omx_sts=false;
+
+	switch(act)
+	{
+		case MPLAYSRV_MEDIA_ACTION_START :
+				if(omx_sts==true)
+					return RPC_SRV_RESULT_SUCCESS;
+				if(pDataCache->MediaFileType!=MPLAYSRV_MEDIAFILE_TYPE_MEDIA)
+						return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+				if(pDataCache->MediaFilePath=="")
+						return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+				sprintf(command,"mkfifo /tmp/mplay-temp-cmd-fifo");
+				system(command);
+				sprintf(command,"omxplayer -b --layer 2 -r -o both %s < /tmp/mplay-temp-cmd-fifo &",pDataCache->MediaFilePath.c_str());
+				system(command);
+				sprintf(command,"echo . > /tmp/mplay-temp-cmd-fifo");
+				system(command);
+				//pDataCache->ActType=GPIOCTL_OMXACT_START;//TODO
+				break;
+		case MPLAYSRV_MEDIA_ACTION_PAUSE  :
+				if(omx_sts==true)
+				{
+					sprintf(command,"echo -n p > /tmp/mplay-temp-cmd-fifo");
+					system(command);
+					//pDataCache->ActType=GPIOCTL_OMXACT_INTR;//pPacket->ActType;
+					return RPC_SRV_RESULT_SUCCESS;
+				}
+				else
+					return 	RPC_SRV_RESULT_FAIL;
+				break;
+		case MPLAYSRV_MEDIA_ACTION_STOP  :
+				if(omx_sts==true)
+				{
+					sprintf(command,"echo -n q > /tmp/mplay-temp-cmd-fifo");
+					system(command);
+					sprintf(command,"fbset -depth 8 && fbset -depth 16");//needed, so that /dev/fb0 can be rendered again
+					system(command);
+					//pDataCache->ActType=GPIOCTL_OMXACT_INTR;//pPacket->ActType;//TODO
+					return RPC_SRV_RESULT_SUCCESS;
+				}
+				else
+					return 	RPC_SRV_RESULT_FAIL;
+				break;
+		default:
+			break;
+	}
+	return RPC_SRV_RESULT_FAIL;
 }
 /* ------------------------------------------------------------------------- */
 

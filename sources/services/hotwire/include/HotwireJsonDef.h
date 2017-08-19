@@ -21,10 +21,10 @@ typedef enum EJSON_GPIOCTL_RPC_TYPES_T
 	EJSON_MPLAYSRV_RPC_PATTERN_GET,
 	EJSON_MPLAYSRV_RPC_PATTERN_SET, //frame buffer based pattern rendering
 
+	EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_GET,
+	EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_SET,
 	EJSON_MPLAYSRV_RPC_MEDIAFILE_GET,
 	EJSON_MPLAYSRV_RPC_MEDIAFILE_SET,
-	//EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_GET,
-	//EJSON_MPLAYSRV_RPC_MEDIAFILE_TYPE_SET,
 	EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET, //start/stop/pause video
 	EJSON_MPLAYSRV_RPC_SCREENSTS_GET,   //read the status of video/graphics output
 
@@ -186,6 +186,8 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 	int qr_size;
 	MPLAYSRV_PATTERN_TYPE pattern;
 	MPLAYSRV_PATTERN_TYPE StartupBkgnd;
+	MPLAYSRV_MEDIAFILE_TYPE MediaFileType;
+	std::string MediaFilePath;
 
 	GPIOCTL_CMN_DATA_CACHE_T()
 	{
@@ -194,6 +196,8 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 		qr_size=37;//TODO: configure qr-code-size via rpc
 		pattern=MPLAYSRV_PATTERN_NONE;
 		StartupBkgnd=MPLAYSRV_PATTERN_BLUE;//TODO: read from user setting
+		MediaFileType=MPLAYSRV_MEDIAFILE_TYPE_UNKNOWN;
+		MediaFilePath="";//"none";
 	};//initialize variables here
 	~ GPIOCTL_CMN_DATA_CACHE_T(){};
 
