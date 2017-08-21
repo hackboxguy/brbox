@@ -673,7 +673,7 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 						return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
 				sprintf(command,"mkfifo /tmp/mplay-temp-cmd-fifo");
 				system(command);
-				sprintf(command,"omxplayer -b --layer 2 -r -o both %s;fbset -depth 8 && fbset -depth 16 < /tmp/mplay-temp-cmd-fifo &",pDataCache->MediaFilePath.c_str());
+				sprintf(command,"omxplayer -b --layer 2 -r -o both %s < /tmp/mplay-temp-cmd-fifo &",pDataCache->MediaFilePath.c_str());
 				system(command);
 				sprintf(command,"echo . > /tmp/mplay-temp-cmd-fifo");
 				system(command);
