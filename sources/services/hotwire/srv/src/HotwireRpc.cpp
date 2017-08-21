@@ -804,11 +804,13 @@ RPC_SRV_RESULT GpioCtrlRpc::UpdateScreenStatus()
 			return RPC_SRV_RESULT_SUCCESS;
 		}
 	}
-	//else
-	//{
-	//		pDataCache->ScreenStatus=MPLAYSRV_SCREENSTS_BLANK;
-	//		return RPC_SRV_RESULT_SUCCESS;
-	//}
+	else
+	{
+			//TODO:
+			//if("/tmp/omxplay.finished" file exists)
+			//pDataCache->ScreenStatus=MPLAYSRV_SCREENSTS_BLANK;
+			//return RPC_SRV_RESULT_SUCCESS;
+	}
 
 	return RPC_SRV_RESULT_SUCCESS;
 }
