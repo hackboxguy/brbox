@@ -78,6 +78,13 @@ public:
 	int bin_to_json_media_action_set(JsonDataCommObj* pReq);
 	int process_media_action_set(JsonDataCommObj* pReq);
 	RPC_SRV_RESULT process_media_action(MPLAYSRV_MEDIA_ACTION act);
+
+	int json_to_bin_graphics_out_get(JsonDataCommObj* pReq);
+	int bin_to_json_graphics_out_get(JsonDataCommObj* pReq);
+	int process_graphics_out_get(JsonDataCommObj* pReq);
+	int json_to_bin_graphics_out_set(JsonDataCommObj* pReq);
+	int bin_to_json_graphics_out_set(JsonDataCommObj* pReq);
+	int process_graphics_out_set(JsonDataCommObj* pReq);
 };
 /* ------------------------------------------------------------------------- */
 

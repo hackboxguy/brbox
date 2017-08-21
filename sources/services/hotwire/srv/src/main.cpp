@@ -53,6 +53,8 @@ int main(int argc, const char* argv[])
 	GpioCtrlRpc MFileSet(MPLAYSRV_RPC_MEDIAFILE_SET,EJSON_MPLAYSRV_RPC_MEDIAFILE_SET,emulat,dbglog,&DataCache);
 	GpioCtrlRpc MActionSet(MPLAYSRV_RPC_MEDIA_ACTION_SET,EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET,emulat,dbglog,&DataCache);
 	GpioCtrlRpc ScreenStsGet(MPLAYSRV_RPC_SCREENSTS_GET,EJSON_MPLAYSRV_RPC_SCREENSTS_GET,emulat,dbglog,&DataCache);
+	GpioCtrlRpc GraphicsOutGet(MPLAYSRV_RPC_GRAPHICS_OUT_GET,EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_GET,emulat,dbglog,&DataCache);
+	GpioCtrlRpc GraphicsOutSet(MPLAYSRV_RPC_GRAPHICS_OUT_SET,EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_SET,emulat,dbglog,&DataCache);
 
 	RpcMgr.AttachRpc(&OmxActGet);
 	RpcMgr.AttachRpc(&OmxActSet);
@@ -67,6 +69,8 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&MFileSet);
 	RpcMgr.AttachRpc(&MActionSet);
 	RpcMgr.AttachRpc(&ScreenStsGet);
+	RpcMgr.AttachRpc(&GraphicsOutGet);
+	RpcMgr.AttachRpc(&GraphicsOutSet);
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr

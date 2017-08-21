@@ -32,6 +32,8 @@ int GpioCtrlRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_MPLAYSRV_RPC_MEDIAFILE_GET:return json_to_bin_mediafile_get(pReq);
 		case EJSON_MPLAYSRV_RPC_MEDIAFILE_SET:return json_to_bin_mediafile_set(pReq);
 		case EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET:return json_to_bin_media_action_set(pReq);
+		case EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_GET:return json_to_bin_graphics_out_get(pReq);
+		case EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_SET:return json_to_bin_graphics_out_set(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -54,6 +56,8 @@ int GpioCtrlRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_MPLAYSRV_RPC_MEDIAFILE_GET:return bin_to_json_mediafile_get(pReq);
 		case EJSON_MPLAYSRV_RPC_MEDIAFILE_SET:return bin_to_json_mediafile_set(pReq);
 		case EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET:return bin_to_json_media_action_set(pReq);
+		case EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_GET:return bin_to_json_graphics_out_get(pReq);
+		case EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_SET:return bin_to_json_graphics_out_set(pReq);
 		default:break;
 	}
 	return -1;
@@ -76,6 +80,8 @@ int GpioCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProduce
 		case EJSON_MPLAYSRV_RPC_MEDIAFILE_GET:return process_mediafile_get(pReq);
 		case EJSON_MPLAYSRV_RPC_MEDIAFILE_SET:return process_mediafile_set(pReq);
 		case EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET:return process_media_action_set(pReq);
+		case EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_GET:return process_graphics_out_get(pReq);
+		case EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_SET:return process_graphics_out_set(pReq);
 		default:break;
 	}
 	return 0;
@@ -690,7 +696,7 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 					return RPC_SRV_RESULT_SUCCESS;
 				}
 				else
-					return 	return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;//video is already stopped;//RPC_SRV_RESULT_FAIL;
+					return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;//video is already stopped;//RPC_SRV_RESULT_FAIL;
 				break;
 		case MPLAYSRV_MEDIA_ACTION_STOP  :
 				if(omx_sts==true)
@@ -704,12 +710,69 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 					return RPC_SRV_RESULT_SUCCESS;
 				}
 				else
-					return 	return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;//video is already stopped
+					return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;//video is already stopped
 				break;
 		default:
 			break;
 	}
 	return RPC_SRV_RESULT_FAIL;
+}
+/* ------------------------------------------------------------------------- */
+int GpioCtrlRpc::json_to_bin_graphics_out_get(JsonDataCommObj* pReq)
+{
+	MPLAYSRV_MEDIA_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,MPLAYSRV_MEDIA_PACKET,RPC_SRV_ACT_READ,EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_GET);
+	return 0;
+}
+int GpioCtrlRpc::bin_to_json_graphics_out_get(JsonDataCommObj* pReq)
+{
+PREPARE_JSON_RESP_ENUM(RPC_SRV_REQ,MPLAYSRV_MEDIA_PACKET,MPLAYSRV_RPC_GRAPHICS_OUT_ARG,GraphicsOut,MPLAYSRV_RPC_GRAPHICS_OUT_ARG_TABL,MPLAYSRV_GRAPHICS_OUT_UNKNOWN);
+	return 0;
+}
+int GpioCtrlRpc::process_graphics_out_get(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	MPLAYSRV_MEDIA_PACKET* pPacket;
+	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
+	pPacket->GraphicsOut=pDataCache->GraphicsOut;
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+int GpioCtrlRpc::json_to_bin_graphics_out_set(JsonDataCommObj* pReq)
+{
+	MPLAYSRV_MEDIA_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,MPLAYSRV_MEDIA_PACKET,RPC_SRV_ACT_WRITE,EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_SET);
+	JSON_STRING_TO_ENUM(MPLAYSRV_RPC_GRAPHICS_OUT_ARG,MPLAYSRV_RPC_GRAPHICS_OUT_ARG_TABL,MPLAYSRV_GRAPHICS_OUT,MPLAYSRV_GRAPHICS_OUT_UNKNOWN,pPanelCmdObj->GraphicsOut);
+	return 0;
+}
+int GpioCtrlRpc::bin_to_json_graphics_out_set(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,MPLAYSRV_MEDIA_PACKET);
+	return 0;
+}
+int GpioCtrlRpc::process_graphics_out_set(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	MPLAYSRV_MEDIA_PACKET* pPacket;
+	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
+
+	char command[1024];
+	if(pPacket->GraphicsOut==MPLAYSRV_GRAPHICS_OUT_DISABLE)
+		sprintf(command,"tvservice -o");
+	else
+		sprintf(command,"tvservice -p");
+	
+	if (system(command)==0)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+		pDataCache->GraphicsOut=pPacket->GraphicsOut;
+	}
+	else
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+
+	return 0;
 }
 /* ------------------------------------------------------------------------- */
 

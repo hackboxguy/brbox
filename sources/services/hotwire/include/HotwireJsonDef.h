@@ -27,7 +27,8 @@ typedef enum EJSON_GPIOCTL_RPC_TYPES_T
 	EJSON_MPLAYSRV_RPC_MEDIAFILE_SET,
 	EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET, //start/stop/pause video
 	EJSON_MPLAYSRV_RPC_SCREENSTS_GET,   //read the status of video/graphics output
-
+	EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_GET,
+	EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_SET,//enable/disable graphics output signal
 	EJSON_GPIOCTL_RPC_END,
 	EJSON_GPIOCTL_RPC_NONE
 }EJSON_GPIOCTL_RPC_TYPES;
@@ -167,12 +168,27 @@ typedef enum MPLAYSRV_SCREENSTS_T
 	MPLAYSRV_SCREENSTS_NONE
 }MPLAYSRV_SCREENSTS;
 
+//EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_GET,
+//EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_SET,
+#define MPLAYSRV_RPC_GRAPHICS_OUT_GET         "get_graphics_out"
+#define MPLAYSRV_RPC_GRAPHICS_OUT_SET         "set_graphics_out"
+#define MPLAYSRV_RPC_GRAPHICS_OUT_ARG         "status"
+#define MPLAYSRV_RPC_GRAPHICS_OUT_ARG_TABL    {"disable","enable","unknown","none","\0"}
+typedef enum MPLAYSRV_GRAPHICS_OUT_T
+{
+	MPLAYSRV_GRAPHICS_OUT_DISABLE,
+	MPLAYSRV_GRAPHICS_OUT_ENABLE,
+	MPLAYSRV_GRAPHICS_OUT_UNKNOWN,
+	MPLAYSRV_GRAPHICS_OUT_NONE
+}MPLAYSRV_GRAPHICS_OUT;
+
 typedef struct MPLAYSRV_MEDIA_PACKET_T
 {
 	MPLAYSRV_MEDIAFILE_TYPE MediaFileType;
 	char MediaFilePath[1023];
 	MPLAYSRV_MEDIA_ACTION MediaAction;
 	MPLAYSRV_SCREENSTS ScreenSts;
+	MPLAYSRV_GRAPHICS_OUT GraphicsOut;
 }MPLAYSRV_MEDIA_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to mplaysrv-service here
@@ -188,6 +204,7 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 	MPLAYSRV_PATTERN_TYPE StartupBkgnd;
 	MPLAYSRV_MEDIAFILE_TYPE MediaFileType;
 	std::string MediaFilePath;
+	MPLAYSRV_GRAPHICS_OUT GraphicsOut;
 
 	GPIOCTL_CMN_DATA_CACHE_T()
 	{
@@ -198,6 +215,7 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 		StartupBkgnd=MPLAYSRV_PATTERN_BLUE;//TODO: read from user setting
 		MediaFileType=MPLAYSRV_MEDIAFILE_TYPE_MEDIA;//MPLAYSRV_MEDIAFILE_TYPE_UNKNOWN;
 		MediaFilePath="/opt/fmw/misc_binaries/sample-video.mkv";//"none";
+		GraphicsOut=MPLAYSRV_GRAPHICS_OUT_ENABLE;//upon boot, graphics is always enabled.
 	};//initialize variables here
 	~ GPIOCTL_CMN_DATA_CACHE_T(){};
 
