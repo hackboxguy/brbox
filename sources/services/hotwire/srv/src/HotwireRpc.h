@@ -85,6 +85,9 @@ public:
 	int json_to_bin_graphics_out_set(JsonDataCommObj* pReq);
 	int bin_to_json_graphics_out_set(JsonDataCommObj* pReq);
 	int process_graphics_out_set(JsonDataCommObj* pReq);
+
+	RPC_SRV_RESULT UpdateScreenStatus();
+
 };
 /* ------------------------------------------------------------------------- */
 

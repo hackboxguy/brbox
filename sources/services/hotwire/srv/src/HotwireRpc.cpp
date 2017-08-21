@@ -409,6 +409,7 @@ RPC_SRV_RESULT GpioCtrlRpc::process_show_image(std::string imgfile)
 	sprintf(command,"echo . > %s",IMG_RENDER_FIFO_FILE);
 	system(command);
 
+	pDataCache->ScreenStatus=MPLAYSRV_SCREENSTS_IMAGE;
 
 	//pDataCache->fbimgpath=imgfile;
 	return RPC_SRV_RESULT_SUCCESS;
@@ -539,6 +540,7 @@ RPC_SRV_RESULT GpioCtrlRpc::process_show_pattern(MPLAYSRV_PATTERN_TYPE pat)
 	}
 	sprintf(command,"fb-test -f 0 %s>/dev/null",pat_cmd);
 	system(command);
+	pDataCache->ScreenStatus=MPLAYSRV_SCREENSTS_PATTERN;
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
@@ -678,12 +680,13 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 				if(pDataCache->MediaFilePath=="")
 						return RPC_SRV_RESULT_FILE_NOT_FOUND;//RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
 				//TODO: check if the media file exists, else return file-not-found
-				sprintf(command,"mkfifo /tmp/mplay-temp-cmd-fifo");
+				sprintf(command,"mkfifo /tmp/mplay-temp-cmd-fifo;rm -rf /tmp/omxplay.finished");
 				system(command);
-				sprintf(command,"(omxplayer -b --layer 2 -r -o both %s;fbset -depth 8 && fbset -depth 16) < /tmp/mplay-temp-cmd-fifo &",pDataCache->MediaFilePath.c_str());
+				sprintf(command,"(omxplayer -b --layer 2 -r -o both %s;fbset -depth 8 && fbset -depth 16;touch /tmp/omxplay.finished) < /tmp/mplay-temp-cmd-fifo &",pDataCache->MediaFilePath.c_str());
 				system(command);
 				sprintf(command,"echo . > /tmp/mplay-temp-cmd-fifo");
 				system(command);
+				pDataCache->VideoPaused=false;
 				//pDataCache->ActType=GPIOCTL_OMXACT_START;//TODO
 				return RPC_SRV_RESULT_SUCCESS;
 				break;
@@ -693,6 +696,7 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 					sprintf(command,"echo -n p > /tmp/mplay-temp-cmd-fifo");
 					system(command);
 					//pDataCache->ActType=GPIOCTL_OMXACT_INTR;//pPacket->ActType;
+					pDataCache->VideoPaused=!pDataCache->VideoPaused;
 					return RPC_SRV_RESULT_SUCCESS;
 				}
 				else
@@ -707,6 +711,9 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 					//sprintf(command,"fbset -depth 8 && fbset -depth 16");//needed, so that /dev/fb0 can be rendered again
 					//system(command);
 					//pDataCache->ActType=GPIOCTL_OMXACT_INTR;//pPacket->ActType;//TODO
+
+					pDataCache->VideoPaused=false;
+					pDataCache->ScreenStatus=MPLAYSRV_SCREENSTS_BLANK;
 					return RPC_SRV_RESULT_SUCCESS;
 				}
 				else
@@ -773,6 +780,37 @@ int GpioCtrlRpc::process_graphics_out_set(JsonDataCommObj* pReq)
 		pPanelReq->result=RPC_SRV_RESULT_FAIL;
 
 	return 0;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT GpioCtrlRpc::UpdateScreenStatus()
+{
+	bool omx_sts=false;
+
+	if(pDataCache->GraphicsOut==MPLAYSRV_GRAPHICS_OUT_DISABLE)
+	{
+		pDataCache->ScreenStatus=MPLAYSRV_SCREENSTS_OFF;
+		return RPC_SRV_RESULT_SUCCESS;
+	}	
+	if(is_omx_running()==true)
+	{
+		if(pDataCache->VideoPaused==true)
+		{
+			pDataCache->ScreenStatus=MPLAYSRV_SCREENSTS_MPAUSE;
+			return RPC_SRV_RESULT_SUCCESS;
+		}
+		else
+		{
+			pDataCache->ScreenStatus=MPLAYSRV_SCREENSTS_MPLAY;//MPLAYSRV_SCREENSTS_BLANK;
+			return RPC_SRV_RESULT_SUCCESS;
+		}
+	}
+	//else
+	//{
+	//		pDataCache->ScreenStatus=MPLAYSRV_SCREENSTS_BLANK;
+	//		return RPC_SRV_RESULT_SUCCESS;
+	//}
+
+	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
 

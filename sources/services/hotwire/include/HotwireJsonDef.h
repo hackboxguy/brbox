@@ -205,7 +205,8 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 	MPLAYSRV_MEDIAFILE_TYPE MediaFileType;
 	std::string MediaFilePath;
 	MPLAYSRV_GRAPHICS_OUT GraphicsOut;
-
+	bool VideoPaused;
+	MPLAYSRV_SCREENSTS ScreenStatus;
 	GPIOCTL_CMN_DATA_CACHE_T()
 	{
 		fbimgpath="none";
@@ -216,6 +217,8 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 		MediaFileType=MPLAYSRV_MEDIAFILE_TYPE_MEDIA;//MPLAYSRV_MEDIAFILE_TYPE_UNKNOWN;
 		MediaFilePath="/opt/fmw/misc_binaries/sample-video.mkv";//"none";
 		GraphicsOut=MPLAYSRV_GRAPHICS_OUT_ENABLE;//upon boot, graphics is always enabled.
+		VideoPaused=false;
+		ScreenStatus=MPLAYSRV_SCREENSTS_UNKNOWN;
 	};//initialize variables here
 	~ GPIOCTL_CMN_DATA_CACHE_T(){};
 
