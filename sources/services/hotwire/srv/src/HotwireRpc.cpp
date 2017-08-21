@@ -655,11 +655,12 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 {
 	char command[1024];
 	bool omx_sts=false;
-	sprintf(command,"pgrep omxplayer");
-	if(system(command)==0)
-		omx_sts=true;
-	else
-		omx_sts=false;
+	//sprintf(command,"pgrep omxplayer");
+	//if(system(command)==0)
+	//	omx_sts=true;
+	//else
+	//	omx_sts=false;
+	omx_sts=is_omx_running();
 
 	switch(act)
 	{
@@ -672,7 +673,7 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 						return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
 				sprintf(command,"mkfifo /tmp/mplay-temp-cmd-fifo");
 				system(command);
-				sprintf(command,"omxplayer -b --layer 2 -r -o both %s < /tmp/mplay-temp-cmd-fifo &",pDataCache->MediaFilePath.c_str());
+				sprintf(command,"omxplayer -b --layer 2 -r -o both %s;fbset -depth 8 && fbset -depth 16 < /tmp/mplay-temp-cmd-fifo &",pDataCache->MediaFilePath.c_str());
 				system(command);
 				sprintf(command,"echo . > /tmp/mplay-temp-cmd-fifo");
 				system(command);
