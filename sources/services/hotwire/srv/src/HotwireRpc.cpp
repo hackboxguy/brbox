@@ -673,13 +673,14 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 						return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
 				sprintf(command,"mkfifo /tmp/mplay-temp-cmd-fifo");
 				system(command);
-				sprintf(command,"omxplayer -b --layer 2 -r -o both %s < /tmp/mplay-temp-cmd-fifo &",pDataCache->MediaFilePath.c_str());
+				sprintf(command,"(omxplayer -b --layer 2 -r -o both %s;fbset -depth 8 && fbset -depth 16) < /tmp/mplay-temp-cmd-fifo &",pDataCache->MediaFilePath.c_str());
 				system(command);
 				sprintf(command,"echo . > /tmp/mplay-temp-cmd-fifo");
 				system(command);
 				//pDataCache->ActType=GPIOCTL_OMXACT_START;//TODO
+				return RPC_SRV_RESULT_SUCCESS;
 				break;
-		case MPLAYSRV_MEDIA_ACTION_PAUSE  :
+		case MPLAYSRV_MEDIA_ACTION_PAUSE  ://user for both pause or play(sending pause on paused video, will start playing)
 				if(omx_sts==true)
 				{
 					sprintf(command,"echo -n p > /tmp/mplay-temp-cmd-fifo");
@@ -695,8 +696,9 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 				{
 					sprintf(command,"echo -n q > /tmp/mplay-temp-cmd-fifo");
 					system(command);
-					sprintf(command,"fbset -depth 8 && fbset -depth 16");//needed, so that /dev/fb0 can be rendered again
-					system(command);
+					//sleep(1);
+					//sprintf(command,"fbset -depth 8 && fbset -depth 16");//needed, so that /dev/fb0 can be rendered again
+					//system(command);
 					//pDataCache->ActType=GPIOCTL_OMXACT_INTR;//pPacket->ActType;//TODO
 					return RPC_SRV_RESULT_SUCCESS;
 				}
