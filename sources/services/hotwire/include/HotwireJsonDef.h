@@ -140,7 +140,7 @@ typedef enum MPLAYSRV_MEDIAFILE_TYPE_T
 //EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET, //start/stop/pause video
 #define MPLAYSRV_RPC_MEDIA_ACTION_SET         "set_media_action"
 #define MPLAYSRV_RPC_MEDIA_ACTION_ARG         "action"
-#define MPLAYSRV_RPC_MEDIA_ACTION_ARG_TABL    {"start","pause","stop","unknown","none","\0"}
+#define MPLAYSRV_RPC_MEDIA_ACTION_ARG_TABL    {"start","pause_play","stop","unknown","none","\0"}
 typedef enum MPLAYSRV_MEDIA_ACTION_T
 {
 	MPLAYSRV_MEDIA_ACTION_START,
@@ -196,8 +196,8 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 		qr_size=37;//TODO: configure qr-code-size via rpc
 		pattern=MPLAYSRV_PATTERN_NONE;
 		StartupBkgnd=MPLAYSRV_PATTERN_BLUE;//TODO: read from user setting
-		MediaFileType=MPLAYSRV_MEDIAFILE_TYPE_UNKNOWN;
-		MediaFilePath="";//"none";
+		MediaFileType=MPLAYSRV_MEDIAFILE_TYPE_MEDIA;//MPLAYSRV_MEDIAFILE_TYPE_UNKNOWN;
+		MediaFilePath="/opt/fmw/misc_binaries/sample-video.mkv";//"none";
 	};//initialize variables here
 	~ GPIOCTL_CMN_DATA_CACHE_T(){};
 

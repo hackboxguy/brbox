@@ -31,7 +31,7 @@ GpioCltCmdline::GpioCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--mfile=filepath           [get/set media file path]");
 
 	CmdlineHelper.insert_options_entry((char*)"maction" ,optional_argument,EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET);
-	CmdlineHelper.insert_help_entry((char*)"--maction=type             [set media play action, type=<start/pause/stop>]");
+	CmdlineHelper.insert_help_entry((char*)"--maction=type             [set media play action, type=<start/pause_play/stop>]");
 
 	CmdlineHelper.insert_options_entry((char*)"screensts" ,optional_argument,EJSON_MPLAYSRV_RPC_SCREENSTS_GET);
 	CmdlineHelper.insert_help_entry((char*)"--screensts                [read current screen status<mplay/mpause/pattern/image/blank/off>]");

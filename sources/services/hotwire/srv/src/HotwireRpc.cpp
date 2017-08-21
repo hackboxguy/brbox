@@ -666,11 +666,12 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 	{
 		case MPLAYSRV_MEDIA_ACTION_START :
 				if(omx_sts==true)
-					return RPC_SRV_RESULT_SUCCESS;
+					return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;//video is already running, stop it first
 				if(pDataCache->MediaFileType!=MPLAYSRV_MEDIAFILE_TYPE_MEDIA)
 						return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
 				if(pDataCache->MediaFilePath=="")
-						return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+						return RPC_SRV_RESULT_FILE_NOT_FOUND;//RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+				//TODO: check if the media file exists, else return file-not-found
 				sprintf(command,"mkfifo /tmp/mplay-temp-cmd-fifo");
 				system(command);
 				sprintf(command,"(omxplayer -b --layer 2 -r -o both %s;fbset -depth 8 && fbset -depth 16) < /tmp/mplay-temp-cmd-fifo &",pDataCache->MediaFilePath.c_str());
@@ -689,7 +690,7 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 					return RPC_SRV_RESULT_SUCCESS;
 				}
 				else
-					return 	RPC_SRV_RESULT_FAIL;
+					return 	return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;//video is already stopped;//RPC_SRV_RESULT_FAIL;
 				break;
 		case MPLAYSRV_MEDIA_ACTION_STOP  :
 				if(omx_sts==true)
@@ -703,7 +704,7 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 					return RPC_SRV_RESULT_SUCCESS;
 				}
 				else
-					return 	RPC_SRV_RESULT_FAIL;
+					return 	return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;//video is already stopped
 				break;
 		default:
 			break;
