@@ -4,8 +4,10 @@
 #
 ################################################################################
 BRBOX_PNGVIEW_VERSION = master
-BRBOX_PNGVIEW_SITE_METHOD = local
-BRBOX_PNGVIEW_SITE = $(TOPDIR)/../sources/utils/pngview
+#BRBOX_PNGVIEW_SITE_METHOD = local
+#BRBOX_PNGVIEW_SITE = $(TOPDIR)/../sources/utils/pngview
+BRBOX_PNGVIEW_SITE = $(call github,AndrewFromMelbourne,raspidmx,$(BRBOX_PNGVIEW_VERSION))
+BRBOX_PNGVIEW_INSTALL_STAGING = NO
 BRBOX_PNGVIEW_LICENSE = GPL-2.0
 BRBOX_PNGVIEW_LICENSE_FILES = COPYING
 
