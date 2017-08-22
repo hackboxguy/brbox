@@ -2,10 +2,10 @@
 #sudo ./raspi-bootdisk.sh -o /home/adav/tmp/rp/ -i /home/adav/tmp/rp/images/rp-sd.img
 #sudo dd if=/home/adav/tmp/rp/images/rp-sd.img of=/dev/sdd bs=1M
 ###########################################################
-IMAGESIZE=356M
+IMAGESIZE=420M #356M
 BOOTSIZE=16M
-ROOT1SIZE=130M
-ROOT2SIZE=130M
+ROOT1SIZE=160M #130M
+ROOT2SIZE=160M #130M
 STTNGSIZE=32M
 USRDATSIZE=40M
 ROOT1_LABEL=ROOT1   #linux-1
