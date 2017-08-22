@@ -2,10 +2,10 @@
 #sudo ./raspi-bootdisk.sh -o /home/adav/tmp/rp/ -i /home/adav/tmp/rp/images/rp-sd.img
 #sudo dd if=/home/adav/tmp/rp/images/rp-sd.img of=/dev/sdd bs=1M
 ###########################################################
-IMAGESIZE=420M #356M
+IMAGESIZE=460M #356M
 BOOTSIZE=16M
-ROOT1SIZE=160M #130M
-ROOT2SIZE=160M #130M
+ROOT1SIZE=180M #130M
+ROOT2SIZE=180M #130M
 STTNGSIZE=32M
 USRDATSIZE=40M
 ROOT1_LABEL=ROOT1   #linux-1
@@ -62,12 +62,12 @@ printf "Creating loopdevice ..................................... "
 sudo parted -s $LOOPDEVICE mklabel msdos
 sudo parted -s $LOOPDEVICE unit cyl mkpart primary fat32 -- 0 2  
 sudo parted -s $LOOPDEVICE set 1 boot on  
-sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 2 20  
-sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 20 38  
+sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 2 22  
+sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 22 42  
 
-sudo parted -s $LOOPDEVICE unit cyl mkpart extended -- 38 -2  
-sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 38 41  
-sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 41 -2  
+sudo parted -s $LOOPDEVICE unit cyl mkpart extended -- 42 -2  
+sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 42 45  
+sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 45 -2  
 #TODO: create userData partition as secondary
 printf "Formating boot partition ................................ "
     $SUDO mkfs.vfat -n boot "${LOOPDEVICE}p1" 1>/dev/null 2>/dev/null
