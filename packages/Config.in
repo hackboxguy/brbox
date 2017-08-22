@@ -40,6 +40,7 @@ source "package/brbox/brbox_tftpdconfig/Config.in"
 source "package/brbox/brbox_miscbins/Config.in"
 source "package/brbox/brbox_zbarimg/Config.in"
 source "package/brbox/brbox_fbtestapp/Config.in"
+source "package/brbox/brbox_pngview/Config.in"
 endmenu
 endif
 

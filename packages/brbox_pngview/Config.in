@@ -1,0 +1,5 @@
+config BR2_PACKAGE_BRBOX_PNGVIEW
+	bool "brbox-pngview-app"
+	help
+	  png file rendering tool cloned from.
+	  https://github.com/AndrewFromMelbourne/raspidmx/tree/master/pngview
