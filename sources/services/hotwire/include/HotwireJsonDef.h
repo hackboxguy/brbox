@@ -207,6 +207,7 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 	MPLAYSRV_GRAPHICS_OUT GraphicsOut;
 	bool VideoPaused;
 	MPLAYSRV_SCREENSTS ScreenStatus;
+	bool LoopVideo;
 	GPIOCTL_CMN_DATA_CACHE_T()
 	{
 		fbimgpath="none";
@@ -219,6 +220,7 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 		GraphicsOut=MPLAYSRV_GRAPHICS_OUT_ENABLE;//upon boot, graphics is always enabled.
 		VideoPaused=false;
 		ScreenStatus=MPLAYSRV_SCREENSTS_UNKNOWN;
+		LoopVideo=false;
 	};//initialize variables here
 	~ GPIOCTL_CMN_DATA_CACHE_T(){};
 
