@@ -691,7 +691,7 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 				}
 				else
 				{
-					sprintf(command,"/opt/fmw/misc_binaries/omxloop.sh %s &",pDataCache->MediaFilePath.c_str());
+					sprintf(command,"/opt/fmw/misc_binaries/omx-loop.sh %s &",pDataCache->MediaFilePath.c_str());
 				}
 				system(command);
 				pDataCache->VideoPaused=false;
