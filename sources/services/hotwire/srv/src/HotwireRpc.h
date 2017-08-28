@@ -88,6 +88,14 @@ public:
 
 	RPC_SRV_RESULT UpdateScreenStatus();
 
+	int json_to_bin_media_loop_get(JsonDataCommObj* pReq);
+	int bin_to_json_media_loop_get(JsonDataCommObj* pReq);
+	int process_media_loop_get(JsonDataCommObj* pReq);
+	int json_to_bin_media_loop_set(JsonDataCommObj* pReq);
+	int bin_to_json_media_loop_set(JsonDataCommObj* pReq);
+	int process_media_loop_set(JsonDataCommObj* pReq);
+
+
 };
 /* ------------------------------------------------------------------------- */
 

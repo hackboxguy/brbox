@@ -34,6 +34,8 @@ int GpioCtrlRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET:return json_to_bin_media_action_set(pReq);
 		case EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_GET:return json_to_bin_graphics_out_get(pReq);
 		case EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_SET:return json_to_bin_graphics_out_set(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIA_LOOP_GET:return json_to_bin_media_loop_get(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIA_LOOP_SET:return json_to_bin_media_loop_set(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -58,6 +60,8 @@ int GpioCtrlRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET:return bin_to_json_media_action_set(pReq);
 		case EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_GET:return bin_to_json_graphics_out_get(pReq);
 		case EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_SET:return bin_to_json_graphics_out_set(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIA_LOOP_GET:return bin_to_json_media_loop_get(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIA_LOOP_SET:return bin_to_json_media_loop_set(pReq);
 		default:break;
 	}
 	return -1;
@@ -82,6 +86,8 @@ int GpioCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProduce
 		case EJSON_MPLAYSRV_RPC_MEDIA_ACTION_SET:return process_media_action_set(pReq);
 		case EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_GET:return process_graphics_out_get(pReq);
 		case EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_SET:return process_graphics_out_set(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIA_LOOP_GET:return process_media_loop_get(pReq);
+		case EJSON_MPLAYSRV_RPC_MEDIA_LOOP_SET:return process_media_loop_set(pReq);
 		default:break;
 	}
 	return 0;
@@ -682,7 +688,7 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 				sprintf(command,"mkfifo /tmp/omxplay.fifo;rm -rf /tmp/omxplay.finished");
 				system(command);
 
-				if(!pDataCache->LoopVideo)
+				if(pDataCache->MediaLoop==MPLAYSRV_MEDIA_LOOP_DISABLE)
 				{
 					//TODO: check if the media file exists, else return file-not-found
 					sprintf(command,"(omxplayer -b --layer 2 -r -o both %s;fbset -depth 8 && fbset -depth 16;touch /tmp/omxplay.finished) < /tmp/omxplay.fifo &",pDataCache->MediaFilePath.c_str());
@@ -713,7 +719,7 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 		case MPLAYSRV_MEDIA_ACTION_STOP  :
 				if(omx_sts==true)
 				{
-					if(pDataCache->LoopVideo)
+					if(pDataCache->MediaLoop==MPLAYSRV_MEDIA_LOOP_ENABLE)
 					{
 						sprintf(command,"touch /tmp/omxplay.stoploop");
 						system(command);
@@ -826,6 +832,50 @@ RPC_SRV_RESULT GpioCtrlRpc::UpdateScreenStatus()
 	}
 
 	return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+int GpioCtrlRpc::json_to_bin_media_loop_get(JsonDataCommObj* pReq)
+{
+	MPLAYSRV_MEDIA_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,MPLAYSRV_MEDIA_PACKET,RPC_SRV_ACT_READ,EJSON_MPLAYSRV_RPC_MEDIA_LOOP_GET);
+	return 0;
+}
+int GpioCtrlRpc::bin_to_json_media_loop_get(JsonDataCommObj* pReq)
+{
+PREPARE_JSON_RESP_ENUM(RPC_SRV_REQ,MPLAYSRV_MEDIA_PACKET,MPLAYSRV_RPC_MEDIA_LOOP_ARG,MediaLoop,MPLAYSRV_RPC_MEDIA_LOOP_ARG_TABL,MPLAYSRV_MEDIA_LOOP_UNKNOWN);
+	return 0;
+}
+int GpioCtrlRpc::process_media_loop_get(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	MPLAYSRV_MEDIA_PACKET* pPacket;
+	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
+	pPacket->MediaLoop=pDataCache->MediaLoop;
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+int GpioCtrlRpc::json_to_bin_media_loop_set(JsonDataCommObj* pReq)
+{
+	MPLAYSRV_MEDIA_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,MPLAYSRV_MEDIA_PACKET,RPC_SRV_ACT_WRITE,EJSON_MPLAYSRV_RPC_MEDIA_LOOP_SET);
+	JSON_STRING_TO_ENUM(MPLAYSRV_RPC_MEDIA_LOOP_ARG,MPLAYSRV_RPC_MEDIA_LOOP_ARG_TABL,MPLAYSRV_MEDIA_LOOP,MPLAYSRV_MEDIA_LOOP_UNKNOWN,pPanelCmdObj->MediaLoop);
+	return 0;
+}
+int GpioCtrlRpc::bin_to_json_media_loop_set(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,MPLAYSRV_MEDIA_PACKET);
+	return 0;
+}
+int GpioCtrlRpc::process_media_loop_set(JsonDataCommObj* pReq)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	MPLAYSRV_MEDIA_PACKET* pPacket;
+	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
+	pDataCache->MediaLoop=pPacket->MediaLoop;
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
 }
 /* ------------------------------------------------------------------------- */
 

@@ -29,6 +29,10 @@ typedef enum EJSON_GPIOCTL_RPC_TYPES_T
 	EJSON_MPLAYSRV_RPC_SCREENSTS_GET,   //read the status of video/graphics output
 	EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_GET,
 	EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_SET,//enable/disable graphics output signal
+
+	EJSON_MPLAYSRV_RPC_MEDIA_LOOP_GET,
+	EJSON_MPLAYSRV_RPC_MEDIA_LOOP_SET,
+
 	EJSON_GPIOCTL_RPC_END,
 	EJSON_GPIOCTL_RPC_NONE
 }EJSON_GPIOCTL_RPC_TYPES;
@@ -182,6 +186,20 @@ typedef enum MPLAYSRV_GRAPHICS_OUT_T
 	MPLAYSRV_GRAPHICS_OUT_NONE
 }MPLAYSRV_GRAPHICS_OUT;
 
+//EJSON_MPLAYSRV_RPC_MEDIA_LOOP_GET,
+//EJSON_MPLAYSRV_RPC_MEDIA_LOOP_SET,
+#define MPLAYSRV_RPC_MEDIA_LOOP_GET         "get_media_loop"
+#define MPLAYSRV_RPC_MEDIA_LOOP_SET         "set_media_loop"
+#define MPLAYSRV_RPC_MEDIA_LOOP_ARG         "status"
+#define MPLAYSRV_RPC_MEDIA_LOOP_ARG_TABL    {"disable","enable","unknown","none","\0"}
+typedef enum MPLAYSRV_MEDIA_LOOP_T
+{
+	MPLAYSRV_MEDIA_LOOP_DISABLE,
+	MPLAYSRV_MEDIA_LOOP_ENABLE,
+	MPLAYSRV_MEDIA_LOOP_UNKNOWN,
+	MPLAYSRV_MEDIA_LOOP_NONE
+}MPLAYSRV_MEDIA_LOOP;
+
 typedef struct MPLAYSRV_MEDIA_PACKET_T
 {
 	MPLAYSRV_MEDIAFILE_TYPE MediaFileType;
@@ -189,6 +207,7 @@ typedef struct MPLAYSRV_MEDIA_PACKET_T
 	MPLAYSRV_MEDIA_ACTION MediaAction;
 	MPLAYSRV_SCREENSTS ScreenSts;
 	MPLAYSRV_GRAPHICS_OUT GraphicsOut;
+	MPLAYSRV_MEDIA_LOOP MediaLoop;
 }MPLAYSRV_MEDIA_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to mplaysrv-service here
@@ -207,7 +226,7 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 	MPLAYSRV_GRAPHICS_OUT GraphicsOut;
 	bool VideoPaused;
 	MPLAYSRV_SCREENSTS ScreenStatus;
-	bool LoopVideo;
+	MPLAYSRV_MEDIA_LOOP MediaLoop;
 	GPIOCTL_CMN_DATA_CACHE_T()
 	{
 		fbimgpath="none";
@@ -220,7 +239,7 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 		GraphicsOut=MPLAYSRV_GRAPHICS_OUT_ENABLE;//upon boot, graphics is always enabled.
 		VideoPaused=false;
 		ScreenStatus=MPLAYSRV_SCREENSTS_UNKNOWN;
-		LoopVideo=true;
+		MediaLoop=MPLAYSRV_MEDIA_LOOP_DISABLE;
 	};//initialize variables here
 	~ GPIOCTL_CMN_DATA_CACHE_T(){};
 
