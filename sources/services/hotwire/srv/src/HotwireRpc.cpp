@@ -782,7 +782,7 @@ int GpioCtrlRpc::process_graphics_out_set(JsonDataCommObj* pReq)
 	if(pPacket->GraphicsOut==MPLAYSRV_GRAPHICS_OUT_DISABLE)
 		sprintf(command,"tvservice -o");
 	else
-		sprintf(command,"tvservice -p");
+		sprintf(command,"tvservice -p;fbset -depth 8 && fbset -depth 16");
 	
 	if (system(command)==0)
 	{
