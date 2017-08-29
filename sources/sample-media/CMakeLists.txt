@@ -1,0 +1,5 @@
+#this cmake is used for installing media files to target)
+cmake_minimum_required(VERSION 2.8.9)
+set(MISC_MEDIA_FILES *.*)
+file(GLOB  BIN_FILES ${MISC_MEDIA_FILES}) 
+install(FILES ${BIN_FILES} DESTINATION opt/fmw/misc_binaries/)
