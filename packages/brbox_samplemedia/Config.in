@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BRBOX_SAMPLEMEDIA
+	bool "sample media files"
+	default n
+	depends on BR2_TARGET_BRBOX_PACKAGES
+	help
+	  includes sample media files to target file system.
+
