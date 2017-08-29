@@ -1,0 +1,6 @@
+config BR2_PACKAGE_BRBOX_LIBILCLIENT
+	bool "libIlClient"
+	default n
+	help
+	  ilclient library used by raspberry pi hello_video omx based video player
+

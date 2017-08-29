@@ -24,6 +24,7 @@ menu "Common packages"
 source "package/brbox/brbox_libAdDisp/Config.in"
 source "package/brbox/brbox_libAdSttngs/Config.in"
 source "package/brbox/brbox_libAdCmnOld/Config.in"
+source "package/brbox/brbox_libIlClient/Config.in"
 source "package/brbox/brbox_mkimage/Config.in"
 source "package/brbox/brbox_sysmgr/Config.in"
 source "package/brbox/brbox_finddevtype/Config.in"
@@ -42,6 +43,7 @@ source "package/brbox/brbox_samplemedia/Config.in"
 source "package/brbox/brbox_zbarimg/Config.in"
 source "package/brbox/brbox_fbtestapp/Config.in"
 source "package/brbox/brbox_pngview/Config.in"
+source "package/brbox/brbox_hellovideo/Config.in"
 endmenu
 endif
 

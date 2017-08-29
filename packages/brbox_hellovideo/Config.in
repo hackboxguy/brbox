@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BRBOX_HELLOVIDEO
+	bool "hello-video media player for raspberry pi"
+	default n
+	select BR2_PACKAGE_BRBOX_LIBILCLIENT
+	help
+	  video player utility user h/w based decoding on raspberry pi
+
