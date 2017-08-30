@@ -39,8 +39,10 @@ GpioCltCmdline::GpioCltCmdline()
 	CmdlineHelper.insert_options_entry((char*)"graphicsout" ,optional_argument,EJSON_MPLAYSRV_RPC_GRAPHICS_OUT_GET);
 	CmdlineHelper.insert_help_entry((char*)"--graphicsout=state        [enable/disable graphics output signal, type=<enable/disable>]");
 
-	CmdlineHelper.insert_options_entry((char*)"medialoop" ,optional_argument,EJSON_MPLAYSRV_RPC_MEDIA_LOOP_GET);
-	CmdlineHelper.insert_help_entry((char*)"--medialoop=state          [enable/disable looping of media playback, state=<enable/disable>]");
+	CmdlineHelper.insert_options_entry((char*)"mloop" ,optional_argument,EJSON_MPLAYSRV_RPC_MEDIA_LOOP_GET);
+	CmdlineHelper.insert_help_entry((char*)"--mloop=state              [enable/disable looping of media playback, state=<enable/disable>]");
+	CmdlineHelper.insert_options_entry((char*)"seamlessloop" ,optional_argument,EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_GET);
+	CmdlineHelper.insert_help_entry((char*)"--seamlessloop=state       [enable/disable seamless looping of media playback, state=<enable/disable>]");
 
 	//--moverlay=enable/disable (show/hide overlay file on media)
 	//--moverlayfile=/some/file.png (overlay file: ex.pngfile)
@@ -144,6 +146,16 @@ int GpioCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			EJSON_MPLAYSRV_RPC_MEDIA_LOOP_SET,MPLAYSRV_RPC_MEDIA_LOOP_GET,
 			MPLAYSRV_RPC_MEDIA_LOOP_SET,&table[0],MPLAYSRV_MEDIA_LOOP_UNKNOWN,
 			(char*)MPLAYSRV_RPC_MEDIA_LOOP_ARG,sub_arg);
+			}
+			break;
+		case EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_GET:
+		case EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_SET:
+			{
+			const char *table[]   = MPLAYSRV_RPC_SEAMLESS_LOOP_ARG_TABL;
+			CmdlineHelper.push_single_enum_get_set_command( EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_GET,
+			EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_SET,MPLAYSRV_RPC_SEAMLESS_LOOP_GET,
+			MPLAYSRV_RPC_SEAMLESS_LOOP_SET,&table[0],MPLAYSRV_MEDIA_LOOP_UNKNOWN,
+			(char*)MPLAYSRV_RPC_SEAMLESS_LOOP_ARG,sub_arg);
 			}
 			break;
 		default:

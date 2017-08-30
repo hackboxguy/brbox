@@ -30,11 +30,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <termios.h>
+
 #include "bcm_host.h"
 #include "ilclient.h"
 /* ------------------------------------------------------------------------- */
+struct termios orig_termios;
+void reset_terminal_mode()
+{
+	tcsetattr(0, TCSANOW, &orig_termios);
+	//usleep(10000);
+}
+void set_conio_terminal_mode()
+{
+	struct termios new_termios;
+
+	/* take two copies - one for now, one for later */
+	tcgetattr(0, &orig_termios);
+	memcpy(&new_termios, &orig_termios, sizeof(new_termios));
+
+	/* register cleanup handler, and set the new terminal mode */
+	atexit(reset_terminal_mode);
+	cfmakeraw(&new_termios);
+	tcsetattr(0, TCSANOW, &new_termios);
+}
+int kbhit()
+{
+	struct timeval tv = { 0L, 0L };
+	fd_set fds;
+	FD_ZERO(&fds);
+	FD_SET(0, &fds);
+	return select(1, &fds, NULL, NULL, &tv);
+}
+int getch()
+{
+	int r;
+	unsigned char c;
+	if ((r = read(0, &c, sizeof(c))) < 0) 
+		return r;
+	else 
+		return c;
+}
+/* ------------------------------------------------------------------------- */
 static int video_decode_test(char *filename, int loop)
 {
+	int user_key;unsigned char abort_loop=0;
 	OMX_VIDEO_PARAM_PORTFORMATTYPE format;
 	OMX_TIME_CONFIG_CLOCKSTATETYPE cstate;
 	COMPONENT_T *video_decode = NULL, *video_scheduler = NULL, *video_render = NULL, *clock = NULL;
@@ -161,6 +201,22 @@ static int video_decode_test(char *filename, int loop)
 				else 
 					break;
 			}
+			else
+			{
+				if(kbhit())
+				{
+					user_key=getch();
+					if((char)user_key=='q')
+					{
+						//reset_terminal_mode();usleep(100000);
+						//goto abort_point;
+						//abort_loop=1;
+						//reset_terminal_mode();
+						//break;
+						exit(1);
+					}
+				}
+			}
 
 			buf->nFilledLen = data_len;
 			data_len = 0;
@@ -180,6 +236,10 @@ static int video_decode_test(char *filename, int loop)
 			}
 		}
 
+//abort_point:
+		//if(!abort_loop)
+		{
+
 		buf->nFilledLen = 0;
 		buf->nFlags = OMX_BUFFERFLAG_TIME_UNKNOWN | OMX_BUFFERFLAG_EOS;
 
@@ -194,8 +254,8 @@ static int video_decode_test(char *filename, int loop)
 		ilclient_flush_tunnels(tunnel, 0);
 
 		ilclient_disable_port_buffers(video_decode, 130, NULL, NULL, NULL);
+		}
 	}
-
 	fclose(in);
 	ilclient_disable_tunnel(tunnel);
 	ilclient_disable_tunnel(tunnel+1);
@@ -235,6 +295,9 @@ int main (int argc, char **argv)
 		else
 			error_usage(argv[0]);
 	}
+	//TODO: check if given media file exists.
+	set_conio_terminal_mode();
+
 	bcm_host_init();
 	return video_decode_test(argv[argc-1], loop);
 }

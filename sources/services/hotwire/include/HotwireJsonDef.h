@@ -32,6 +32,8 @@ typedef enum EJSON_GPIOCTL_RPC_TYPES_T
 
 	EJSON_MPLAYSRV_RPC_MEDIA_LOOP_GET,
 	EJSON_MPLAYSRV_RPC_MEDIA_LOOP_SET,
+	EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_GET,
+	EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_SET,
 
 	EJSON_GPIOCTL_RPC_END,
 	EJSON_GPIOCTL_RPC_NONE
@@ -200,6 +202,13 @@ typedef enum MPLAYSRV_MEDIA_LOOP_T
 	MPLAYSRV_MEDIA_LOOP_NONE
 }MPLAYSRV_MEDIA_LOOP;
 
+//EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_GET,
+//EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_SET,
+#define MPLAYSRV_RPC_SEAMLESS_LOOP_GET         "get_seamless_loop"
+#define MPLAYSRV_RPC_SEAMLESS_LOOP_SET         "set_seamless_loop"
+#define MPLAYSRV_RPC_SEAMLESS_LOOP_ARG         "status"
+#define MPLAYSRV_RPC_SEAMLESS_LOOP_ARG_TABL    {"disable","enable","unknown","none","\0"}
+
 typedef struct MPLAYSRV_MEDIA_PACKET_T
 {
 	MPLAYSRV_MEDIAFILE_TYPE MediaFileType;
@@ -208,6 +217,7 @@ typedef struct MPLAYSRV_MEDIA_PACKET_T
 	MPLAYSRV_SCREENSTS ScreenSts;
 	MPLAYSRV_GRAPHICS_OUT GraphicsOut;
 	MPLAYSRV_MEDIA_LOOP MediaLoop;
+	MPLAYSRV_MEDIA_LOOP SeamlessLoop;//h264 formatter raw video only support
 }MPLAYSRV_MEDIA_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to mplaysrv-service here
@@ -227,6 +237,7 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 	bool VideoPaused;
 	MPLAYSRV_SCREENSTS ScreenStatus;
 	MPLAYSRV_MEDIA_LOOP MediaLoop;
+	MPLAYSRV_MEDIA_LOOP SeamlessLoop;//h264 formatter raw video only support
 	GPIOCTL_CMN_DATA_CACHE_T()
 	{
 		fbimgpath="none";
@@ -240,6 +251,7 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 		VideoPaused=false;
 		ScreenStatus=MPLAYSRV_SCREENSTS_UNKNOWN;
 		MediaLoop=MPLAYSRV_MEDIA_LOOP_DISABLE;
+		SeamlessLoop=MPLAYSRV_MEDIA_LOOP_ENABLE;
 	};//initialize variables here
 	~ GPIOCTL_CMN_DATA_CACHE_T(){};
 

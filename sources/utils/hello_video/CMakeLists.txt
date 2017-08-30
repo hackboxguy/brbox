@@ -21,7 +21,7 @@ target_link_libraries(${COMPONENT_NAME} ${LIB_ILCLT} GLESv2 EGL openmaxil bcm_ho
 
 #install the binary and server-rpc-headers to CMAKE_INSTALL_PREFIX destination
 file(GLOB  INCFILES "${INC_SRVCOMMN}/*.*")
-install(TARGETS ${COMPONENT_NAME} DESTINATION bin)
+install(TARGETS ${COMPONENT_NAME} DESTINATION usr/bin)
 
 
 #automatically include svn revision to a headerfile which will be included in this component

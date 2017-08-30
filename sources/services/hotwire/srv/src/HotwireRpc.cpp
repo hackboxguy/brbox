@@ -325,7 +325,13 @@ bool GpioCtrlRpc::is_omx_running()
 	if (system(command)==0)
 		return true;
 	else
-		return false;
+	{
+		sprintf(command,"ps cax | grep [h]ello_video >/dev/null");
+		if (system(command)==0)
+			return true;
+		else
+			return false;
+	}
 }
 /* ------------------------------------------------------------------------- */
 int GpioCtrlRpc::json_to_bin_showfbimg_get(JsonDataCommObj* pReq)
@@ -697,7 +703,14 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 				}
 				else
 				{
-					sprintf(command,"omx-loop.sh %s &",pDataCache->MediaFilePath.c_str());
+					if(pDataCache->SeamlessLoop==MPLAYSRV_MEDIA_LOOP_ENABLE)
+					{
+						sprintf(command,"(hello_video --loop %s;fbset -depth 8 && fbset -depth 16;touch /tmp/omxplay.finished) < /tmp/omxplay.fifo &",pDataCache->MediaFilePath.c_str());
+						system(command);
+						sprintf(command,"echo . > /tmp/omxplay.fifo");
+					}
+					else
+						sprintf(command,"omx-loop.sh %s &",pDataCache->MediaFilePath.c_str());
 				}
 				system(command);
 				pDataCache->VideoPaused=false;
@@ -719,7 +732,7 @@ RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
 		case MPLAYSRV_MEDIA_ACTION_STOP  :
 				if(omx_sts==true)
 				{
-					if(pDataCache->MediaLoop==MPLAYSRV_MEDIA_LOOP_ENABLE)
+					if(pDataCache->MediaLoop==MPLAYSRV_MEDIA_LOOP_ENABLE && pDataCache->SeamlessLoop==MPLAYSRV_MEDIA_LOOP_DISABLE)
 					{
 						sprintf(command,"touch /tmp/omxplay.stoploop");
 						system(command);
