@@ -6,6 +6,7 @@ CUSTOM_POST_INIT_SCRIPT=/media/usb0/rc.local
 start() {
         if [ -f "$CUSTOM_POST_INIT_SCRIPT" ]; then
 		cp $CUSTOM_POST_INIT_SCRIPT /tmp/rc.local
+		chmod +x /tmp/rc.local
 		sh -c /tmp/rc.local
         fi
 	echo "OK"
