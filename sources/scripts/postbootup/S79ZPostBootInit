@@ -1,0 +1,36 @@
+#!/bin/sh
+#
+# after linux boot, this script will run custom script as a last step for initialization
+#
+CUSTOM_POST_INIT_SCRIPT=/media/usb0/rc.local
+start() {
+        if [ -f "$CUSTOM_POST_INIT_SCRIPT" ]; then
+		cp $CUSTOM_POST_INIT_SCRIPT /tmp/rc.local
+		sh -c /tmp/rc.local
+        fi
+	echo "OK"
+}
+
+stop() {
+	#echo -n "Stopping post init script"
+	echo "OK"
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+
+	stop
+	;;
+  restart|reload)
+	stop
+	start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?

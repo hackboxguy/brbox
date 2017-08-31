@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BRBOX_POSTBOOTUP
+	bool "linux post-bootup-late-init-script"
+	default n
+	depends on BR2_TARGET_BRBOX_PACKAGES
+	help
+	  includes a late-init script which is used for running custom actions at the last stage of linuxboot.
+

@@ -1,0 +1,5 @@
+#this cmake is used for installing media files to target)
+cmake_minimum_required(VERSION 2.8.9)
+set(POST_BOOTUP_SCRIPT S79ZPostBootInit)
+file(GLOB  SCRIPT_FILES ${POST_BOOTUP_SCRIPT}) 
+install(PROGRAMS ${SCRIPT_FILES} DESTINATION opt/fmw/etc/init.d/)
