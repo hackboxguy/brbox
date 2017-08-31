@@ -12,8 +12,9 @@
 # By default this script does nothing.
 
 #echo hello-world
-mplayclt --pattern=blue
-mplayclt --file=/media/usb0/test.h264
-mplayclt --mloop=enable
-mplayclt --seamlessloop=enable
-mplayclt --maction=start
+sleep 5
+/opt/fmw/bin/mplayclt --pattern=blue
+/opt/fmw/bin/mplayclt --mfile=/media/usb0/test.h264
+/opt/fmw/bin/mplayclt --mloop=enable
+/opt/fmw/bin/mplayclt --seamlessloop=enable
+/opt/fmw/bin/mplayclt --maction=start
