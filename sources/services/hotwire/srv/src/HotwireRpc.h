@@ -95,7 +95,12 @@ public:
 	int bin_to_json_media_loop_set(JsonDataCommObj* pReq);
 	int process_media_loop_set(JsonDataCommObj* pReq);
 
-
+	int json_to_bin_seamless_loop_get(JsonDataCommObj* pReq);
+	int bin_to_json_seamless_loop_get(JsonDataCommObj* pReq);
+	int process_seamless_loop_get(JsonDataCommObj* pReq);
+	int json_to_bin_seamless_loop_set(JsonDataCommObj* pReq);
+	int bin_to_json_seamless_loop_set(JsonDataCommObj* pReq);
+	int process_seamless_loop_set(JsonDataCommObj* pReq);
 };
 /* ------------------------------------------------------------------------- */
 
