@@ -85,7 +85,11 @@ printf "Formating root2 partition ............................... "
 printf "Formating settings partition ............................ "
     $SUDO mkfs.ext3 -L $STTNG_LABEL "${LOOPDEVICE}p5" 1>/dev/null 2>/dev/null
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
+
 #note: /dev/loop0p6 is allocated to userdata partition
+printf "Formating userdata partition ............................ "
+    $SUDO mkfs.ext3 -L $USRDAT_LABEL "${LOOPDEVICE}p6" 1>/dev/null 2>/dev/null
+    test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "Mounting loopdevice boot partition ...................... "
     $SUDO mount "${LOOPDEVICE}p1" "$BOOTMOUNTPOINT"
