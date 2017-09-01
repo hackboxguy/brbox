@@ -60,14 +60,24 @@ printf "Creating loopdevice ..................................... "
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 sudo parted -s $LOOPDEVICE mklabel msdos
-sudo parted -s $LOOPDEVICE unit cyl mkpart primary fat32 -- 0 2  
+#sudo parted -s $LOOPDEVICE unit cyl mkpart primary fat32 -- 0 2    #old
+sudo parted -s $LOOPDEVICE mkpart primary fat32 0% 5%
 sudo parted -s $LOOPDEVICE set 1 boot on  
-sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 2 26  
-sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 26 50  
+#sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 2 26    #old
+sudo parted -s $LOOPDEVICE mkpart primary ext3 5% 50%
 
-sudo parted -s $LOOPDEVICE unit cyl mkpart extended -- 50 -2  
-sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 50 53  
-sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 53 -2  
+#sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 26 50   #old
+sudo parted -s $LOOPDEVICE mkpart primary 50% 95%
+
+#sudo parted -s $LOOPDEVICE unit cyl mkpart extended -- 50 -2       #old
+sudo parted -s $LOOPDEVICE mkpart extended 95% 100%
+
+#sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 50 53  #old
+#sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 53 -2  #old
+sudo parted -s $LOOPDEVICE mkpart logical  ext3 95% 98%
+sudo parted -s $LOOPDEVICE mkpart logical  ext3 98% 100%
+
+
 #TODO: create userData partition as secondary
 printf "Formating boot partition ................................ "
     $SUDO mkfs.vfat -n boot "${LOOPDEVICE}p1" 1>/dev/null 2>/dev/null
@@ -85,11 +95,7 @@ printf "Formating root2 partition ............................... "
 printf "Formating settings partition ............................ "
     $SUDO mkfs.ext3 -L $STTNG_LABEL "${LOOPDEVICE}p5" 1>/dev/null 2>/dev/null
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
-
 #note: /dev/loop0p6 is allocated to userdata partition
-printf "Formating userdata partition ............................ "
-    $SUDO mkfs.ext3 -L $USRDAT_LABEL "${LOOPDEVICE}p6" 1>/dev/null 2>/dev/null
-    test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "Mounting loopdevice boot partition ...................... "
     $SUDO mount "${LOOPDEVICE}p1" "$BOOTMOUNTPOINT"
