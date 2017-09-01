@@ -14,7 +14,7 @@
 #echo hello-world
 sleep 5
 /opt/fmw/bin/mplayclt --pattern=blue
-/opt/fmw/bin/mplayclt --mfile=/media/usb0/test.h264
+/opt/fmw/bin/mplayclt --mfile=/mnt/userdata/test.h264
 /opt/fmw/bin/mplayclt --mloop=enable
 /opt/fmw/bin/mplayclt --seamlessloop=enable
 /opt/fmw/bin/mplayclt --maction=start
