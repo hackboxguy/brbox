@@ -41,8 +41,6 @@ int DispCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			DISPSRV_RPC_DISP_PRINT_MESG_ARG,sub_arg);
 			}
 			break;
-
-			break;
 		default:
 			return 0;
 			break;	

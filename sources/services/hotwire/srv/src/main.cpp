@@ -60,6 +60,7 @@ int main(int argc, const char* argv[])
 
 	GpioCtrlRpc SeamlessLoopGet(MPLAYSRV_RPC_SEAMLESS_LOOP_GET,EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_GET,emulat,dbglog,&DataCache);
 	GpioCtrlRpc SeamlessLoopSet(MPLAYSRV_RPC_SEAMLESS_LOOP_SET,EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_SET,emulat,dbglog,&DataCache);
+	GpioCtrlRpc ReadEdid(MPLAYSRV_RPC_READ_EDID,EJSON_MPLAYSRV_RPC_READ_EDID,emulat,dbglog,&DataCache);
 
 	RpcMgr.AttachRpc(&OmxActGet);
 	RpcMgr.AttachRpc(&OmxActSet);
@@ -80,6 +81,7 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&MediaLoopSet);
 	RpcMgr.AttachRpc(&SeamlessLoopGet);
 	RpcMgr.AttachRpc(&SeamlessLoopSet);
+	RpcMgr.AttachRpc(&ReadEdid);
 
 
 	//start listening for rpc-commands

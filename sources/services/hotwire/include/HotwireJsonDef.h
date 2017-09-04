@@ -35,6 +35,8 @@ typedef enum EJSON_GPIOCTL_RPC_TYPES_T
 	EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_GET,
 	EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_SET,
 
+	EJSON_MPLAYSRV_RPC_READ_EDID, //reads edid data of the connected monitor via hdmi/dp
+
 	EJSON_GPIOCTL_RPC_END,
 	EJSON_GPIOCTL_RPC_NONE
 }EJSON_GPIOCTL_RPC_TYPES;
@@ -219,6 +221,25 @@ typedef struct MPLAYSRV_MEDIA_PACKET_T
 	MPLAYSRV_MEDIA_LOOP MediaLoop;
 	MPLAYSRV_MEDIA_LOOP SeamlessLoop;//h264 formatter raw video only support
 }MPLAYSRV_MEDIA_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_MPLAYSRV_RPC_READ_EDID
+#define	MPLAYSRV_RPC_READ_EDID                "read_edid_from_sink"
+#define MPLAYSRV_RPC_READ_EDID_TYPE_ARG       "sink"
+#define MPLAYSRV_RPC_READ_EDID_FILE_ARG       "filepath"
+#define MPLAYSRV_RPC_READ_EDID_TYPE_ARG_TABL  {"dvi","hdmi","dp","none","none","\0"} //
+typedef enum EJSON_MPLAYSRV_EDID_SINK_T
+{
+	EJSON_MPLAYSRV_EDID_SINK_DVI,
+	EJSON_MPLAYSRV_EDID_SINK_HDMI,
+	EJSON_MPLAYSRV_EDID_SINK_DP,
+	EJSON_MPLAYSRV_EDID_SINK_UNKNOWN,
+	EJSON_MPLAYSRV_EDID_SINK_NONE
+}EJSON_MPLAYSRV_EDID_SINK;
+typedef struct MPLAYSRV_EDID_PACKET_T
+{
+	EJSON_MPLAYSRV_EDID_SINK sink;
+	char filepath[1024];
+}MPLAYSRV_EDID_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to mplaysrv-service here
 typedef struct GPIOCTL_CMN_DATA_CACHE_T

@@ -5,7 +5,7 @@ add_subdirectory(lib-display)
 add_subdirectory(lib-settings)
 add_subdirectory(lib-adav-old)
 add_subdirectory(lib-onion)
-add_subdirectory(lib-ilclient)
+#add_subdirectory(lib-ilclient)
 #for cross compiling
 #cmake -H. -BOutput -DCMAKE_TOOLCHAIN_FILE=toolchain-arm-backup.cmake
 #cmake --build Output -- all

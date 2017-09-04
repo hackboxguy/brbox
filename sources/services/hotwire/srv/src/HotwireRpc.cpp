@@ -38,6 +38,7 @@ int GpioCtrlRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_MPLAYSRV_RPC_MEDIA_LOOP_SET:return json_to_bin_media_loop_set(pReq);
 		case EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_GET:return json_to_bin_seamless_loop_get(pReq);
 		case EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_SET:return json_to_bin_seamless_loop_set(pReq);
+		case EJSON_MPLAYSRV_RPC_READ_EDID:return json_to_bin_read_edid(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -66,6 +67,7 @@ int GpioCtrlRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_MPLAYSRV_RPC_MEDIA_LOOP_SET:return bin_to_json_media_loop_set(pReq);
 		case EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_GET:return bin_to_json_seamless_loop_get(pReq);
 		case EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_SET:return bin_to_json_seamless_loop_set(pReq);
+		case EJSON_MPLAYSRV_RPC_READ_EDID:return bin_to_json_read_edid(pReq);
 		default:break;
 	}
 	return -1;
@@ -94,6 +96,7 @@ int GpioCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProduce
 		case EJSON_MPLAYSRV_RPC_MEDIA_LOOP_SET:return process_media_loop_set(pReq);
 		case EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_GET:return process_seamless_loop_get(pReq);
 		case EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_SET:return process_seamless_loop_set(pReq);
+		case EJSON_MPLAYSRV_RPC_READ_EDID:return process_read_edid(pReq);
 		default:break;
 	}
 	return 0;
@@ -941,4 +944,42 @@ int GpioCtrlRpc::process_seamless_loop_set(JsonDataCommObj* pReq)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
+//EJSON_MPLAYSRV_RPC_READ_EDID
+int GpioCtrlRpc::json_to_bin_read_edid(JsonDataCommObj* pReq)
+{
+	MPLAYSRV_EDID_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,MPLAYSRV_EDID_PACKET,RPC_SRV_ACT_WRITE,EJSON_MPLAYSRV_RPC_READ_EDID);
+	//after assigning pointer to pPanelReq->dataRef, modify cmd-req-obj with correct client arguments
+JSON_STRING_TO_ENUM(MPLAYSRV_RPC_READ_EDID_TYPE_ARG,MPLAYSRV_RPC_READ_EDID_TYPE_ARG_TABL,EJSON_MPLAYSRV_EDID_SINK,EJSON_MPLAYSRV_EDID_SINK_UNKNOWN,pPanelCmdObj->sink);
+	//extract targetFilePath
+	JSON_STRING_TO_STRING(MPLAYSRV_RPC_READ_EDID_FILE_ARG,pPanelCmdObj->filepath);
+	return 0;
+}
+int GpioCtrlRpc::bin_to_json_read_edid(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,MPLAYSRV_EDID_PACKET);
+	return 0;
+}
+int GpioCtrlRpc::process_read_edid(JsonDataCommObj* pReq)//,DISPSRV_CMN_DATA_CACHE *pData)
+{
+	//DisplayDevice *pDisp=pData->pDisplay;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	MPLAYSRV_EDID_PACKET* pPacket;
+	pPacket=(MPLAYSRV_EDID_PACKET*)pPanelReq->dataRef;
+
+	//TODO: for raspi, check if requested sink is hdmi
+	char command[1024];
+	if(pPacket->sink==EJSON_MPLAYSRV_EDID_SINK_HDMI)
+		sprintf(command,"tvservice -d %s",pPacket->filepath);
+
+	else //other sinks are not supprted yet.
+		pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	
+	if (system(command)==0)
+		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	else
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+	return 0;
+}
 

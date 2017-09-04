@@ -101,6 +101,11 @@ public:
 	int json_to_bin_seamless_loop_set(JsonDataCommObj* pReq);
 	int bin_to_json_seamless_loop_set(JsonDataCommObj* pReq);
 	int process_seamless_loop_set(JsonDataCommObj* pReq);
+
+	int json_to_bin_read_edid(JsonDataCommObj* pReq);
+	int bin_to_json_read_edid(JsonDataCommObj* pReq);
+	int process_read_edid(JsonDataCommObj* pReq);//,DISPSRV_CMN_DATA_CACHE *pData);
+
 };
 /* ------------------------------------------------------------------------- */
 

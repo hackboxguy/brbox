@@ -44,6 +44,10 @@ GpioCltCmdline::GpioCltCmdline()
 	CmdlineHelper.insert_options_entry((char*)"seamlessloop" ,optional_argument,EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_GET);
 	CmdlineHelper.insert_help_entry((char*)"--seamlessloop=state       [enable/disable seamless looping of media playback, state=<enable/disable>]");
 
+
+	CmdlineHelper.insert_options_entry((char*)"readedid" ,optional_argument,EJSON_MPLAYSRV_RPC_READ_EDID);
+	CmdlineHelper.insert_help_entry((char*)"--readedid=sink,filepath   [reads edid data from connected monitor, sink=<dvi/hdmi/dp>]");
+
 	//--moverlay=enable/disable (show/hide overlay file on media)
 	//--moverlayfile=/some/file.png (overlay file: ex.pngfile)
 	//--mfiletype=playlist/media (mfile is of type play-list.txt or mp3/mp4/h264 media binary)
@@ -156,6 +160,15 @@ int GpioCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			EJSON_MPLAYSRV_RPC_SEAMLESS_LOOP_SET,MPLAYSRV_RPC_SEAMLESS_LOOP_GET,
 			MPLAYSRV_RPC_SEAMLESS_LOOP_SET,&table[0],MPLAYSRV_MEDIA_LOOP_UNKNOWN,
 			(char*)MPLAYSRV_RPC_SEAMLESS_LOOP_ARG,sub_arg);
+			}
+			break;
+		case EJSON_MPLAYSRV_RPC_READ_EDID:
+			{
+			const char *table[]   = MPLAYSRV_RPC_READ_EDID_TYPE_ARG_TABL;
+			CmdlineHelper.push_string_get_set_with_enum_arg(EJSON_MPLAYSRV_RPC_READ_EDID,EJSON_MPLAYSRV_RPC_READ_EDID,
+			MPLAYSRV_RPC_READ_EDID ,MPLAYSRV_RPC_READ_EDID ,
+			MPLAYSRV_RPC_READ_EDID_TYPE_ARG,EJSON_MPLAYSRV_EDID_SINK_UNKNOWN,&table[0],
+			MPLAYSRV_RPC_READ_EDID_FILE_ARG,sub_arg);
 			}
 			break;
 		default:
