@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BRBOX_PREPAREBOOTDISK
+	bool "installs an automated boot disk creation script"
+	default n
+	depends on BR2_TARGET_BRBOX_PACKAGES
+	help
+	  installs automated boot disk creator script to the target script.
+
