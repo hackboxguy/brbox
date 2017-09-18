@@ -1,0 +1,6 @@
+config BR2_PACKAGE_BRBOX_GPHOTO2
+	bool "gphoto2 commandline utility"
+	default n
+	help
+	  includes gphoto2 commandline utility.
+
