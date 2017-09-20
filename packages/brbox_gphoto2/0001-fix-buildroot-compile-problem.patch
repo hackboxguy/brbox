@@ -1,0 +1,42 @@
+diff --git a/Makefile.am b/Makefile.am
+index 3b36e00..f1f93e7 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,6 +1,6 @@
+ SUBDIRS = gphoto-m4 contrib doc gphoto2 packaging po tests
+ 
+-ACLOCAL_AMFLAGS = -I auto-m4 -I gphoto-m4
++ACLOCAL_AMFLAGS = -I gphoto-m4
+ EXTRA_DIST = README.md
+ 
+ README: $(srcdir)/README.md
+diff --git a/configure.ac b/configure.ac
+index 1757d76..e0fd240 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3,7 +3,7 @@ dnl Next stable release must be 2.5.15 or later
+ AC_INIT([gphoto2 command line interface], [2.5.14.1], [gphoto-devel@lists.sourceforge.net], [gphoto2])
+ AC_CONFIG_SRCDIR([gphoto2/main.c])
+ AC_CONFIG_HEADERS([config.h])
+-AC_CONFIG_MACRO_DIR([auto-m4])
++AC_CONFIG_MACRO_DIR([gphoto-m4])
+ AC_CONFIG_AUX_DIR([auto-aux])
+ AM_INIT_AUTOMAKE([-Wall -Werror gnu 1.9 dist-bzip2 check-news])
+ 
+@@ -59,7 +59,7 @@ GP_GETTEXT_HACK([],[Lutz Müller and others],[${MAIL_GPHOTO_TRANSLATION}])
+ ALL_LINGUAS="az cs da de en_GB es eu fi fr hu id is it ja nl pa pl pt_BR ro ru rw sk sr sv uk vi zh_CN zh_TW"
+ AM_GNU_GETTEXT_VERSION([0.14.1])
+ AM_GNU_GETTEXT([external])
+-AM_PO_SUBDIRS()
++#AM_PO_SUBDIRS()
+ AM_ICONV()
+ GP_GETTEXT_FLAGS()
+ 
+@@ -407,7 +407,6 @@ AC_SUBST([AM_LDFLAGS])
+ # Create output files
+ # ---------------------------------------------------------------------------
+ AC_CONFIG_FILES([
+-po/Makefile.in 
+ Makefile
+ gphoto2/Makefile
+ gphoto-m4/Makefile
