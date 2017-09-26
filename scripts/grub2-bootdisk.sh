@@ -137,7 +137,7 @@ test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "regenerate grub.img ..................................... "
     $BR_OUTPUT_FOLDER/host/usr/bin/grub-mkimage -d $BR_OUTPUT_FOLDER/host/usr/lib/grub/i386-pc \
-        -O i386-pc -o $BR_OUTPUT_FOLDER/images/grub.img -c ./grub.cfg.in \
+        --prefix "" -O i386-pc -o $BR_OUTPUT_FOLDER/images/grub.img -c ./grub.cfg.in \
         acpi cat boot linux ext2 fat part_msdos part_gpt normal biosdisk \
         search echo search_fs_uuid normal ls ata configfile halt help \
         hello read png vga lspci echo minicmd vga_text terminal
