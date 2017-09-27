@@ -166,6 +166,15 @@ else
 fi
 #TODO: set a flag in /mnt/setting to know that fmw-update has begun
 printf "Formatting $BRBOX_PARTITION as ext3................ "
+RESULT=$(mount | grep sda3) #due to usbmount, usb partition is automatically mounted
+if [ $? = "0" ]; then
+	RESULT=$(umount /dev/sda3)
+fi
+RESULT=$(mount | grep sda2) #due to usbmount, usb partition is automatically mounted
+if [ $? = "0" ]; then
+	RESULT=$(umount /dev/sda2)
+fi
+
 $MKFSTOOL -F -L $BRBOX_LABEL $BRBOX_PARTITION 1>/dev/null 2>/dev/null
 if [ $? != "0" ]; then #unable format ext3 filesystem
 	echo "Error: Unable to format ext3 filesystem!!!"
