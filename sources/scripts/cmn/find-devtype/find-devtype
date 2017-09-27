@@ -12,6 +12,8 @@ BD_TYP_RASPI_BPLUS="RASPI_BPLUS"
 BD_TYP_RASPI_B2="RASPI_B2"
 BD_TYP_BAYTRAIL="BAYTRAIL"
 BD_TYP_BAYTRAIL_I210="BAYTRAIL_I210"
+BD_TYP_X86_64="X86_64"
+BD_TYP_X86_32="X86_32"
 BD_TYP_BBB="BBB"
 BD_TYP_DEFAULT="Unknown"
 ###############################################################################
@@ -90,6 +92,20 @@ if [ $? = "0" ]; then
 	ReadBaytrailType
 	return $?
 fi
+
+#look for other intel pc's
+RESULT=$(cat /proc/cpuinfo | grep "model name" | grep "Intel(R)" )
+if [ $? = "0" ]; then
+	RESULT=$(cat /proc/cpuinfo | grep "clflush size" | grep "64" )
+	if [ $? = "0" ]; then
+		echo $BD_TYP_X86_64
+	else
+		echo $BD_TYP_X86_32
+	fi
+	return 0
+fi
+
+
 #look for bbb
 RESULT=$(cat /proc/cpuinfo | grep "Hardware" | grep "Generic AM33XX" )
 if [ $? = "0" ]; then
