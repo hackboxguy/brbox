@@ -1,5 +1,5 @@
 #!/bin/sh
-MKFSTOOL=/usr/sbin/mkfs.ext3
+MKFSTOOL=mkfs.ext3
 BRDSKMGR_TOOL=/usr/sbin/brdskmgr
 ONE_BRBOX_NAME=brbox1 #name of the first brbox system
 TWO_BRBOX_NAME=brbox2 #name of the second brbox system
