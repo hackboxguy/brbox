@@ -6,12 +6,15 @@
 #include "MyCmdline.h"
 #include "SrcControlVersion.h"
 #include "ADTimer.hpp"
-
+#include "MPlayer.h"
+#include "MPlayX86.h"
+#include "MPlayRaspi.h"
 /* ------------------------------------------------------------------------- */
 #include "HotwireJsonDef.h"
 #include "HotwireRpc.h"
 #define SERVER_JSON_PORT_NUM ADCMN_PORT_MPLAYSRV
 /* ------------------------------------------------------------------------- */
+MPlayer* create_media_player(ADCMN_BOARD_TYPE Type,std::string edid_node);
 using namespace std;
 int main(int argc, const char* argv[])
 {
@@ -34,6 +37,10 @@ int main(int argc, const char* argv[])
 	//create a common data Cache of the service
 	GPIOCTL_CMN_DATA_CACHE DataCache;
 	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
+	DataCache.edid_dvi =CmdLine.get_edid_dvi();
+	DataCache.edid_hdmi=CmdLine.get_edid_hdmi();
+	DataCache.edid_dp  =CmdLine.get_edid_dp();
+	DataCache.pMplayer=create_media_player(DevInfo.BoardType,"none");
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
@@ -96,3 +103,30 @@ int main(int argc, const char* argv[])
 	AppTimer.stop_timer();//stop sending heart-beats to other objects
 	return 0;
 }
+/* ------------------------------------------------------------------------- */
+//following function creates a media-player object based on user passed hardware-type
+MPlayer* create_media_player(ADCMN_BOARD_TYPE Type,std::string edid_node)
+{
+	MPlayer* pPlayer=NULL;
+	switch(Type)
+	{
+		case ADCMN_BOARD_TYPE_RASPI_A:
+		case ADCMN_BOARD_TYPE_RASPI_APLUS:
+		case ADCMN_BOARD_TYPE_RASPI_B:
+		case ADCMN_BOARD_TYPE_RASPI_BPLUS:
+		case ADCMN_BOARD_TYPE_RASPI_B2:
+		case ADCMN_BOARD_TYPE_RASPI_0:
+		case ADCMN_BOARD_TYPE_RASPI_3:pPlayer = new MPlayRaspi(edid_node);break;
+		case ADCMN_BOARD_TYPE_X86_64:
+		case ADCMN_BOARD_TYPE_X86_32:
+		case ADCMN_BOARD_TYPE_BAYTRAIL:
+		case ADCMN_BOARD_TYPE_BAYTRAIL_I210:pPlayer = new MPlayX86(edid_node);break;
+		case ADCMN_BOARD_TYPE_BBB:break;
+		//case LIGHT_SENSOR_TYPE_TAOS3414:pPlayer = new I2CTAOS3414Sensor(DevNode,Type);break;
+		//case LIGHT_SENSOR_TYPE_OOSTS   :pPlayer = new I2CDualPcfLcd(DevNode,Type);break;//spectrometer
+		default: break;
+	}
+	return pPlayer;
+}
+/* ------------------------------------------------------------------------- */
+

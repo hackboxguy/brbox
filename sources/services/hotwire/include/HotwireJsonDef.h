@@ -245,6 +245,7 @@ typedef struct MPLAYSRV_EDID_PACKET_T
 typedef struct GPIOCTL_CMN_DATA_CACHE_T
 {
 	void *pDevInfo;//device-info-struct(typecast in rpc handlers)
+	void *pMplayer;//Mediaplayerhandle
 	unsigned int tmpData;
 	GPIOCTL_OMXACT_TYPE ActType;
 	std::string fbimgpath;
@@ -259,8 +260,11 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 	MPLAYSRV_SCREENSTS ScreenStatus;
 	MPLAYSRV_MEDIA_LOOP MediaLoop;
 	MPLAYSRV_MEDIA_LOOP SeamlessLoop;//h264 formatter raw video only support
+	std::string edi_dvi,edid_hdmi,edid_dp,edid_dvi;
 	GPIOCTL_CMN_DATA_CACHE_T()
 	{
+		pDevInfo=NULL;
+		pMplayer=NULL;
 		fbimgpath="none";
 		qr_density=500;//TODO: configure qr-code-density via rpc
 		qr_size=37;//TODO: configure qr-code-size via rpc
@@ -273,6 +277,7 @@ typedef struct GPIOCTL_CMN_DATA_CACHE_T
 		ScreenStatus=MPLAYSRV_SCREENSTS_UNKNOWN;
 		MediaLoop=MPLAYSRV_MEDIA_LOOP_DISABLE;
 		SeamlessLoop=MPLAYSRV_MEDIA_LOOP_ENABLE;
+		edid_dvi="";edid_hdmi="";edid_dp="";
 	};//initialize variables here
 	~ GPIOCTL_CMN_DATA_CACHE_T(){};
 

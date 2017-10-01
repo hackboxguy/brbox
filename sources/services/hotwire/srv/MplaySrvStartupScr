@@ -8,7 +8,7 @@ DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
 start() {
 	echo -n "Starting $SERVER_NAME Service: "
 	DEV_TYPE=$(cat $DEV_TYPE_FILE)
-	$SERVER_PATH/$SERVER_NAME --boardtype=$DEV_TYPE 1>/dev/null 2>/dev/null &
+	$SERVER_PATH/$SERVER_NAME --boardtype=$DEV_TYPE --edid_dvi="/dev/i2c-1" --edid_hdmi="/dev/i2c-2" --edid_dp="/dev/i2c-3" 1>/dev/null 2>/dev/null &
 	echo "OK"
 }
 

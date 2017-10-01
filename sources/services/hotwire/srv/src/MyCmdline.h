@@ -8,7 +8,7 @@ class MyCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 	int port_number;
 	char version_number[255];
 	ADCmdlineHelper CmdlineHelper;
-
+	std::string edid_dvi,edid_hdmi,edid_dp;
 	//Chain-callback functions	
 	virtual int parse_my_cmdline_options(int arg, char* sub_arg);
 	virtual int run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);//char* ip);
@@ -27,5 +27,9 @@ public:
 	int get_dev_info(ADCMN_DEV_INFO *pInfo);
 
 	//service specific part
+	std::string get_edid_dvi();
+	std::string get_edid_hdmi();
+	std::string get_edid_dp();
+
 };
 #endif

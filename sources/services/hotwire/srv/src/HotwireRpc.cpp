@@ -1,4 +1,5 @@
 #include "HotwireRpc.h"
+#include "MPlayer.h"
 #define IMG_RENDER_FIFO_FILE "/tmp/img-renderer-process.fifo"
 /* ------------------------------------------------------------------------- */
 GpioCtrlRpc:: GpioCtrlRpc(std::string rpcName,int myIndex,bool emu, bool log,GPIOCTL_CMN_DATA_CACHE *pData):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
@@ -783,8 +784,17 @@ int GpioCtrlRpc::process_graphics_out_get(JsonDataCommObj* pReq)
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	MPLAYSRV_MEDIA_PACKET* pPacket;
 	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
-	pPacket->GraphicsOut=pDataCache->GraphicsOut;
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	//pPacket->GraphicsOut=pDataCache->GraphicsOut;
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+
+	if(pDataCache->pMplayer==NULL)
+		pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	else
+	{
+		MPlayer *pPlayer=(MPlayer*)pDataCache->pMplayer;
+		pPanelReq->result=pPlayer->get_graphics_out_ctrl(pPacket->GraphicsOut);
+	}
+
 	return 0;
 }
 int GpioCtrlRpc::json_to_bin_graphics_out_set(JsonDataCommObj* pReq)
@@ -806,7 +816,7 @@ int GpioCtrlRpc::process_graphics_out_set(JsonDataCommObj* pReq)
 	MPLAYSRV_MEDIA_PACKET* pPacket;
 	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
 
-	char command[1024];
+	/*char command[1024];
 	if(pPacket->GraphicsOut==MPLAYSRV_GRAPHICS_OUT_DISABLE)
 		sprintf(command,"tvservice -o");
 	else
@@ -818,8 +828,14 @@ int GpioCtrlRpc::process_graphics_out_set(JsonDataCommObj* pReq)
 		pDataCache->GraphicsOut=pPacket->GraphicsOut;
 	}
 	else
-		pPanelReq->result=RPC_SRV_RESULT_FAIL;
-
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;*/
+	if(pDataCache->pMplayer==NULL)
+		pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	else
+	{
+		MPlayer *pPlayer=(MPlayer*)pDataCache->pMplayer;
+		pPanelReq->result=pPlayer->set_graphics_out_ctrl(pPacket->GraphicsOut);
+	}
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
@@ -968,18 +984,33 @@ int GpioCtrlRpc::process_read_edid(JsonDataCommObj* pReq)//,DISPSRV_CMN_DATA_CAC
 	MPLAYSRV_EDID_PACKET* pPacket;
 	pPacket=(MPLAYSRV_EDID_PACKET*)pPanelReq->dataRef;
 
+	std::string edid_i2c_node="none";
+	switch(pPacket->sink)
+	{
+		case EJSON_MPLAYSRV_EDID_SINK_DVI :edid_i2c_node=pDataCache->edid_dvi;break;
+		case EJSON_MPLAYSRV_EDID_SINK_HDMI:edid_i2c_node=pDataCache->edid_hdmi;break;
+		case EJSON_MPLAYSRV_EDID_SINK_DP  :edid_i2c_node=pDataCache->edid_dp;break;
+		default:break;
+	}
 	//TODO: for raspi, check if requested sink is hdmi
-	char command[1024];
+	/*char command[1024];
 	if(pPacket->sink==EJSON_MPLAYSRV_EDID_SINK_HDMI)
 		sprintf(command,"tvservice -d %s",pPacket->filepath);
-
 	else //other sinks are not supprted yet.
 		pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
 	
 	if (system(command)==0)
 		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 	else
-		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;*/
+
+	if(pDataCache->pMplayer==NULL)
+		pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	else
+	{
+		MPlayer *pPlayer=(MPlayer*)pDataCache->pMplayer;
+		pPanelReq->result=pPlayer->read_edid(pPacket->filepath,edid_i2c_node);
+	}
 	return 0;
 }
 
