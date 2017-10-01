@@ -6,9 +6,21 @@ GpioCtrlRpc:: GpioCtrlRpc(std::string rpcName,int myIndex,bool emu, bool log,GPI
 {
 	pDataCache=pData;
 	pDataCache->ActType=GPIOCTL_OMXACT_IDLE;
-	char command[512];
-	sprintf(command,"dd if=/dev/zero of=/dev/fb0;setterm -cursor off >/dev/tty1");
-	system(command);
+	/*char command[512];
+	switch(pDataCache->BoardType)
+	{
+		case ADCMN_BOARD_TYPE_RASPI_A:
+		case ADCMN_BOARD_TYPE_RASPI_APLUS:
+		case ADCMN_BOARD_TYPE_RASPI_B:
+		case ADCMN_BOARD_TYPE_RASPI_BPLUS:
+		case ADCMN_BOARD_TYPE_RASPI_B2:
+		case ADCMN_BOARD_TYPE_RASPI_0:
+		case ADCMN_BOARD_TYPE_RASPI_3:
+			sprintf(command,"dd if=/dev/zero of=/dev/fb0;setterm -cursor off >/dev/tty1");
+			system(command);
+			break;
+		default:break;
+	}*/
 	//process_show_pattern(pDataCache->StartupBkgnd);//on bootup, show solid color
 }
 /* ------------------------------------------------------------------------- */

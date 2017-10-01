@@ -8,6 +8,9 @@ MPlayRaspi::MPlayRaspi(std::string DevNode):MPlayer(DevNode)//,I2CBusAccess(DevN
 {
 	//sensorI2CAddr=COLOR_SENSOR_ADDR;
 	//ledStatus = 0;//flashlight led on the grove color sensor
+	char command[512];
+	sprintf(command,"dd if=/dev/zero of=/dev/fb0;setterm -cursor off >/dev/tty1");
+	system(command);
 }
 MPlayRaspi::~MPlayRaspi()
 {
