@@ -8,6 +8,13 @@ MPlayX86::MPlayX86(std::string DevNode):MPlayer(DevNode)//,I2CBusAccess(DevNode)
 {
 	//sensorI2CAddr=COLOR_SENSOR_ADDR;
 	//ledStatus = 0;//flashlight led on the grove color sensor
+
+	//defaults
+	graphics_out_sts=MPLAYSRV_GRAPHICS_OUT_ENABLE;//upon boot, graphics is always enabled.
+	MediaFileType=MPLAYSRV_MEDIAFILE_TYPE_MEDIA;//MPLAYSRV_MEDIAFILE_TYPE_UNKNOWN;
+	MediaFile="/opt/fmw/misc_binaries/sample-video.mkv";//"none";
+	MediaLoop=MPLAYSRV_MEDIA_LOOP_DISABLE;
+	SeamlessLoop=MPLAYSRV_MEDIA_LOOP_ENABLE;
 }
 MPlayX86::~MPlayX86()
 {
@@ -112,5 +119,134 @@ RPC_SRV_RESULT MPlayX86::show_image(std::string imgfile)
 	//xdotool key q --windowid 6291457
 }
 /*****************************************************************************/
+RPC_SRV_RESULT MPlayX86::get_mediafile_type(MPLAYSRV_MEDIAFILE_TYPE& type)
+{
+	type=MediaFileType;
+	return RPC_SRV_RESULT_SUCCESS;
+}
+RPC_SRV_RESULT MPlayX86::set_mediafile_type(MPLAYSRV_MEDIAFILE_TYPE type)
+{
+	MediaFileType=type;
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/*****************************************************************************/
+RPC_SRV_RESULT MPlayX86::get_mediafile(char* file)
+{
+	strcpy(file,MediaFile.c_str());
+	return RPC_SRV_RESULT_SUCCESS;
+}
+RPC_SRV_RESULT MPlayX86::set_mediafile(char* file)
+{
+	MediaFile=file;
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/*****************************************************************************/
+RPC_SRV_RESULT MPlayX86::get_media_loop(MPLAYSRV_MEDIA_LOOP& loop)
+{
+	loop=MediaLoop;
+	return RPC_SRV_RESULT_SUCCESS;
+}
+RPC_SRV_RESULT MPlayX86::set_media_loop(MPLAYSRV_MEDIA_LOOP loop)
+{
+	MediaLoop=loop;
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/*****************************************************************************/
+RPC_SRV_RESULT MPlayX86::get_seamless_loop(MPLAYSRV_MEDIA_LOOP& loop)
+{
+	loop=SeamlessLoop;
+	return RPC_SRV_RESULT_SUCCESS;
+}
+RPC_SRV_RESULT MPlayX86::set_seamless_loop(MPLAYSRV_MEDIA_LOOP loop)
+{
+	SeamlessLoop=loop;
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/*****************************************************************************/
+bool MPlayX86::is_media_playing()
+{
+	char command[1024];
+	sprintf(command,"ps cax | grep [g]st-play-1.0 >/dev/null");
+	if (system(command)==0)
+		return true;
+	else
+	{
+		//sprintf(command,"ps cax | grep [h]ello_video >/dev/null");
+		//if (system(command)==0)
+		//	return true;
+		//else
+			return false;
+	}
+}
 
+RPC_SRV_RESULT MPlayX86::set_media_action(MPLAYSRV_MEDIA_ACTION act)
+{
+	char command[1024];
+	bool omx_sts=false;
+	omx_sts=is_media_playing();
+	switch(act)
+	{
+		case MPLAYSRV_MEDIA_ACTION_START :
+				if(omx_sts==true)
+					return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;//video is already running, stop it first
+				if(MediaFileType!=MPLAYSRV_MEDIAFILE_TYPE_MEDIA)
+						return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+				if(MediaFile=="")
+						return RPC_SRV_RESULT_FILE_NOT_FOUND;//RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+				sprintf(command,"mkfifo /tmp/omxplay.fifo;rm -rf /tmp/omxplay.finished");
+				system(command);
+
+				if(MediaLoop==MPLAYSRV_MEDIA_LOOP_DISABLE)
+				{
+					//TODO: check if the media file exists, else return file-not-found
+					sprintf(command,"(export DISPLAY=:0; gst-play-1.0 %s --videosink=xvimagesink;touch /tmp/omxplay.finished) < /tmp/omxplay.fifo &",MediaFile.c_str());
+					system(command);
+					sprintf(command,"echo . > /tmp/omxplay.fifo");
+				}
+				else
+				{
+					//if(SeamlessLoop==MPLAYSRV_MEDIA_LOOP_ENABLE)
+					//{
+					//	sprintf(command,"(hello_video --loop %s;fbset -depth 8 && fbset -depth 16;touch /tmp/omxplay.finished) < /tmp/omxplay.fifo &",MediaFile.c_str());
+					//	system(command);
+					//	sprintf(command,"echo . > /tmp/omxplay.fifo");
+					//}
+					//else
+						sprintf(command,"omx-loop.sh %s &",MediaFile.c_str());
+				}
+				system(command);
+				//VideoPaused=false;
+				return RPC_SRV_RESULT_SUCCESS;		
+				break;
+		case MPLAYSRV_MEDIA_ACTION_PAUSE :
+				if(omx_sts==true)
+				{
+					sprintf(command,"echo -n \" \" > /tmp/omxplay.fifo");
+					system(command);
+					return RPC_SRV_RESULT_SUCCESS;
+				}
+				else
+					return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;//video is already stopped;//RPC_SRV_RESULT_FAIL;
+				break;//user for both pause or play(sending pause on paused video, will start playing)
+		case MPLAYSRV_MEDIA_ACTION_STOP  :
+				if(omx_sts==true)
+				{
+					//if(MediaLoop==MPLAYSRV_MEDIA_LOOP_ENABLE && SeamlessLoop==MPLAYSRV_MEDIA_LOOP_DISABLE)
+					//{
+					//	sprintf(command,"touch /tmp/omxplay.stoploop");
+					//	system(command);
+					//}
+					sprintf(command,"echo -n q > /tmp/omxplay.fifo");
+					system(command);
+					return RPC_SRV_RESULT_SUCCESS;
+				}
+				else
+					return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;//video is already stopped
+
+				break;
+		default:break;
+	}
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/*****************************************************************************/
 

@@ -594,8 +594,16 @@ int GpioCtrlRpc::process_mediafile_type_get(JsonDataCommObj* pReq)
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	MPLAYSRV_MEDIA_PACKET* pPacket;
 	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
-	pPacket->MediaFileType=pDataCache->MediaFileType;//TODO
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	//pPacket->MediaFileType=pDataCache->MediaFileType;//TODO
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+
+	if(pDataCache->pMplayer==NULL)
+		pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	else
+	{
+		MPlayer *pPlayer=(MPlayer*)pDataCache->pMplayer;
+		pPanelReq->result=pPlayer->get_mediafile_type(pPacket->MediaFileType);
+	}
 	return 0;
 }
 int GpioCtrlRpc::json_to_bin_mediafile_type_set(JsonDataCommObj* pReq)
@@ -616,8 +624,15 @@ int GpioCtrlRpc::process_mediafile_type_set(JsonDataCommObj* pReq)
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	MPLAYSRV_MEDIA_PACKET* pPacket;
 	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
-	pDataCache->MediaFileType=pPacket->MediaFileType;//TODO
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	//pDataCache->MediaFileType=pPacket->MediaFileType;//TODO
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	if(pDataCache->pMplayer==NULL)
+		pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	else
+	{
+		MPlayer *pPlayer=(MPlayer*)pDataCache->pMplayer;
+		pPanelReq->result=pPlayer->set_mediafile_type(pPacket->MediaFileType);
+	}
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
@@ -643,8 +658,15 @@ int GpioCtrlRpc::process_mediafile_get(JsonDataCommObj* pReq)
 		pPanelReq->result=RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
 		return 0;
 	}
-	strcpy(pPacket->MediaFilePath,pDataCache->MediaFilePath.c_str());
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	//strcpy(pPacket->MediaFilePath,pDataCache->MediaFilePath.c_str());
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	if(pDataCache->pMplayer==NULL)
+		pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	else
+	{
+		MPlayer *pPlayer=(MPlayer*)pDataCache->pMplayer;
+		pPanelReq->result=pPlayer->get_mediafile(pPacket->MediaFilePath);
+	}
 	return 0;
 }
 int GpioCtrlRpc::json_to_bin_mediafile_set(JsonDataCommObj* pReq)
@@ -665,8 +687,15 @@ int GpioCtrlRpc::process_mediafile_set(JsonDataCommObj* pReq)//,ADJsonRpcMgrProd
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	MPLAYSRV_MEDIA_PACKET* pPacket;
 	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
-	pDataCache->MediaFilePath=pPacket->MediaFilePath;
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;//TODO//=process_show_image(pDataCache->fbimgpath);//RPC_SRV_RESULT_SUCCESS;
+	//pDataCache->MediaFilePath=pPacket->MediaFilePath;
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;//TODO//=process_show_image(pDataCache->fbimgpath);//RPC_SRV_RESULT_SUCCESS;
+	if(pDataCache->pMplayer==NULL)
+		pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	else
+	{
+		MPlayer *pPlayer=(MPlayer*)pDataCache->pMplayer;
+		pPanelReq->result=pPlayer->set_mediafile(pPacket->MediaFilePath);
+	}
 	return 0;		
 }
 /* ------------------------------------------------------------------------- */
@@ -688,8 +717,15 @@ int GpioCtrlRpc::process_media_action_set(JsonDataCommObj* pReq)
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	MPLAYSRV_MEDIA_PACKET* pPacket;
 	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
-	//pDataCache->MediaAction=pPacket->MediaAction;//TODO
-	pPanelReq->result=process_media_action(pPacket->MediaAction);//RPC_SRV_RESULT_SUCCESS;
+	//pPanelReq->result=process_media_action(pPacket->MediaAction);//RPC_SRV_RESULT_SUCCESS;
+
+	if(pDataCache->pMplayer==NULL)
+		pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	else
+	{
+		MPlayer *pPlayer=(MPlayer*)pDataCache->pMplayer;
+		pPanelReq->result=pPlayer->set_media_action(pPacket->MediaAction);
+	}
 	return 0;
 }
 RPC_SRV_RESULT GpioCtrlRpc::process_media_action(MPLAYSRV_MEDIA_ACTION act)
@@ -900,8 +936,15 @@ int GpioCtrlRpc::process_media_loop_get(JsonDataCommObj* pReq)
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	MPLAYSRV_MEDIA_PACKET* pPacket;
 	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
-	pPacket->MediaLoop=pDataCache->MediaLoop;
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	//pPacket->MediaLoop=pDataCache->MediaLoop;
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	if(pDataCache->pMplayer==NULL)
+		pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	else
+	{
+		MPlayer *pPlayer=(MPlayer*)pDataCache->pMplayer;
+		pPanelReq->result=pPlayer->get_media_loop(pPacket->MediaLoop);
+	}
 	return 0;
 }
 int GpioCtrlRpc::json_to_bin_media_loop_set(JsonDataCommObj* pReq)
@@ -922,8 +965,15 @@ int GpioCtrlRpc::process_media_loop_set(JsonDataCommObj* pReq)
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	MPLAYSRV_MEDIA_PACKET* pPacket;
 	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
-	pDataCache->MediaLoop=pPacket->MediaLoop;
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	//pDataCache->MediaLoop=pPacket->MediaLoop;
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	if(pDataCache->pMplayer==NULL)
+		pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	else
+	{
+		MPlayer *pPlayer=(MPlayer*)pDataCache->pMplayer;
+		pPanelReq->result=pPlayer->set_media_loop(pPacket->MediaLoop);
+	}
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
@@ -944,8 +994,15 @@ int GpioCtrlRpc::process_seamless_loop_get(JsonDataCommObj* pReq)
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	MPLAYSRV_MEDIA_PACKET* pPacket;
 	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
-	pPacket->SeamlessLoop=pDataCache->SeamlessLoop;
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	//pPacket->SeamlessLoop=pDataCache->SeamlessLoop;
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	if(pDataCache->pMplayer==NULL)
+		pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	else
+	{
+		MPlayer *pPlayer=(MPlayer*)pDataCache->pMplayer;
+		pPanelReq->result=pPlayer->get_seamless_loop(pPacket->SeamlessLoop);
+	}
 	return 0;
 }
 int GpioCtrlRpc::json_to_bin_seamless_loop_set(JsonDataCommObj* pReq)
@@ -966,8 +1023,15 @@ int GpioCtrlRpc::process_seamless_loop_set(JsonDataCommObj* pReq)
 	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
 	MPLAYSRV_MEDIA_PACKET* pPacket;
 	pPacket=(MPLAYSRV_MEDIA_PACKET*)pPanelReq->dataRef;
-	pDataCache->SeamlessLoop=pPacket->SeamlessLoop;
-	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	//pDataCache->SeamlessLoop=pPacket->SeamlessLoop;
+	//pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	if(pDataCache->pMplayer==NULL)
+		pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	else
+	{
+		MPlayer *pPlayer=(MPlayer*)pDataCache->pMplayer;
+		pPanelReq->result=pPlayer->set_seamless_loop(pPacket->SeamlessLoop);
+	}
 	return 0;
 }
 /* ------------------------------------------------------------------------- */

@@ -8,6 +8,8 @@
 class MPlayX86 : public MPlayer
 {
 	RPC_SRV_RESULT remove_existing_image();
+	bool is_media_playing();
+
 public:
 	MPlayX86(std::string DevNode);//,std::string DevType);
 	~MPlayX86();
@@ -15,6 +17,16 @@ public:
 	RPC_SRV_RESULT get_graphics_out_ctrl(MPLAYSRV_GRAPHICS_OUT& sts);
 	RPC_SRV_RESULT set_graphics_out_ctrl(MPLAYSRV_GRAPHICS_OUT sts);
 	RPC_SRV_RESULT show_image(std::string imgfile);
+	RPC_SRV_RESULT get_mediafile_type(MPLAYSRV_MEDIAFILE_TYPE& type);
+	RPC_SRV_RESULT set_mediafile_type(MPLAYSRV_MEDIAFILE_TYPE type);
+	RPC_SRV_RESULT get_mediafile(char* file);
+	RPC_SRV_RESULT set_mediafile(char* file);
+	RPC_SRV_RESULT get_media_loop(MPLAYSRV_MEDIA_LOOP& loop);
+	RPC_SRV_RESULT set_media_loop(MPLAYSRV_MEDIA_LOOP loop);
+	RPC_SRV_RESULT get_seamless_loop(MPLAYSRV_MEDIA_LOOP& loop);
+	RPC_SRV_RESULT set_seamless_loop(MPLAYSRV_MEDIA_LOOP loop);
+        RPC_SRV_RESULT set_media_action(MPLAYSRV_MEDIA_ACTION act);
+
 };
 #endif
 
