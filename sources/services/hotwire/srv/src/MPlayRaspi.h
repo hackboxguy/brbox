@@ -13,6 +13,7 @@ public:
 	RPC_SRV_RESULT read_edid(std::string filepath,std::string devnode="");
 	RPC_SRV_RESULT get_graphics_out_ctrl(MPLAYSRV_GRAPHICS_OUT& sts);
 	RPC_SRV_RESULT set_graphics_out_ctrl(MPLAYSRV_GRAPHICS_OUT sts);
+	RPC_SRV_RESULT show_image(std::string imgfile);
 };
 #endif
 

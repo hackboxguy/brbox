@@ -5,6 +5,7 @@
 #include "ADCommon.hpp"
 //#include <stdint.h>
 #include "HotwireJsonDef.h"
+#define IMG_RENDER_FIFO_FILE "/tmp/img-renderer-process.fifo"
 /*****************************************************************************/
 class MPlayer
 {
@@ -17,6 +18,7 @@ public:
 	virtual RPC_SRV_RESULT read_edid(std::string filepath,std::string devnode)=0;
 	virtual RPC_SRV_RESULT get_graphics_out_ctrl(MPLAYSRV_GRAPHICS_OUT& sts)=0;
 	virtual RPC_SRV_RESULT set_graphics_out_ctrl(MPLAYSRV_GRAPHICS_OUT sts)=0;
+	virtual RPC_SRV_RESULT show_image(std::string imgfile)=0;
 
 	//virtual RPC_SRV_RESULT init_sensor()=0;//must-have function for derived class
 	//virtual RPC_SRV_RESULT trigger_measurement()=0;//must-have function for derived class

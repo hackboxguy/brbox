@@ -412,20 +412,11 @@ int GpioCtrlRpc::process_showfbimg_set(JsonDataCommObj* pReq)//,ADJsonRpcMgrProd
 RPC_SRV_RESULT GpioCtrlRpc::process_show_image(std::string imgfile)
 {
 	//TODO: if video is already playing, then return fail, dont render any image
-	char command[1024];
+/*	char command[1024];
 	if(imgfile=="none")
 	{
-		//if(is_screen_image_active()==true)//stop only if fbv image rendering is already running
-		{
-			//stop fbv command which is running in background
-			//sprintf(command,"echo -n q > %s",IMG_RENDER_FIFO_FILE);
-			//system(command);
-			//clean framebuffer and turn off blinking cursor
-			sprintf(command,"dd if=/dev/zero of=/dev/fb0;setterm -cursor off >/dev/tty1");
-			system(command);
-			//pDataCache->fbimgpath="none";
-
-		}
+		sprintf(command,"dd if=/dev/zero of=/dev/fb0;setterm -cursor off >/dev/tty1");
+		system(command);
 		return RPC_SRV_RESULT_SUCCESS;
 	}
 	//check if image file exists //TODO:
@@ -444,9 +435,17 @@ RPC_SRV_RESULT GpioCtrlRpc::process_show_image(std::string imgfile)
 	system(command);
 
 	pDataCache->ScreenStatus=MPLAYSRV_SCREENSTS_IMAGE;
+	return RPC_SRV_RESULT_SUCCESS;*/
 
-	//pDataCache->fbimgpath=imgfile;
-	return RPC_SRV_RESULT_SUCCESS;
+
+	if(pDataCache->pMplayer==NULL)
+		return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
+	else
+	{
+		MPlayer *pPlayer=(MPlayer*)pDataCache->pMplayer;
+		pDataCache->ScreenStatus=MPLAYSRV_SCREENSTS_IMAGE;//TODO
+		return pPlayer->show_image(imgfile);
+	}
 }
 bool GpioCtrlRpc::is_screen_image_active()
 {

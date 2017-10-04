@@ -31,6 +31,7 @@ RPC_SRV_RESULT MPlayRaspi::get_graphics_out_ctrl(MPLAYSRV_GRAPHICS_OUT& sts)
 	sts=graphics_out_sts;
 	return RPC_SRV_RESULT_SUCCESS;
 }
+/*****************************************************************************/
 RPC_SRV_RESULT MPlayRaspi::set_graphics_out_ctrl(MPLAYSRV_GRAPHICS_OUT sts)
 {
 	char command[1024];
@@ -48,4 +49,35 @@ RPC_SRV_RESULT MPlayRaspi::set_graphics_out_ctrl(MPLAYSRV_GRAPHICS_OUT sts)
 		return RPC_SRV_RESULT_FAIL;
 }
 /*****************************************************************************/
+RPC_SRV_RESULT MPlayRaspi::show_image(std::string imgfile)
+{
+	char command[1024];
+	if(imgfile=="none")
+	{
+		sprintf(command,"dd if=/dev/zero of=/dev/fb0;setterm -cursor off >/dev/tty1");
+		system(command);
+		return RPC_SRV_RESULT_SUCCESS;
+	}
+
+	//check if image file exists //TODO:
+	sprintf(command,"mkfifo %s",IMG_RENDER_FIFO_FILE);
+	system(command);
+
+	//wake-up sleeping display-output and clear screen
+	sprintf(command,"echo -ne \"\\033[9;2]\">/dev/tty1;dd if=/dev/zero of=/dev/fb0");
+	system(command);
+
+	//using fbv command render the image file
+	sprintf(command,"fbv -f %s < %s &",imgfile.c_str(),IMG_RENDER_FIFO_FILE);
+	system(command);
+	//with following command, frame is rendered on the screen(need to check why?)
+	sprintf(command,"echo . > %s",IMG_RENDER_FIFO_FILE);
+	system(command);
+
+	//pDataCache->ScreenStatus=MPLAYSRV_SCREENSTS_IMAGE;
+
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/*****************************************************************************/
+
 
