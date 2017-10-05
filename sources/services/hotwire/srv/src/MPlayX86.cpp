@@ -258,7 +258,7 @@ RPC_SRV_RESULT MPlayX86::set_media_action(MPLAYSRV_MEDIA_ACTION act)
 RPC_SRV_RESULT MPlayX86::send_char_to_xutility(std::string utility, char ch)
 {
 	char command[1024];
-	sprintf(command,"export DISPLAY=:0;xdotool key %c --windowid \"$(xdotool search --class feh | tail -1)\"",ch,utility.c_str());
+	sprintf(command,"export DISPLAY=:0;xdotool key %c --windowid \"$(xdotool search --class %s | tail -1)\"",ch,utility.c_str());
 	system(command);
 	return RPC_SRV_RESULT_SUCCESS;
 }
