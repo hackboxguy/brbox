@@ -215,7 +215,8 @@ RPC_SRV_RESULT MPlayX86::set_media_action(MPLAYSRV_MEDIA_ACTION act)
 					//	sprintf(command,"echo . > /tmp/omxplay.fifo");
 					//}
 					//else
-						sprintf(command,"omx-loop.sh %s &",MediaFile.c_str());
+					sprintf(command,"gst-loop.sh %s &",MediaFile.c_str());
+					system(command);
 				}
 				//system(command);
 				//VideoPaused=false;
@@ -235,11 +236,11 @@ RPC_SRV_RESULT MPlayX86::set_media_action(MPLAYSRV_MEDIA_ACTION act)
 		case MPLAYSRV_MEDIA_ACTION_STOP  :
 				if(omx_sts==true)
 				{
-					//if(MediaLoop==MPLAYSRV_MEDIA_LOOP_ENABLE && SeamlessLoop==MPLAYSRV_MEDIA_LOOP_DISABLE)
-					//{
-					//	sprintf(command,"touch /tmp/omxplay.stoploop");
-					//	system(command);
-					//}
+					if(MediaLoop==MPLAYSRV_MEDIA_LOOP_ENABLE)// && SeamlessLoop==MPLAYSRV_MEDIA_LOOP_DISABLE)
+					{
+						sprintf(command,"touch /tmp/omxplay.stoploop");
+						system(command);
+					}
 
 					//sprintf(command,"echo -n q > /tmp/omxplay.fifo");
 					//system(command);
