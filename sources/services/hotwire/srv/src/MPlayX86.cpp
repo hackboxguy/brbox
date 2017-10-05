@@ -193,15 +193,18 @@ RPC_SRV_RESULT MPlayX86::set_media_action(MPLAYSRV_MEDIA_ACTION act)
 						return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
 				if(MediaFile=="")
 						return RPC_SRV_RESULT_FILE_NOT_FOUND;//RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
-				sprintf(command,"mkfifo /tmp/omxplay.fifo;rm -rf /tmp/omxplay.finished");
+				
+				//sprintf(command,"mkfifo /tmp/omxplay.fifo;rm -rf /tmp/omxplay.finished");
+				sprintf(command,"rm -rf /tmp/omxplay.finished");
 				system(command);
 
 				if(MediaLoop==MPLAYSRV_MEDIA_LOOP_DISABLE)
 				{
 					//TODO: check if the media file exists, else return file-not-found
-					sprintf(command,"(export DISPLAY=:0; gst-play-1.0 %s --videosink=xvimagesink;touch /tmp/omxplay.finished) < /tmp/omxplay.fifo &",MediaFile.c_str());
+					//sprintf(command,"(export DISPLAY=:0; gst-play-1.0 %s --videosink=xvimagesink;touch /tmp/omxplay.finished) < /tmp/omxplay.fifo &",MediaFile.c_str());
+					sprintf(command,"(export DISPLAY=:0; gst-play-1.0 %s --videosink=xvimagesink;touch /tmp/omxplay.finished) &",MediaFile.c_str());
 					system(command);
-					sprintf(command,"echo . > /tmp/omxplay.fifo");
+					//sprintf(command,"echo . > /tmp/omxplay.fifo");
 				}
 				else
 				{
@@ -221,8 +224,9 @@ RPC_SRV_RESULT MPlayX86::set_media_action(MPLAYSRV_MEDIA_ACTION act)
 		case MPLAYSRV_MEDIA_ACTION_PAUSE :
 				if(omx_sts==true)
 				{
-					sprintf(command,"echo -n \" \" > /tmp/omxplay.fifo");
-					system(command);
+					//sprintf(command,"echo -n \" \" > /tmp/omxplay.fifo");
+					//system(command);
+					send_char_to_xutility("gst*", ' ');
 					return RPC_SRV_RESULT_SUCCESS;
 				}
 				else
@@ -236,8 +240,10 @@ RPC_SRV_RESULT MPlayX86::set_media_action(MPLAYSRV_MEDIA_ACTION act)
 					//	sprintf(command,"touch /tmp/omxplay.stoploop");
 					//	system(command);
 					//}
-					sprintf(command,"echo -n q > /tmp/omxplay.fifo");
-					system(command);
+
+					//sprintf(command,"echo -n q > /tmp/omxplay.fifo");
+					//system(command);
+					send_char_to_xutility("gst*", 'q');
 					return RPC_SRV_RESULT_SUCCESS;
 				}
 				else
@@ -246,6 +252,14 @@ RPC_SRV_RESULT MPlayX86::set_media_action(MPLAYSRV_MEDIA_ACTION act)
 				break;
 		default:break;
 	}
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/*****************************************************************************/
+RPC_SRV_RESULT MPlayX86::send_char_to_xutility(std::string utility, char ch)
+{
+	char command[1024];
+	sprintf(command,"export DISPLAY=:0;xdotool key %c --windowid \"$(xdotool search --class feh | tail -1)\"",ch,utility.c_str());
+	system(command);
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
