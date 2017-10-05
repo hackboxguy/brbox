@@ -217,7 +217,7 @@ RPC_SRV_RESULT MPlayX86::set_media_action(MPLAYSRV_MEDIA_ACTION act)
 					//else
 						sprintf(command,"omx-loop.sh %s &",MediaFile.c_str());
 				}
-				system(command);
+				//system(command);
 				//VideoPaused=false;
 				return RPC_SRV_RESULT_SUCCESS;		
 				break;
