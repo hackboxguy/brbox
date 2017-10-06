@@ -58,6 +58,6 @@ xset s off &
 xsetroot -solid darkblue &
 #exec xterm -geometry 0x0+0+0 -name login
 /etc/X11/draw-desktop-info.sh
-feh /tmp/desktop-screen.jpg & #/etc/X11/logo.png &
+feh -F /tmp/desktop-screen.jpg & #/etc/X11/logo.png &
 pid=$!
 wait $pid
