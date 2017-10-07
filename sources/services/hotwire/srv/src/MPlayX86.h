@@ -10,7 +10,7 @@ class MPlayX86 : public MPlayer
 	RPC_SRV_RESULT remove_existing_image();
 	bool is_media_playing();
 	RPC_SRV_RESULT send_char_to_xutility(std::string utility, std::string ch);
-
+	std::string get_image_geometry();
 public:
 	MPlayX86(std::string DevNode);//,std::string DevType);
 	~MPlayX86();

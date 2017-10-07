@@ -98,6 +98,11 @@ RPC_SRV_RESULT MPlayX86::remove_existing_image()
 		return RPC_SRV_RESULT_FILE_READ_ERR;	
 
 }
+std::string MPlayX86::get_image_geometry()
+{
+	//TODO: return actual screen geometry read from fbset
+	return "1920x1080";
+}
 RPC_SRV_RESULT MPlayX86::show_image(std::string imgfile)
 {
 	char command[1024];
@@ -107,8 +112,8 @@ RPC_SRV_RESULT MPlayX86::show_image(std::string imgfile)
 
 	if(imgfile=="none")
 		return RPC_SRV_RESULT_SUCCESS;//last shown image successfully removed.
-
-	sprintf(command,"export DISPLAY=:0;feh -F %s &",imgfile.c_str());
+	std::string geometry = get_image_geometry();
+	sprintf(command,"export DISPLAY=:0;feh -Z -g %s %s &",geometry.c_str(),imgfile.c_str());
 	if (system(command)==0)
 		return RPC_SRV_RESULT_SUCCESS;
 	else
