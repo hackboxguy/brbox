@@ -5,6 +5,8 @@ DISK_IMAGE=$INTEL_DISK
 #todo: check user argument, and select correct image type
 #add lcd display message
 #return if sdcard is not found.
+
+#!!!!!!Note: disable auto  usbmount before running this script
 ###############################################################################
 PrintLcdMsg() #$1=line_nuber $2-msg-string
 {
@@ -61,6 +63,7 @@ sgdisk -d 5 /dev/sdb 1>/dev/null 2>/dev/null
 sgdisk -N 5 /dev/sdb 1>/dev/null 2>/dev/null
 umount /dev/sdb2 1>/dev/null 2>/dev/null
 umount /dev/sdb3 1>/dev/null 2>/dev/null
+
 #partprobe /dev/sdb   1>/dev/null 2>/dev/null
 
 printf "unmounting partitions again.... "
@@ -71,6 +74,12 @@ done
 echo "[OK]"
 
 e2fsck -f /dev/sdb5  1>/dev/null 2>/dev/null
+
+for f in `ls /dev/sdb*`
+do
+	umount $f 1>/dev/null 2>/dev/null
+done
+
 PrintLcdMsg line2 "   step-5-of-12   "
 printf "expanding userdata ............ "
 resize2fs /dev/sdb5 1>/dev/null 2>/dev/null
