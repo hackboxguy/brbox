@@ -100,7 +100,29 @@ RPC_SRV_RESULT MPlayX86::remove_existing_image()
 }
 std::string MPlayX86::get_image_geometry()
 {
-	//TODO: return actual screen geometry read from fbset
+	char command[1024];
+	sprintf(command,"fbset | grep geometry |awk '{print $2\"x\"$3'} > %s","/tmp/temp-x11-feh-session.txt");
+	if(system(command)!=0)
+		return "1920x1080";//RPC_SRV_RESULT_FILE_OPEN_ERR;
+
+	FILE *shell;
+	shell= fopen("/tmp/temp-x11-feh-session.txt","r");
+	if(shell == NULL) 
+		return "1920x1080";//RPC_SRV_RESULT_FILE_OPEN_ERR;
+
+	size_t read_bytes = fread(command,1,100,shell);
+	fclose(shell);
+	if(read_bytes>0)
+	{
+		command[read_bytes]='\0';
+		if(command[strlen(command)-1]=='\n')//remove the carriage return line
+			command[strlen(command)-1]='\0';
+		if(strlen(command)>=1)
+		{
+			std::string geo = command;
+			return geo;
+		}
+	}
 	return "1920x1080";
 }
 RPC_SRV_RESULT MPlayX86::show_image(std::string imgfile)
