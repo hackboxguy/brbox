@@ -2,7 +2,7 @@
 
 TFTPD_DIR=/tmp/tftpboot
 
-OPTIONS="-c -l -s $TFTPD_DIR"
+OPTIONS="-c -l -4 -s $TFTPD_DIR"
 
 set -e
 
