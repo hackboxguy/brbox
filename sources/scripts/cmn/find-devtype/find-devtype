@@ -15,6 +15,7 @@ BD_TYP_BAYTRAIL_I210="BAYTRAIL_I210"
 BD_TYP_X86_64="X86_64"
 BD_TYP_X86_32="X86_32"
 BD_TYP_BBB="BBB"
+BD_TYP_A5V11="A5_V11"
 BD_TYP_DEFAULT="Unknown"
 ###############################################################################
 ReadRaspiType()
@@ -111,6 +112,12 @@ RESULT=$(cat /proc/cpuinfo | grep "Hardware" | grep "Generic AM33XX" )
 if [ $? = "0" ]; then
 	ReadBBBType
 	return $?
+fi
+
+RESULT=$(cat /proc/cpuinfo | grep "machine" | grep "A5-V11" )
+if [ $? = "0" ]; then
+	echo $BD_TYP_A5V11
+	return 0
 fi
 
 echo $BD_TYP_DEFAULT
