@@ -1,0 +1,19 @@
+#!/bin/sh /etc/rc.common
+# "new(er)" style init script
+# Look at /lib/functions/service.sh on a running system for explanations of what other SERVICE_
+# options you can use, and when you might want them.
+
+START=01
+APP=find-devtype
+SERVICE_WRITE_PID=0
+SERVICE_DAEMONIZE=0
+DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
+
+start() {
+	/usr/bin/find-devtype > $DEV_TYPE_FILE
+}
+
+stop() {
+	rm -f $DEV_TYPE_FILE
+}
+
