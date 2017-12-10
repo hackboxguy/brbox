@@ -11,12 +11,12 @@ SERVICE_DAEMONIZE=1
 start() {
 	DEVNODE=$(ls -la /dev/i2c-* |head -1|grep -oh "/dev/.*") #choose the first i2c device node in the list
 	service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt) --disptype=ssd1306_128x64 --device=$DEVNODE
-        sleep 3
+        sleep 5
 	IPADDR=$(/opt/fmw/bin/sysmgrclt --ipaddr=eth0 | awk '{print $9}'|sed 's/result=//')
         FMWVER=$(cat /etc/version.txt)
 	#CONFIG=$(cat /boot/sysconfig.txt)                                                   
 	sleep 1                          
-        /opt/fmw/bin/dispclt --dispclear --printline=line1,"BRBOX-$FMWVER" --printline=line2,"IP-$IPADDR"  
+        /opt/fmw/bin/dispclt --dispclear --printline=line3,"BRBOX-$FMWVER" --printline=line4,"IP-$IPADDR"  
 }
 
 stop() {
