@@ -1,0 +1,21 @@
+#!/bin/sh /etc/rc.common
+# "new(er)" style init script
+# Look at /lib/functions/service.sh on a running system for explanations of what other SERVICE_
+# options you can use, and when you might want them.
+
+START=73
+APP=xmproxy
+SERVICE_WRITE_PID=1
+SERVICE_DAEMONIZE=1
+
+XMPP_LOGIN_DATA=/mnt/settings/etc/xmpp-login.txt
+ALIAS_LIST_DATA=/mnt/settings/etc/xmpp-alias-list.txt
+BOT_NAME_DATA=/mnt/settings/etc/xmpp-bot-name.txt
+
+start() {
+        service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt) --loginfile=$XMPP_LOGIN_DATA --aliaslist=$ALIAS_LIST_DATA --botname=$BOT_NAME_DATA --usbgsm=0 &
+}
+
+stop() {
+        service_stop /opt/fmw/bin/$APP
+}
