@@ -4,7 +4,7 @@
 # options you can use, and when you might want them.
 
 START=73
-APP=xmproxy
+APP=xmproxysrv
 SERVICE_WRITE_PID=1
 SERVICE_DAEMONIZE=1
 
