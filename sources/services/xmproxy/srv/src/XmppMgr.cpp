@@ -160,7 +160,11 @@ std::string XmppMgr::print_help()
 	return help;
 }
 /* ------------------------------------------------------------------------- */
+#ifdef USE_CXMPP_LIB
+int XmppMgr::onXmppMessage(std::string msg,std::string sender,CXmppProducer* pObj)
+#else
 int XmppMgr::onXmppMessage(std::string msg,std::string sender,ADXmppProducer* pObj)
+#endif
 {
 	//process the messages
 	//cout<<"msg arrived: "<<msg<<endl;

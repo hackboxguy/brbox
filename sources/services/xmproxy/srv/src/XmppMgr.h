@@ -1,6 +1,12 @@
 #ifndef __XMPP_MGR_H_
 #define __XMPP_MGR_H_
-#include "ADXmppProxy.hpp"
+
+#ifdef USE_CXMPP_LIB
+	#include "CXmppProxy.hpp"
+#else
+	#include "ADXmppProxy.hpp"
+#endif
+
 #include <iostream>
 #include <vector>
 #include <deque>
@@ -147,7 +153,11 @@ typedef struct XMPROXY_CMD_TABLE_T
 	char cmd_arg[128];
 }XMPROXY_CMD_TABLE;
 /* ------------------------------------------------------------------------- */
+#ifdef USE_CXMPP_LIB
+class XmppMgr : public CXmppConsumer, public ADThreadConsumer, public ADTimerConsumer
+#else
 class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerConsumer
+#endif
 {
 	int XmppTaskIDCounter;
 	int heartbeat_ms;
@@ -165,7 +175,12 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	std::string XmppUserPw;
 	std::string XmppBotName;
 	std::string XmppBotNameFilePath;
+#ifdef USE_CXMPP_LIB
+	CXmppProxy XmppProxy;//xmpp client
+#else
 	ADXmppProxy XmppProxy;//xmpp client
+#endif
+	
 
 	std::string AliasListFile;
 	typedef std::map<std::string, std::string> Alias;
@@ -186,7 +201,12 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 
 
 	//xmpp-client-callback functions
+#ifdef USE_CXMPP_LIB
+	virtual int onXmppMessage(std::string msg,std::string sender,CXmppProducer* pObj);
+#else
 	virtual int onXmppMessage(std::string msg,std::string sender,ADXmppProducer* pObj);
+#endif
+
 
 	ADThread XmppClientThread,XmppCmdProcessThread;//thread for xmpp client connection
 	virtual int monoshot_callback_function(void* pUserData,ADThreadProducer* pObj);//{return 0;};

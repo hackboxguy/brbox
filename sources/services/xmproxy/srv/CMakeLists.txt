@@ -6,28 +6,39 @@ set(STARTNUM "74" CACHE STRING "74")    #init order number of the service
 set(LIB_ADSTTNG AdSttngs)   #settings library
 set(LIB_ADCOMMN AdCmn)      #common library
 
-
+option(WITH_CXMPP_LIB "link with libstrophe xmpp c lib" OFF)
+if(WITH_CXMPP_LIB)
+  add_definitions(-DUSE_CXMPP_LIB)
+endif()
 
 
 
 
 project(${COMPONENT_NAME})
 set(CMAKE_CXX_FLAGS "-std=c++11")
-#set(TARGET ${COMPONENT_NAME} PROPERTY CXX_STANDARD 11)
 set(AUTO_SVN_VERSION    ON CACHE BOOL ON)  #by default include svn revision numbers
 set(INSTALL_MY_HEADERS  ON CACHE BOOL ON)  #by default install header files to target-install-directory
 file(GLOB SOURCES "src/*.cpp")
+if(WITH_CXMPP_LIB)
+	LIST(REMOVE_ITEM SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/ADXmppProxy.cpp)
+else()
+	LIST(REMOVE_ITEM SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/CXmppProxy.cpp)
+endif()
+
+
 add_executable(${COMPONENT_NAME} ${SOURCES})
 set(INC_ADSTTNG  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-settings/include")
 set(INC_ADCOMMN  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-adav-old/include")
 set(INC_SRVCOMMN "${CMAKE_CURRENT_SOURCE_DIR}/../include")
-
-#find_package( OpenCV REQUIRED ) #core imgproc highgui )
-# Add #include path of all dependent components
+set(INC_LIBSTROPHE "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/libstrophe")
 include_directories(${INC_ADSTTNG} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${CMAKE_CURRENT_BINARY_DIR})
 
 # Specify component's dependency.
-target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt gloox)
+if(WITH_CXMPP_LIB)
+	target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt strophe)
+else()
+	target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt gloox)
+endif()
 
 #install the binary and server-rpc-headers to CMAKE_INSTALL_PREFIX destination
 file(GLOB  INCFILES "${INC_SRVCOMMN}/*.*")
@@ -54,15 +65,18 @@ else()
 	FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SrcControlVersion.h "#define SRC_CONTROL_VERSION 0001\n")
 endif()
 
-INCLUDE( FindPkgConfig )
-pkg_check_modules( GLOOX gloox )
-if( NOT GLOOX_FOUND )
-	message( FATAL_ERROR "ERROR: could not find gloox development files" )
-endif( NOT GLOOX_FOUND )
-include_directories( ${GLOOX_INCLUDE_DIR} )
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/3rd_party )
-include_directories( ${GLOOX_INCLUDE_DIRS} )
-
+if(WITH_CXMPP_LIB)
+	include_directories( ${INC_LIBSTROPHE} )
+else()
+	INCLUDE( FindPkgConfig )
+	pkg_check_modules( GLOOX gloox )
+	if( NOT GLOOX_FOUND )
+		message( FATAL_ERROR "ERROR: could not find gloox development files" )
+	endif( NOT GLOOX_FOUND )
+	include_directories( ${GLOOX_INCLUDE_DIR} )
+	include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/3rd_party )
+	include_directories( ${GLOOX_INCLUDE_DIRS} )
+endif()
 
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/")
 #find_package (GAMMU)  #REQUIRED

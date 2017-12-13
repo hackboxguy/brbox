@@ -56,6 +56,10 @@ int ADXmppProxy::connect(char* user,char* password)
 	j = new Client( jid,password);
 	connected=true;//after creation of Client object, make this flag true
 
+	//j->setSasl(true);
+	//j->setSASLMechanisms(gloox::SaslMechPlain);//SaslMechDigestMd5);//SaslMechScramSha1);//);
+	//j->setTls(gloox::TLSPolicy::TLSOptional);//TLSDisabled);
+
 	j->registerConnectionListener( this );
 	j->registerMessageSessionHandler( this, 0 );
 	j->rosterManager()->registerRosterListener( this );
