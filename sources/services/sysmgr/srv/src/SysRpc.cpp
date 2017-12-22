@@ -21,6 +21,17 @@ SysRpc::~ SysRpc()
 {
 }
 /* ------------------------------------------------------------------------- */
+bool SysRpc::openwrt_system(void)
+{
+	ADCMN_DEV_INFO *pDevInfo=(ADCMN_DEV_INFO *)pDataCache->pDevInfo;
+	switch(pDevInfo->BoardType)
+	{
+		case ADCMN_BOARD_TYPE_A5_V11    :return true;
+		case ADCMN_BOARD_TYPE_NEXX_3020 :return true;
+		default: return false;
+	}
+}
+/* ------------------------------------------------------------------------- */
 int SysRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 {
 	//printf("SysRpc::MapJsonToBinary called\n");
@@ -462,7 +473,10 @@ int SysRpc::process_get_fmwver(JsonDataCommObj* pReq)
 				pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 				return 0;
 			}
-			sprintf(command,"%s -v > %s",SYSMGR_BRDSK_TOOL,SYSMGR_TEMP_FMW_READ_FILE);
+			if(openwrt_system())
+				sprintf(command,"cat %s > %s","/etc/version.txt",SYSMGR_TEMP_FMW_READ_FILE);
+			else
+				sprintf(command,"%s -v > %s",SYSMGR_BRDSK_TOOL,SYSMGR_TEMP_FMW_READ_FILE);
 			break;
 		case SYSMGR_FMW_MODULE_BRBOX_BACKUP :
 			if(bkup_fmwver_updated==true)
@@ -471,16 +485,11 @@ int SysRpc::process_get_fmwver(JsonDataCommObj* pReq)
 				pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 				return 0;
 			}
-			sprintf(command,"%s -b > %s",SYSMGR_BRDSK_TOOL,SYSMGR_TEMP_FMW_READ_FILE);
+			if(openwrt_system())
+				sprintf(command,"cat %s > %s","/etc/version.txt",SYSMGR_TEMP_FMW_READ_FILE);
+			else
+				sprintf(command,"%s -b > %s",SYSMGR_BRDSK_TOOL,SYSMGR_TEMP_FMW_READ_FILE);
 			break;
-		//case SYSMGR_FMW_MODULE_BRBOX_KERNEL :
-			//if(krnl_fmwver_updated==true)
-			//{
-			//	strcpy(pPacket->cmn_fname_ver_str,pDataCache->krnl_fmwver);
-			//	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
-			//	return 0;
-			//}
-			//break;
 		default:
 			pPanelReq->result=RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;
 			return 0;
@@ -660,7 +669,10 @@ RPC_SRV_RESULT SysRpc::process_async_set_fmwupdate(SYSMGR_FMWUPDATE_PACKET* pPac
 	switch(pPacket->module)
 	{
 		case SYSMGR_FMW_MODULE_BRBOX_PROJECT :
-			sprintf(cmdline,"%s -u %s",SYSMGR_UPDATE_TOOL,pPacket->cmn_fname_ver_str);
+			if(openwrt_system())
+				sprintf(cmdline,"%s %s","sysupgrade",pPacket->cmn_fname_ver_str);
+			else
+				sprintf(cmdline,"%s -u %s",SYSMGR_UPDATE_TOOL,pPacket->cmn_fname_ver_str);
 			ret_val=SysInfo.run_shell_script(cmdline,get_emulation_flag());//backup-fmw will be updated
 			bkup_fmwver_updated=false;//re-read bkup-fmw-version when fmw-version-rpc is called
 			break;

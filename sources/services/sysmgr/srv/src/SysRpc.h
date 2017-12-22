@@ -22,6 +22,8 @@ public:
 	virtual void ReceiveEvent(int cltToken,int evntNum,int evntArg,int evntArg2){};
 	//virtual RPC_SRV_RESULT ProcessCommonRpc(int index,unsigned char* pWorkData){return RPC_SRV_RESULT_SUCCESS;};
 
+	bool openwrt_system(void);
+
 	int json_to_bin_get_loadinfo(JsonDataCommObj* pReq);
 	int bin_to_json_get_loadinfo(JsonDataCommObj* pReq);
 	int process_get_loadinfo(JsonDataCommObj* pReq);
