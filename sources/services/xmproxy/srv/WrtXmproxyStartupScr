@@ -5,6 +5,7 @@
 
 START=73
 APP=xmproxysrv
+APPCLT=xmproxyclt
 SERVICE_WRITE_PID=1
 SERVICE_DAEMONIZE=1
 
@@ -17,5 +18,6 @@ start() {
 }
 
 stop() {
-        service_stop /opt/fmw/bin/$APP
+        /opt/fmw/bin/$APPCLT --shutdown 
+	#service_stop /opt/fmw/bin/$APP
 }
