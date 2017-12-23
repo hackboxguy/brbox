@@ -11,6 +11,8 @@
 #include "XmppMgr.h" //ADXmppProxy.hpp"
 #include "EvntHandler.h"
 /* ------------------------------------------------------------------------- */
+bool openwrt_system(ADCMN_BOARD_TYPE BoardType);
+/* ------------------------------------------------------------------------- */
 using namespace std;
 int main(int argc, const char* argv[])
 {
@@ -39,6 +41,7 @@ int main(int argc, const char* argv[])
 	DataCache.pXmpMgr =(void*)&XmpManager;//rpc's needs to know the object pointer of xmpp-handling-object
 	XmpManager.SetDebugLog(dbglog);
 	XmpManager.SetUSBGsmSts(CmdLine.is_usbgsm_connected());
+	XmpManager.SetOpenWrtCmdGroupSts(!openwrt_system(DevInfo.BoardType));//for openwrt system, disable certain commands.
 	XmpManager.SetAliasListFilePath(CmdLine.get_alias_list_filepath());//persistant alias list file
 	XmpManager.SetBotNameFilePath(CmdLine.get_botname_filepath());//persistent bot-name-file
 	XmpManager.SetEventSubscrListFilePath(CmdLine.get_evnt_subscr_list_filepath());//persistent event subscriber's list file
@@ -88,3 +91,13 @@ int main(int argc, const char* argv[])
 	//XmpManager.Stop();//disconnect the xmpp server
 	return 0;
 }
+bool openwrt_system(ADCMN_BOARD_TYPE BoardType)
+{
+	switch(BoardType)
+	{
+		case ADCMN_BOARD_TYPE_A5_V11    :return true;
+		case ADCMN_BOARD_TYPE_NEXX_3020 :return true;
+		default: return false;
+	}
+}
+

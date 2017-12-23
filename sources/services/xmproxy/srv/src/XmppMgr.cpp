@@ -47,7 +47,8 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{true ,EXMPP_CMD_BUDDY_LIST              , "buddylist"    ,""}, //prints buddy list
 	{true ,EXMPP_CMD_SHELLCMD                , "shellcmd"     ,"<command>"}, //executes remote shell command
 	{true ,EXMPP_CMD_SHELLCMD_RESP           , "shellcmdresp" ,"<command>"}, //executes remote shell command
-	{true ,EXMPP_CMD_DEVIDENT                , "identify" ,""}  //identify board by blinking onboard LED
+	{true ,EXMPP_CMD_DEVIDENT                , "identify" ,""},  //identify board by blinking onboard LED
+	{true ,EXMPP_CMD_SHUTDOWN                , "xmpshutdown" ,""}  //shutdown xmpp server(for xmpp logout)
 };
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
@@ -131,6 +132,23 @@ void XmppMgr::SetUSBGsmSts(bool sts)
 			case EXMPP_CMD_DIAL_USSD      :
 			case EXMPP_CMD_GET_USSD       :
 			case EXMPP_CMD_GSM_EVENT_NOTIFY:
+				if(xmproxy_cmd_table[i].cmdsts==true) //if default is disabled, then dont enable it
+					xmproxy_cmd_table[i].cmdsts=sts;
+				break;
+			default:
+				break;
+		}
+	}
+}
+/* ------------------------------------------------------------------------- */
+void XmppMgr::SetOpenWrtCmdGroupSts(bool sts)
+{
+	int total_cmds=sizeof(xmproxy_cmd_table)/sizeof(XMPROXY_CMD_TABLE);
+	for(int i=0;i<total_cmds;i++)
+	{
+		switch(xmproxy_cmd_table[i].cmd)
+		{
+			case EXMPP_CMD_FMW_POWEROFF    :
 				if(xmproxy_cmd_table[i].cmdsts==true) //if default is disabled, then dont enable it
 					xmproxy_cmd_table[i].cmdsts=sts;
 				break;
@@ -307,6 +325,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_SHELLCMD        :res=proc_cmd_shellcmd(cmdcmdMsg,returnval,cmd.sender);break;//inProgbreak;
 				case EXMPP_CMD_SHELLCMD_RESP   :res=proc_cmd_shellcmdresp(cmdcmdMsg,returnval,cmd.sender);break;//inProgbreak;
 				case EXMPP_CMD_DEVIDENT        :res=proc_cmd_devident(cmdcmdMsg,returnval,cmd.sender);break;//inProg
+				case EXMPP_CMD_SHUTDOWN        :res=proc_cmd_xmpshutdown(cmdcmdMsg,returnval,cmd.sender);break;//inProg
 				default                        :break;
 			}
 			result.pop_front();
@@ -1418,6 +1437,23 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_devident(std::string msg,std::string &returnval
 	int xmptid=-1;
 	if(result==RPC_SRV_RESULT_IN_PROG)
 		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_SYSMGR,true,&xmptid,sender);
+	sprintf(tID,"%d",xmptid);returnval+=tID;
+	return result;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_xmpshutdown(std::string msg,std::string &returnval,std::string sender)
+{
+	//send shutdown rpc call to self.
+	char tID[255];tID[254]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_XMPROXY)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result=Client.set_action_noarg_get_single_string_type((char*)"trigger_shutdown",(char*)"taskId",tID);
+	Client.rpc_server_disconnect();
+	returnval="taskID=";
+	int xmptid=-1;
+	if(result==RPC_SRV_RESULT_IN_PROG)
+		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_XMPROXY,true,&xmptid,sender);
 	sprintf(tID,"%d",xmptid);returnval+=tID;
 	return result;
 }

@@ -62,6 +62,7 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_SHELLCMD,     //executes remote shell command and returns the success/fail value of shell-command
 	EXMPP_CMD_SHELLCMD_RESP,//executes remote shell command and returns the shell-command's text output
 	EXMPP_CMD_DEVIDENT,
+	EXMPP_CMD_SHUTDOWN, //shuts down the xmproxysrv(xmpp-log-out)
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -255,6 +256,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_shellcmd(std::string msg,std::string &returnval,std::string sender);
 	RPC_SRV_RESULT proc_cmd_shellcmdresp(std::string msg,std::string &returnval,std::string sender);
 	RPC_SRV_RESULT proc_cmd_devident(std::string msg,std::string &returnval,std::string sender);
+	RPC_SRV_RESULT proc_cmd_xmpshutdown(std::string msg,std::string &returnval,std::string sender);
 
 	std::string print_help();
 
@@ -280,6 +282,7 @@ public:
 	//RPC_SRV_RESULT IsItMyAsyncTaskResp(int tid,int port);
 	RPC_SRV_RESULT AccessAsyncTaskList(int tid, int port, bool insertEntryFlag,int *xmpptID,std::string &sender);
 	void SetUSBGsmSts(bool sts);
+	void SetOpenWrtCmdGroupSts(bool sts);
 	inline void SetAliasListFilePath(std::string filepath){AliasListFile=filepath;};
 	inline void SetEventSubscrListFilePath(std::string filepath){EventSubscrListFile=filepath;};
 	void SetBotNameFilePath(std::string filepath);

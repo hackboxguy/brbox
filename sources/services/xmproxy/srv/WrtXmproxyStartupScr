@@ -24,6 +24,6 @@ start() {
 }
 
 stop() {
-        /opt/fmw/bin/$APPCLT --shutdown 
-	#service_stop /opt/fmw/bin/$APP
+        /opt/fmw/bin/$APPCLT --shutdown
+	sleep 5
 }
