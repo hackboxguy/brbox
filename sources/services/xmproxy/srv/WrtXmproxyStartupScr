@@ -9,11 +9,17 @@ APPCLT=xmproxyclt
 SERVICE_WRITE_PID=1
 SERVICE_DAEMONIZE=1
 
-XMPP_LOGIN_DATA=/mnt/settings/etc/xmpp-login.txt
-ALIAS_LIST_DATA=/mnt/settings/etc/xmpp-alias-list.txt
-BOT_NAME_DATA=/mnt/settings/etc/xmpp-bot-name.txt
+XMPP_FILE_DIR=/etc/xmproxy
+XMPP_LOGIN_DATA="$XMPP_FILE_DIR/xmpp-login.txt"
+ALIAS_LIST_DATA="$XMPP_FILE_DIR/xmpp-alias-list.txt"
+BOT_NAME_DATA="$XMPP_FILE_DIR/xmpp-bot-name.txt"
 
 start() {
+	#if login file doesnt exist, then create an empty file(later login data can be filled in)
+	if [ ! -f "$XMPP_LOGIN_DATA" ]; then
+		mkdir -p $XMPP_FILE_DIR		
+		touch $XMPP_LOGIN_DATA
+	fi
         service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt) --loginfile=$XMPP_LOGIN_DATA --aliaslist=$ALIAS_LIST_DATA --botname=$BOT_NAME_DATA --usbgsm=0 &
 }
 
