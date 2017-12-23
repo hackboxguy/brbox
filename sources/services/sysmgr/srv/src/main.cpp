@@ -9,6 +9,7 @@
 #include "ADTimer.hpp"
 #include "DevIdent.h"
 #include "DevIdentRaspiAZero.h"
+#include "DevIdentNexx3020.h"
 /* ------------------------------------------------------------------------- */
 #include "NetRpc.h"
 #include "SysRpc.h"
@@ -161,17 +162,11 @@ int main(int argc, const char* argv[])
 	if(pEventMonitor!=NULL)delete pEventMonitor;
 	return 0;
 }
-
+/* ------------------------------------------------------------------------- */
 //following function creates device identify object for board-identify-with-led-blink-functionality
 DevIdent* create_dev_ident_object(ADCMN_BOARD_TYPE board_type)
 {
 	DevIdent* pDevice=NULL;
-	//ADCMN_BOARD_TYPE board_type;
-	//const char *boardTbl[] = ADCMN_BOARD_TYPE_TABLE;
-	//ADCmnStringProcessor string_proc;
-	//board_type=(ADCMN_BOARD_TYPE)string_proc.string_to_enum(boardTbl,(char*)BoardType.c_str(),ADCMN_BOARD_TYPE_UNKNOWN);
-	//if(board_type>=ADCMN_BOARD_TYPE_UNKNOWN)
-	//	return NULL;//unable to determine which devident object is needed
 	switch(board_type)
 	{
 		case ADCMN_BOARD_TYPE_RASPI_A      :pDevice = new DevIdentRaspiAZero;break;
@@ -184,8 +179,10 @@ DevIdent* create_dev_ident_object(ADCMN_BOARD_TYPE board_type)
 		case ADCMN_BOARD_TYPE_BBB          :break;
 		case ADCMN_BOARD_TYPE_RASPI_0      :pDevice = new DevIdentRaspiAZero;break;
 		case ADCMN_BOARD_TYPE_RASPI_3      :pDevice = new DevIdentRaspiAZero;break;
+		case ADCMN_BOARD_TYPE_A5_V11       :break;
+		case ADCMN_BOARD_TYPE_NEXX_3020    :pDevice = new DevIdentNexx3020;break;
 		default: break;
 	}
 	return pDevice;
 }
-
+/* ------------------------------------------------------------------------- */
