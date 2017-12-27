@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 set(COMPONENT_NAME apisrv)           #server name
 set(STARTUP_SCRIPT ApisrvStartupScr)   #server startup script
+set(WRTSTARTUP_SCRIPT WrtApisrvStartupScr)   #server startup script
 set(STARTNUM "79" CACHE STRING "79")    #init order number of the service
 set(LIB_ADSTTNG AdSttngs)   #settings library
 set(LIB_ADCOMMN AdCmn)      #common library
@@ -33,6 +34,7 @@ target_link_libraries(${COMPONENT_NAME} ${LIB_ADONION} ${LIB_ADONIONCPP} ${LIB_A
 file(GLOB  INCFILES "${INC_SRVCOMMN}/*.*")
 install(TARGETS ${COMPONENT_NAME} DESTINATION bin)
 install(PROGRAMS ${STARTUP_SCRIPT} DESTINATION etc/init.d) #copy server's startup script to init.d
+install(PROGRAMS ${WRTSTARTUP_SCRIPT} DESTINATION etc/init.d) #copy server's startup script to init.d
 if(${INSTALL_MY_HEADERS})
 	install(FILES ${INCFILES} DESTINATION include)
 endif()
