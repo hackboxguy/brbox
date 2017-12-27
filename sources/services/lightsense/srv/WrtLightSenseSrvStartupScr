@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# Start/stop server script
+#
+START=73
+APP=lightsensesrv
+SERVICE_WRITE_PID=1
+SERVICE_DAEMONIZE=1
+
+start() {
+	DEVNODE=$(ls -la /dev/i2c-* |head -1|grep -oh "/dev/.*") #choose the first i2c device node in the list
+	service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt) --sensortype=taos3414 --device=$DEVNODE
+}
+
+stop() {
+        service_stop /opt/fmw/bin/$APP
+}
+
