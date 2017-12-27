@@ -12,6 +12,8 @@ project(${COMPONENT_NAME})
 set(AUTO_SVN_VERSION    ON CACHE BOOL ON)  #by default include svn revision numbers
 set(INSTALL_MY_HEADERS  ON CACHE BOOL ON)  #by default install header files to target-install-directory
 set(STARTUP_SCRIPT LightSenseSrvStartupScr)         #server startup script
+set(WRTSTARTUP_SCRIPT WrtLightSenseSrvStartupScr)         #server startup script
+
 set(STARTNUM "79" CACHE STRING "79")       #init order number of the service
 file(GLOB SOURCES "src/*.cpp")
 add_executable(${COMPONENT_NAME} ${SOURCES})
@@ -30,6 +32,7 @@ target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADDISP} ${LIB_ADSTT
 file(GLOB  INCFILES "${INC_SRVCOMMN}/*.*")
 install(TARGETS ${COMPONENT_NAME} DESTINATION bin)
 install(PROGRAMS ${STARTUP_SCRIPT} DESTINATION etc/init.d) #copy server's startup script to init.d
+install(PROGRAMS ${WRTSTARTUP_SCRIPT} DESTINATION etc/init.d) #copy server's startup script to init.d
 if(${INSTALL_MY_HEADERS})
 	install(FILES ${INCFILES} DESTINATION include)
 endif()
