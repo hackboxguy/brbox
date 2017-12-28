@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.9)
 set(COMPONENT_NAME lightsensesrv) #set the name of the binary
-set(LIB_ADDISP AdDisp)      #oled display control library
+#set(LIB_ADDISP AdDisp)      #oled display control library
 set(LIB_ADSTTNG AdSttngs)   #settings library
 set(LIB_ADCOMMN AdCmn)      #common library
 
@@ -17,16 +17,16 @@ set(WRTSTARTUP_SCRIPT WrtLightSenseSrvStartupScr)         #server startup script
 set(STARTNUM "79" CACHE STRING "79")       #init order number of the service
 file(GLOB SOURCES "src/*.cpp")
 add_executable(${COMPONENT_NAME} ${SOURCES})
-set(INC_ADDISP   "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-display/include")
+#set(INC_ADDISP   "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-display/include")
 set(INC_ADSTTNG  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-settings/include")
 set(INC_ADCOMMN  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-adav-old/include")
 set(INC_SRVCOMMN "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 #find_package( libi2c-dev REQUIRED ) #core imgproc highgui )
 # Add #include path of all dependent components
-include_directories(${INC_ADDISP} ${INC_ADSTTNG} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${INC_ADSTTNG} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${CMAKE_CURRENT_BINARY_DIR})
 
 # Specify component's dependency.
-target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADDISP} ${LIB_ADSTTNG} json-c pthread rt)
+target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt)
 
 #install the binary and server-rpc-headers to CMAKE_INSTALL_PREFIX destination
 file(GLOB  INCFILES "${INC_SRVCOMMN}/*.*")
