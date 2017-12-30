@@ -10,6 +10,7 @@
 #include "DevIdent.h"
 #include "DevIdentRaspiAZero.h"
 #include "DevIdentNexx3020.h"
+#include "DevIdentA5V11.h"
 /* ------------------------------------------------------------------------- */
 #include "NetRpc.h"
 #include "SysRpc.h"
@@ -179,7 +180,7 @@ DevIdent* create_dev_ident_object(ADCMN_BOARD_TYPE board_type)
 		case ADCMN_BOARD_TYPE_BBB          :break;
 		case ADCMN_BOARD_TYPE_RASPI_0      :pDevice = new DevIdentRaspiAZero;break;
 		case ADCMN_BOARD_TYPE_RASPI_3      :pDevice = new DevIdentRaspiAZero;break;
-		case ADCMN_BOARD_TYPE_A5_V11       :break;
+		case ADCMN_BOARD_TYPE_A5_V11       :pDevice = new DevIdentA5V11;break;
 		case ADCMN_BOARD_TYPE_NEXX_3020    :pDevice = new DevIdentNexx3020;break;
 		default: break;
 	}

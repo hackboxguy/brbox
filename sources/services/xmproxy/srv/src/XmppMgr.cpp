@@ -148,7 +148,11 @@ void XmppMgr::SetOpenWrtCmdGroupSts(bool sts)
 	{
 		switch(xmproxy_cmd_table[i].cmd)
 		{
-			case EXMPP_CMD_FMW_POWEROFF    :
+			case EXMPP_CMD_GPIO              :
+			case EXMPP_CMD_GPIO_EVENT_NOTIFY :
+			case EXMPP_CMD_FMW_HOSTNAME      :
+			case EXMPP_CMD_FMW_RESET_HOSTNAME:
+			case EXMPP_CMD_FMW_POWEROFF      :
 				if(xmproxy_cmd_table[i].cmdsts==true) //if default is disabled, then dont enable it
 					xmproxy_cmd_table[i].cmdsts=sts;
 				break;
