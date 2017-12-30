@@ -669,8 +669,8 @@ RPC_SRV_RESULT SysRpc::process_async_set_fmwupdate(SYSMGR_FMWUPDATE_PACKET* pPac
 	switch(pPacket->module)
 	{
 		case SYSMGR_FMW_MODULE_BRBOX_PROJECT :
-			if(openwrt_system())
-				sprintf(cmdline,"%s %s","sysupgrade",pPacket->cmn_fname_ver_str);
+			if(openwrt_system()) //sleep 2 is to ensure that previous file download result has already been delivered
+				sprintf(cmdline,"sleep 2;%s %s","sysupgrade",pPacket->cmn_fname_ver_str);
 			else
 				sprintf(cmdline,"%s -u %s",SYSMGR_UPDATE_TOOL,pPacket->cmn_fname_ver_str);
 			ret_val=SysInfo.run_shell_script(cmdline,get_emulation_flag());//backup-fmw will be updated
@@ -737,13 +737,6 @@ RPC_SRV_RESULT SysRpc::process_async_download_file(SYSMGR_DOWNLOAD_FILE_PACKET* 
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADFTP :
 			sprintf(cmdline,"wget %s -O %s",pPacket->srcurl,pPacket->targetfilepath);//targetfilepath must be fullpath+filename
 			ret_val=SysInfo.run_shell_script(cmdline,get_emulation_flag());//backup-fmw will be updated
-			//hack: wget for a5v11-xmpp fails due to missing openssl utility, but file downloads successfully.
-			//hence overwrite fail as success
-			if(openwrt_system())
-			{
-				if(ret_val==RPC_SRV_RESULT_FAIL)
-					ret_val=RPC_SRV_RESULT_SUCCESS;
-			}
 			break;
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP :
 			//NOTE: becuase of full tftp command, busy-box-tftp command is absolete
