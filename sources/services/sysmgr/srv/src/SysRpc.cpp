@@ -737,6 +737,13 @@ RPC_SRV_RESULT SysRpc::process_async_download_file(SYSMGR_DOWNLOAD_FILE_PACKET* 
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADFTP :
 			sprintf(cmdline,"wget %s -O %s",pPacket->srcurl,pPacket->targetfilepath);//targetfilepath must be fullpath+filename
 			ret_val=SysInfo.run_shell_script(cmdline,get_emulation_flag());//backup-fmw will be updated
+			//hack: wget for a5v11-xmpp fails due to missing openssl utility, but file downloads successfully.
+			//hence overwrite fail as success
+			if(openwrt_system())
+			{
+				if(ret_val==RPC_SRV_RESULT_FAIL)
+					ret_val=RPC_SRV_RESULT_SUCCESS;
+			}
 			break;
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP :
 			//NOTE: becuase of full tftp command, busy-box-tftp command is absolete
