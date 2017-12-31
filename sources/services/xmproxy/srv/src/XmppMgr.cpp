@@ -46,7 +46,7 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{true ,EXMPP_CMD_BOTNAME                 , "botname"      ,"[name]"}, //xmpp chat-bot name for identification
 	{true ,EXMPP_CMD_BUDDY_LIST              , "buddylist"    ,""}, //prints buddy list
 	{true ,EXMPP_CMD_SHELLCMD                , "shellcmd"     ,"<command>"}, //executes remote shell command
-	{true ,EXMPP_CMD_SHELLCMD_RESP           , "shellcmdresp" ,"<command>"}, //executes remote shell command
+	{true ,EXMPP_CMD_SHELLCMD_RESP           , "shellcmdresp" ,""}, //reads response of last executed shell command
 	{true ,EXMPP_CMD_DEVIDENT                , "identify" ,""},  //identify board by blinking onboard LED
 	{true ,EXMPP_CMD_SHUTDOWN                , "xmpshutdown" ,""}  //shutdown xmpp server(for xmpp logout)
 };
@@ -153,6 +153,7 @@ void XmppMgr::SetOpenWrtCmdGroupSts(bool sts)
 			case EXMPP_CMD_FMW_HOSTNAME      :
 			case EXMPP_CMD_FMW_RESET_HOSTNAME:
 			case EXMPP_CMD_FMW_POWEROFF      :
+			case EXMPP_CMD_SHUTDOWN          :
 				if(xmproxy_cmd_table[i].cmdsts==true) //if default is disabled, then dont enable it
 					xmproxy_cmd_table[i].cmdsts=sts;
 				break;
