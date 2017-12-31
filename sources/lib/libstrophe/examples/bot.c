@@ -163,6 +163,7 @@ int main(int argc, char **argv)
 
     /* create a connection */
     conn = xmpp_conn_new(ctx);
+xmpp_conn_set_keepalive(conn, 60,1);//KA_TIMEOUT, KA_INTERVAL);
 
     /*
      * also you can disable TLS support or force legacy SSL

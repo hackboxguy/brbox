@@ -5,12 +5,12 @@ add_subdirectory(lib-display)
 add_subdirectory(lib-settings)
 add_subdirectory(lib-adav-old)
 
-include(ExternalProject)
-ExternalProject_Add(libstrophe
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libstrophe
-    UPDATE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libstrophe/bootstrap.sh
-    CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libstrophe/configure --prefix=${CMAKE_INSTALL_PREFIX}
-    BUILD_COMMAND ${MAKE})
+#include(ExternalProject)
+#ExternalProject_Add(libstrophe
+#    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libstrophe
+#    UPDATE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libstrophe/bootstrap.sh
+#    CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libstrophe/configure --prefix=${CMAKE_INSTALL_PREFIX}
+#    BUILD_COMMAND ${MAKE})
 
 #add_subdirectory(lib-onion)
 #add_subdirectory(lib-ilclient)

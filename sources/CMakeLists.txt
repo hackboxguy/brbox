@@ -3,8 +3,8 @@ set(PROJECT_NAME BrBoxComponents)
 project(${PROJECT_NAME})
 add_subdirectory(lib)
 add_subdirectory(services)
-add_subdirectory(utils)
-add_subdirectory(kmods)
+#add_subdirectory(utils)
+#add_subdirectory(kmods)
 
 #for cross compiling
 #cmake -H. -BOutput -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain-arm-backup.cmake -DCMAKE_INSTALL_PREFIX=/home/user/tmp/
