@@ -48,7 +48,8 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{true ,EXMPP_CMD_SHELLCMD                , "shellcmd"     ,"<command>"}, //executes remote shell command
 	{true ,EXMPP_CMD_SHELLCMD_RESP           , "shellcmdresp" ,""}, //reads response of last executed shell command
 	{true ,EXMPP_CMD_DEVIDENT                , "identify" ,""},  //identify board by blinking onboard LED
-	{true ,EXMPP_CMD_SHUTDOWN                , "xmpshutdown" ,""}  //shutdown xmpp server(for xmpp logout)
+	{true ,EXMPP_CMD_SHUTDOWN                , "xmpshutdown" ,""}, //shutdown xmpp server(for xmpp logout)
+	{true ,EXMPP_CMD_SONOFF                  , "sonoff" ,"<ip/hostname> [sts(on/off/toggle)]"}//http based control of sonoff relay(tasmota fmw)
 };
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
@@ -331,6 +332,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_SHELLCMD_RESP   :res=proc_cmd_shellcmdresp(cmdcmdMsg,returnval,cmd.sender);break;//inProgbreak;
 				case EXMPP_CMD_DEVIDENT        :res=proc_cmd_devident(cmdcmdMsg,returnval,cmd.sender);break;//inProg
 				case EXMPP_CMD_SHUTDOWN        :res=proc_cmd_xmpshutdown(cmdcmdMsg,returnval,cmd.sender);break;//inProg
+				case EXMPP_CMD_SONOFF          :res=proc_cmd_sonoff(cmdcmdMsg,returnval);break;
 				default                        :break;
 			}
 			result.pop_front();
@@ -1461,6 +1463,95 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_xmpshutdown(std::string msg,std::string &return
 		AccessAsyncTaskList(atoi(tID),ADCMN_PORT_XMPROXY,true,&xmptid,sender);
 	sprintf(tID,"%d",xmptid);returnval+=tID;
 	return result;
+}
+/* ------------------------------------------------------------------------- */
+#include "ADSonOffHttpClient.hpp"
+//sonoff 192.168.1.2 on     - ip/write/on
+//sonoff 192.168.1.2 off    - ip/write/off
+//sonoff 192.168.1.2 toggle - ip/write/toggle
+//sonoff sonoff-001 toggle  - hostname/write/toggle
+//sonoff sonoff-001         - hostname/read
+//sonoff 192.168.1.2        - ip/read
+RPC_SRV_RESULT XmppMgr::proc_cmd_sonoff(std::string msg,std::string &returnval)
+{
+	RPC_SRV_RESULT result;
+	std::string cmd,cmdArg,cmdArg2;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	msgstream >> cmdArg;
+	msgstream >> cmdArg2;
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0)//get sonoff host/ip string
+		return RPC_SRV_RESULT_ARG_ERROR;
+	if(cmdArg2.size()<=0)//read sonoff
+	{
+		char ip[128];SONOFF_STATE state;
+		//resolve hostname/ip addr to ip
+		if(hostname_to_ip((char*)cmdArg.c_str() ,ip)!=RPC_SRV_RESULT_SUCCESS)
+			return RPC_SRV_RESULT_FAIL;
+		char temp_str[255];temp_str[0]='\0';
+		ADSonOffHttpClient Client;
+		if(Client.rpc_server_connect(ip,80)!=0)
+			return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+		result=Client.get_sonoff_state(state);
+		Client.rpc_server_disconnect();
+		if(state==SONOFF_STATE_ON)
+			returnval="on";//temp_str;
+		else if (state==SONOFF_STATE_OFF)
+			returnval="off";
+		else
+			returnval="unknown";
+		return result;
+	}
+	else //write sonoff
+	{
+		char ip[128];
+		ADSonOffHttpClient Client;
+		//resolve hostname/ip addr to ip
+		if(hostname_to_ip((char*)cmdArg.c_str() ,ip)!=RPC_SRV_RESULT_SUCCESS)
+			return RPC_SRV_RESULT_FAIL;
+		if(cmdArg2=="on")
+		{
+			if(Client.rpc_server_connect(ip,80)!=0)
+				return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+			result=Client.set_sonoff_state(SONOFF_STATE_ON);
+		}
+		else if (cmdArg2=="off")
+		{
+			if(Client.rpc_server_connect(ip,80)!=0)
+				return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+			result=Client.set_sonoff_state(SONOFF_STATE_OFF);
+		}
+		else if (cmdArg2=="toggle")
+		{
+			if(Client.rpc_server_connect(ip,80)!=0)
+				return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+			result=Client.set_sonoff_toggle();
+		}
+		else 
+			return RPC_SRV_RESULT_ARG_ERROR;
+			
+		Client.rpc_server_disconnect();
+		return result;
+	}
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::hostname_to_ip(char * hostname , char* ip)
+{
+	struct hostent *he;
+	struct in_addr **addr_list;
+	int i;
+	if ( (he = gethostbyname( hostname ) ) == NULL) 
+		return RPC_SRV_RESULT_FAIL;
+	addr_list = (struct in_addr **) he->h_addr_list;
+	for(i = 0; addr_list[i] != NULL; i++) 
+	{
+		//Return the first one;
+		strcpy(ip , inet_ntoa(*addr_list[i]) );
+		return RPC_SRV_RESULT_SUCCESS;
+	}
+	return RPC_SRV_RESULT_FAIL;
 }
 /* ------------------------------------------------------------------------- */
 

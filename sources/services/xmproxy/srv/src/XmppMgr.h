@@ -63,6 +63,7 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_SHELLCMD_RESP,//executes remote shell command and returns the shell-command's text output
 	EXMPP_CMD_DEVIDENT,
 	EXMPP_CMD_SHUTDOWN, //shuts down the xmproxysrv(xmpp-log-out)
+	EXMPP_CMD_SONOFF,   //http based control of sonoff relay with tasmota firmware
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -257,6 +258,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_shellcmdresp(std::string msg,std::string &returnval,std::string sender);
 	RPC_SRV_RESULT proc_cmd_devident(std::string msg,std::string &returnval,std::string sender);
 	RPC_SRV_RESULT proc_cmd_xmpshutdown(std::string msg,std::string &returnval,std::string sender);
+	RPC_SRV_RESULT proc_cmd_sonoff(std::string msg,std::string &returnval);
 
 	std::string print_help();
 
@@ -267,6 +269,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT LoadEventSubscrList(std::string listFile,std::vector<EventSubscrEntry> *pList);
 	RPC_SRV_RESULT ExtendEventSubscrList(std::string listFile,std::string addr,EXMPP_EVNT_TYPES type,int arg);
 	RPC_SRV_RESULT RewriteEventSubscrList(std::string listFile,std::vector<EventSubscrEntry> *pList);
+	RPC_SRV_RESULT hostname_to_ip(char * hostname , char* ip);
 
 public:
 	XmppMgr();
