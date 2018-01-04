@@ -9,7 +9,9 @@ SERVICE_WRITE_PID=1
 SERVICE_DAEMONIZE=1
 
 start() {
-        service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt) --syscfg=$(cat /boot/sysconfig.txt) --disptype=ssd1306_128x64
+	i2cdetect  -r -y 0 | grep 3c > /dev/null && DISPTYPE=ssd1306_128x64
+	i2cdetect  -r -y 0 | grep 27 > /dev/null && DISPTYPE=1602_pcf
+        service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt) --syscfg=$(cat /boot/sysconfig.txt) --disptype=$DISPTYPE
 }
 
 stop() {

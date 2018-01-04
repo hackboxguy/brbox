@@ -215,25 +215,13 @@ void low_memory_device_special_action(std::string sysconf,std::string Type)
 		case ADLIB_DISPLAY_TYPE_SSD1306_128x64   :pDevice = new I2CSsd1306(DevNode,Type);break;
 		case ADLIB_DISPLAY_TYPE_1602_DUAL_PCF    :pDevice = new I2CDualPcfLcd(DevNode,Type);break;
 		case ADLIB_DISPLAY_TYPE_1602_PCF         :pDevice = new I2CPcfLcd(DevNode,Type);break;
-		default: break;
+		default: return;//support only 3 types of displays
 	}
 	pDevice->init_display();
 	pDevice->clear_display();
-
-	std::ifstream file("/etc/version.txt");
-	std::string version_num;
-
-	//line-1 software-version
-	std::getline(file, version_num);
 	char msg[255];
-	if(version_num.size()<=0)
-		version_num="unknown";
-	if(version_num.size()>=250) //something is wrong, file cannot be so big
-		version_num="ver-error";
-	sprintf(msg,"a5v11-xmpp-%s",version_num.c_str());
-	pDevice->print_line(msg,DISPLAY_LINE_1);
-	
-	//line-2 ip-address
+
+	//////////////line-1 ip-address///////////////
 	ADSysInfo SysInfo;//lib-class for reading cpu-info and system-info
 	char netmask[512];char mac[512];char ip[512];
 	if(SysInfo.read_network_info((char*)"eth0",mac,ip,netmask)==0)
@@ -246,7 +234,25 @@ void low_memory_device_special_action(std::string sysconf,std::string Type)
 		else
 			sprintf(msg,"ip-not-available");
 	}
+	pDevice->print_line(msg,DISPLAY_LINE_1);
+
+	//////////////line-2 software version///////////////
+	std::ifstream file("/etc/version.txt");
+	std::string version_num;
+	std::getline(file, version_num);
+	if(version_num.size()<=0)
+		version_num="unknown";
+	if(version_num.size()>=250) //something is wrong, file cannot be so big
+		version_num="ver-error";
+	sprintf(msg,"Ver-%s",version_num.c_str());//Ver-00.01.12345
 	pDevice->print_line(msg,DISPLAY_LINE_2);
+
+	//////////////line-3 a5v11-xmpp name///////////////
+	if(ADLIB_DISPLAY_TYPE_1602_PCF!=disp_type)//disp-type has 3rd line
+	{
+		sprintf(msg,"a5v11-xmpp");
+		pDevice->print_line(msg,DISPLAY_LINE_3);
+	}
 	delete pDevice;
 }
 /* ------------------------------------------------------------------------- */
