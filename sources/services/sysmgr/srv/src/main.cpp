@@ -198,7 +198,7 @@ DevIdent* create_dev_ident_object(ADCMN_BOARD_TYPE board_type)
 //hence sysmgr will take care of showing ip address on display
 void low_memory_device_special_action(std::string sysconf,std::string Type)
 {
-	if(sysconf!="")
+	if(sysconf!="a5v11-xmpp")
 		return;
 	std::string DevNode = "/dev/i2c-0";
 	DisplayDevice* pDevice=NULL;
