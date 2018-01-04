@@ -26,8 +26,8 @@ RPC_SRV_RESULT DevIdentA5V11::device_identify()
 		usleep(250000);
 	}
 
-	//switch the red led to ON
-	sprintf(command,"echo 1 > /sys/class/leds/a5-v11\\:red\\:power/brightness");
+	//keep the red led in OFF condition
+	sprintf(command,"echo 0 > /sys/class/leds/a5-v11\\:red\\:power/brightness");
 	if(system(command)!=0)
 	{
 		//pPanelReq->result=RPC_SRV_RESULT_FILE_OPEN_ERR;
