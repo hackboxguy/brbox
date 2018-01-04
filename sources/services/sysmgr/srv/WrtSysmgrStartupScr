@@ -8,9 +8,19 @@ APP=sysmgr
 SERVICE_WRITE_PID=1
 SERVICE_DAEMONIZE=1
 
+XMPP_FILE_DIR=/etc/xmproxy
+DISPTYPE_FILE="$XMPP_FILE_DIR/display-type.txt"
+
 start() {
+	#auto detect
 	i2cdetect  -r -y 0 | grep 3c > /dev/null && DISPTYPE=ssd1306_128x64
 	i2cdetect  -r -y 0 | grep 27 > /dev/null && DISPTYPE=1602_pcf
+
+	#overridd if specified by user
+	if [ -f "$DISPTYPE_FILE" ]; then
+		DISPTYPE=$(cat $DISPTYPE_FILE)
+	fi
+
         service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt) --syscfg=$(cat /boot/sysconfig.txt) --disptype=$DISPTYPE
 }
 

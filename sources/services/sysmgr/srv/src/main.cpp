@@ -215,7 +215,7 @@ void low_memory_device_special_action(std::string sysconf,std::string Type)
 		case ADLIB_DISPLAY_TYPE_SSD1306_128x64   :pDevice = new I2CSsd1306(DevNode,Type);break;
 		case ADLIB_DISPLAY_TYPE_1602_DUAL_PCF    :pDevice = new I2CDualPcfLcd(DevNode,Type);break;
 		case ADLIB_DISPLAY_TYPE_1602_PCF         :pDevice = new I2CPcfLcd(DevNode,Type);break;
-		default: return;//support only 3 types of displays
+		default                                  :pDevice = new I2CSsd1306(DevNode,Type);break;//keep this as default
 	}
 	pDevice->init_display();
 	pDevice->clear_display();
