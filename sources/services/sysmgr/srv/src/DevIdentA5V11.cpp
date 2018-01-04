@@ -6,6 +6,10 @@ using namespace std;
 /* ------------------------------------------------------------------------- */
 DevIdentA5V11::DevIdentA5V11()
 {
+	//on startup keep red led off to save power
+	char command[255];
+	sprintf(command,"echo 0 > /sys/class/leds/a5-v11\\:red\\:power/brightness");
+	system(command);
 }
 /* ------------------------------------------------------------------------- */
 DevIdentA5V11::~DevIdentA5V11()
