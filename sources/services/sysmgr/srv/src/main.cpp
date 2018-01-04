@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <fstream>
 #include "SysmgrJsonDef.h"
 #include "ADJsonRpcMgr.hpp"
 #include "MyCmdline.h"
@@ -194,6 +195,7 @@ DevIdent* create_dev_ident_object(ADCMN_BOARD_TYPE board_type)
 #include "I2CDualPcfLcd.hpp"
 #include "I2CPcfLcd.hpp"
 #include "I2CSsd1306.hpp"
+#include "ADSysInfo.hpp"
 //for a5-v11:xmpp-chatbot config, due to low memory, dispsrv could not be included.
 //hence sysmgr will take care of showing ip address on display
 void low_memory_device_special_action(std::string sysconf,std::string Type)
@@ -217,7 +219,34 @@ void low_memory_device_special_action(std::string sysconf,std::string Type)
 	}
 	pDevice->init_display();
 	pDevice->clear_display();
-	pDevice->print_line((char*)"hello-world",DISPLAY_LINE_1);
+
+	std::ifstream file("/etc/version.txt");
+	std::string version_num;
+
+	//line-1 software-version
+	std::getline(file, version_num);
+	char msg[255];
+	if(version_num.size()<=0)
+		version_num="unknown";
+	if(version_num.size()>=250) //something is wrong, file cannot be so big
+		version_num="ver-error";
+	sprintf(msg,"a5v11-xmpp-%s",version_num.c_str());
+	pDevice->print_line(msg,DISPLAY_LINE_1);
+	
+	//line-2 ip-address
+	ADSysInfo SysInfo;//lib-class for reading cpu-info and system-info
+	char netmask[512];char mac[512];char ip[512];
+	if(SysInfo.read_network_info((char*)"eth0",mac,ip,netmask)==0)
+		sprintf(msg,"ip-%s",ip);
+	else
+	{
+		//if network is not connected, use ifconfig method
+		if(SysInfo.read_network_info_ifconfig((char*)"eth0",mac,ip,netmask)==0)
+			sprintf(msg,"ip-%s",ip);
+		else
+			sprintf(msg,"ip-not-available");
+	}
+	pDevice->print_line(msg,DISPLAY_LINE_2);
 	delete pDevice;
 }
 /* ------------------------------------------------------------------------- */
