@@ -23,6 +23,7 @@
 /* ------------------------------------------------------------------------- */
 using namespace std;
 DevIdent* create_dev_ident_object(ADCMN_BOARD_TYPE board_type);
+void low_memory_device_special_action(std::string sysconf,std::string Type);
 /* ------------------------------------------------------------------------- */
 int main(int argc, const char* argv[])
 {
@@ -52,6 +53,9 @@ int main(int argc, const char* argv[])
 
 	//prepare device-identify object
 	DataCache.pDevIdent=(void*)create_dev_ident_object(DevInfo.BoardType);
+
+	//sysmgr special usecase: if sysmgr is used on low-mem openwrt device, print the ip address using i2c dev.
+	low_memory_device_special_action(CmdLine.get_sys_config(),CmdLine.get_disp_type());//"ssd1306_128x64");//"a5v11-xmpp"
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
@@ -187,3 +191,34 @@ DevIdent* create_dev_ident_object(ADCMN_BOARD_TYPE board_type)
 	return pDevice;
 }
 /* ------------------------------------------------------------------------- */
+#include "I2CDualPcfLcd.hpp"
+#include "I2CPcfLcd.hpp"
+#include "I2CSsd1306.hpp"
+//for a5-v11:xmpp-chatbot config, due to low memory, dispsrv could not be included.
+//hence sysmgr will take care of showing ip address on display
+void low_memory_device_special_action(std::string sysconf,std::string Type)
+{
+	if(sysconf!="")
+		return;
+	std::string DevNode = "/dev/i2c-0";
+	DisplayDevice* pDevice=NULL;
+	ADLIB_DISPLAY_TYPE disp_type;
+	const char *dispTbl[] = ADLIB_DISPLAY_TYPE_TABL;
+	ADCmnStringProcessor string_proc;
+	disp_type=(ADLIB_DISPLAY_TYPE)string_proc.string_to_enum(dispTbl,(char*)Type.c_str(),ADLIB_DISPLAY_TYPE_UNKNOWN);
+	if(disp_type>=ADLIB_DISPLAY_TYPE_UNKNOWN)
+		return;//unable to determine which display object is needed
+	switch(disp_type)
+	{
+		case ADLIB_DISPLAY_TYPE_SSD1306_128x64   :pDevice = new I2CSsd1306(DevNode,Type);break;
+		case ADLIB_DISPLAY_TYPE_1602_DUAL_PCF    :pDevice = new I2CDualPcfLcd(DevNode,Type);break;
+		case ADLIB_DISPLAY_TYPE_1602_PCF         :pDevice = new I2CPcfLcd(DevNode,Type);break;
+		default: break;
+	}
+	pDevice->init_display();
+	pDevice->clear_display();
+	pDevice->print_line((char*)"hello-world",DISPLAY_LINE_1);
+	delete pDevice;
+}
+/* ------------------------------------------------------------------------- */
+

@@ -9,7 +9,7 @@ SERVICE_WRITE_PID=1
 SERVICE_DAEMONIZE=1
 
 start() {
-        service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt)
+        service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt) --syscfg=$(cat /boot/sysconfig.txt) --disptype=ssd1306_128x64
 }
 
 stop() {

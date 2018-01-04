@@ -4,6 +4,8 @@ using namespace std;
 typedef enum SYSMGR_CMDLINE_OPT_T
 {
 	SYSMGR_CMDLINE_OPT_MONITCFG = 100,
+	SYSMGR_CMDLINE_OPT_SYSCFG,
+	SYSMGR_CMDLINE_OPT_DISPTYPE,
 	SYSMGR_CMDLINE_OPT_UNKNOWN,
 	SYSMGR_CMDLINE_OPT_NONE
 }SYSMGR_CMDLINE_OPT;
@@ -14,9 +16,15 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 	strcpy(version_number,version_str);
 	CmdlineHelper.attach_helper(this);
 	MonitCfgFile="";
+	SystemConfig="";
+	DisplayType="";
 	//note:"hviptdln" are already used by the producer class in library
 	CmdlineHelper.insert_options_entry((char*)"evntmonitcfg" ,optional_argument,SYSMGR_CMDLINE_OPT_MONITCFG);
 	CmdlineHelper.insert_help_entry((char*)"--evntmonitcfg=filepath         (config file for monitoring the event)");
+	CmdlineHelper.insert_options_entry((char*)"syscfg" ,optional_argument,SYSMGR_CMDLINE_OPT_SYSCFG);
+	CmdlineHelper.insert_help_entry((char*)"--syscfg=sys_config_str         (specify system type ex:a5v11-xmpp/a5v11-base/3020f-base)");
+	CmdlineHelper.insert_options_entry((char*)"disptype" ,optional_argument,SYSMGR_CMDLINE_OPT_DISPTYPE);
+	CmdlineHelper.insert_help_entry((char*)"--disptype=type                 (display-type [ssd1306_128x64/ssd1306_128x32])");
 }
 /*****************************************************************************/
 MyCmdline::~MyCmdline()
@@ -34,6 +42,18 @@ int MyCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 				MonitCfgFile="";
 			else
 				MonitCfgFile=sub_arg;
+			break;
+		case SYSMGR_CMDLINE_OPT_SYSCFG:
+			if(CmdlineHelper.get_next_subargument(&sub_arg)==0)//no system-config passed by user
+				SystemConfig="none";
+			else
+				SystemConfig=sub_arg;
+			break;
+		case SYSMGR_CMDLINE_OPT_DISPTYPE:
+			if(CmdlineHelper.get_next_subargument(&sub_arg)==0)//display type to support
+				DisplayType="none";
+			else
+				DisplayType=sub_arg;
 			break;
 		default:return 0;break;	
 	}
@@ -103,6 +123,16 @@ int MyCmdline::get_dev_info(ADCMN_DEV_INFO *pInfo)
 std::string MyCmdline::get_monit_cfg_file()
 {
 	return MonitCfgFile;
+}
+/*****************************************************************************/
+std::string MyCmdline::get_sys_config()
+{
+	return SystemConfig;
+}
+/*****************************************************************************/
+std::string MyCmdline::get_disp_type()
+{
+	return DisplayType;
 }
 /*****************************************************************************/
 
