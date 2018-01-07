@@ -12,6 +12,14 @@ XMPP_FILE_DIR=/etc/xmproxy
 DISPTYPE_FILE="$XMPP_FILE_DIR/display-type.txt"
 
 start() {
+
+	#todo: following 5 lines need to go in a separate script(this is s temprory solution to solve a5v11 heating)
+	swconfig dev switch0 port 1 set disable 1
+	swconfig dev switch0 port 2 set disable 1
+	swconfig dev switch0 port 3 set disable 1
+	swconfig dev switch0 port 4 set disable 1
+	swconfig dev switch0 set apply 
+
 	#auto detect
 	i2cdetect  -r -y 0 | grep 3c > /dev/null && DISPTYPE=ssd1306_128x64
 	i2cdetect  -r -y 0 | grep 27 > /dev/null && DISPTYPE=1602_pcf
