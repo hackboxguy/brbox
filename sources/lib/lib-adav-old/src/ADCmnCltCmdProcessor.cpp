@@ -25,7 +25,8 @@ int ADCmnCltCmdProcessor::copy_cmd_exec_obj(CmdExecutionObj *pCmdObjDest,CmdExec
 	pCmdObjDest->cmd_int_val = pCmdObjSrc->cmd_int_val;//first_arg_int_value
 	pCmdObjDest->cmd_enum_val= pCmdObjSrc->cmd_enum_val;//first_arg_enum_value
 
-	for (int i=0; i< sizeof(pCmdObjSrc->arg_param_int_value); i++)
+	//for (int i=0; i< sizeof(pCmdObjSrc->arg_param_int_value); i++)
+	for (int i=0; i< JSON_RPC_METHOD_RESP_MAX_LENGTH; i++)
 		pCmdObjDest->arg_param_int_value[i] =  pCmdObjSrc->arg_param_int_value[i];	
 
 

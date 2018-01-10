@@ -27,6 +27,28 @@ int ADSettings::double_identify_chain_element(void* element,int ident1,int ident
 {
 	return -1;
 }
+void ADSettings::delete_value(ESETTINGS_KEY_TYPE key_type,void *value)
+{
+	switch(key_type)
+	{
+		case ESETTINGS_KEY_TYPE_STRING    :
+			{char *myptr=(char*)value;ARRAY_MEM_DELETE(myptr);}
+			break;
+		case ESETTINGS_KEY_TYPE_INT       :
+			{int *myptr=(int*)value;ARRAY_MEM_DELETE(myptr);}
+		case ESETTINGS_KEY_TYPE_INT_ARR   :
+			{int *myptr=(int*)value;ARRAY_MEM_DELETE(myptr);}
+		case ESETTINGS_KEY_TYPE_LONG      :
+			{long *myptr=(long*)value;ARRAY_MEM_DELETE(myptr);}
+		case ESETTINGS_KEY_TYPE_LONG_ARR  :
+			{long *myptr=(long*)value;ARRAY_MEM_DELETE(myptr);}
+		case ESETTINGS_KEY_TYPE_DOUBLE    :
+			{double *myptr=(double*)value;ARRAY_MEM_DELETE(myptr);}
+		case ESETTINGS_KEY_TYPE_DOUBLE_ARR:
+			{double *myptr=(double*)value;ARRAY_MEM_DELETE(myptr);}
+		default:break;
+	}
+}
 int ADSettings::free_chain_element_data(void* element,ADChainProducer* pObj)
 {
 	if(pObj->getID() == SettingsChainLocalID)
@@ -35,7 +57,8 @@ int ADSettings::free_chain_element_data(void* element,ADChainProducer* pObj)
 		objData=(SETTINGS_ENTRY *)element;
 		if(objData->value!=NULL)
 			//MEM_DELETE(objData->value);
-			ARRAY_MEM_DELETE(objData->value);
+			//ARRAY_MEM_DELETE(objData->value);
+			delete_value(objData->key_type,objData->value);
 	}
 	return 0;
 }
@@ -663,7 +686,8 @@ int ADSettings::attach_setting(SETTINGS_ENTRY* pEntry)
 	if(SettingsChainLocal.chain_put((void *)pNewEntry)!=0)
 	{
 		//OBJ_MEM_DELETE(pNewEntry->value);
-		ARRAY_MEM_DELETE(pNewEntry->value);
+		//ARRAY_MEM_DELETE(pNewEntry->value);
+		delete_value(pNewEntry->key_type,pNewEntry->value);
 		OBJ_MEM_DELETE(pNewEntry);
 		return -1;
 	}

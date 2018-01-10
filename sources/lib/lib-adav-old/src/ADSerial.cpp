@@ -146,7 +146,7 @@ int ADSerial::thread_callback_function(void* pUserData,ADThreadProducer* pObj)
 #include <signal.h>
 void SIOHandler(int num) //just a dummy handler to avoid service exit
 {
-	printf("SDSRV:AdLib:ADSerial","Ouch!!! received SIGIO\n");
+	printf("SDSRV:AdLib:ADSerial: Ouch!!! received SIGIO\n");
 	//LOG_ERR_MSG("SDSRV:AdLib:ADSerial","Ouch!!! received SIGIO");
 }
 ADSerial::ADSerial()//:baud(115200)

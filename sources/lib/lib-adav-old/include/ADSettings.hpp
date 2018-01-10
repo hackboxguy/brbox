@@ -150,7 +150,7 @@ class ADSettings: public ADChainConsumer
 	//bool VerifySha1Checksum(char* file,char* sha1sum,int sumlen);
 	int ReadMetaData(char* file,SETTINGS_META_DATA *pData);
 	int SwapAlternateFile(SETTINGS_META_DATA *pData);
-
+	void delete_value(ESETTINGS_KEY_TYPE key_type,void *value);
 public:
 	ADSettings();//char* file);
 	~ADSettings();
