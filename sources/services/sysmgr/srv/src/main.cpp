@@ -13,6 +13,11 @@
 #include "DevIdentNexx3020.h"
 #include "DevIdentA5V11.h"
 /* ------------------------------------------------------------------------- */
+#include "I2CDualPcfLcd.hpp"
+#include "I2CPcfLcd.hpp"
+#include "I2CSsd1306.hpp"
+#include "ADSysInfo.hpp"
+
 #include "NetRpc.h"
 #include "SysRpc.h"
 #include "EventHandler.h"
@@ -24,7 +29,7 @@
 /* ------------------------------------------------------------------------- */
 using namespace std;
 DevIdent* create_dev_ident_object(ADCMN_BOARD_TYPE board_type);
-void low_memory_device_special_action(std::string sysconf,std::string Type);
+DisplayDevice* low_memory_device_special_action(std::string sysconf,std::string Type,std::string devnode);
 /* ------------------------------------------------------------------------- */
 int main(int argc, const char* argv[])
 {
@@ -56,7 +61,7 @@ int main(int argc, const char* argv[])
 	DataCache.pDevIdent=(void*)create_dev_ident_object(DevInfo.BoardType);
 
 	//sysmgr special usecase: if sysmgr is used on low-mem openwrt device, print the ip address using i2c dev.
-	low_memory_device_special_action(CmdLine.get_sys_config(),CmdLine.get_disp_type());//"ssd1306_128x64");//"a5v11-xmpp"
+	DataCache.pDisplay=(void*)low_memory_device_special_action(CmdLine.get_sys_config(),CmdLine.get_disp_type(),CmdLine.get_dev_node());//"ssd1306_128x64");//"a5v11-xmpp"
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
@@ -166,6 +171,9 @@ int main(int argc, const char* argv[])
 	AppTimer.stop_timer();//stop sending heart-beats to other objects
 	if(pEventHandler!=NULL)delete pEventHandler;
 	if(pEventMonitor!=NULL)delete pEventMonitor;
+
+	DisplayDevice *disp=(DisplayDevice*)DataCache.pDisplay;
+	if(disp!=NULL)delete disp;
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
@@ -192,24 +200,20 @@ DevIdent* create_dev_ident_object(ADCMN_BOARD_TYPE board_type)
 	return pDevice;
 }
 /* ------------------------------------------------------------------------- */
-#include "I2CDualPcfLcd.hpp"
-#include "I2CPcfLcd.hpp"
-#include "I2CSsd1306.hpp"
-#include "ADSysInfo.hpp"
 //for a5-v11:xmpp-chatbot config, due to low memory, dispsrv could not be included.
 //hence sysmgr will take care of showing ip address on display
-void low_memory_device_special_action(std::string sysconf,std::string Type)
+DisplayDevice* low_memory_device_special_action(std::string sysconf,std::string Type,std::string devnode)
 {
 	if(sysconf!="a5v11-xmpp")
-		return;
-	std::string DevNode = "/dev/i2c-0";
+		return NULL;
+	std::string DevNode = devnode;//"/dev/i2c-0";
 	DisplayDevice* pDevice=NULL;
 	ADLIB_DISPLAY_TYPE disp_type;
 	const char *dispTbl[] = ADLIB_DISPLAY_TYPE_TABL;
 	ADCmnStringProcessor string_proc;
 	disp_type=(ADLIB_DISPLAY_TYPE)string_proc.string_to_enum(dispTbl,(char*)Type.c_str(),ADLIB_DISPLAY_TYPE_UNKNOWN);
 	if(disp_type>=ADLIB_DISPLAY_TYPE_UNKNOWN)
-		return;//unable to determine which display object is needed
+		return NULL;//unable to determine which display object is needed
 	switch(disp_type)
 	{
 		case ADLIB_DISPLAY_TYPE_SSD1306_128x64   :pDevice = new I2CSsd1306(DevNode,Type);break;
@@ -253,7 +257,7 @@ void low_memory_device_special_action(std::string sysconf,std::string Type)
 		sprintf(msg,"a5v11-xmpp");
 		pDevice->print_line(msg,DISPLAY_LINE_3);
 	}
-	delete pDevice;
+	return pDevice;
 }
 /* ------------------------------------------------------------------------- */
 

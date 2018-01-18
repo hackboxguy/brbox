@@ -6,6 +6,7 @@ typedef enum SYSMGR_CMDLINE_OPT_T
 	SYSMGR_CMDLINE_OPT_MONITCFG = 100,
 	SYSMGR_CMDLINE_OPT_SYSCFG,
 	SYSMGR_CMDLINE_OPT_DISPTYPE,
+	SYSMGR_CMDLINE_OPT_DISPDEVICE,
 	SYSMGR_CMDLINE_OPT_UNKNOWN,
 	SYSMGR_CMDLINE_OPT_NONE
 }SYSMGR_CMDLINE_OPT;
@@ -18,6 +19,7 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 	MonitCfgFile="";
 	SystemConfig="";
 	DisplayType="";
+	DevNode="/dev/i2c-0";
 	//note:"hviptdln" are already used by the producer class in library
 	CmdlineHelper.insert_options_entry((char*)"evntmonitcfg" ,optional_argument,SYSMGR_CMDLINE_OPT_MONITCFG);
 	CmdlineHelper.insert_help_entry((char*)"--evntmonitcfg=filepath         (config file for monitoring the event)");
@@ -25,6 +27,9 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 	CmdlineHelper.insert_help_entry((char*)"--syscfg=sys_config_str         (specify system type ex:a5v11-xmpp/a5v11-base/3020f-base)");
 	CmdlineHelper.insert_options_entry((char*)"disptype" ,optional_argument,SYSMGR_CMDLINE_OPT_DISPTYPE);
 	CmdlineHelper.insert_help_entry((char*)"--disptype=type                 (display-type [ssd1306_128x32/ssd1306_128x64/1602_pcf/1602_dual_pcf])");
+	CmdlineHelper.insert_options_entry((char*)"device" ,optional_argument,SYSMGR_CMDLINE_OPT_DISPDEVICE);
+	CmdlineHelper.insert_help_entry((char*)"--device=/dev/i2c-x         (i2c device node if applicable)");
+
 }
 /*****************************************************************************/
 MyCmdline::~MyCmdline()
@@ -54,6 +59,12 @@ int MyCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 				DisplayType="none";
 			else
 				DisplayType=sub_arg;
+			break;
+		case SYSMGR_CMDLINE_OPT_DISPDEVICE:
+			if(CmdlineHelper.get_next_subargument(&sub_arg)==0)//no /dev/i2c-x option passed by user
+				DevNode="/dev/i2c-0";//return default as /dev/i2c-0
+			else
+				DevNode=sub_arg;
 			break;
 		default:return 0;break;	
 	}
@@ -133,6 +144,11 @@ std::string MyCmdline::get_sys_config()
 std::string MyCmdline::get_disp_type()
 {
 	return DisplayType;
+}
+/*****************************************************************************/
+std::string MyCmdline::get_dev_node()
+{
+	return DevNode;
 }
 /*****************************************************************************/
 

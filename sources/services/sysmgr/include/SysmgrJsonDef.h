@@ -336,6 +336,7 @@ typedef struct SYSMGR_CMN_DATA_CACHE_T
 	std::string EvntMonitorConfigFile;
 	void *pEventDefault;
 	void *pEventCustom;
+	void *pDisplay;
 	SYSMGR_CMN_DATA_CACHE_T()
 	{
 		AsyncCmdInProgress=EJSON_SYSMGR_RPC_NONE;

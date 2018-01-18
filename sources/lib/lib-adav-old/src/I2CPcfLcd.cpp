@@ -11,6 +11,7 @@
 #define LCD_EN 0x04
 #define LCD_RW 0x02
 #define LCD_RS 0x01
+#define DISPLAY_TYPE 16 //This class is for display length 16
 /*****************************************************************************/
 I2CPcfLcd::I2CPcfLcd(std::string DevNode,std::string DevType):DisplayDevice(DevNode)//,I2CBusAccess(DevNode)
 {
@@ -63,7 +64,6 @@ void I2CPcfLcd::write_inst(uint8_t byte)
 }
 /*****************************************************************************/
 /********function for moving cursor to the required position**********/
-#define DISPLAY_TYPE 16 //TODO: temprory
 void I2CPcfLcd::go_to(uint8_t x)
 {
 	if(x>DISPLAY_TYPE){x-=DISPLAY_TYPE;x+=0x40;}//x+24;//0x40
@@ -142,7 +142,7 @@ void I2CPcfLcd::print_lcd(char *ptr)
 	{
 		write_data(*ptr++);
 		i++;
-		if(i>16)break;
+		if(i>DISPLAY_TYPE)break;
 	}
 }
 /*****************************************************************************/
@@ -168,22 +168,40 @@ void I2CPcfLcd::clear_display_internal(DISPLAY_LINE line)
 /*****************************************************************************/
 void I2CPcfLcd::print_center(DISPLAY_LINE line,char *string)
 {
+	int indx=0;int len=0;
+	if(strlen(string)>DISPLAY_TYPE)
+		len=DISPLAY_TYPE;
+	else
+		len=strlen(string);
+	indx=((DISPLAY_TYPE-len)/2)+1;
 	clear_display_internal(line);
-	go_to_centre(string,line);
-	if(line==DISPLAY_LINE_1)LCD_goto(1,1);
-	else if(line==DISPLAY_LINE_2)LCD_goto(2,1);
+	if(line==DISPLAY_LINE_1)
+		LCD_goto(1,indx);
+	else if(line==DISPLAY_LINE_2)
+		LCD_goto(2,indx);
 	print_lcd(string);
 }
 /*****************************************************************************/
 //interface functions
 RPC_SRV_RESULT I2CPcfLcd::print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNMENT align)
 {
+	int len=strlen(msg);int indx=0;int myline=0;
+	if(len>DISPLAY_TYPE)
+		len=DISPLAY_TYPE;
+	indx=DISPLAY_TYPE-len;
+
+	if(line==DISPLAY_LINE_1)
+		myline=1;
+	else if(line==DISPLAY_LINE_2)
+		myline=2;
+	else
+		myline=1;
+
 	switch(align)
 	{
-		case TEXT_ALIGNMENT_LEFT  :print_lcd(msg);break;
-		case TEXT_ALIGNMENT_RIGHT :print_lcd(msg);break;//TODO
-		//case TEXT_ALIGNMENT_CENTER:
-		default:print_center(line,msg);break;//LCD_goto(1,1);print_lcd(msg);break//;break;
+		case TEXT_ALIGNMENT_LEFT  :LCD_goto(myline,1);print_lcd(msg);break;
+		case TEXT_ALIGNMENT_RIGHT :LCD_goto(myline,indx+1);print_lcd(msg);break;//TODO
+		default:print_center(line,msg);break;
 	}
 	return RPC_SRV_RESULT_SUCCESS;
 }

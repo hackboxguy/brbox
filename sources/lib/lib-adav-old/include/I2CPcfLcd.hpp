@@ -30,7 +30,7 @@ public:
 	//interface functions
 	RPC_SRV_RESULT init_display(){init_lcd();return RPC_SRV_RESULT_SUCCESS;};
 	RPC_SRV_RESULT clear_display(){clear_display_internal(DISPLAY_LINE_FULL);return RPC_SRV_RESULT_SUCCESS;};
-	RPC_SRV_RESULT print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNMENT align);
+	RPC_SRV_RESULT print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNMENT align=TEXT_ALIGNMENT_CENTER);
 };
 #endif
 

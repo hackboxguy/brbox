@@ -11,6 +11,7 @@ class MyCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 	std::string MonitCfgFile;
 	std::string SystemConfig;
 	std::string DisplayType;
+	std::string DevNode;
 
 	//Chain-callback functions	
 	virtual int parse_my_cmdline_options(int arg, char* sub_arg);
@@ -33,5 +34,6 @@ public:
 	std::string get_monit_cfg_file();
 	std::string get_sys_config();
 	std::string get_disp_type();
+	std::string get_dev_node();
 };
 #endif
