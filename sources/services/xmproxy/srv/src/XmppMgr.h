@@ -64,6 +64,8 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_DEVIDENT,
 	EXMPP_CMD_SHUTDOWN, //shuts down the xmproxysrv(xmpp-log-out)
 	EXMPP_CMD_SONOFF,   //http based control of sonoff relay with tasmota firmware
+	EXMPP_CMD_DISPCLEAR,   //clear-display
+	EXMPP_CMD_DISPPRINT,   //display-print
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -259,6 +261,8 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_devident(std::string msg,std::string &returnval,std::string sender);
 	RPC_SRV_RESULT proc_cmd_xmpshutdown(std::string msg,std::string &returnval,std::string sender);
 	RPC_SRV_RESULT proc_cmd_sonoff(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_disp_clear(std::string msg);//,std::string &returnval,std::string sender);
+	RPC_SRV_RESULT proc_cmd_disp_print(std::string msg,std::string &returnval);
 
 	std::string print_help();
 

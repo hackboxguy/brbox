@@ -49,7 +49,9 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{true ,EXMPP_CMD_SHELLCMD_RESP           , "shellcmdresp" ,""}, //reads response of last executed shell command
 	{true ,EXMPP_CMD_DEVIDENT                , "identify" ,""},  //identify board by blinking onboard LED
 	{true ,EXMPP_CMD_SHUTDOWN                , "xmpshutdown" ,""}, //shutdown xmpp server(for xmpp logout)
-	{true ,EXMPP_CMD_SONOFF                  , "sonoff" ,"<ip/hostname> [sts(on/off/toggle)]"}//http based control of sonoff relay(tasmota fmw)
+	{true ,EXMPP_CMD_SONOFF                  , "sonoff" ,"<ip/hostname> [sts(on/off/toggle)]"},//http based control of sonoff relay(tasmota fmw)
+	{true ,EXMPP_CMD_DISPCLEAR               , "dispclear" ,""}, 
+	{true ,EXMPP_CMD_DISPPRINT               , "display" ,"<line1/line2/line3..]> <message>"}
 };
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
@@ -333,6 +335,8 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_DEVIDENT        :res=proc_cmd_devident(cmdcmdMsg,returnval,cmd.sender);break;//inProg
 				case EXMPP_CMD_SHUTDOWN        :res=proc_cmd_xmpshutdown(cmdcmdMsg,returnval,cmd.sender);break;//inProg
 				case EXMPP_CMD_SONOFF          :res=proc_cmd_sonoff(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_DISPCLEAR       :res=proc_cmd_disp_clear(cmdcmdMsg);break;//,returnval,cmd.sender);break;
+				case EXMPP_CMD_DISPPRINT       :res=proc_cmd_disp_print(cmdcmdMsg,returnval);break;
 				default                        :break;
 			}
 			result.pop_front();
@@ -1552,6 +1556,54 @@ RPC_SRV_RESULT XmppMgr::hostname_to_ip(char * hostname , char* ip)
 		return RPC_SRV_RESULT_SUCCESS;
 	}
 	return RPC_SRV_RESULT_FAIL;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_disp_clear(std::string msg)
+{
+	char temp_str[255];temp_str[0]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result = Client.set_action_noarg_type((char*)"display_clear");
+	Client.rpc_server_disconnect();
+	return result;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_disp_print(std::string msg,std::string &returnval)
+{
+	std::string cmd,cmdArg,cmdArg2;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	msgstream >> cmdArg;
+	getline(msgstream, cmdArg2); //get rest of the string!
+
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0)//get-line number
+		return RPC_SRV_RESULT_ARG_ERROR;
+	if(cmdArg2.size()<=0)//read printed message
+	{
+		int gpioAddr=atoi(cmdArg.c_str());
+		char temp_str[255];temp_str[0]='\0';
+		ADJsonRpcClient Client;
+		if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)//ADCMN_PORT_DISPSRV
+			return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+		RPC_SRV_RESULT result = Client.get_integer_type_with_addr_para((char*)"display_print",(char*)"line",gpioAddr,
+										(char*)"msg",temp_str);
+		Client.rpc_server_disconnect();
+		returnval=temp_str;
+		return result;
+	}
+	else //write gpio pin
+	{
+		ADJsonRpcClient Client;
+		if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)//ADCMN_PORT_DISPSRV
+			return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+		RPC_SRV_RESULT result = Client.set_double_string_type((char*)"display_print",(char*)"line",
+						(char*)cmdArg.c_str(),(char*)"msg",(char*)cmdArg2.c_str());
+		Client.rpc_server_disconnect();
+		return result;
+	}
 }
 /* ------------------------------------------------------------------------- */
 
