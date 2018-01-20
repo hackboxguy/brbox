@@ -17,7 +17,7 @@
 #include "I2CPcfLcd.hpp"
 #include "I2CSsd1306.hpp"
 #include "ADSysInfo.hpp"
-
+#include "DispCtrlRpc.h"
 #include "NetRpc.h"
 #include "SysRpc.h"
 #include "EventHandler.h"
@@ -133,6 +133,16 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&DevIdent);
 	SysRpc EvntSubscr (SYSMGR_RPC_EVNT_SUBSCRIBE,EJSON_SYSMGR_RPC_EVNT_SUBSCRIBE,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&EvntSubscr);
+
+	//for low memory device, support display-clear and display-print commands.
+	//if(CmdLine.get_sys_config()=="a5v11-xmpp")
+	//{
+	//}
+	DispCtrlRpc DispClear(SYSMGR_RPC_DISP_CLEAR,EJSON_SYSMGR_RPC_DISP_CLEAR,emulat,dbglog,&DataCache); //clear-display
+	RpcMgr.AttachRpc(&DispClear);
+	DispCtrlRpc DispPrint(SYSMGR_RPC_DISP_PRINT,EJSON_SYSMGR_RPC_DISP_PRINT,emulat,dbglog,&DataCache); //print-display
+	RpcMgr.AttachRpc(&DispPrint);
+
 
 	//common rpc hadler object(eg: trigger-data-save/store-factory/restore-factory..etc)
 	CmnRpc CmnRpcHandler("cmnrpc",0,emulat,dbglog,&DataCache);//common rpc-handler(name and index are ignored)

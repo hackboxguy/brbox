@@ -39,6 +39,8 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_RUN_SHELLCMD,    //runs a shell command
 	EJSON_SYSMGR_RPC_DEVIDENT,
 	EJSON_SYSMGR_RPC_EVNT_SUBSCRIBE, //custom event handler to re-subscribe events as per given event-config file(update subscription).
+	EJSON_SYSMGR_RPC_DISP_CLEAR,     //clear display
+	EJSON_SYSMGR_RPC_DISP_PRINT,     //print string on display
 	EJSON_SYSMGR_RPC_END,
 	EJSON_SYSMGR_RPC_NONE
 }EJSON_SYSMGR_RPC_TYPES;
@@ -319,6 +321,30 @@ typedef struct SYSMGR_EVNT_SUBSCR_PACKET_T
 	//char cmd[1024];
 	int taskID;
 }SYSMGR_EVNT_SUBSCR_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_DISP_CLEAR,
+//EJSON_SYSMGR_RPC_DISP_PRINT,
+#define	SYSMGR_RPC_DISP_CLEAR           "display_clear"
+#define	SYSMGR_RPC_DISP_PRINT           "display_print"
+#define SYSMGR_RPC_DISP_PRINT_LINE_ARG  "line"
+#define SYSMGR_RPC_DISP_PRINT_MESG_ARG  "msg"
+#define SYSMGR_RPC_DISP_LINE_ARG_TABL    {"line1","line2","line3","line4","lineall","none","none","\0"}
+//important: keep enum DISPLAY_LINE and EJSON_DISPSRV_LINE same
+typedef enum EJSON_SYSMGR_LINE_T
+{
+	EJSON_SYSMGR_LINE_1,
+	EJSON_SYSMGR_LINE_2,
+	EJSON_SYSMGR_LINE_3,
+	EJSON_SYSMGR_LINE_4,
+	EJSON_SYSMGR_LINE_FULL,
+	EJSON_SYSMGR_LINE_UNKNOWN,
+	EJSON_SYSMGR_LINE_NONE
+}EJSON_SYSMGR_LINE;
+typedef struct SYSMGR_PRINT_PACKET_T
+{
+	EJSON_SYSMGR_LINE line;
+	char msg[1024];
+}SYSMGR_PRINT_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct SYSMGR_CMN_DATA_CACHE_T
