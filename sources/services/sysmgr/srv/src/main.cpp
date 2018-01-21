@@ -227,8 +227,11 @@ DisplayDevice* low_memory_device_special_action(std::string sysconf,std::string 
 	switch(disp_type)
 	{
 		case ADLIB_DISPLAY_TYPE_SSD1306_128x64   :pDevice = new I2CSsd1306(DevNode,Type);break;
-		case ADLIB_DISPLAY_TYPE_1602_DUAL_PCF    :pDevice = new I2CDualPcfLcd(DevNode,Type);break;
-		case ADLIB_DISPLAY_TYPE_1602_PCF         :pDevice = new I2CPcfLcd(DevNode,Type);break;
+		case ADLIB_DISPLAY_TYPE_1602_DUAL_PCF    ://pDevice = new I2CPcfLcd(DevNode,Type);break;//I2CDualPcfLcd
+		case ADLIB_DISPLAY_TYPE_1602_PCF         ://pDevice = new I2CPcfLcd(DevNode,Type);break;
+		case ADLIB_DISPLAY_TYPE_2002_PCF         ://pDevice = new I2CPcfLcd(DevNode,Type);break;
+		case ADLIB_DISPLAY_TYPE_2004_PCF         ://pDevice = new I2CPcfLcd(DevNode,Type);break;
+		case ADLIB_DISPLAY_TYPE_1604_PCF         :pDevice = new I2CPcfLcd(DevNode,Type);break;
 		default                                  :pDevice = new I2CSsd1306(DevNode,Type);break;//keep this as default
 	}
 	pDevice->init_display();
@@ -239,7 +242,7 @@ DisplayDevice* low_memory_device_special_action(std::string sysconf,std::string 
 	ADSysInfo SysInfo;//lib-class for reading cpu-info and system-info
 	char netmask[512];char mac[512];char ip[512];
 	if(SysInfo.read_network_info((char*)"eth0",mac,ip,netmask)==0)
-		sprintf(msg,"ip-%s",ip);
+		sprintf(msg,"%s",ip);
 	else
 	{
 		//if network is not connected, use ifconfig method

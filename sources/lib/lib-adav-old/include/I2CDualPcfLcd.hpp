@@ -2,7 +2,7 @@
 #define __I2C_DUAL_PCF_LCD_H_
 
 #define LCD_PCF_DATA_ADDRESS     (0x70>>1)
-#define LCD_PCF_CTRL_ADDRESS     (0x72>>1)
+#define LCD_PCF_CTRL_ADDRESS     (0x4E>>1) //(0x72>>1)
 #include <stdint.h>
 //#include "I2CBusAccess.h"
 #include "DisplayDevice.hpp"
@@ -26,6 +26,8 @@ public:
 	RPC_SRV_RESULT init_display(){init_lcd();return RPC_SRV_RESULT_SUCCESS;};
 	RPC_SRV_RESULT clear_display(){clear_display_internal(DISPLAY_LINE_FULL);return RPC_SRV_RESULT_SUCCESS;};
 	RPC_SRV_RESULT print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNMENT align);
+	RPC_SRV_RESULT set_back_light(bool sts);
+	RPC_SRV_RESULT get_back_light(bool &sts);
 };
 #endif
 

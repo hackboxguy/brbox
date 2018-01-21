@@ -8,6 +8,8 @@
 #include "DisplayDevice.hpp"
 class I2CPcfLcd : public DisplayDevice //, public I2CBusAccess
 {
+	int DISPLAY_TYPE;
+	ADLIB_DISPLAY_TYPE disp_type;
 	uint8_t io_ctrl_byte;
 	void update_io_ctrl_device();
 	void update_io_ctrl_cache(uint8_t location,uint8_t value);
@@ -31,6 +33,8 @@ public:
 	RPC_SRV_RESULT init_display(){init_lcd();return RPC_SRV_RESULT_SUCCESS;};
 	RPC_SRV_RESULT clear_display(){clear_display_internal(DISPLAY_LINE_FULL);return RPC_SRV_RESULT_SUCCESS;};
 	RPC_SRV_RESULT print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNMENT align=TEXT_ALIGNMENT_CENTER);
+	RPC_SRV_RESULT set_back_light(bool sts);
+	RPC_SRV_RESULT get_back_light(bool &sts);
 };
 #endif
 

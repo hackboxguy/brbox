@@ -320,5 +320,14 @@ RPC_SRV_RESULT I2CSsd1306::print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNMENT
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
+RPC_SRV_RESULT I2CSsd1306::set_back_light(bool sts)
+{
+	return RPC_SRV_RESULT_SUCCESS;
+}
+RPC_SRV_RESULT I2CSsd1306::get_back_light(bool &sts)
+{
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/*****************************************************************************/
 
 

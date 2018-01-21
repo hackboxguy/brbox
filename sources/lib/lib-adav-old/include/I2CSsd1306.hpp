@@ -52,7 +52,8 @@ public:
 	RPC_SRV_RESULT clear_display();//{clear_display_internal(DISPLAY_LINE_FULL);return RPC_SRV_RESULT_SUCCESS;};
 	RPC_SRV_RESULT print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNMENT align);
 	//RPC_SRV_RESULT test_function(){return print_line((char*)"ssd1306-testfunc",DISPLAY_LINE_2,TEXT_ALIGNMENT_CENTER);};
-
+	RPC_SRV_RESULT set_back_light(bool sts);
+	RPC_SRV_RESULT get_back_light(bool &sts);
 };
 #endif
 

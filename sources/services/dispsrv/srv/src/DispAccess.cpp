@@ -106,4 +106,13 @@ RPC_SRV_RESULT DispAccess::print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNMENT
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
+RPC_SRV_RESULT DispAccess::set_back_light(bool sts)
+{
+	return RPC_SRV_RESULT_SUCCESS;
+}
+RPC_SRV_RESULT DispAccess::get_back_light(bool &sts)
+{
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/*****************************************************************************/
 

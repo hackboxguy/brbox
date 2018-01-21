@@ -21,6 +21,8 @@ public:
 	RPC_SRV_RESULT clear_display();
 	//RPC_SRV_RESULT print_line(int line, char* msg);
 	RPC_SRV_RESULT print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNMENT align);
+	RPC_SRV_RESULT set_back_light(bool sts);
+	RPC_SRV_RESULT get_back_light(bool &sts);
 
 	//RPC_SRV_RESULT read_byte(uint32_t addr, uint8_t *data);
 	//RPC_SRV_RESULT write_byte(uint32_t addr, uint8_t data);

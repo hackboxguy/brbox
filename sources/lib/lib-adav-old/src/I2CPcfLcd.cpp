@@ -11,10 +11,26 @@
 #define LCD_EN 0x04
 #define LCD_RW 0x02
 #define LCD_RS 0x01
-#define DISPLAY_TYPE 16 //This class is for display length 16
+//#define DISPLAY_TYPE 20 //16 //This class is for display length 16
 /*****************************************************************************/
 I2CPcfLcd::I2CPcfLcd(std::string DevNode,std::string DevType):DisplayDevice(DevNode)//,I2CBusAccess(DevNode)
 {
+	const char *dispTbl[] = ADLIB_DISPLAY_TYPE_TABL;
+	ADCmnStringProcessor string_proc;
+	disp_type=(ADLIB_DISPLAY_TYPE)string_proc.string_to_enum(dispTbl,(char*)DevType.c_str(),ADLIB_DISPLAY_TYPE_UNKNOWN);
+	if(disp_type>=ADLIB_DISPLAY_TYPE_UNKNOWN)
+		disp_type=ADLIB_DISPLAY_TYPE_1602_PCF;
+	switch(disp_type)
+	{
+		//case ADLIB_DISPLAY_TYPE_1602_DUAL_PCF: DISPLAY_TYPE=16;break;
+		//case ADLIB_DISPLAY_TYPE_1604_DUAL_PCF: DISPLAY_TYPE=16;break;
+		case ADLIB_DISPLAY_TYPE_2002_PCF     :
+		case ADLIB_DISPLAY_TYPE_2004_PCF     : DISPLAY_TYPE=20;break;
+		default                              : DISPLAY_TYPE=16;break;
+	}
+
+
+
 	io_ctrl_byte=0xff;
 	init_lcd();
 	//clear_display_internal(DISPLAY_LINE_FULL);
@@ -45,7 +61,7 @@ void I2CPcfLcd::write_inst(uint8_t byte)
 	update_io_ctrl_cache(0,0);//make RS=0
 	update_io_ctrl_cache(1,0);//make R/W=0
 	update_io_ctrl_cache(2,1);//make LCDEN=1
-	update_io_ctrl_cache(3,1);//keep backlight high
+	update_io_ctrl_cache(3,0);//keep backlight high
 	io_ctrl_byte = (io_ctrl_byte & 0x0F)|((byte<<4) & 0xF0);//send high nibble
 	//io_ctrl_byte = (io_ctrl_byte & 0x0F)|(byte & 0xF0); // send lower nibble
 
@@ -109,7 +125,7 @@ void I2CPcfLcd::write_inst(unsigned char data,unsigned char cmdtype)
 {
 	unsigned char lcddata; 
 	// Write high nibble
-	lcddata = HI_NIBBLE(data) |LCD_BL;
+	lcddata = HI_NIBBLE(data) ;//|LCD_BL;
 	write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata | LCD_EN);usleep(100);
 	write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata & ~LCD_EN);usleep(100);
 
@@ -117,7 +133,7 @@ void I2CPcfLcd::write_inst(unsigned char data,unsigned char cmdtype)
 	if (cmdtype)
 	{
 		// Write low nibble
-		lcddata = LO_NIBBLE(data) |LCD_BL;
+		lcddata = LO_NIBBLE(data) ;//|LCD_BL;
 		write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata | LCD_EN);usleep(500);
 		write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata & ~LCD_EN);usleep(500);
 	}
@@ -127,10 +143,10 @@ void I2CPcfLcd::write_inst(unsigned char data,unsigned char cmdtype)
 void I2CPcfLcd::write_data(unsigned char data)
 {
 	unsigned char lcddata;
-	lcddata = HI_NIBBLE(data)|LCD_BL|LCD_RS; // Get high nibble
+	lcddata = HI_NIBBLE(data)|LCD_RS;//|LCD_BL; // Get high nibble
 	write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata | LCD_EN);usleep(500);
 	write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata & ~LCD_EN);usleep(500);
-	lcddata = LO_NIBBLE(data)|LCD_BL|LCD_RS; // Get low nibble
+	lcddata = LO_NIBBLE(data)|LCD_RS;//|LCD_BL; // Get low nibble
 	write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata | LCD_EN);usleep(500);
 	write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata & ~LCD_EN);usleep(500);
 } // LCD_putch()
@@ -158,6 +174,14 @@ void I2CPcfLcd::clear_display_internal(DISPLAY_LINE line)
 			LCD_goto(2,1);//go_to(17);
 			print_lcd((char*)"                ");//Blank);
 			break;
+		case DISPLAY_LINE_3:
+			LCD_goto(3,1);//go_to(17);
+			print_lcd((char*)"                ");//Blank);
+			break;
+		case DISPLAY_LINE_4:
+			LCD_goto(4,1);//go_to(17);
+			print_lcd((char*)"                ");//Blank);
+			break;
 		case DISPLAY_LINE_FULL:
 			write_inst(0x01,1);
 			break;
@@ -179,6 +203,10 @@ void I2CPcfLcd::print_center(DISPLAY_LINE line,char *string)
 		LCD_goto(1,indx);
 	else if(line==DISPLAY_LINE_2)
 		LCD_goto(2,indx);
+	else if(line==DISPLAY_LINE_3)
+		LCD_goto(3,indx);
+	else if(line==DISPLAY_LINE_4)
+		LCD_goto(4,indx);
 	print_lcd(string);
 }
 /*****************************************************************************/
@@ -194,6 +222,10 @@ RPC_SRV_RESULT I2CPcfLcd::print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNMENT 
 		myline=1;
 	else if(line==DISPLAY_LINE_2)
 		myline=2;
+	else if(line==DISPLAY_LINE_3)
+		myline=3;
+	else if(line==DISPLAY_LINE_4)
+		myline=4;
 	else
 		myline=1;
 
@@ -203,6 +235,29 @@ RPC_SRV_RESULT I2CPcfLcd::print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNMENT 
 		case TEXT_ALIGNMENT_RIGHT :LCD_goto(myline,indx+1);print_lcd(msg);break;//TODO
 		default:print_center(line,msg);break;
 	}
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/*****************************************************************************/
+RPC_SRV_RESULT I2CPcfLcd::set_back_light(bool sts)
+{
+	uint8_t lcddata;
+	if(read_byte((uint32_t)LCD_PCF_ADDRESS, &lcddata)!=RPC_SRV_RESULT_SUCCESS)
+		return RPC_SRV_RESULT_FAIL;
+	if(sts==true)
+		write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata | 0x80);
+	else
+		write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata & 0x7F);
+	return RPC_SRV_RESULT_SUCCESS;
+}
+RPC_SRV_RESULT I2CPcfLcd::get_back_light(bool &sts)
+{
+	uint8_t lcddata;
+	if(read_byte((uint32_t)LCD_PCF_ADDRESS, &lcddata)!=RPC_SRV_RESULT_SUCCESS)
+		return RPC_SRV_RESULT_FAIL;
+	if((lcddata | 0x7F) == 0x7F)
+		sts=false;
+	else
+		sts=true;
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/

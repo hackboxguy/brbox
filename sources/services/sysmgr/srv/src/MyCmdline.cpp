@@ -26,7 +26,7 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 	CmdlineHelper.insert_options_entry((char*)"syscfg" ,optional_argument,SYSMGR_CMDLINE_OPT_SYSCFG);
 	CmdlineHelper.insert_help_entry((char*)"--syscfg=sys_config_str         (specify system type ex:a5v11-xmpp/a5v11-base/3020f-base)");
 	CmdlineHelper.insert_options_entry((char*)"disptype" ,optional_argument,SYSMGR_CMDLINE_OPT_DISPTYPE);
-	CmdlineHelper.insert_help_entry((char*)"--disptype=type                 (display-type [ssd1306_128x32/ssd1306_128x64/1602_pcf/1602_dual_pcf])");
+	CmdlineHelper.insert_help_entry((char*)"--disptype=type                 (display-type [ssd1306_128x32/ssd1306_128x64/1602_pcf/1604_pcf/2002_pcf/2004_pcf])");
 	CmdlineHelper.insert_options_entry((char*)"device" ,optional_argument,SYSMGR_CMDLINE_OPT_DISPDEVICE);
 	CmdlineHelper.insert_help_entry((char*)"--device=/dev/i2c-x         (i2c device node if applicable)");
 

@@ -150,4 +150,13 @@ RPC_SRV_RESULT I2CDualPcfLcd::print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNM
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
+RPC_SRV_RESULT I2CDualPcfLcd::set_back_light(bool sts)
+{
+	return RPC_SRV_RESULT_SUCCESS;
+}
+RPC_SRV_RESULT I2CDualPcfLcd::get_back_light(bool &sts)
+{
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/*****************************************************************************/
 
