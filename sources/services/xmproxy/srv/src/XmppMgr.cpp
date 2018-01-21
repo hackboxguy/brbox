@@ -51,7 +51,8 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{true ,EXMPP_CMD_SHUTDOWN                , "xmpshutdown" ,""}, //shutdown xmpp server(for xmpp logout)
 	{true ,EXMPP_CMD_SONOFF                  , "sonoff" ,"<ip/hostname> [sts(on/off/toggle)]"},//http based control of sonoff relay(tasmota fmw)
 	{true ,EXMPP_CMD_DISPCLEAR               , "dispclear" ,""}, 
-	{true ,EXMPP_CMD_DISPPRINT               , "display" ,"<line1/line2/line3..]> <message>"}
+	{true ,EXMPP_CMD_DISPPRINT               , "display" ,"<line1/line2/line3..]> <message>"},
+	{true ,EXMPP_CMD_DISPBKLT                , "dispbklt" ,"<sts[on/off]>"}
 };
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
@@ -337,6 +338,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_SONOFF          :res=proc_cmd_sonoff(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_DISPCLEAR       :res=proc_cmd_disp_clear(cmdcmdMsg);break;//,returnval,cmd.sender);break;
 				case EXMPP_CMD_DISPPRINT       :res=proc_cmd_disp_print(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_DISPBKLT        :res=proc_cmd_disp_backlight(cmdcmdMsg,returnval);break;
 				default                        :break;
 			}
 			result.pop_front();
@@ -1604,6 +1606,55 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_disp_print(std::string msg,std::string &returnv
 		Client.rpc_server_disconnect();
 		return result;
 	}
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_disp_backlight(std::string msg,std::string &returnval)
+{
+	std::string cmd,cmdArg;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	msgstream >> cmdArg;
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0)//get-hostname-cmd
+		return proc_cmd_get_display_backlight(msg,returnval);
+	else
+		return proc_cmd_set_display_backlight(msg);
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_get_display_backlight(std::string msg,std::string &returnval)
+{
+//14:52:09.440-->{ "jsonrpc": "2.0", "method": "display_backlight_get", "id": 0 }
+//14:52:09.440<--{ "jsonrpc": "2.0", "result": { "return": "Success", "status": "on" }, "id": 0 }
+	char temp_str[255];temp_str[0]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result = Client.get_string_type((char*)"display_backlight_get",(char*)"status",temp_str);
+	Client.rpc_server_disconnect();
+	returnval=temp_str;
+	return result;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_set_display_backlight(std::string msg)
+{
+//14:52:21.336-->{ "jsonrpc": "2.0", "method": "display_backlight_set", "params": { "status": "off" }, "id": 0 }
+//14:52:21.336<--{ "jsonrpc": "2.0", "result": { "return": "Success" }, "id": 0 }
+	std::string cmd,cmdArg;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	msgstream >> cmdArg;
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0)
+		return RPC_SRV_RESULT_ARG_ERROR;
+	//char temp_str[255];temp_str[0]='\0';
+	ADJsonRpcClient Client;
+	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
+		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
+	RPC_SRV_RESULT result = Client.set_single_string_type((char*)"display_backlight_set",(char*)"status",(char*)cmdArg.c_str());
+	Client.rpc_server_disconnect();
+	return result;
 }
 /* ------------------------------------------------------------------------- */
 

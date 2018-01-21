@@ -66,6 +66,7 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_SONOFF,   //http based control of sonoff relay with tasmota firmware
 	EXMPP_CMD_DISPCLEAR,   //clear-display
 	EXMPP_CMD_DISPPRINT,   //display-print
+	EXMPP_CMD_DISPBKLT,    //display-backlight-control
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -263,9 +264,11 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_sonoff(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_disp_clear(std::string msg);//,std::string &returnval,std::string sender);
 	RPC_SRV_RESULT proc_cmd_disp_print(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_disp_backlight(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_get_display_backlight(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_set_display_backlight(std::string msg);
 
 	std::string print_help();
-
 	RPC_SRV_RESULT LoadAliasList(std::string listFile);
 	RPC_SRV_RESULT ExtendAliasList(std::string listFile,std::string key,std::string val);
 	RPC_SRV_RESULT RewriteAliasList(std::string listFile);

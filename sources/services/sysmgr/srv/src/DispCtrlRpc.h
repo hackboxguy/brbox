@@ -25,6 +25,13 @@ public:
 	int bin_to_json_disp_print(JsonDataCommObj* pReq);
 	int process_disp_print(JsonDataCommObj* pReq,SYSMGR_CMN_DATA_CACHE *pData);
 
+	int json_to_bin_backlight_get(JsonDataCommObj* pReq);
+	int bin_to_json_backlight_get(JsonDataCommObj* pReq);
+	int process_backlight_get(JsonDataCommObj* pReq,SYSMGR_CMN_DATA_CACHE *pData);
+	int json_to_bin_backlight_set(JsonDataCommObj* pReq);
+	int bin_to_json_backlight_set(JsonDataCommObj* pReq);
+	int process_backlight_set(JsonDataCommObj* pReq,SYSMGR_CMN_DATA_CACHE *pData);
+
 };
 /* ------------------------------------------------------------------------- */
 

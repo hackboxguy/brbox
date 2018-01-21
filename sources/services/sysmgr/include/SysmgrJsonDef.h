@@ -41,6 +41,8 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_EVNT_SUBSCRIBE, //custom event handler to re-subscribe events as per given event-config file(update subscription).
 	EJSON_SYSMGR_RPC_DISP_CLEAR,     //clear display
 	EJSON_SYSMGR_RPC_DISP_PRINT,     //print string on display
+	EJSON_SYSMGR_RPC_DISP_GET_BKLT,  //read display backlight status
+	EJSON_SYSMGR_RPC_DISP_SET_BKLT,  //control display backlight
 	EJSON_SYSMGR_RPC_END,
 	EJSON_SYSMGR_RPC_NONE
 }EJSON_SYSMGR_RPC_TYPES;
@@ -340,10 +342,25 @@ typedef enum EJSON_SYSMGR_LINE_T
 	EJSON_SYSMGR_LINE_UNKNOWN,
 	EJSON_SYSMGR_LINE_NONE
 }EJSON_SYSMGR_LINE;
+/* ------------------------------------------------------------------------- */
+//EJSON_SYSMGR_RPC_DISP_GET_BKLT,
+//EJSON_SYSMGR_RPC_DISP_SET_BKLT,
+#define	SYSMGR_RPC_DISP_GET_BKLT        "display_backlight_get"
+#define	SYSMGR_RPC_DISP_SET_BKLT        "display_backlight_set"
+#define SYSMGR_RPC_DISP_BKLT_ARG        "status"
+#define SYSMGR_RPC_DISP_BKLT_ARG_TABL   {"off","on","unknown","none","\0"} 
+typedef enum SYSMGR_BKLT_STS_T
+{
+	SYSMGR_BKLT_STS_OFF,
+	SYSMGR_BKLT_STS_ON,
+	SYSMGR_BKLT_STS_UNKNOWN,
+	SYSMGR_BKLT_STS_NONE
+}SYSMGR_BKLT_STS;
 typedef struct SYSMGR_PRINT_PACKET_T
 {
 	EJSON_SYSMGR_LINE line;
 	char msg[1024];
+	SYSMGR_BKLT_STS bklsts;//backlight status
 }SYSMGR_PRINT_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here

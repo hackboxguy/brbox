@@ -142,6 +142,10 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&DispClear);
 	DispCtrlRpc DispPrint(SYSMGR_RPC_DISP_PRINT,EJSON_SYSMGR_RPC_DISP_PRINT,emulat,dbglog,&DataCache); //print-display
 	RpcMgr.AttachRpc(&DispPrint);
+	DispCtrlRpc DispGetBklt(SYSMGR_RPC_DISP_GET_BKLT,EJSON_SYSMGR_RPC_DISP_GET_BKLT,emulat,dbglog,&DataCache); //print-display
+	RpcMgr.AttachRpc(&DispGetBklt);
+	DispCtrlRpc DispSetBklt(SYSMGR_RPC_DISP_SET_BKLT,EJSON_SYSMGR_RPC_DISP_SET_BKLT,emulat,dbglog,&DataCache); //print-display
+	RpcMgr.AttachRpc(&DispSetBklt);
 
 
 	//common rpc hadler object(eg: trigger-data-save/store-factory/restore-factory..etc)
