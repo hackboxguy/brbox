@@ -268,6 +268,7 @@ RPC_SRV_RESULT I2CPcfLcd::set_back_light(bool sts)
 		lcddata = HI_NIBBLE(0);
 	else
 		lcddata = HI_NIBBLE(0)|LCD_BL;
+	BkLight=sts;
 	write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata);
 	return RPC_SRV_RESULT_SUCCESS;
 }
