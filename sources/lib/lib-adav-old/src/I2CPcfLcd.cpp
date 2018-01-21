@@ -30,7 +30,7 @@ I2CPcfLcd::I2CPcfLcd(std::string DevNode,std::string DevType):DisplayDevice(DevN
 	}
 
 
-
+	BkLight=true;
 	io_ctrl_byte=0xff;
 	init_lcd();
 	//clear_display_internal(DISPLAY_LINE_FULL);
@@ -119,13 +119,18 @@ void I2CPcfLcd::init_lcd(void)
 	write_inst(0x01,1);//usleep(50000); // display on cursor on
 	write_inst(0x06,1);//usleep(50000); // increment cursor
 	write_inst(0x0C,1);//usleep(50000); // increment cursor
+	//set_back_light(BkLight);
 }
 /*****************************************************************************/
 void I2CPcfLcd::write_inst(unsigned char data,unsigned char cmdtype)
 {
 	unsigned char lcddata; 
 	// Write high nibble
-	lcddata = HI_NIBBLE(data) ;//|LCD_BL;
+	if(BkLight==false)
+		lcddata = HI_NIBBLE(data) ;//|LCD_BL;
+	else	
+		lcddata = HI_NIBBLE(data)|LCD_BL;
+		
 	write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata | LCD_EN);usleep(100);
 	write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata & ~LCD_EN);usleep(100);
 
@@ -133,7 +138,10 @@ void I2CPcfLcd::write_inst(unsigned char data,unsigned char cmdtype)
 	if (cmdtype)
 	{
 		// Write low nibble
-		lcddata = LO_NIBBLE(data) ;//|LCD_BL;
+		if(BkLight==false)
+			lcddata = LO_NIBBLE(data) ;//|LCD_BL;
+		else
+			lcddata = LO_NIBBLE(data)|LCD_BL;
 		write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata | LCD_EN);usleep(500);
 		write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata & ~LCD_EN);usleep(500);
 	}
@@ -143,10 +151,16 @@ void I2CPcfLcd::write_inst(unsigned char data,unsigned char cmdtype)
 void I2CPcfLcd::write_data(unsigned char data)
 {
 	unsigned char lcddata;
-	lcddata = HI_NIBBLE(data)|LCD_RS;//|LCD_BL; // Get high nibble
+	if(BkLight==false)
+		lcddata = HI_NIBBLE(data)|LCD_RS;//|LCD_BL; // Get high nibble
+	else
+		lcddata = HI_NIBBLE(data)|LCD_RS|LCD_BL; // Get high nibble
 	write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata | LCD_EN);usleep(500);
 	write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata & ~LCD_EN);usleep(500);
-	lcddata = LO_NIBBLE(data)|LCD_RS;//|LCD_BL; // Get low nibble
+	if(BkLight==false)
+		lcddata = LO_NIBBLE(data)|LCD_RS;//|LCD_BL; // Get low nibble
+	else
+		lcddata = LO_NIBBLE(data)|LCD_RS|LCD_BL; // Get low nibble
 	write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata | LCD_EN);usleep(500);
 	write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata & ~LCD_EN);usleep(500);
 } // LCD_putch()
@@ -240,24 +254,33 @@ RPC_SRV_RESULT I2CPcfLcd::print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNMENT 
 /*****************************************************************************/
 RPC_SRV_RESULT I2CPcfLcd::set_back_light(bool sts)
 {
-	uint8_t lcddata;
-	if(read_byte((uint32_t)LCD_PCF_ADDRESS, &lcddata)!=RPC_SRV_RESULT_SUCCESS)
-		return RPC_SRV_RESULT_FAIL;
-	if(sts==true)
-		write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata | 0x80);
+	//uint8_t lcddata;
+	//if(read_byte((uint32_t)LCD_PCF_ADDRESS, &lcddata)!=RPC_SRV_RESULT_SUCCESS)
+	//	{printf("failed to read lcd pcf\n");return RPC_SRV_RESULT_FAIL;}
+	//if(sts==true)
+	//	{write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata | 0x80);BkLight=true;}
+	//else
+	//	{write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata & 0x7F);BkLight=false;}
+	//return RPC_SRV_RESULT_SUCCESS;
+
+	unsigned char lcddata;
+	if(sts==false)
+		lcddata = HI_NIBBLE(0);
 	else
-		write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata & 0x7F);
+		lcddata = HI_NIBBLE(0)|LCD_BL;
+	write_byte((uint32_t)LCD_PCF_ADDRESS,lcddata);
 	return RPC_SRV_RESULT_SUCCESS;
 }
 RPC_SRV_RESULT I2CPcfLcd::get_back_light(bool &sts)
 {
-	uint8_t lcddata;
-	if(read_byte((uint32_t)LCD_PCF_ADDRESS, &lcddata)!=RPC_SRV_RESULT_SUCCESS)
-		return RPC_SRV_RESULT_FAIL;
-	if((lcddata | 0x7F) == 0x7F)
-		sts=false;
-	else
-		sts=true;
+	sts=BkLight;
+	//uint8_t lcddata;
+	//if(read_byte((uint32_t)LCD_PCF_ADDRESS, &lcddata)!=RPC_SRV_RESULT_SUCCESS)
+	//	return RPC_SRV_RESULT_FAIL;
+	//if((lcddata | 0x7F) == 0x7F)
+	//	sts=false;
+	//else
+	//	sts=true;
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/

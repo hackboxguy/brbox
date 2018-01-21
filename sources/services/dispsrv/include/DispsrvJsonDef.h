@@ -11,6 +11,8 @@ typedef enum EJSON_DISPSRV_RPC_TYPES_T
 	EJSON_DISPSRV_RPC_DISP_INIT,
 	EJSON_DISPSRV_RPC_DISP_CLEAR,
 	EJSON_DISPSRV_RPC_DISP_PRINT,
+	EJSON_DISPSRV_RPC_DISP_GET_BLKT,
+	EJSON_DISPSRV_RPC_DISP_SET_BLKT,
 	EJSON_DISPSRV_RPC_END,
 	EJSON_DISPSRV_RPC_NONE
 }EJSON_DISPSRV_RPC_TYPES;
@@ -43,12 +45,27 @@ typedef enum EJSON_DISPSRV_LINE_T
 	TEXT_ALIGNMENT_UNKNOWN,
 	TEXT_ALIGNMENT_NONE
 }TEXT_ALIGNMENT;*/
+/* ------------------------------------------------------------------------- */
+//EJSON_DISPSRV_RPC_DISP_GET_BLKT,
+//EJSON_DISPSRV_RPC_DISP_SET_BLKT,
+#define	DISPSRV_RPC_DISP_GET_BKLT        "display_backlight_get"
+#define	DISPSRV_RPC_DISP_SET_BKLT        "display_backlight_set"
+#define DISPSRV_RPC_DISP_BKLT_ARG        "status"
+#define DISPSRV_RPC_DISP_BKLT_ARG_TABL   {"off","on","unknown","none","\0"} 
+typedef enum DISPSRV_BKLT_STS_T
+{
+	DISPSRV_BKLT_STS_OFF,
+	DISPSRV_BKLT_STS_ON,
+	DISPSRV_BKLT_STS_UNKNOWN,
+	DISPSRV_BKLT_STS_NONE
+}DISPSRV_BKLT_STS;
 typedef struct DISPSRV_PRINT_PACKET_T
 {
 	//int line;
 	//DISPLAY_LINE line;
 	EJSON_DISPSRV_LINE line;
 	char msg[1024];
+	DISPSRV_BKLT_STS bklsts;//backlight status
 }DISPSRV_PRINT_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to gpioctl-service here

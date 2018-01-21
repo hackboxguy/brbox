@@ -8,6 +8,7 @@
 #include "DisplayDevice.hpp"
 class I2CPcfLcd : public DisplayDevice //, public I2CBusAccess
 {
+	bool BkLight;
 	int DISPLAY_TYPE;
 	ADLIB_DISPLAY_TYPE disp_type;
 	uint8_t io_ctrl_byte;

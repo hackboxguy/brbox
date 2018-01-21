@@ -52,9 +52,13 @@ int main(int argc, const char* argv[])
 	DispCtrlRpc DisplayInit (DISPSRV_RPC_DISP_INIT ,EJSON_DISPSRV_RPC_DISP_INIT ,emulat,dbglog,&DataCache);
 	DispCtrlRpc DisplayClear(DISPSRV_RPC_DISP_CLEAR,EJSON_DISPSRV_RPC_DISP_CLEAR,emulat,dbglog,&DataCache);
 	DispCtrlRpc DisplayPrint(DISPSRV_RPC_DISP_PRINT,EJSON_DISPSRV_RPC_DISP_PRINT,emulat,dbglog,&DataCache);
+	DispCtrlRpc DisplayBklGet(DISPSRV_RPC_DISP_GET_BKLT,EJSON_DISPSRV_RPC_DISP_GET_BLKT,emulat,dbglog,&DataCache);
+	DispCtrlRpc DisplayBklSet(DISPSRV_RPC_DISP_SET_BKLT,EJSON_DISPSRV_RPC_DISP_SET_BLKT,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&DisplayInit);
 	RpcMgr.AttachRpc(&DisplayClear);
 	RpcMgr.AttachRpc(&DisplayPrint);
+	RpcMgr.AttachRpc(&DisplayBklGet);
+	RpcMgr.AttachRpc(&DisplayBklSet);
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr

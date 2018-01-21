@@ -14,6 +14,9 @@ DispCltCmdline::DispCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--dispclear                [clears the display content]");
 	CmdlineHelper.insert_options_entry((char*)"printline" ,optional_argument,EJSON_DISPSRV_RPC_DISP_PRINT);
 	CmdlineHelper.insert_help_entry((char*)"--printline=line,msg       [print message on display]");
+	CmdlineHelper.insert_options_entry((char*)"backlight" ,optional_argument,EJSON_DISPSRV_RPC_DISP_GET_BLKT);
+	CmdlineHelper.insert_help_entry((char*)"--backlight=<on/off>       [get/set display backlight status]");
+
 }
 /*****************************************************************************/
 DispCltCmdline::~DispCltCmdline()
@@ -39,6 +42,15 @@ int DispCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 (EJSON_DISPSRV_RPC_DISP_PRINT,EJSON_DISPSRV_RPC_DISP_PRINT,DISPSRV_RPC_DISP_PRINT ,DISPSRV_RPC_DISP_PRINT ,
 			DISPSRV_RPC_DISP_PRINT_LINE_ARG,EJSON_DISPSRV_LINE_UNKNOWN,&table[0],
 			DISPSRV_RPC_DISP_PRINT_MESG_ARG,sub_arg);
+			}
+			break;
+		case EJSON_DISPSRV_RPC_DISP_GET_BLKT:
+		case EJSON_DISPSRV_RPC_DISP_SET_BLKT:
+			{
+			const char *table[]   = DISPSRV_RPC_DISP_BKLT_ARG_TABL;
+			CmdlineHelper.push_single_enum_get_set_command(EJSON_DISPSRV_RPC_DISP_GET_BLKT,EJSON_DISPSRV_RPC_DISP_SET_BLKT,
+			DISPSRV_RPC_DISP_GET_BKLT,DISPSRV_RPC_DISP_SET_BKLT,&table[0],DISPSRV_BKLT_STS_UNKNOWN,
+			(char*)DISPSRV_RPC_DISP_BKLT_ARG,sub_arg);
 			}
 			break;
 		default:
