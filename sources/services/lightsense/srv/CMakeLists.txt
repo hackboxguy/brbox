@@ -4,9 +4,10 @@ set(COMPONENT_NAME lightsensesrv) #set the name of the binary
 set(LIB_ADSTTNG AdSttngs)   #settings library
 set(LIB_ADCOMMN AdCmn)      #common library
 
-
-
-
+option(WITH_SEABREEZE_LIB "link with lib-seabreeze" OFF)
+if(WITH_SEABREEZE_LIB)
+  add_definitions(-DUSE_SEABREEZE_LIB)
+endif()
 
 project(${COMPONENT_NAME})
 set(AUTO_SVN_VERSION    ON CACHE BOOL ON)  #by default include svn revision numbers
@@ -16,17 +17,30 @@ set(WRTSTARTUP_SCRIPT WrtLightSenseSrvStartupScr)         #server startup script
 
 set(STARTNUM "79" CACHE STRING "79")       #init order number of the service
 file(GLOB SOURCES "src/*.cpp")
+if(WITH_SEABREEZE_LIB)
+	LIST(REMOVE_ITEM SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/SeaBreezeAccess.cpp)
+endif()
+
 add_executable(${COMPONENT_NAME} ${SOURCES})
 #set(INC_ADDISP   "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-display/include")
 set(INC_ADSTTNG  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-settings/include")
 set(INC_ADCOMMN  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-adav-old/include")
 set(INC_SRVCOMMN "${CMAKE_CURRENT_SOURCE_DIR}/../include")
+set(INC_SEABREEZE "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/libseabreeze")
 #find_package( libi2c-dev REQUIRED ) #core imgproc highgui )
 # Add #include path of all dependent components
-include_directories(${INC_ADSTTNG} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${CMAKE_CURRENT_BINARY_DIR})
-
+if(WITH_CXMPP_LIB)
+	include_directories(${INC_ADSTTNG} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${INC_SEABREEZE} ${CMAKE_CURRENT_BINARY_DIR})
+else()
+	include_directories(${INC_ADSTTNG} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${CMAKE_CURRENT_BINARY_DIR})
+endif()
 # Specify component's dependency.
-target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt)
+if(WITH_SEABREEZE_LIB)
+	target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt seabreeze)
+else()
+	target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt)
+endif()
+
 
 #install the binary and server-rpc-headers to CMAKE_INSTALL_PREFIX destination
 file(GLOB  INCFILES "${INC_SRVCOMMN}/*.*")
