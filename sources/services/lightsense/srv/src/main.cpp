@@ -12,6 +12,7 @@
 #include "SensorCtrlRpc.h"
 #include "LightSensor.hpp"
 #include "I2CTAOS3414Sensor.hpp"
+#include "SeaBreezeAccess.h"
 /* ------------------------------------------------------------------------- */
 using namespace std;
 LightSensor* create_sensor_device(std::string DevNode,std::string Type);
@@ -113,6 +114,7 @@ LightSensor* create_sensor_device(std::string DevNode,std::string Type)
 	switch(sensor_type)
 	{
 		case LIGHT_SENSOR_TYPE_TAOS3414:pDevice = new I2CTAOS3414Sensor(DevNode,Type);break;
+		case LIGHT_SENSOR_TYPE_OOSTS   :pDevice = new SeaBreezeAccess(DevNode,Type);break;
 		//case LIGHT_SENSOR_TYPE_OOSTS   :pDevice = new I2CDualPcfLcd(DevNode,Type);break;//spectrometer
 		default: break;
 	}
