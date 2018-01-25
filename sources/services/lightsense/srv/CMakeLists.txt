@@ -26,13 +26,16 @@ add_executable(${COMPONENT_NAME} ${SOURCES})
 set(INC_ADSTTNG  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-settings/include")
 set(INC_ADCOMMN  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-adav-old/include")
 set(INC_SRVCOMMN "${CMAKE_CURRENT_SOURCE_DIR}/../include")
-#set(INC_SEABREEZE "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/libseabreeze")
-set(INC_SEABREEZE /usr/local/include/seabreeze)
+
+#set(INC_SEABREEZE /usr/local/include/seabreeze)
+find_path (INC_SEABREEZE NAMES seabreeze)
+#MESSAGE( STATUS "INC_SEABREEZE:         " ${INC_SEABREEZE} )
+
 
 #find_package( libi2c-dev REQUIRED ) #core imgproc highgui )
 # Add #include path of all dependent components
 if(WITH_SEABREEZE_LIB)
-	include_directories(${INC_ADSTTNG} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${INC_SEABREEZE} ${CMAKE_CURRENT_BINARY_DIR})
+	include_directories(${INC_ADSTTNG} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${INC_SEABREEZE}/seabreeze ${CMAKE_CURRENT_BINARY_DIR})
 else()
 	include_directories(${INC_ADSTTNG} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${CMAKE_CURRENT_BINARY_DIR})
 endif()
