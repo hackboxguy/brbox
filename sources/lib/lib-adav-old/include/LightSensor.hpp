@@ -83,6 +83,17 @@ typedef enum LS_PRESCALER_T
 	LS_PRESCALER_NONE
 }LS_PRESCALER;
 #define LS_PRESCALER_TABL  {"div1","div2","div4","div8","div16","div32","div64","unknown","none","\0"}
+
+typedef enum LS_TRIG_MODE_T
+{
+	LS_TRIG_MODE_NORMAL,
+	LS_TRIG_MODE_SOFTWARE,//software triggered
+	LS_TRIG_MODE_SYNC,    //synchronized
+	LS_TRIG_MODE_EXTHW,   //external hardware triggered
+	LS_TRIG_MODE_UNKNOWN,
+	LS_TRIG_MODE_NONE
+}LS_TRIG_MODE;
+#define LS_TRIG_MODE_TABL  {"normal","software","sync","exthw","unknown","none","\0"}
 /*****************************************************************************/
 class LightSensor : public I2CBusAccess
 {
@@ -112,6 +123,11 @@ public:
 	virtual RPC_SRV_RESULT get_prescaler(LS_PRESCALER &mode){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
 	virtual RPC_SRV_RESULT set_prescaler(LS_PRESCALER mode){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
 	virtual RPC_SRV_RESULT get_rgbw_count(int32_t &red,int32_t &green,int32_t &blue,int32_t &white){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
+	virtual RPC_SRV_RESULT get_wavelength_count(uint32_t &count){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
+	virtual RPC_SRV_RESULT get_wavelength_value(uint32_t index,double &value){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
+	virtual RPC_SRV_RESULT get_spectrum_count(uint32_t &count){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
+	virtual RPC_SRV_RESULT get_spectrum_value(uint32_t index,double &value){return RPC_SRV_RESULT_FEATURE_NOT_AVAILABLE;};
+
 
 };
 #endif

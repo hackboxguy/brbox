@@ -66,6 +66,10 @@ int main(int argc, const char* argv[])
 	SensorCtrlRpc PrescalerGet  (LIGHTSENSE_RPC_PRESCALER_GET,EJSON_LIGHTSENSE_PRESCALER_GET,emulat,dbglog,&DataCache);
 	SensorCtrlRpc PrescalerSet  (LIGHTSENSE_RPC_PRESCALER_SET,EJSON_LIGHTSENSE_PRESCALER_SET,emulat,dbglog,&DataCache);
 	SensorCtrlRpc RGBWCountGet  (LIGHTSENSE_RPC_RGBWCOUNT_GET,EJSON_LIGHTSENSE_RGBWCOUNT_GET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc WaveLengthItms(LIGHTSENSE_RPC_WAVELENGTH_COUNT_GET,EJSON_LIGHTSENSE_WAVELENGTH_COUNT_GET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc WaveLengthSamp(LIGHTSENSE_RPC_WAVELENGTH_ITEM_GET,EJSON_LIGHTSENSE_WAVELENGTH_ITEM_GET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc SpectrumItms  (LIGHTSENSE_RPC_SPECTRUM_COUNT_GET,EJSON_LIGHTSENSE_SPECTRUM_COUNT_GET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc SpectrumSamp  (LIGHTSENSE_RPC_SPECTRUM_ITEM_GET,EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET,emulat,dbglog,&DataCache);
 
 	RpcMgr.AttachRpc(&SensorInit);
 	RpcMgr.AttachRpc(&StartMeasure);
@@ -88,6 +92,11 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&PrescalerGet);
 	RpcMgr.AttachRpc(&PrescalerSet);
 	RpcMgr.AttachRpc(&RGBWCountGet);
+	RpcMgr.AttachRpc(&WaveLengthItms);
+	RpcMgr.AttachRpc(&WaveLengthSamp);
+	RpcMgr.AttachRpc(&SpectrumItms);
+	RpcMgr.AttachRpc(&SpectrumSamp);
+
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr
 	RpcMgr.Start(CmdLine.get_port_number(),CmdLine.get_socket_log(),CmdLine.get_emulation_mode());

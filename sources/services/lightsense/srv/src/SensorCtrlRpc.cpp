@@ -37,6 +37,10 @@ int SensorCtrlRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_LIGHTSENSE_PRESCALER_GET       :return json_to_bin_get_prescaler(pReq);
 		case EJSON_LIGHTSENSE_PRESCALER_SET       :return json_to_bin_set_prescaler(pReq);
 		case EJSON_LIGHTSENSE_RGBWCOUNT_GET       :return json_to_bin_get_rgbwcount(pReq);
+		case EJSON_LIGHTSENSE_WAVELENGTH_COUNT_GET:return json_to_bin_get_wavelength_count(pReq);
+		case EJSON_LIGHTSENSE_WAVELENGTH_ITEM_GET :return json_to_bin_get_wavelength_item(pReq);
+		case EJSON_LIGHTSENSE_SPECTRUM_COUNT_GET  :return json_to_bin_get_spectrum_count(pReq);
+		case EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET   :return json_to_bin_get_spectrum_item(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -68,6 +72,10 @@ int SensorCtrlRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_LIGHTSENSE_PRESCALER_GET       :return bin_to_json_get_prescaler(pReq);
 		case EJSON_LIGHTSENSE_PRESCALER_SET       :return bin_to_json_set_prescaler(pReq);
 		case EJSON_LIGHTSENSE_RGBWCOUNT_GET       :return bin_to_json_get_rgbwcount(pReq);
+		case EJSON_LIGHTSENSE_WAVELENGTH_COUNT_GET:return bin_to_json_get_wavelength_count(pReq);
+		case EJSON_LIGHTSENSE_WAVELENGTH_ITEM_GET :return bin_to_json_get_wavelength_item(pReq);
+		case EJSON_LIGHTSENSE_SPECTRUM_COUNT_GET  :return bin_to_json_get_spectrum_count(pReq);
+		case EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET   :return bin_to_json_get_spectrum_item(pReq);
 		default:break;
 	}
 	return -1;
@@ -99,6 +107,10 @@ int SensorCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProdu
 		case EJSON_LIGHTSENSE_PRESCALER_GET       :return process_get_prescaler(pReq,pDataCache);
 		case EJSON_LIGHTSENSE_PRESCALER_SET       :return process_set_prescaler(pReq,pDataCache);
 		case EJSON_LIGHTSENSE_RGBWCOUNT_GET       :return process_get_rgbwcount(pReq,pDataCache);
+		case EJSON_LIGHTSENSE_WAVELENGTH_COUNT_GET:return process_get_wavelength_count(pReq,pDataCache);
+		case EJSON_LIGHTSENSE_WAVELENGTH_ITEM_GET :return process_get_wavelength_item(pReq,pDataCache);
+		case EJSON_LIGHTSENSE_SPECTRUM_COUNT_GET  :return process_get_spectrum_count(pReq,pDataCache);
+		case EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET   :return process_get_spectrum_item(pReq,pDataCache);
 		default:break;
 	}
 	return 0;
@@ -687,6 +699,116 @@ int SensorCtrlRpc::process_get_rgbwcount(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DA
 	pPacket=(LIGHTSENSE_MEASUREMENT_PACKET*)pPanelReq->dataRef;
 	if(pData->pSensor!=NULL)
 		pPanelReq->result=pSensr->get_rgbw_count(pPacket->red,pPacket->green,pPacket->blue,pPacket->white);
+	else
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int SensorCtrlRpc::json_to_bin_get_wavelength_count(JsonDataCommObj* pReq)
+{
+	LIGHTSENSE_MEASUREMENT_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,RPC_SRV_ACT_READ,EJSON_LIGHTSENSE_WAVELENGTH_COUNT_GET);
+	return 0;
+}
+int SensorCtrlRpc::bin_to_json_get_wavelength_count(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_INT(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,LIGHTSENSE_RPC_COUNT_ARG,sample_count);
+	return 0;
+}
+int SensorCtrlRpc::process_get_wavelength_count(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData)
+{
+	LightSensor *pSensr=pData->pSensor;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	LIGHTSENSE_MEASUREMENT_PACKET* pPacket;
+	pPacket=(LIGHTSENSE_MEASUREMENT_PACKET*)pPanelReq->dataRef;
+	if(pData->pSensor!=NULL)
+		pPanelReq->result=pSensr->get_wavelength_count(pPacket->sample_count);
+	else
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int SensorCtrlRpc::json_to_bin_get_wavelength_item(JsonDataCommObj* pReq)
+{
+	LIGHTSENSE_MEASUREMENT_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,RPC_SRV_ACT_READ,EJSON_LIGHTSENSE_WAVELENGTH_ITEM_GET);
+	JSON_STRING_TO_INT(LIGHTSENSE_RPC_ITEM_INDX_ARG,pPanelCmdObj->sample_index);
+	return 0;
+}
+int SensorCtrlRpc::bin_to_json_get_wavelength_item(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_STRING(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,LIGHTSENSE_RPC_ITEM_VAL_ARG,str_sample_value);
+	return 0;
+}
+int SensorCtrlRpc::process_get_wavelength_item(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData)
+{
+	LightSensor *pSensr=pData->pSensor;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	LIGHTSENSE_MEASUREMENT_PACKET* pPacket;
+	pPacket=(LIGHTSENSE_MEASUREMENT_PACKET*)pPanelReq->dataRef;
+	if(pData->pSensor!=NULL)
+	{
+		pPacket->sample_value=0.0;
+		pPanelReq->result=pSensr->get_wavelength_value(pPacket->sample_index,pPacket->sample_value);
+		sprintf(pPacket->str_sample_value,"%.2lf",pPacket->sample_value);
+	}
+	else
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int SensorCtrlRpc::json_to_bin_get_spectrum_count(JsonDataCommObj* pReq)
+{
+	LIGHTSENSE_MEASUREMENT_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,RPC_SRV_ACT_READ,EJSON_LIGHTSENSE_SPECTRUM_COUNT_GET);
+	return 0;
+}
+int SensorCtrlRpc::bin_to_json_get_spectrum_count(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_INT(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,LIGHTSENSE_RPC_COUNT_ARG,sample_count);
+	return 0;
+}
+int SensorCtrlRpc::process_get_spectrum_count(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData)
+{
+	LightSensor *pSensr=pData->pSensor;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	LIGHTSENSE_MEASUREMENT_PACKET* pPacket;
+	pPacket=(LIGHTSENSE_MEASUREMENT_PACKET*)pPanelReq->dataRef;
+	if(pData->pSensor!=NULL)
+		pPanelReq->result=pSensr->get_spectrum_count(pPacket->sample_count);
+	else
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int SensorCtrlRpc::json_to_bin_get_spectrum_item(JsonDataCommObj* pReq)
+{
+	LIGHTSENSE_MEASUREMENT_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,RPC_SRV_ACT_READ,EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET);
+	JSON_STRING_TO_INT(LIGHTSENSE_RPC_ITEM_INDX_ARG,pPanelCmdObj->sample_index);
+	return 0;
+}
+int SensorCtrlRpc::bin_to_json_get_spectrum_item(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_STRING(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,LIGHTSENSE_RPC_ITEM_VAL_ARG,str_sample_value);
+	return 0;
+}
+int SensorCtrlRpc::process_get_spectrum_item(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData)
+{
+	LightSensor *pSensr=pData->pSensor;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	LIGHTSENSE_MEASUREMENT_PACKET* pPacket;
+	pPacket=(LIGHTSENSE_MEASUREMENT_PACKET*)pPanelReq->dataRef;
+	if(pData->pSensor!=NULL)
+	{
+		pPacket->sample_value=0.0;
+		pPanelReq->result=pSensr->get_spectrum_value(pPacket->sample_index,pPacket->sample_value);
+		sprintf(pPacket->str_sample_value,"%.2lf",pPacket->sample_value);
+	}
 	else
 		pPanelReq->result=RPC_SRV_RESULT_FAIL;
 	return 0;

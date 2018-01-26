@@ -29,6 +29,16 @@ CltCmdline::CltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--prescaler=value          [read/write prescaler=<div1/div2/div4/div8/div16/div32/div64>]");
 	CmdlineHelper.insert_options_entry((char*)"rgbwcount" ,optional_argument,EJSON_LIGHTSENSE_RGBWCOUNT_GET);
 	CmdlineHelper.insert_help_entry((char*)"--rgbwcount                [read r/g/b/w count value of tri-stimulus sensor]");
+
+	CmdlineHelper.insert_options_entry((char*)"getwavelenCount" ,optional_argument,EJSON_LIGHTSENSE_WAVELENGTH_COUNT_GET);
+	CmdlineHelper.insert_help_entry((char*)"--getwavelenCount          [returns total number of wavelength samples]");
+	CmdlineHelper.insert_options_entry((char*)"getwavelenVal" ,optional_argument,EJSON_LIGHTSENSE_WAVELENGTH_ITEM_GET);
+	CmdlineHelper.insert_help_entry((char*)"--getwavelenVal=index      [returns wavelength value of given index]");
+	CmdlineHelper.insert_options_entry((char*)"getspectrumCount" ,optional_argument,EJSON_LIGHTSENSE_SPECTRUM_COUNT_GET);
+	CmdlineHelper.insert_help_entry((char*)"--getspectrumCount         [returns total number of spectrum samples]");
+	CmdlineHelper.insert_options_entry((char*)"getspectrumVal" ,optional_argument,EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET);
+	CmdlineHelper.insert_help_entry((char*)"--getspectrumVal=index     [returns spectrum value of given index]");
+
 }
 /*****************************************************************************/
 CltCmdline::~CltCmdline()
@@ -131,6 +141,24 @@ int CltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 		case EJSON_LIGHTSENSE_RGBWCOUNT_GET:
 			push_get_set_rgbwcount(sub_arg);
 			break;
+		case EJSON_LIGHTSENSE_WAVELENGTH_COUNT_GET:
+			CmdlineHelper.push_single_int_get_set_command(EJSON_LIGHTSENSE_WAVELENGTH_COUNT_GET,
+				EJSON_LIGHTSENSE_WAVELENGTH_COUNT_GET,LIGHTSENSE_RPC_WAVELENGTH_COUNT_GET,LIGHTSENSE_RPC_WAVELENGTH_COUNT_GET,
+				(char*)LIGHTSENSE_RPC_COUNT_ARG,sub_arg,1);
+			break;
+		case EJSON_LIGHTSENSE_WAVELENGTH_ITEM_GET :
+			push_get_indexed_msg_command(sub_arg,(char*)LIGHTSENSE_RPC_WAVELENGTH_ITEM_GET,EJSON_LIGHTSENSE_WAVELENGTH_ITEM_GET,
+						     (char*)LIGHTSENSE_RPC_ITEM_INDX_ARG,(char*)LIGHTSENSE_RPC_ITEM_VAL_ARG);
+			break;
+		case EJSON_LIGHTSENSE_SPECTRUM_COUNT_GET:
+			CmdlineHelper.push_single_int_get_set_command(EJSON_LIGHTSENSE_SPECTRUM_COUNT_GET,
+				EJSON_LIGHTSENSE_SPECTRUM_COUNT_GET,LIGHTSENSE_RPC_SPECTRUM_COUNT_GET,LIGHTSENSE_RPC_SPECTRUM_COUNT_GET,
+				(char*)LIGHTSENSE_RPC_COUNT_ARG,sub_arg,1);
+			break;
+		case EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET :
+			push_get_indexed_msg_command(sub_arg,(char*)LIGHTSENSE_RPC_SPECTRUM_ITEM_GET,EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET,
+						     (char*)LIGHTSENSE_RPC_ITEM_INDX_ARG,(char*)LIGHTSENSE_RPC_ITEM_VAL_ARG);
+			break;
 		default:
 			return 0;
 			break;	
@@ -144,6 +172,10 @@ int CltCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSo
 	{
 		case EJSON_LIGHTSENSE_RGBWCOUNT_GET:
 			run_get_set_rgbwcount(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
+		case EJSON_LIGHTSENSE_WAVELENGTH_ITEM_GET:
+		case EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET:
+			run_get_indexed_msg_command(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
+			break;
 		default:return -1;
 			break;
 	}
@@ -243,4 +275,55 @@ int CltCmdline::run_get_set_rgbwcount(CmdExecutionObj *pCmdObj,ADJsonRpcClient *
 	return 0;
 }
 /*****************************************************************************/
+int CltCmdline::push_get_indexed_msg_command(char* subarg,char* rpc_name,int rpc_index,char* arg_name,char* result_name)
+{
+	CmdExecutionObj *pCmdObj=NULL;
+	OBJECT_MEM_NEW(pCmdObj,CmdExecutionObj);
+	if(pCmdObj==NULL)
+	{
+		printf("failed create pCmdObj!!!\n");
+		return -1;
+	}
+	strcpy(pCmdObj->get_rpc_name,rpc_name);
+	if(CmdlineHelper.get_next_subargument(&subarg)==0)//user must specify index number
+	{
+		OBJ_MEM_DELETE(pCmdObj);
+		printf("please specify correct msg index number\n");
+		return -1;
+	}
+	else 
+	{
+			strcpy(pCmdObj->first_arg_param_name,arg_name);
+			//strcpy(pCmdObj->first_arg_param_value,subarg);
+			pCmdObj->first_arg_param_int_value=atoi(subarg);
+			strcpy(pCmdObj->second_arg_param_name,result_name);
+			pCmdObj->command=rpc_index;
+			pCmdObj->action=RPC_SRV_ACT_READ;
+	}
+	pCmdObj->cmd_type=CLIENT_CMD_TYPE_USER_DEFINED;
+	//put the request into chain
+	if(CmdlineHelper.CmdChain.chain_put((void *)pCmdObj)!=0)
+	{
+		printf("push_get_indexed_msg_command: failed! unable to push json-req-task-obj to chain!\n");
+		OBJ_MEM_DELETE(pCmdObj);
+		return -1;
+	}
+	return 0;
+}
+int CltCmdline::run_get_indexed_msg_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker)
+{
+	ADThreadedSockClient *pOrig = (ADThreadedSockClient*)pWorker;
+	if(pCmdObj->action == RPC_SRV_ACT_READ)
+	{
+	//following command has different name for req_arg and for resp_arg.
+	pCmdObj->result=pSrvSockConn->get_int_type_with_string_para(pCmdObj->get_rpc_name,pCmdObj->first_arg_param_name,pCmdObj->first_arg_param_int_value,pCmdObj->second_arg_param_value,pCmdObj->second_arg_param_name);
+	pOrig->log_print_message(pSrvSockConn,pCmdObj->get_rpc_name,RPC_SRV_ACT_READ,pCmdObj->result,pOutMsgList,pCmdObj->second_arg_param_value);
+	}
+	else
+	{
+		pOrig->my_log_print_message(pSrvSockConn,(char*)"run_get_indexed_msg_command",RPC_SRV_ACT_UNKNOWN,(char*)CLIENT_CMD_RESULT_INVALID_ACT,pOutMsgList);
+		return -1;
+	}
+	return 0;
+}
 

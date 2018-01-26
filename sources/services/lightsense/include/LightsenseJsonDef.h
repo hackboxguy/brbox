@@ -29,6 +29,10 @@ typedef enum EJSON_LIGHTSENSE_RPC_TYPES_T
 	EJSON_LIGHTSENSE_PRESCALER_GET,
 	EJSON_LIGHTSENSE_PRESCALER_SET,
 	EJSON_LIGHTSENSE_RGBWCOUNT_GET,
+	EJSON_LIGHTSENSE_WAVELENGTH_COUNT_GET,
+	EJSON_LIGHTSENSE_WAVELENGTH_ITEM_GET,
+	EJSON_LIGHTSENSE_SPECTRUM_COUNT_GET,
+	EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET,
 	EJSON_LIGHTSENSE_RPC_END,
 	EJSON_LIGHTSENSE_RPC_NONE
 }EJSON_LIGHTSENSE_RPC_TYPES;
@@ -100,6 +104,18 @@ typedef enum EJSON_LIGHTSENSE_RPC_TYPES_T
 #define	LIGHTSENSE_RPC_RGBWCOUNT_ARGB "B"
 #define	LIGHTSENSE_RPC_RGBWCOUNT_ARGW "W"
 /* ------------------------------------------------------------------------- */
+//EJSON_LIGHTSENSE_WAVELENGTH_COUNT_GET,
+//EJSON_LIGHTSENSE_WAVELENGTH_ITEM_GET,
+//EJSON_LIGHTSENSE_SPECTRUM_COUNT_GET,
+//EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET,
+#define	LIGHTSENSE_RPC_WAVELENGTH_COUNT_GET "get_wavelength_count"
+#define	LIGHTSENSE_RPC_WAVELENGTH_ITEM_GET  "get_wavelength_item"
+#define	LIGHTSENSE_RPC_SPECTRUM_COUNT_GET   "get_spectrum_count"
+#define	LIGHTSENSE_RPC_SPECTRUM_ITEM_GET    "get_spectrum_item"
+#define	LIGHTSENSE_RPC_COUNT_ARG            "count"
+#define	LIGHTSENSE_RPC_ITEM_INDX_ARG        "index"
+#define	LIGHTSENSE_RPC_ITEM_VAL_ARG         "value"
+/* ------------------------------------------------------------------------- */
 typedef struct LIGHTSENSE_MEASUREMENT_PACKET_T
 {
 	int32_t red;
@@ -115,6 +131,10 @@ typedef struct LIGHTSENSE_MEASUREMENT_PACKET_T
 	LS_INTR_SOURCE intr_source;
 	LS_GAIN_MODE gain_mode;
 	LS_PRESCALER prescaler;
+	uint32_t sample_count;//used for spectrometer
+	uint32_t sample_index;//used for spectrometer
+	double sample_value;//used for spectrometer
+	char str_sample_value[255];
 }LIGHTSENSE_MEASUREMENT_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to gpioctl-service here

@@ -101,7 +101,22 @@ public:
 	int bin_to_json_get_rgbwcount(JsonDataCommObj* pReq);
 	int process_get_rgbwcount(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
 
-
+	//EJSON_LIGHTSENSE_WAVELENGTH_COUNT_GET
+	int json_to_bin_get_wavelength_count(JsonDataCommObj* pReq);
+	int bin_to_json_get_wavelength_count(JsonDataCommObj* pReq);
+	int process_get_wavelength_count(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
+	//EJSON_LIGHTSENSE_WAVELENGTH_ITEM_GET,
+	int json_to_bin_get_wavelength_item(JsonDataCommObj* pReq);
+	int bin_to_json_get_wavelength_item(JsonDataCommObj* pReq);
+	int process_get_wavelength_item(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
+	//EJSON_LIGHTSENSE_SPECTRUM_COUNT_GET
+	int json_to_bin_get_spectrum_count(JsonDataCommObj* pReq);
+	int bin_to_json_get_spectrum_count(JsonDataCommObj* pReq);
+	int process_get_spectrum_count(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
+	//EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET,
+	int json_to_bin_get_spectrum_item(JsonDataCommObj* pReq);
+	int bin_to_json_get_spectrum_item(JsonDataCommObj* pReq);
+	int process_get_spectrum_item(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
 };
 /* ------------------------------------------------------------------------- */
 

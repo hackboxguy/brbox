@@ -15,6 +15,11 @@ class CltCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 	virtual int get_my_server_port();
 	int push_get_set_rgbwcount(char* subarg);
 	int run_get_set_rgbwcount(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);
+
+	int push_get_indexed_msg_command(char* subarg,char* rpc_name,int rpc_index,char* arg_name,char* result_name);
+	int run_get_indexed_msg_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,
+		ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);
+
 public:
 	CltCmdline();
 	~CltCmdline();
