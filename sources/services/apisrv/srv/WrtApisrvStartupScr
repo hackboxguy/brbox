@@ -7,7 +7,7 @@ START=74
 APP=apisrv
 SERVICE_WRITE_PID=1
 SERVICE_DAEMONIZE=1
-HTTP_PORT=8080
+HTTP_PORT=80
 
 start() {
         service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt) --httpport=$HTTP_PORT
