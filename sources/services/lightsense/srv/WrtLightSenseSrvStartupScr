@@ -7,10 +7,14 @@ START=73
 APP=lightsensesrv
 SERVICE_WRITE_PID=1
 SERVICE_DAEMONIZE=1
-
+SENSORTYPE=oosts #if i2c device 0x39 is not found, then start as spectrometer sensor
+DEVNODE=/dev/i2c-0
 start() {
-	DEVNODE=$(ls -la /dev/i2c-* |head -1|grep -oh "/dev/.*") #choose the first i2c device node in the list
-	service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt) --sensortype=oosts #taos3414 --device=$DEVNODE
+
+	#DEVNODE=$(ls -la /dev/i2c-* |head -1|grep -oh "/dev/.*") #choose the first i2c device node in the list
+	#auto detect
+	i2cdetect  -r -y 0 | grep 39 > /dev/null && SENSORTYPE=taos3414
+	service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt) --sensortype=$SENSORTYPE --device=$DEVNODE
 }
 
 stop() {
