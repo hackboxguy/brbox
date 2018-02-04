@@ -41,6 +41,7 @@ int SensorCtrlRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_LIGHTSENSE_WAVELENGTH_ITEM_GET :return json_to_bin_get_wavelength_item(pReq);
 		case EJSON_LIGHTSENSE_SPECTRUM_COUNT_GET  :return json_to_bin_get_spectrum_count(pReq);
 		case EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET   :return json_to_bin_get_spectrum_item(pReq);
+		case EJSON_LIGHTSENSE_FIRST_LEASED_IP_GET :return json_to_bin_get_leased_ip(pReq);
 		default:break;
 	}
 	return -1;//0;
@@ -76,6 +77,7 @@ int SensorCtrlRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_LIGHTSENSE_WAVELENGTH_ITEM_GET :return bin_to_json_get_wavelength_item(pReq);
 		case EJSON_LIGHTSENSE_SPECTRUM_COUNT_GET  :return bin_to_json_get_spectrum_count(pReq);
 		case EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET   :return bin_to_json_get_spectrum_item(pReq);
+		case EJSON_LIGHTSENSE_FIRST_LEASED_IP_GET :return bin_to_json_get_leased_ip(pReq);
 		default:break;
 	}
 	return -1;
@@ -111,6 +113,7 @@ int SensorCtrlRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProdu
 		case EJSON_LIGHTSENSE_WAVELENGTH_ITEM_GET :return process_get_wavelength_item(pReq,pDataCache);
 		case EJSON_LIGHTSENSE_SPECTRUM_COUNT_GET  :return process_get_spectrum_count(pReq,pDataCache);
 		case EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET   :return process_get_spectrum_item(pReq,pDataCache);
+		case EJSON_LIGHTSENSE_FIRST_LEASED_IP_GET :return process_get_leased_ip(pReq,pDataCache);
 		default:break;
 	}
 	return 0;
@@ -811,6 +814,65 @@ int SensorCtrlRpc::process_get_spectrum_item(JsonDataCommObj* pReq,LIGHTSENSE_CM
 	}
 	else
 		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <cerrno>
+
+//EJSON_LIGHTSENSE_FIRST_LEASED_IP_GET
+int SensorCtrlRpc::json_to_bin_get_leased_ip(JsonDataCommObj* pReq)
+{
+	LIGHTSENSE_MEASUREMENT_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,RPC_SRV_ACT_READ,EJSON_LIGHTSENSE_FIRST_LEASED_IP_GET);
+	return 0;
+}
+int SensorCtrlRpc::bin_to_json_get_leased_ip(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_STRING(RPC_SRV_REQ,LIGHTSENSE_MEASUREMENT_PACKET,LIGHTSENSE_RPC_FIRST_LEASED_IP_ARG,leased_ip_addr);
+	return 0;
+}
+int SensorCtrlRpc::process_get_leased_ip(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData)
+{
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	LIGHTSENSE_MEASUREMENT_PACKET* pPacket;
+	pPacket=(LIGHTSENSE_MEASUREMENT_PACKET*)pPanelReq->dataRef;
+	if(pPanelReq->action!=RPC_SRV_ACT_READ)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+		return 0;
+	}
+
+
+	if(pData->LeaseFilePath.size()<=0)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+		return 0;
+	}
+	std::ifstream infile(pData->LeaseFilePath.c_str());
+	std::string line;
+	while (std::getline(infile, line))
+	{
+		//1517049089 28:d2:44:89:b3:4f 192.168.1.205 my-linux-machine *
+		stringstream iss(line);
+		std::string uid,mac,ip;
+		iss >> uid;
+		iss >> mac;
+		iss >> ip;
+		if(ip.size()>0)
+		{
+			strcpy(pPacket->leased_ip_addr,ip.c_str());
+			pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+		}
+		else
+		{
+			pPanelReq->result=RPC_SRV_RESULT_FAIL;
+		}
+	}
 	return 0;
 }
 /* ------------------------------------------------------------------------- */

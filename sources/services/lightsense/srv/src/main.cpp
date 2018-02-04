@@ -40,6 +40,7 @@ int main(int argc, const char* argv[])
 	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
 	DataCache.pEventNotifier=(void*)&EventNotifier;
 	DataCache.pSensor=create_sensor_device(CmdLine.get_dev_node(),CmdLine.get_sensor_type());
+	DataCache.LeaseFilePath=CmdLine.get_lease_filepath();
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
@@ -70,6 +71,7 @@ int main(int argc, const char* argv[])
 	SensorCtrlRpc WaveLengthSamp(LIGHTSENSE_RPC_WAVELENGTH_ITEM_GET,EJSON_LIGHTSENSE_WAVELENGTH_ITEM_GET,emulat,dbglog,&DataCache);
 	SensorCtrlRpc SpectrumItms  (LIGHTSENSE_RPC_SPECTRUM_COUNT_GET,EJSON_LIGHTSENSE_SPECTRUM_COUNT_GET,emulat,dbglog,&DataCache);
 	SensorCtrlRpc SpectrumSamp  (LIGHTSENSE_RPC_SPECTRUM_ITEM_GET,EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET,emulat,dbglog,&DataCache);
+	SensorCtrlRpc LeasedIpAddr  (LIGHTSENSE_RPC_FIRST_LEASED_IP_GET,EJSON_LIGHTSENSE_FIRST_LEASED_IP_GET,emulat,dbglog,&DataCache);
 
 	RpcMgr.AttachRpc(&SensorInit);
 	RpcMgr.AttachRpc(&StartMeasure);
@@ -96,6 +98,7 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&WaveLengthSamp);
 	RpcMgr.AttachRpc(&SpectrumItms);
 	RpcMgr.AttachRpc(&SpectrumSamp);
+	RpcMgr.AttachRpc(&LeasedIpAddr);
 
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr

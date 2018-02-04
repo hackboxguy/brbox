@@ -38,7 +38,8 @@ CltCmdline::CltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--getspectrumCount         [returns total number of spectrum samples]");
 	CmdlineHelper.insert_options_entry((char*)"getspectrumVal" ,optional_argument,EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET);
 	CmdlineHelper.insert_help_entry((char*)"--getspectrumVal=index     [returns spectrum value of given index]");
-
+	CmdlineHelper.insert_options_entry((char*)"getLeasedIp" ,optional_argument,EJSON_LIGHTSENSE_FIRST_LEASED_IP_GET);
+	CmdlineHelper.insert_help_entry((char*)"--getLeasedIp              [returns ipaddr of first entry of dhcp.lease file]");
 }
 /*****************************************************************************/
 CltCmdline::~CltCmdline()
@@ -158,6 +159,11 @@ int CltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 		case EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET :
 			push_get_indexed_msg_command(sub_arg,(char*)LIGHTSENSE_RPC_SPECTRUM_ITEM_GET,EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET,
 						     (char*)LIGHTSENSE_RPC_ITEM_INDX_ARG,(char*)LIGHTSENSE_RPC_ITEM_VAL_ARG);
+			break;
+		case EJSON_LIGHTSENSE_FIRST_LEASED_IP_GET:
+			CmdlineHelper.push_string_get_set_command(EJSON_LIGHTSENSE_FIRST_LEASED_IP_GET,EJSON_LIGHTSENSE_FIRST_LEASED_IP_GET,
+			LIGHTSENSE_RPC_FIRST_LEASED_IP_GET,LIGHTSENSE_RPC_FIRST_LEASED_IP_GET,(char*)LIGHTSENSE_RPC_FIRST_LEASED_IP_ARG,
+			sub_arg);
 			break;
 		default:
 			return 0;

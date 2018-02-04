@@ -33,6 +33,7 @@ typedef enum EJSON_LIGHTSENSE_RPC_TYPES_T
 	EJSON_LIGHTSENSE_WAVELENGTH_ITEM_GET,
 	EJSON_LIGHTSENSE_SPECTRUM_COUNT_GET,
 	EJSON_LIGHTSENSE_SPECTRUM_ITEM_GET,
+	EJSON_LIGHTSENSE_FIRST_LEASED_IP_GET,//to get the ip of the display
 	EJSON_LIGHTSENSE_RPC_END,
 	EJSON_LIGHTSENSE_RPC_NONE
 }EJSON_LIGHTSENSE_RPC_TYPES;
@@ -116,6 +117,10 @@ typedef enum EJSON_LIGHTSENSE_RPC_TYPES_T
 #define	LIGHTSENSE_RPC_ITEM_INDX_ARG        "index"
 #define	LIGHTSENSE_RPC_ITEM_VAL_ARG         "value"
 /* ------------------------------------------------------------------------- */
+//EJSON_LIGHTSENSE_FIRST_LEASED_IP_GET
+#define	LIGHTSENSE_RPC_FIRST_LEASED_IP_GET "get_first_leased_ipaddr"
+#define	LIGHTSENSE_RPC_FIRST_LEASED_IP_ARG "addr"
+/* ------------------------------------------------------------------------- */
 typedef struct LIGHTSENSE_MEASUREMENT_PACKET_T
 {
 	int32_t red;
@@ -135,6 +140,7 @@ typedef struct LIGHTSENSE_MEASUREMENT_PACKET_T
 	uint32_t sample_index;//used for spectrometer
 	double sample_value;//used for spectrometer
 	char str_sample_value[255];
+	char leased_ip_addr[255];
 }LIGHTSENSE_MEASUREMENT_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to gpioctl-service here
@@ -146,12 +152,14 @@ typedef struct LIGHTSENSE_CMN_DATA_CACHE_T
 	//unsigned int gpio_data[GPIOCTL_MAX_GPIO_PINS];//allow max 64gpio addresses(0 to 63)
 	//unsigned int gpio_data_prev[GPIOCTL_MAX_GPIO_PINS];//comparing the last value for eventing
 	LightSensor *pSensor;
+	std::string LeaseFilePath;
 	LIGHTSENSE_CMN_DATA_CACHE_T() //constructor(initializer)
 	{
 		pDevInfo=NULL;
 		pEventNotifier=NULL;
 		//pDispAccess=NULL;
 		pSensor=NULL;
+		LeaseFilePath="";
 	};
 }LIGHTSENSE_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */

@@ -117,6 +117,10 @@ public:
 	int json_to_bin_get_spectrum_item(JsonDataCommObj* pReq);
 	int bin_to_json_get_spectrum_item(JsonDataCommObj* pReq);
 	int process_get_spectrum_item(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
+	//EJSON_LIGHTSENSE_FIRST_LEASED_IP_GET
+	int json_to_bin_get_leased_ip(JsonDataCommObj* pReq);
+	int bin_to_json_get_leased_ip(JsonDataCommObj* pReq);
+	int process_get_leased_ip(JsonDataCommObj* pReq,LIGHTSENSE_CMN_DATA_CACHE *pData);
 };
 /* ------------------------------------------------------------------------- */
 

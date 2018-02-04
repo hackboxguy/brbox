@@ -1,10 +1,12 @@
 #include "MyCmdline.h"
 using namespace std;
+#define DEFAULT_LEASEFILE_PATH "/tmp/dhcp.leases"
 /*****************************************************************************/
 typedef enum LIGHTSENSE_CMDLINE_OPT_T
 {
 	LIGHTSENSE_CMDLINE_OPT_SENSORTYPE = 100,
 	LIGHTSENSE_CMDLINE_OPT_DEVICE, //device node
+	LIGHTSENSE_CMDLINE_OPT_LEASEFILE, //sensor service needs to know connected display ip
 	LIGHTSENSE_CMDLINE_OPT_UNKNOWN,
 	LIGHTSENSE_CMDLINE_OPT_NONE
 }LIGHTSENSE_CMDLINE_OPT;
@@ -13,6 +15,8 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 {
 	SensorType="none";
 	DevNode="none";
+	LeaseFile=DEFAULT_LEASEFILE_PATH;
+
 	port_number=portnum;
 	strcpy(version_number,version_str);
 	CmdlineHelper.attach_helper(this);
@@ -21,6 +25,8 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 	CmdlineHelper.insert_help_entry((char*)"--sensortype=<type>         (light sesor type[taos3414/oosts])");
 	CmdlineHelper.insert_options_entry((char*)"device" ,optional_argument,LIGHTSENSE_CMDLINE_OPT_DEVICE);
 	CmdlineHelper.insert_help_entry((char*)"--device=/dev/i2c-x         (i2c device node if applicable)");
+	CmdlineHelper.insert_options_entry((char*)"leasefile" ,optional_argument,LIGHTSENSE_CMDLINE_OPT_LEASEFILE);
+	CmdlineHelper.insert_help_entry((char*)"--leasefile=/lease/file.txt (dhcp leasefile path)");
 }
 /*****************************************************************************/
 MyCmdline::~MyCmdline()
@@ -44,6 +50,10 @@ int MyCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 				DevNode="none";
 			else
 				DevNode=sub_arg;
+			break;
+		case LIGHTSENSE_CMDLINE_OPT_LEASEFILE:
+			if(CmdlineHelper.get_next_subargument(&sub_arg)==0)//no /dev/i2c-x option passed by user
+				LeaseFile=sub_arg;
 			break;
 		default:return 0;break;	
 	}
@@ -118,6 +128,11 @@ std::string MyCmdline::get_sensor_type()
 std::string MyCmdline::get_dev_node()
 {
 	return DevNode;
+}
+/*****************************************************************************/
+std::string MyCmdline::get_lease_filepath()
+{
+	return LeaseFile;
 }
 /*****************************************************************************/
 
