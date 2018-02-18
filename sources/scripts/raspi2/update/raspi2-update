@@ -254,11 +254,23 @@ if [ $? != "0" ]; then #unable mount device, boot-filesystem might be corrupt
 	rm -rf $TEMP_BOOT_MOUNT_POINT
 	return 1
 fi
+
+#raspi3-64: there is no zImage, instead there is just "Image" file
+RESULT=$(cat /tmp/BrBoxDevType.txt)
+if [ $RESULT = "RASPI_3" ]; then
+	RP_KERNEL1=Image
+	RP_KERNEL2=Image2
+else
+	RP_KERNEL1=zImage
+	RP_KERNEL2=zImage2
+
+fi
+
 printf "Copying zImage to $BRBOX_BOOT_PARTITION ........... "
 if [ "$CUR_BOOT" = "$ONE_BRBOX_NAME" ]; then
-	cp $TEMP_MOUNT_POINT/boot/zImage $TEMP_BOOT_MOUNT_POINT/zImage2
+	cp $TEMP_MOUNT_POINT/boot/$RP_KERNEL1 $TEMP_BOOT_MOUNT_POINT/$KERNEL2
 elif [ "$CUR_BOOT" = "$TWO_BRBOX_NAME" ]; then
-	cp $TEMP_MOUNT_POINT/boot/zImage $TEMP_BOOT_MOUNT_POINT/
+	cp $TEMP_MOUNT_POINT/boot/$RP_KERNEL1 $TEMP_BOOT_MOUNT_POINT/
 else
 	echo "Error: Unknown boot system!!!" 
 	umount $BRBOX_PARTITION
