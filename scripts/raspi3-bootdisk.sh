@@ -61,20 +61,20 @@ printf "Creating loopdevice ..................................... "
 
 sudo parted -s $LOOPDEVICE mklabel msdos
 #sudo parted -s $LOOPDEVICE unit cyl mkpart primary fat32 -- 0 2    #old
-sudo parted -s $LOOPDEVICE mkpart primary fat32 0% 6%
+sudo parted -s $LOOPDEVICE mkpart primary fat32 0% 5%
 sudo parted -s $LOOPDEVICE set 1 boot on  
 #sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 2 26    #old
-sudo parted -s $LOOPDEVICE mkpart primary ext3 6% 51%
+sudo parted -s $LOOPDEVICE mkpart primary ext3 5% 50%
 
 #sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 26 50   #old
-sudo parted -s $LOOPDEVICE mkpart primary 51% 96%
+sudo parted -s $LOOPDEVICE mkpart primary 50% 95%
 
 #sudo parted -s $LOOPDEVICE unit cyl mkpart extended -- 50 -2       #old
-sudo parted -s $LOOPDEVICE mkpart extended 96% 100%
+sudo parted -s $LOOPDEVICE mkpart extended 95% 100%
 
 #sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 50 53  #old
 #sudo parted -s $LOOPDEVICE unit cyl mkpart logical  ext3 -- 53 -2  #old
-sudo parted -s $LOOPDEVICE mkpart logical  ext3 96% 98%
+sudo parted -s $LOOPDEVICE mkpart logical  ext3 95% 98%
 sudo parted -s $LOOPDEVICE mkpart logical  ext3 98% 100%
 
 
