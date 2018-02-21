@@ -41,6 +41,8 @@ BOARD_TYPE_BBBMMC="bbbmmc"                #base-build
 BOARD_TYPE_BBBMMC_RBOX="bbbmmc-rbox"      #remote-box-application-build
 BOARD_TYPE_WDB="wandboard"                #base-build
 BOARD_TYPE_RP3_64="raspi3-64"                #base-build
+BOARD_TYPE_RP3_QT5WE="raspi3-qt5we"
+
 ###############################################################################
 while getopts b:o:v:c:s:ip f
 do
@@ -87,6 +89,10 @@ elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP3" ]; then
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP3_64" ]; then
 	BR_BOARD_CONFIG=raspberrypi3_64_defconfig
 	BR_BOARD_LINUX_CONFIG_PATH=board/raspberrypi3-64/
+	BOOT_IMG_SCRIPT=$(pwd)/scripts/raspi3-bootdisk.sh
+elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP3_QT5WE" ]; then
+	BR_BOARD_CONFIG=raspberrypi3_qt5we_defconfig
+	BR_BOARD_LINUX_CONFIG_PATH=board/raspberrypi3/
 	BOOT_IMG_SCRIPT=$(pwd)/scripts/raspi3-bootdisk.sh
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_BBB" ]; then
 	BR_BOARD_CONFIG=beaglebone_defconfig
@@ -166,6 +172,9 @@ elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP3" ]; then
 	ROOTFS_TYPE=$ROOTFS_TYPE_RP3
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP3_64" ]; then
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
+	ROOTFS_TYPE=$ROOTFS_TYPE_RP3
+elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP3_QT5WE" ]; then
+	#./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 	ROOTFS_TYPE=$ROOTFS_TYPE_RP3
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_BBB" ]; then
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
