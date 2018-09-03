@@ -12,6 +12,7 @@ add_subdirectory(services)
 #cmake --build Output -- install -j5 (-j option is for multi-cpu system for faster compilation)
 
 #for local compiling
+#cmake -H. -BOutput -DCMAKE_INSTALL_PREFIX=/home/adav/tmp/brbox -DAUTO_SVN_VERSION=OFF -DINSTALL_CLIENT=ON
 #cmake -H. -BOutput
 #cmake --build Output -- all
 
