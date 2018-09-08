@@ -52,14 +52,14 @@ else()
 	FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SrcControlVersion.h "#define SRC_CONTROL_VERSION 0001\n")
 endif()
 
-#INCLUDE( FindPkgConfig )
-#pkg_check_modules( I2CDEV i2c-dev )
-#if( NOT I2CDEV_FOUND )
-#	message( FATAL_ERROR "ERROR: could not find libi2c-dev development files" )
-#endif( NOT I2CDEV_FOUND )
-#include_directories( ${I2CDEV_INCLUDE_DIR} )
-#include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/3rd_party )
-#include_directories( ${I2CDEV_INCLUDE_DIRS} )
+INCLUDE( FindPkgConfig )
+pkg_check_modules( MODBUS libmodbus )
+if( NOT MODBUS_FOUND )
+        message( FATAL_ERROR "ERROR: could not find libmodbus" )
+endif( NOT MODBUS_FOUND )
+include_directories( ${MODBUS_INCLUDE_DIRS} )
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/3rd_party )
+include_directories( ${MODBUS_INCLUDE_DIRS} )
 
 #for cross compiling
 #cmake -H. -BOutput -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain-arm-backup.cmake -DCMAKE_INSTALL_PREFIX=/home/user/tmp/
