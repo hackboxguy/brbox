@@ -1,0 +1,23 @@
+#!/bin/sh /etc/rc.common
+# "new(er)" style init script
+# Look at /lib/functions/service.sh on a running system for explanations of what other SERVICE_
+# options you can use, and when you might want them.
+
+START=81
+APP=modbussrv
+SERVICE_WRITE_PID=1
+SERVICE_DAEMONIZE=1
+
+start() {
+	DEVNODE=$(ls -la /dev/ttyUSB* |head -1|grep -oh "/dev/.*") #choose the first usb-to-serial device in the list
+	service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt) --device=$DEVNODE
+        #sleep 5
+	#IPADDR=$(/opt/fmw/bin/sysmgrclt --ipaddr=eth0 | awk '{print $9}'|sed 's/result=//')
+        #FMWVER=$(cat /etc/version.txt)
+	#sleep 1                          
+        #/opt/fmw/bin/dispclt --dispclear --printline=line3,"BRBOX-$FMWVER" --printline=line4,"IP-$IPADDR"  
+}
+
+stop() {
+        service_stop /opt/fmw/bin/$APP
+}
