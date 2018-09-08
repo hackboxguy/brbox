@@ -1,0 +1,50 @@
+#!/bin/sh
+#
+# Start/stop server script
+#
+SERVER_NAME=modbussrv
+SERVER_PATH=/opt/fmw/bin/
+DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
+start() {
+	echo -n "Starting $SERVER_NAME Service: "
+	DEV_TYPE=$(cat $DEV_TYPE_FILE)
+	#TMPDEVTYPE=$(cat /tmp/BrBoxDevType.txt |grep RASPI*)
+	#if [ $? = "0" ]; then
+	#	DISPTYPE=ssd1306_128x64_pi
+	#else
+	#	DISPTYPE=ssd1306_128x64
+	#fi
+	#DEVNODE=$(ls -la /dev/i2c-* |head -1|grep -oh "/dev/.*") #choose the first i2c device node in the list
+	$SERVER_PATH/$SERVER_NAME --boardtype=$DEV_TYPE & #--disptype=$DISPTYPE --device=$DEVNODE &
+	#print ipaddr/version/config on 128x32 i2c display
+        #IPADDR=$(/opt/fmw/bin/sysmgrclt --ipaddr=eth0 | awk '{print $9}'|sed 's/result=//')
+        #FMWVER=$(cat /boot/version-num.txt)
+	#CONFIG=$(cat /boot/sysconfig.txt)                                                   
+	#sleep 1                          
+        #/opt/fmw/bin/dispclt --dispclear --printline=line1,"BRBOX-$FMWVER" --printline=line2,"IP-$IPADDR"  --printline=line3,"Cfg-$CONFIG"
+	echo "OK"
+}
+
+stop() {
+	echo -n "Stopping $SERVER_NAME Service:  "
+	killall $SERVER_NAME
+	echo "OK"
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	stop
+	start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
