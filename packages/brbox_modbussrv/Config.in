@@ -1,0 +1,15 @@
+config BR2_PACKAGE_BRBOX_MODBUSSRV
+	bool "Modbus-Control-Service"
+	default n
+	select BR2_PACKAGE_BRBOX_LIBADCMNOLD
+	help
+		modbus service for supporting modbus control features via rpc
+
+config BR2_PACKAGE_BRBOX_MODBUSSRV_INIT_ORDER
+        string "modbussrv init.d order"
+        default "81"
+        depends on BR2_PACKAGE_BRBOX_MODBUSSRV
+        help
+          At which place in the init.d startup this service should be started. Needs to be a 2-digit integer.
+          Will be prefixed by "S" by buildroot, so e.g. "77" becomes "S77"
+

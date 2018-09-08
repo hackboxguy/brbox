@@ -71,4 +71,5 @@ source "package/brbox/brbox_i2csrv/Config.in"
 source "package/brbox/brbox_dispsrv/Config.in"
 source "package/brbox/brbox_lightsense/Config.in"
 source "package/brbox/brbox_mplaysrv/Config.in"
+source "package/brbox/brbox_modbussrv/Config.in"
 endmenu
