@@ -7,10 +7,10 @@
 #include "SrcControlVersion.h"
 #include "ADTimer.hpp"
 #include "ADEvntNotifier.hpp"
-//#include "I2CBusAccess.h"
+#include "MODBusAccess.h"
 /* ------------------------------------------------------------------------- */
 #include "ModBusSrvJsonDef.h"
-//#include "Pcf8574Rpc.h"
+#include "ModbusRpc.h"
 //#include "CmnRpc.h"
 /* ------------------------------------------------------------------------- */
 using namespace std;
@@ -37,18 +37,18 @@ int main(int argc, const char* argv[])
 	ADEvntNotifier EventNotifier;//global event notification object
 	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
 	DataCache.pEventNotifier=(void*)&EventNotifier;
-//	I2CBusAccess I2CBus(CmdLine.get_dev_node());
-//	DataCache.pDevAccess=(void*)&I2CBus;
+	MODBusAccess MODBus(CmdLine.get_dev_node());
+	DataCache.pDevAccess=(void*)&MODBus;
 
 
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 
 	/****************************RPC list*************************************/
-//	Pcf8574Rpc PCF8574Get(I2CSRV_RPC_PCF8574_GET ,EJSON_I2CSRV_RPC_PCF8574_GET ,emulat,dbglog,&DataCache);
+	ModbusRpc VoltageGet(MODBUSSRV_RPC_VOLTAGE_GET ,EJSON_MODBUSSRV_RPC_VOLTAGE_GET ,emulat,dbglog,&DataCache);
 //	Pcf8574Rpc PCF8574Set(I2CSRV_RPC_PCF8574_SET ,EJSON_I2CSRV_RPC_PCF8574_SET ,emulat,dbglog,&DataCache);
 
-//	RpcMgr.AttachRpc(&PCF8574Get);
+	RpcMgr.AttachRpc(&VoltageGet);
 //	RpcMgr.AttachRpc(&PCF8574Set);
 
 	//common rpc hadler object(eg: trigger-data-save/store-factory/restore-factory..etc)

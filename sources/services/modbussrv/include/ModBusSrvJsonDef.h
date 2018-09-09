@@ -9,21 +9,34 @@
 typedef enum EJSON_MODBUSSRV_RPC_TYPES_T
 {
 	EJSON_MODBUSSRV_RPC_MODBUS_INIT,
+	EJSON_MODBUSSRV_RPC_VOLTAGE_GET, //read voltage from energy meter
+
 	EJSON_MODBUSSRV_RPC_END,
 	EJSON_MODBUSSRV_RPC_NONE
 }EJSON_MODBUSSRV_RPC_TYPES;
+/* ------------------------------------------------------------------------- */
+//EJSON_MODBUSSRV_RPC_VOLTAGE_GET
+#define MODBUSSRV_RPC_VOLTAGE_GET  "modbus_get_voltage"
+#define MODBUSSRV_RPC_VOLTAGE_ARG  "voltage"
+typedef struct MODBUSSRV_VOLTAGE_ACCESS_PACKET_T
+{
+	int voltage;
+}MODBUSSRV_VOLTAGE_ACCESS_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to modbus-server here
 typedef struct MODBUSSRV_CMN_DATA_CACHE_T
 {
 	void *pDevInfo;//device-info-struct(typecast in rpc handlers)
 	void *pEventNotifier;//event notifier object
+	void *pDevAccess;//modbus device access node
+
+	int voltage;
 	//DisplayDevice *pDisplay;
 	MODBUSSRV_CMN_DATA_CACHE_T() //constructor(initializer)
 	{
+		pDevAccess=NULL;
 		pDevInfo=NULL;
 		pEventNotifier=NULL;
-		//pDisplay=NULL;
 	};
 }MODBUSSRV_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */
