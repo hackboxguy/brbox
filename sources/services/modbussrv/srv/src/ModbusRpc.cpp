@@ -84,8 +84,10 @@ int ModbusRpc::process_voltage_get(JsonDataCommObj* pReq)
 	}
 	else
 	{
-		//TODO: do tha actual device driver(/dev/i2c-x) access 
-		pPanelReq->result=RPC_SRV_RESULT_FAIL;
+		//TODO: do tha actual device modbus access 
+		pPacket->voltage=231;//pDataCache->voltage;//[pPacket->devaddr];
+		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+		//pPanelReq->result=RPC_SRV_RESULT_FAIL;
 	}
 	return 0;
 }
