@@ -45,10 +45,10 @@ int main(int argc, const char* argv[])
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 
 	/****************************RPC list*************************************/
-	ModbusRpc VoltageGet(MODBUSSRV_RPC_VOLTAGE_GET ,EJSON_MODBUSSRV_RPC_VOLTAGE_GET ,emulat,dbglog,&DataCache);
+	ModbusRpc EnergyParamGet(MODBUSSRV_RPC_ENRGYPARM_GET ,EJSON_MODBUSSRV_RPC_ENRGYPARM_GET ,emulat,dbglog,&DataCache);
 //	Pcf8574Rpc PCF8574Set(I2CSRV_RPC_PCF8574_SET ,EJSON_I2CSRV_RPC_PCF8574_SET ,emulat,dbglog,&DataCache);
 
-	RpcMgr.AttachRpc(&VoltageGet);
+	RpcMgr.AttachRpc(&EnergyParamGet);
 //	RpcMgr.AttachRpc(&PCF8574Set);
 
 	//common rpc hadler object(eg: trigger-data-save/store-factory/restore-factory..etc)

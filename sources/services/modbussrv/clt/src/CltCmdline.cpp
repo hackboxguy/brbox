@@ -5,13 +5,11 @@ using namespace std;
 CltCmdline::CltCmdline()
 {
 	CmdlineHelper.attach_helper(this);
-	CmdlineHelper.insert_options_entry((char*)"voltage" ,optional_argument,EJSON_MODBUSSRV_RPC_VOLTAGE_GET);
-	CmdlineHelper.insert_help_entry((char*)"--voltage        (read voltage from energy meter)");
-
-	//CmdlineHelper.insert_options_entry((char*)"imgcheck" ,optional_argument,EJSON_SMARTEYE_RPC_CHECK_ID_PATTERN);
-	//CmdlineHelper.insert_help_entry((char*)"--imgcheck=imgtype         [checks captured image against<ident/red/green/blue/white>]");
-	//CmdlineHelper.insert_options_entry((char*)"debugimgfile" ,optional_argument,EJSON_SMARTEYE_RPC_DEBUG_OUTFILE_GET);
-	//CmdlineHelper.insert_help_entry((char*)"--debugimgfile=filepath    [read/write debug image file path]");
+	CmdlineHelper.insert_options_entry((char*)"enrgyparm" ,optional_argument,EJSON_MODBUSSRV_RPC_ENRGYPARM_GET);
+	CmdlineHelper.insert_help_entry((char*)"--enrgyparm=param          [read energy parameter from energy meter]");
+	CmdlineHelper.insert_help_entry((char*)"                           [param=voltage/current/power/actpwr/reactpwr/pfactor");
+	CmdlineHelper.insert_help_entry((char*)"                            phangle/freq/import_act/export_act/import_react");
+	CmdlineHelper.insert_help_entry((char*)"                            export_react/total_act/total_react]");
 }
 /*****************************************************************************/
 CltCmdline::~CltCmdline()
@@ -24,10 +22,11 @@ int CltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 	EJSON_MODBUSSRV_RPC_TYPES command =(EJSON_MODBUSSRV_RPC_TYPES)arg;
 	switch(command)
 	{
-		case EJSON_MODBUSSRV_RPC_VOLTAGE_GET:
+		case EJSON_MODBUSSRV_RPC_ENRGYPARM_GET:
 			CmdlineHelper.push_single_int_get_set_command
-			(EJSON_MODBUSSRV_RPC_VOLTAGE_GET,EJSON_MODBUSSRV_RPC_VOLTAGE_GET,MODBUSSRV_RPC_VOLTAGE_GET,MODBUSSRV_RPC_VOLTAGE_GET,
-			(char*)MODBUSSRV_RPC_VOLTAGE_ARG,sub_arg,1);
+			(EJSON_MODBUSSRV_RPC_ENRGYPARM_GET,EJSON_MODBUSSRV_RPC_ENRGYPARM_GET,
+			MODBUSSRV_RPC_ENRGYPARM_GET,MODBUSSRV_RPC_ENRGYPARM_GET,
+			(char*)MODBUSSRV_RPC_ENRGYPARM_ARG,sub_arg,1);
 			//CmdlineHelper.push_int_get_set_with_dev_addr_arg_command(EJSON_I2CSRV_RPC_PCF8574_GET,EJSON_I2CSRV_RPC_PCF8574_SET,
 			//I2CSRV_RPC_PCF8574_GET,I2CSRV_RPC_PCF8574_SET,(char*)I2CSRV_RPC_PCF8574_DATA_ARG,(char*)I2CSRV_RPC_PCF8574_ADDR_ARG,-1,sub_arg);
 			break;

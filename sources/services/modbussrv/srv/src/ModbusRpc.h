@@ -17,13 +17,9 @@ public:
 	virtual void ReceiveEvent(int cltToken,int evntNum,int evntArg,int evntArg2){};
 	virtual RPC_SRV_RESULT ProcessCommonRpc(int index,unsigned char* pWorkData){return RPC_SRV_RESULT_SUCCESS;};
 
-	int json_to_bin_voltage_get(JsonDataCommObj* pReq);
-	int bin_to_json_voltage_get(JsonDataCommObj* pReq);
-	int process_voltage_get(JsonDataCommObj* pReq);
-
-	//int json_to_bin_pcf_set(JsonDataCommObj* pReq);
-	//int bin_to_json_pcf_set(JsonDataCommObj* pReq);
-	//int process_pcf_set(JsonDataCommObj* pReq);
+	int json_to_bin_energyparm_get(JsonDataCommObj* pReq);
+	int bin_to_json_energyparm_get(JsonDataCommObj* pReq);
+	int process_energyparm_get(JsonDataCommObj* pReq);
 };
 /* ------------------------------------------------------------------------- */
 
