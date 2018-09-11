@@ -11,7 +11,7 @@ add_subdirectory(xmproxy)
 #add_subdirectory(i2csrv)
 #add_subdirectory(dispsrv)
 #add_subdirectory(lightsense)
-#add_subdirectory(modbussrv)
+add_subdirectory(modbussrv)
 
 
 #for cross compiling

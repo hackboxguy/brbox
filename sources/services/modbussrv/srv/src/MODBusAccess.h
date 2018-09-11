@@ -4,37 +4,38 @@
 #include "ADCommon.hpp"
 //#include "ADJsonRpcClient.hpp"
 #include <stdint.h>
+#include <modbus.h>
 using namespace std;
-
+/* ------------------------------------------------------------------------- */
+typedef enum MODBUS_BAUD_T
+{
+	MODBUS_BAUD_1200,
+	MODBUS_BAUD_2400,
+	MODBUS_BAUD_4800,
+	MODBUS_BAUD_9600,
+	MODBUS_BAUD_END,
+	MODBUS_BAUD_NONE
+}MODBUS_BAUD;
+/* ------------------------------------------------------------------------- */
+typedef enum MODBUS_PARITY_T
+{
+	MODBUS_PARITY_ODD,
+	MODBUS_PARITY_EVEN,
+	MODBUS_PARITY_NO, //no parity
+	MODBUS_PARITY_END,
+	MODBUS_PARITY_NONE
+}MODBUS_PARITY;
+/* ------------------------------------------------------------------------- */
 class MODBusAccess
 {
 	int fd;
 	std::string node;
 	RPC_SRV_RESULT DevOpened;
-	/*ADLIB_DEV_CONN_TYPE ConnType;
-	ADJsonRpcClient Client;
-	std::string IpAddr;
-	int Port;
-	RPC_SRV_RESULT test_write_byte(char* dev,uint8_t addr, uint8_t data);
-	bool is_number(const std::string& s);
-	bool validateIpAddress(const string &ipAddress);
-	RPC_SRV_RESULT is_it_network_node(std::string devnode,int &port,std::string &ip);
-	RPC_SRV_RESULT is_it_device_node(std::string devnode);
-	int32_t i2c_smbus_access(int file, char read_write, uint8_t command,int size, union i2c_smbus_data *data);
-	int32_t i2c_smbus_read_byte(int file);
-	int32_t i2c_smbus_write_byte(int file,uint8_t value);*/
-
+	modbus_t *ctx;
+	RPC_SRV_RESULT getMeasureFloat(modbus_t *ctx, int address, int retries, int nb,float &result);
 public:
-	MODBusAccess(std::string DevNode);
+	MODBusAccess(std::string DevNode,int baud=9600,char parity='N',int stopbits=1);
 	~MODBusAccess();
-	/*RPC_SRV_RESULT SetSlaveAddr(uint8_t addr);
-	RPC_SRV_RESULT read_byte(uint32_t addr, uint8_t *data);
-	RPC_SRV_RESULT write_byte(uint32_t addr, uint8_t data);
-	RPC_SRV_RESULT read_word(uint32_t addr, uint16_t *data);
-	RPC_SRV_RESULT write_word(uint32_t addr, uint16_t data);
-	RPC_SRV_RESULT read_dword(uint32_t addr, uint32_t *data);
-	RPC_SRV_RESULT write_dword(uint32_t addr, uint32_t data);
-	RPC_SRV_RESULT write_array(uint32_t addr, uint8_t *data,uint32_t len);
-	RPC_SRV_RESULT read_array(uint32_t addr, uint8_t *data,uint32_t len);*/
+	RPC_SRV_RESULT InitModbus(const char* devnode,int baud,char parity,int stop_bits,bool debug=false);
 };
 #endif
