@@ -17,5 +17,10 @@ public:
 	CltCmdline();
 	~CltCmdline();
 	int parse_cmdline_arguments(int argc, char **argv);
+	int push_energy_param_command(char* subarg);
+	int run_energy_param_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,
+				     ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);
+
+
 };
 #endif

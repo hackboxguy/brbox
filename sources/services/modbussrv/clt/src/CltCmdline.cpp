@@ -22,13 +22,14 @@ int CltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 	EJSON_MODBUSSRV_RPC_TYPES command =(EJSON_MODBUSSRV_RPC_TYPES)arg;
 	switch(command)
 	{
+		//case EJSON_MODBUSSRV_RPC_ENRGYPARM_GET:
+		//	CmdlineHelper.push_single_int_get_set_command
+		//	(EJSON_MODBUSSRV_RPC_ENRGYPARM_GET,EJSON_MODBUSSRV_RPC_ENRGYPARM_GET,
+		//	MODBUSSRV_RPC_ENRGYPARM_GET,MODBUSSRV_RPC_ENRGYPARM_GET,
+		//	(char*)MODBUSSRV_RPC_ENRGYPARM_ARG,sub_arg,1);
+		//	break;
 		case EJSON_MODBUSSRV_RPC_ENRGYPARM_GET:
-			CmdlineHelper.push_single_int_get_set_command
-			(EJSON_MODBUSSRV_RPC_ENRGYPARM_GET,EJSON_MODBUSSRV_RPC_ENRGYPARM_GET,
-			MODBUSSRV_RPC_ENRGYPARM_GET,MODBUSSRV_RPC_ENRGYPARM_GET,
-			(char*)MODBUSSRV_RPC_ENRGYPARM_ARG,sub_arg,1);
-			//CmdlineHelper.push_int_get_set_with_dev_addr_arg_command(EJSON_I2CSRV_RPC_PCF8574_GET,EJSON_I2CSRV_RPC_PCF8574_SET,
-			//I2CSRV_RPC_PCF8574_GET,I2CSRV_RPC_PCF8574_SET,(char*)I2CSRV_RPC_PCF8574_DATA_ARG,(char*)I2CSRV_RPC_PCF8574_ADDR_ARG,-1,sub_arg);
+			push_energy_param_command(sub_arg);
 			break;
 		default:
 			return 0;
@@ -41,6 +42,9 @@ int CltCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSo
 {
 	switch(pCmdObj->command)
 	{
+		case EJSON_MODBUSSRV_RPC_ENRGYPARM_GET:
+			run_energy_param_command(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
+			break;
 		default:return -1;
 			break;
 	}
@@ -67,5 +71,67 @@ int CltCmdline::parse_cmdline_arguments(int argc, char **argv)
 {
 	return CmdlineHelper.parse_cmdline_arguments(argc,argv);
 }
-/*****************************************************************************/
+/* ------------------------------------------------------------------------- */
+int CltCmdline::push_energy_param_command(char* subarg)
+{
+	CmdExecutionObj *pCmdObj=NULL;
+	OBJECT_MEM_NEW(pCmdObj,CmdExecutionObj);
+	if(pCmdObj==NULL)
+	{
+		printf("failed create pCmdObj!!!\n");
+		return -1;
+	}
+	strcpy(pCmdObj->get_rpc_name,MODBUSSRV_RPC_ENRGYPARM_GET);
+	if(CmdlineHelper.get_next_subargument(&subarg)==0)//user must specify either eth0 or eth1
+	{
+		OBJ_MEM_DELETE(pCmdObj);
+		printf("please specify correct energy parameter type []!!!\n");
+		return -1;
+	}
+	else 
+	{
+		const char *table[]   = MODBUSSRV_RPC_ENRGYPARM_ARG_TABL;
+		EJSON_ENRGYPARM module=(EJSON_ENRGYPARM)string_to_enum(table,subarg,EJSON_ENRGYPARM_UNKNOWN);
+		if(module>=EJSON_ENRGYPARM_UNKNOWN)
+		{
+			printf("energy parameters type must be specified\n");
+			OBJ_MEM_DELETE(pCmdObj);
+			return -1;
+		}
+		else
+		{	
+			strcpy(pCmdObj->first_arg_param_name,MODBUSSRV_RPC_ENRGYPARM_ARG);
+			strcpy(pCmdObj->first_arg_param_value,table[module]);
+			strcpy(pCmdObj->second_arg_param_name,MODBUSSRV_RPC_ENRGYPARM_RESP_ARG);
+			pCmdObj->command=EJSON_MODBUSSRV_RPC_ENRGYPARM_GET;
+			pCmdObj->action=RPC_SRV_ACT_READ;
+		}
+	}
+	pCmdObj->cmd_type=CLIENT_CMD_TYPE_USER_DEFINED;
+	//put the request into chain
+	if(CmdlineHelper.CmdChain.chain_put((void *)pCmdObj)!=0)
+	{
+		printf("push_energy_param_command: failed! unable to push json-req-task-obj to chain!\n");
+		OBJ_MEM_DELETE(pCmdObj);
+		return -1;
+	}
+	return 0;
+}
+int CltCmdline::run_energy_param_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker)
+{
+	ADThreadedSockClient *pOrig = (ADThreadedSockClient*)pWorker;
+	if(pCmdObj->action == RPC_SRV_ACT_READ)
+	{
+		//following command has different name for req_arg and for resp_arg.
+		pCmdObj->result=pSrvSockConn->get_string_type_with_string_para(pCmdObj->get_rpc_name,pCmdObj->first_arg_param_name,pCmdObj->first_arg_param_value,pCmdObj->second_arg_param_value,pCmdObj->second_arg_param_name);
+		pOrig->log_print_message(pSrvSockConn,pCmdObj->get_rpc_name,RPC_SRV_ACT_READ,pCmdObj->result,pOutMsgList,pCmdObj->second_arg_param_value);
+	}
+	else
+	{
+		pOrig->my_log_print_message(pSrvSockConn,(char*)"run_energy_param_command",RPC_SRV_ACT_UNKNOWN,(char*)CLIENT_CMD_RESULT_INVALID_ACT,pOutMsgList);
+		return -1;
+	}
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
 

@@ -15,7 +15,7 @@ using namespace std;
 #define TAENERGY  0x0156
 #define TRENERGY  0x0158
 #include <unistd.h>
-/*****************************************************************************/
+/* ------------------------------------------------------------------------- */
 MODBusAccess::MODBusAccess(std::string DevNode,int baud,char parity,int stopbits)
 {
 	node=DevNode;
@@ -27,7 +27,7 @@ MODBusAccess::MODBusAccess(std::string DevNode,int baud,char parity,int stopbits
 	//	printf("Voltage: %3.2f V \n",voltage);
 	//}
 }
-/*****************************************************************************/
+/* ------------------------------------------------------------------------- */
 MODBusAccess::~MODBusAccess()
 {
 	if(DevOpened==RPC_SRV_RESULT_SUCCESS)
@@ -37,7 +37,7 @@ MODBusAccess::~MODBusAccess()
 		DevOpened=RPC_SRV_RESULT_FAIL;
 	}	
 }
-/*****************************************************************************/
+/* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT MODBusAccess::InitModbus(const char* devnode,int baud,char parity,int stop_bits,bool debug)
 {
 	ctx = modbus_new_rtu(devnode, baud, parity, 8, stop_bits);
@@ -79,9 +79,44 @@ RPC_SRV_RESULT MODBusAccess::InitModbus(const char* devnode,int baud,char parity
 	}
 	return RPC_SRV_RESULT_SUCCESS;
 }
-/*****************************************************************************/
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT MODBusAccess::getEnergyParam(EJSON_ENRGYPARM type,std::string &result)
+{
+	uint16_t addr;
+	float param_value;
+	switch(type)
+	{
+		case EJSON_ENRGYPARM_VOLTAGE      :addr=VOLTAGE  ;break;
+		case EJSON_ENRGYPARM_CURRENT      :addr=CURRENT  ;break;
+		case EJSON_ENRGYPARM_POWER        :addr=POWER    ;break;
+		case EJSON_ENRGYPARM_POWER_ACT    :addr=APOWER   ;break;
+		case EJSON_ENRGYPARM_POWER_REACT  :addr=RAPOWER  ;break;
+		case EJSON_ENRGYPARM_PFACTOR      :addr=PFACTOR  ;break;
+		case EJSON_ENRGYPARM_PHASE_ANGLE  :addr=PANGLE   ;break;
+		case EJSON_ENRGYPARM_FREQ         :addr=FREQUENCY;break;
+		case EJSON_ENRGYPARM_IMPORT_ACT   :addr=IAENERGY ;break;
+		case EJSON_ENRGYPARM_EXPORT_ACT   :addr=EAENERGY ;break;
+		case EJSON_ENRGYPARM_IMPORT_REACT :addr=IRAENERGY;break;
+		case EJSON_ENRGYPARM_EXPORT_REACT :addr=ERAENERGY;break;
+		case EJSON_ENRGYPARM_TOTAL_ACT    :addr=TAENERGY ;break;
+		case EJSON_ENRGYPARM_TOTAL_REACT  :addr=TRENERGY ;break;
+		default: return RPC_SRV_RESULT_ARG_ERROR;
+	}
+	//read the parameter over modbus
+	RPC_SRV_RESULT res=getMeasureFloat(ctx, addr, 1, 2,param_value);
+	char tmpstr[255];
+	if(res==RPC_SRV_RESULT_SUCCESS)
+		sprintf(tmpstr,"%f",param_value);
+	else
+		sprintf(tmpstr,"read-error");
+	result=tmpstr;
+	return res;
+}
+/* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT MODBusAccess::getMeasureFloat(modbus_t *ctx, int address, int retries, int nb,float &result) 
 {
+	if(DevOpened!=RPC_SRV_RESULT_SUCCESS)
+		return RPC_SRV_RESULT_DEV_NOT_ACCESSIBLE;
 	uint16_t tab_reg[nb * sizeof(uint16_t)];
 	int rc = -1;
 	int i;
@@ -93,14 +128,6 @@ RPC_SRV_RESULT MODBusAccess::getMeasureFloat(modbus_t *ctx, int address, int ret
 	while (j < retries && exit_loop == 0) 
 	{
 		j++;
-
-		//if (command_delay) 
-		//{
-		//	log_message(debug_flag, "Sleeping command delay: %ldus", command_delay);
-		//	usleep(command_delay);
-		//}
-
-		//log_message(debug_flag, "%d/%d. Register Address %d [%04X]", j, retries, 30000+address+1, address);
 		gettimeofday(&tvStart, NULL); 
 		rc = modbus_read_input_registers(ctx, address, nb, tab_reg);
 		errno_save = errno;
@@ -119,7 +146,7 @@ RPC_SRV_RESULT MODBusAccess::getMeasureFloat(modbus_t *ctx, int address, int ret
 	result = modbus_get_float(&tab_reg[0]);
 	return RPC_SRV_RESULT_SUCCESS;
 }
-/*****************************************************************************/
+/* ------------------------------------------------------------------------- */
 //how to set new baud rate
 //new_baud_rate=2 (2 is for 9600)
 //changeConfigFloat(ctx, BAUD_RATE, new_baud_rate, RESTART_FALSE, 2);

@@ -16,14 +16,13 @@ typedef enum EJSON_MODBUSSRV_RPC_TYPES_T
 }EJSON_MODBUSSRV_RPC_TYPES;
 /* ------------------------------------------------------------------------- */
 //EJSON_MODBUSSRV_RPC_ENRGYPARM_GET
-#define MODBUSSRV_RPC_ENRGYPARM_GET  "modbus_energy_param_get"
-#define MODBUSSRV_RPC_ENRGYPARM_ARG  "parameter"
-//"voltage/current/power/actpwr/reactpwr/pfactor/phangle/freq/import_act/export_act/import_react/export_react/total_act/total_react"
-typedef struct MODBUSSRV_ENRGYPARM_ACCESS_PACKET_T
-{
-	int parameter;
-}MODBUSSRV_ENRGYPARM_ACCESS_PACKET;
-/* ------------------------------------------------------------------------- */
+#define MODBUSSRV_RPC_ENRGYPARM_GET      "modbus_energy_param_get"
+#define MODBUSSRV_RPC_ENRGYPARM_ARG      "parameter"
+#define MODBUSSRV_RPC_ENRGYPARM_ARG_TABL {"voltage","current","power","actpwr","reactpwr","pfactor","phangle",\
+					  "freq","import_act","export_act","import_react","export_react",\
+					  "total_act","total_react","unknown","none","\0"}
+
+#define MODBUSSRV_RPC_ENRGYPARM_RESP_ARG "value"
 typedef enum EJSON_ENRGYPARM_T
 {
 	EJSON_ENRGYPARM_VOLTAGE,
@@ -40,9 +39,14 @@ typedef enum EJSON_ENRGYPARM_T
 	EJSON_ENRGYPARM_EXPORT_REACT,
 	EJSON_ENRGYPARM_TOTAL_ACT,
 	EJSON_ENRGYPARM_TOTAL_REACT,
-	EJSON_ENRGYPARM_END,
+	EJSON_ENRGYPARM_UNKNOWN,
 	EJSON_ENRGYPARM_NONE
 }EJSON_ENRGYPARM;
+typedef struct MODBUSSRV_ENRGYPARM_ACCESS_PACKET_T
+{
+	EJSON_ENRGYPARM param_type;
+	char parameter[255];
+}MODBUSSRV_ENRGYPARM_ACCESS_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to modbus-server here
 typedef struct MODBUSSRV_CMN_DATA_CACHE_T

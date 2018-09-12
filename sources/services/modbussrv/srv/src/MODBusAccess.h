@@ -2,7 +2,7 @@
 #define __MOD_BUS_ACCESS_H_
 #include <iostream>
 #include "ADCommon.hpp"
-//#include "ADJsonRpcClient.hpp"
+#include "ModBusSrvJsonDef.h"
 #include <stdint.h>
 #include <modbus.h>
 using namespace std;
@@ -33,9 +33,11 @@ class MODBusAccess
 	RPC_SRV_RESULT DevOpened;
 	modbus_t *ctx;
 	RPC_SRV_RESULT getMeasureFloat(modbus_t *ctx, int address, int retries, int nb,float &result);
+	
 public:
 	MODBusAccess(std::string DevNode,int baud=9600,char parity='N',int stopbits=1);
 	~MODBusAccess();
 	RPC_SRV_RESULT InitModbus(const char* devnode,int baud,char parity,int stop_bits,bool debug=false);
+	RPC_SRV_RESULT getEnergyParam(EJSON_ENRGYPARM,std::string &result);
 };
 #endif
