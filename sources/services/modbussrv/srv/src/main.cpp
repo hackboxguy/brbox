@@ -37,7 +37,7 @@ int main(int argc, const char* argv[])
 	ADEvntNotifier EventNotifier;//global event notification object
 	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
 	DataCache.pEventNotifier=(void*)&EventNotifier;
-	MODBusAccess MODBus(CmdLine.get_dev_node());
+	MODBusAccess MODBus(CmdLine.get_dev_node(),dbglog);
 	DataCache.pDevAccess=(void*)&MODBus;
 
 

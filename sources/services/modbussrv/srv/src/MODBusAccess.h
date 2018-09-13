@@ -35,7 +35,8 @@ class MODBusAccess
 	RPC_SRV_RESULT getMeasureFloat(modbus_t *ctx, int address, int retries, int nb,float &result);
 	
 public:
-	MODBusAccess(std::string DevNode,int baud=9600,char parity='N',int stopbits=1);
+	bool LogFlag;
+	MODBusAccess(std::string DevNode,bool debuglog=false,int baud=9600,char parity='N',int stopbits=1);
 	~MODBusAccess();
 	RPC_SRV_RESULT InitModbus(const char* devnode,int baud,char parity,int stop_bits,bool debug=false);
 	RPC_SRV_RESULT getEnergyParam(EJSON_ENRGYPARM,std::string &result);

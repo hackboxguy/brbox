@@ -16,11 +16,23 @@ using namespace std;
 #define TRENERGY  0x0158
 #include <unistd.h>
 /* ------------------------------------------------------------------------- */
-MODBusAccess::MODBusAccess(std::string DevNode,int baud,char parity,int stopbits)
+MODBusAccess::MODBusAccess(std::string DevNode,bool debuglog,int baud,char parity,int stopbits)
 {
+	LogFlag=debuglog;
+
 	node=DevNode;
 	DevOpened=InitModbus(node.c_str(),baud,parity,stopbits,false);//9600,'N',1,false);
-	//if(DevOpened==RPC_SRV_RESULT_SUCCESS)
+	if(DevOpened==RPC_SRV_RESULT_SUCCESS)
+	{
+		if(LogFlag)
+			printf("MODBusAccess::MODBusAccess: InitModbus success\n");
+	}
+	else
+	{
+		if(LogFlag)
+			printf("MODBusAccess::MODBusAccess: InitModbus failed\n");
+	}
+	//LOG_DEBUG_MSG(LogFlag,"BRBOX:modbussrv","MODBusAccess::MODBusAccess:modbus dev open failed");
 	//{
 	//	float voltage=0;
 	//	getMeasureFloat(ctx, VOLTAGE, 1, 2,voltage);
@@ -43,14 +55,21 @@ RPC_SRV_RESULT MODBusAccess::InitModbus(const char* devnode,int baud,char parity
 	ctx = modbus_new_rtu(devnode, baud, parity, 8, stop_bits);
 
 	if (ctx == NULL)
+	{
+		if(LogFlag)
+			printf("MODBusAccess::InitModbus: modbux ctx is null\n");
 		return RPC_SRV_RESULT_DEV_NOT_ACCESSIBLE;//modbus is not accessible
-
+	}
 #if LIBMODBUS_VERSION_MAJOR >= 3 && LIBMODBUS_VERSION_MINOR >= 1 && LIBMODBUS_VERSION_MICRO >= 2
+	if(LogFlag)
+		printf("MODBusAccess::InitModbus: detected libmodbus ver is >=3.1.2\n");
 	uint32_t resp_timeout = 2;
 	modbus_set_byte_timeout(ctx, -1, 0);
 	resp_timeout *= 100000;
 	modbus_set_response_timeout(ctx, 0, resp_timeout);
 #else
+	if(LogFlag)
+		printf("MODBusAccess::InitModbus: detected libmodbus ver is <3.1.2\n");
 	//byte timeout
 	struct timeval timeout;
 	timeout.tv_sec = -1;
@@ -75,6 +94,8 @@ RPC_SRV_RESULT MODBusAccess::InitModbus(const char* devnode,int baud,char parity
 	if (modbus_connect(ctx) == -1) 
 	{
 		modbus_free(ctx);
+		if(LogFlag)
+			printf("MODBusAccess::InitModbus: modbus connect failed\n");
 		return RPC_SRV_RESULT_FAIL;
 	}
 	return RPC_SRV_RESULT_SUCCESS;
@@ -103,7 +124,7 @@ RPC_SRV_RESULT MODBusAccess::getEnergyParam(EJSON_ENRGYPARM type,std::string &re
 		default: return RPC_SRV_RESULT_ARG_ERROR;
 	}
 	//read the parameter over modbus
-	RPC_SRV_RESULT res=getMeasureFloat(ctx, addr, 1, 2,param_value);
+	RPC_SRV_RESULT res=getMeasureFloat(ctx, addr, 1, 2,param_value);//addr
 	char tmpstr[255];
 	if(res==RPC_SRV_RESULT_SUCCESS)
 		sprintf(tmpstr,"%f",param_value);
@@ -135,8 +156,11 @@ RPC_SRV_RESULT MODBusAccess::getMeasureFloat(modbus_t *ctx, int address, int ret
 	}
 
 	if (rc == -1) 
-		return RPC_SRV_RESULT_FAIL;;//exit_error(ctx);
-
+	{
+		if(LogFlag)
+			printf("MODBusAccess::getMeasureFloat: modbus_read_input_registers failed\n");
+		return RPC_SRV_RESULT_FAIL;;
+	}
 	// swap LSB and MSB
 	uint16_t tmp1 = tab_reg[0];
 	uint16_t tmp2 = tab_reg[1];
