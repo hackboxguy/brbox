@@ -4,6 +4,9 @@ using namespace std;
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include "route.h"
+#include <regex>
+
 using namespace Onion;
 
 /// Same as strcmp, but also checks for NULL values.
@@ -175,6 +178,66 @@ onion_connection_status SdapiHttpHandler::handle_request(Request &req, Response 
 	}
 	return OCS_PROCESSED;
 }
+onion_connection_status SdapiHttpHandler::handle_api_request(Request &req, Response &res)
+{
+	char url[1024];strcpy(url,onion_request_get_path(req.c_handler()));
+	cout<<"SdapiHttpHandler::handle_api_request url="<<url<<endl;
+
+	route::Route myRoute;
+	auto match = myRoute.set(url);//"energy/ab");
+
+	int r1 = match.test(":str");
+	int r2 = match.test(":str/");
+	if(r1==1 || r2==1)
+	{
+		cout<<"level1:"<<match.get("str")<<endl;
+		return OCS_PROCESSED;
+	}
+	return OCS_PROCESSED;
+
+
+
+	int r = match.test(":str");
+	if(r==1) //read next-level flat list
+	{
+		std::string s = match.get("str");// "energy" return next level flat list[voltage/current/freq/pfactor/etc]
+		cout<<"str = "<<s<<endl;
+		return OCS_PROCESSED;
+	}
+
+	r = match.test(":str/");
+	if(r==1) //read next-level flat list
+	{
+		std::string s = match.get("str"); // "energy/" treat above and this case same [return next level flat-list]
+		cout<<"str/ = "<<s<<endl;
+		return OCS_PROCESSED;
+	}
+
+	//todo: remove "str/" from url and repeat the same for next level
+	r = match.test(":str/.*");
+	if(r>=1) //read tree
+	{
+		std::string t = url; //url="energy/ab"
+		std::string s = match.get("str");//"energy" to be removed remaining result shal be "/ab"
+		std::string::size_type i = t.find(s);
+		if (i != std::string::npos)
+		{
+			t.erase(i, s.length());
+			cout<<"remaining is ="<<t<<endl; //t = "/ab" when urls is: energy/ab
+		}
+		//std::string s2 = match.get("str1");
+		//cout<<"str/:str1 = "<<s1<<" "<<s2<<" r="<<match.keys<<endl;
+	}
+
+
+	return OCS_PROCESSED;
+}
+onion_connection_status SdapiHttpHandler::handle_api1_request(Request &req, Response &res)
+{
+	char url[1024];strcpy(url,onion_request_get_path(req.c_handler()));
+	cout<<"SdapiHttpHandler::handle_api1_request url="<<url<<endl;
+	return OCS_PROCESSED;
+}
 
 int SdapiHttpHandler::StartServer()
 {
@@ -196,16 +259,8 @@ int SdapiHttpHandler::StartServer()
 	onion_log_flags|=OF_NOINFO;
 	Onion::Onion server(O_THREADED);
 	Onion::Url root(&server);
-	//root.add("^rpcapi/sysmgr", "Some static text", HTTP_OK );
-	//root.add("", "Some static text", HTTP_OK );
-	//root.add("lambda", [](Onion::Request &req, Onion::Response &res){
-	//	res<<"Lambda handler";
-	//	return OCS_PROCESSED;
-	//});
-
-	//root.add("^rpcapi/sysmgr" ,this, &SdapiHttpHandler::handle_symgr);
-	//root.add("^rpcapi/gpiosrv",this, &SdapiHttpHandler::handle_gpiosrv);
 	root.add("^rpcapi/" ,this, &SdapiHttpHandler::handle_request);
+	root.add("^api/" ,this, &SdapiHttpHandler::handle_api_request);
 
 	server.setPort(http_port);
 	server.listen();

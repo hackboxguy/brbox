@@ -12,7 +12,7 @@ add_subdirectory(lib-adav-old)
 #    CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libstrophe/configure --prefix=${CMAKE_INSTALL_PREFIX}
 #    BUILD_COMMAND ${MAKE})
 
-#add_subdirectory(lib-onion)
+add_subdirectory(lib-onion)
 #add_subdirectory(lib-ilclient)
 #for cross compiling
 #cmake -H. -BOutput -DCMAKE_TOOLCHAIN_FILE=toolchain-arm-backup.cmake

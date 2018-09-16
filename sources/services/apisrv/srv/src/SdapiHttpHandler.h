@@ -28,5 +28,8 @@ public:
 	onion_connection_status handle_symgr(Onion::Request &req, Onion::Response &res);
 	onion_connection_status handle_gpiosrv(Onion::Request &req, Onion::Response &res);
 	onion_connection_status handle_request(Onion::Request &req, Onion::Response &res);
+	onion_connection_status handle_api_request(Onion::Request &req, Onion::Response &res);
+	onion_connection_status handle_api1_request(Onion::Request &req, Onion::Response &res);
+
 };
 #endif
