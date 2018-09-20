@@ -9,6 +9,7 @@ set(LIB_ADCOMMN AdCmn)      #common library
 
 
 project(${COMPONENT_NAME})
+option(INSTALL_CLIENT "install client binary" OFF)
 file(GLOB SOURCES "src/*.cpp")
 add_executable(${COMPONENT_NAME} ${SOURCES})
 set(INC_ADSTTNG  "${CMAKE_CURRENT_SOURCE_DIR}/../../../lib/lib-settings/include")
@@ -25,7 +26,9 @@ target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pth
 
 #install the binary and server-rpc-headers to CMAKE_INSTALL_PREFIX destination
 #file(GLOB  INCFILES "${INC_SRVCOMMN}/*.*")
-install(TARGETS ${COMPONENT_NAME} DESTINATION bin)
+if(INSTALL_CLIENT)
+	install(TARGETS ${COMPONENT_NAME} DESTINATION bin)
+endif()
 #install(FILES ${INCFILES} DESTINATION include)
 
 
