@@ -1,13 +1,16 @@
 #include "SdapiHttpHandler.h"
-using namespace std;
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
 #include "route.h"
 #include <regex>
-
+#include <iostream>
+#include <fstream>
+using namespace std;
 using namespace Onion;
+#define JSON_URL_TREE_FILE "/home/adav/tmp/nlohmann/test.json"
+
 
 /// Same as strcmp, but also checks for NULL values.
 bool safe_strcmp(const char *a, const char *b)
@@ -110,6 +113,10 @@ onion_connection_status gpiosrv_handler(void *_, onion_request *req, onion_respo
 /*****************************************************************************/
 SdapiHttpHandler::SdapiHttpHandler(int port):http_port(port)
 {
+	std::ifstream ifs(JSON_URL_TREE_FILE);//"test.json");
+#ifdef CONFIGURABLE_API 
+	JsonUrlTree = json::parse(ifs);
+#endif
 }
 /*****************************************************************************/
 SdapiHttpHandler::~SdapiHttpHandler()
@@ -178,67 +185,212 @@ onion_connection_status SdapiHttpHandler::handle_request(Request &req, Response 
 	}
 	return OCS_PROCESSED;
 }
+/*****************************************************************************/
 onion_connection_status SdapiHttpHandler::handle_api_request(Request &req, Response &res)
 {
+#ifdef CONFIGURABLE_API 
 	char url[1024];strcpy(url,onion_request_get_path(req.c_handler()));
-	cout<<"SdapiHttpHandler::handle_api_request url="<<url<<endl;
+	//cout<<"SdapiHttpHandler::handle_api_request url="<<url<<endl;
+	//std::cout << std::setw(4) << JsonUrlTree.flatten() << '\n';
 
+	//prints the query string for cmd: curl localhost:8080/api/temps?search=testtest
+	char query[1024];query[0]='\0';strcpy(query,onion_request_get_query(req.c_handler(),"search"));
+	query[1000]='\0';
+	cout<<"query = "<<query<<endl;//testtest will be printed
+
+	int r1,r2;
 	route::Route myRoute;
 	auto match = myRoute.set(url);//"energy/ab");
 
-	int r1 = match.test(":str");
-	int r2 = match.test(":str/");
-	if(r1==1 || r2==1)
+	//serve top-level url
+	int r = match.test(":str/.*");
+	if(r!=1) //read tree
 	{
-		cout<<"level1:"<<match.get("str")<<endl;
-		return OCS_PROCESSED;
+		r1 = match.test(":str");
+		r2 = match.test(":str/");
+		//get on http://ip/api (return top-level flat list)
+		if(r1!=1 && r2!=1)
+		{
+			//if(JsonUrlTree.is_primitive())
+			//	;//this is the leaf
+
+			json toplevellist = json::array();
+			for (auto it = JsonUrlTree.begin(); it != JsonUrlTree.end(); ++it)
+					toplevellist.emplace_back(it.key());
+			std::string s = toplevellist.dump();s+='\n';
+		
+	 		onion_response_write( res.c_handler(), s.c_str(), strlen(s.c_str()));
+			return OCS_PROCESSED;
+
+		}
 	}
-	return OCS_PROCESSED;
 
 
-
-	int r = match.test(":str");
-	if(r==1) //read next-level flat list
+	//level-1
+	std::string level1,level2,level3,level4,level5;
+	std::string remain,remain1,remain2,remain3,remain4,result;
+	bool res1=extract_url_string(url,level1,remain);
+	if(res1==false)
 	{
-		std::string s = match.get("str");// "energy" return next level flat list[voltage/current/freq/pfactor/etc]
-		cout<<"str = "<<s<<endl;
-		return OCS_PROCESSED;
+		onion_response_write( res.c_handler(), "wrong-url1", strlen("wrong-url1"));
+		return OCS_PROCESSED;//wrong url
+	}
+	if(remain.size()==0)
+	{
+		if(get_flat_list(JsonUrlTree, level1,result)==true)
+		{
+			onion_response_write( res.c_handler(), result.c_str(), strlen(result.c_str()));
+			return OCS_PROCESSED;
+		}
+	}
+
+	//level-2
+	res1=extract_url_string(remain,level2,remain1);
+	if(res1==false)
+	{
+		onion_response_write( res.c_handler(), "wrong-url2", strlen("wrong-url2"));
+		return OCS_PROCESSED;//wrong url
+	}
+	if(remain1.size()==0)
+	{
+		//if(JsonUrlTree.count()); //TODO: check if level1 string exists, else new object will be added
+		if(get_flat_list(JsonUrlTree[level1], level2,result)==true)
+		{
+			onion_response_write( res.c_handler(), result.c_str(), strlen(result.c_str()));
+			return OCS_PROCESSED;
+		}
+	}
+
+	//level-3
+	res1=extract_url_string(remain1,level3,remain2);
+	if(res1==false)
+	{
+		onion_response_write( res.c_handler(), "wrong-url3", strlen("wrong-url3"));
+		return OCS_PROCESSED;//wrong url
+	}
+	if(remain2.size()==0)
+	{
+		if(get_flat_list(JsonUrlTree[level1][level2], level3,result)==true)
+		{
+			onion_response_write( res.c_handler(), result.c_str(), strlen(result.c_str()));
+			return OCS_PROCESSED;
+		}
+	}
+
+	//level-4
+	res1=extract_url_string(remain2,level4,remain3);
+	if(res1==false)
+	{
+		onion_response_write( res.c_handler(), "wrong-url4", strlen("wrong-url4"));
+		return OCS_PROCESSED;//wrong url
+	}
+	if(remain3.size()==0)
+	{
+		if(get_flat_list(JsonUrlTree[level1][level2][level3], level4,result)==true)
+		{
+			onion_response_write( res.c_handler(), result.c_str(), strlen(result.c_str()));
+			return OCS_PROCESSED;
+		}
+	}
+
+	//level-5
+	res1=extract_url_string(remain3,level5,remain4);
+	if(res1==false)
+	{
+		onion_response_write( res.c_handler(), "wrong-url5", strlen("wrong-url5"));
+		return OCS_PROCESSED;//wrong url
+	}
+	if(remain4.size()==0)
+	{
+		if(get_flat_list(JsonUrlTree[level1][level2][level3][level4], level5,result)==true)
+		{
+			onion_response_write( res.c_handler(), result.c_str(), strlen(result.c_str()));
+			return OCS_PROCESSED;
+		}
+	}
+#endif
+	return OCS_PROCESSED;
+}
+/*****************************************************************************/
+#ifdef CONFIGURABLE_API 
+bool SdapiHttpHandler::get_flat_list(json topObj, std::string key,std::string &result)
+{
+	auto test = topObj.find(key);//check if this object exists
+	if(test != topObj.end())
+	{
+		json jobj = topObj[key];
+		if(jobj.is_primitive())
+		{
+			//cout<<"primitive object key="<<key<<endl;//this is the last stage - return value
+			result=jobj.dump();result+='\n';
+
+			//result as json-key-value-pair
+			json j;j[key]=result;
+			result=j.dump();result+='\n';
+			return true;
+		}
+		if(jobj.is_object())
+		{
+			json toplevellist = json::array();
+			for (auto it = jobj.begin(); it != jobj.end(); ++it)
+				toplevellist.emplace_back(it.key());
+			result = toplevellist.dump();result+='\n';
+
+			//result as json-key-value-pair
+			json j;j[key]=result;
+			result=j.dump();result+='\n';
+
+			return true;
+	 		//onion_response_write( res.c_handler(), s.c_str(), strlen(s.c_str()));
+			//return OCS_PROCESSED;
+		}	
+	}
+	//else
+		//cout<<"SdapiHttpHandler::get_flat_list:leaf-node"<<endl;
+	return false;
+}
+#endif
+/*****************************************************************************/
+bool SdapiHttpHandler::extract_url_string(std::string url,std::string &result,std::string &remaining)
+{
+#ifdef CONFIGURABLE_API 
+	//cout<<"SdapiHttpHandler::extract_url_string:url="<<url<<endl;
+	route::Route myRoute;
+	auto match = myRoute.set(url);
+	
+	int r = match.test(":str");
+	if(r==1)
+	{
+		result = match.get("str");
+		//cout<<"SdapiHttpHandler::extract_url_string:str="<<result<<endl;
+		return true;
 	}
 
 	r = match.test(":str/");
-	if(r==1) //read next-level flat list
+	if(r==1)
 	{
-		std::string s = match.get("str"); // "energy/" treat above and this case same [return next level flat-list]
-		cout<<"str/ = "<<s<<endl;
-		return OCS_PROCESSED;
+		result = match.get("str");
+		return true;
 	}
 
-	//todo: remove "str/" from url and repeat the same for next level
 	r = match.test(":str/.*");
-	if(r>=1) //read tree
+	if(r==1)
 	{
-		std::string t = url; //url="energy/ab"
-		std::string s = match.get("str");//"energy" to be removed remaining result shal be "/ab"
-		std::string::size_type i = t.find(s);
+		result = match.get("str");
+		std::string t = url;
+		std::string::size_type i = t.find(result);
 		if (i != std::string::npos)
 		{
-			t.erase(i, s.length());
-			cout<<"remaining is ="<<t<<endl; //t = "/ab" when urls is: energy/ab
+			t.erase(i, result.length()+1);//+1 is for removing last char '/'
+			remaining=t;
+			//cout<<"SdapiHttpHandler::extract_url_string:res1="<<result<<endl;
 		}
-		//std::string s2 = match.get("str1");
-		//cout<<"str/:str1 = "<<s1<<" "<<s2<<" r="<<match.keys<<endl;
+		return true;
 	}
-
-
-	return OCS_PROCESSED;
+#endif
+	return false;
 }
-onion_connection_status SdapiHttpHandler::handle_api1_request(Request &req, Response &res)
-{
-	char url[1024];strcpy(url,onion_request_get_path(req.c_handler()));
-	cout<<"SdapiHttpHandler::handle_api1_request url="<<url<<endl;
-	return OCS_PROCESSED;
-}
-
+/*****************************************************************************/
 int SdapiHttpHandler::StartServer()
 {
 /*	onion *o=onion_new(O_THREADED);
@@ -267,3 +419,4 @@ int SdapiHttpHandler::StartServer()
 	return 0;
 }
 /*****************************************************************************/
+
