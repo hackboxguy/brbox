@@ -1,9 +1,9 @@
 /* ---------------------------------------------------------------------------- 
 how to test this utility?
 1)cd ~/sandbox/OE-FMW-FOO/Mercury/trunk/target (do "svn up" if needed)
-2)cmake -H. -BOutput -DCMAKE_INSTALL_PREFIX=~/tmp/barcofmw
+2)cmake -H. -BOutput -DCMAKE_INSTALL_PREFIX=~/tmp/fmw
 3)cmake --build Output -- install -j5
-4)cd ~/tmp/barcofmw
+4)cd ~/tmp/fmw
 5)export LD_LIBRARY_PATH=./lib
 6)./bin/cmnlib
 ---------------------------------------------------------------------------- */
