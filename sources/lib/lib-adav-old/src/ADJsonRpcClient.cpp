@@ -106,7 +106,7 @@ int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* result,char*
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 /*****************************************************************************/
@@ -128,7 +128,7 @@ int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* result,char*
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 //for sdps with int-addr and int-value
@@ -150,7 +150,7 @@ int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* name1,int va
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* name1,int value1,char* name2, int value2,char* name3, int value3,char* result)
@@ -173,7 +173,7 @@ int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* name1,int va
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 //for sdps with int-addr and string-value
@@ -195,7 +195,7 @@ int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* name1,int va
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 /*****************************************************************************/
@@ -216,7 +216,7 @@ int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* name,int val
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 /*****************************************************************************/
@@ -238,7 +238,7 @@ int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* result,char*
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* result,char* name1,int value1,char* name2, char* value2)
@@ -259,7 +259,7 @@ int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* result,char*
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* result,char* name1,char* value1,char* name2, char* value2)
@@ -279,7 +279,7 @@ int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* result,char*
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 
@@ -300,7 +300,7 @@ int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* result,char*
     strcpy(result,json_object_to_json_string(main_object));
 
     json_object_put(main_object);
-    json_object_put(param_object);
+    //json_object_put(param_object);
     return 0;
 }
 int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* result,char* name1,char* value1,char* name2, char* value2,char* name3,char* value3)
@@ -321,7 +321,7 @@ int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* result,char*
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 
@@ -345,7 +345,7 @@ int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* result,char*
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 
@@ -374,7 +374,7 @@ int ADJsonRpcClient::prepare_json_request(char*  method,int ID,char* result,char
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 
@@ -398,7 +398,7 @@ int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* result,char*
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 
@@ -423,7 +423,7 @@ int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* result,char*
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 
@@ -446,7 +446,7 @@ int ADJsonRpcClient::prepare_json_request(char* method,int ID,char* result,char*
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 
 }
@@ -472,7 +472,7 @@ int ADJsonRpcClient::prepare_json_request(char *method_name,int ID,char* result,
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 
@@ -499,7 +499,7 @@ int ADJsonRpcClient::prepare_json_request_three_int_two_string(char* method,int 
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 
@@ -524,7 +524,7 @@ int ADJsonRpcClient::prepare_json_request_four_int(char* method,int ID,char* res
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 int ADJsonRpcClient::prepare_json_request_four_int_two_string(char* method,int ID,char* result,char* name1,int value1,
@@ -551,7 +551,7 @@ int ADJsonRpcClient::prepare_json_request_four_int_two_string(char* method,int I
 	strcpy(result,json_object_to_json_string(main_object));
 	
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 
@@ -576,7 +576,7 @@ int ADJsonRpcClient::prepare_json_request_two_int_two_string(char* method,int ID
     strcpy(result,json_object_to_json_string(main_object));
 
     json_object_put(main_object);
-    json_object_put(param_object);
+    //json_object_put(param_object);
     return 0;
 }
 
@@ -601,7 +601,7 @@ int ADJsonRpcClient::prepare_json_request_two_int_one_double_one_string(char* me
     strcpy(result,json_object_to_json_string(main_object));
 
     json_object_put(main_object);
-    json_object_put(param_object);
+    //json_object_put(param_object);
     return 0;
 }
 
@@ -632,7 +632,7 @@ int ADJsonRpcClient::prepare_json_request_seven_int_param(char* method,int ID,ch
     strcpy(result,json_object_to_json_string(main_object));
 
     json_object_put(main_object);
-    json_object_put(param_object);
+    //json_object_put(param_object);
     return 0;
 }
 
@@ -665,7 +665,7 @@ int ADJsonRpcClient::prepare_json_request_single_int_nine_double_param(char* met
     strcpy(result,json_object_to_json_string(main_object));
 
     json_object_put(main_object);
-    json_object_put(param_object);
+    //json_object_put(param_object);
     return 0;
 }
 
@@ -689,7 +689,7 @@ int ADJsonRpcClient::prepare_json_request_three_double(char* method,int ID,char*
     strcpy(result,json_object_to_json_string(main_object));
 
     json_object_put(main_object);
-    json_object_put(param_object);
+    //json_object_put(param_object);
     return 0;
 }
 
@@ -724,7 +724,7 @@ int ADJsonRpcClient::prepare_json_request_three_string_nine_double_param(char* m
     strcpy(result,json_object_to_json_string(main_object));
 
     json_object_put(main_object);
-    json_object_put(param_object);
+    //json_object_put(param_object);
     return 0;
 }
 /*****************************************************************************/
@@ -749,7 +749,7 @@ int ADJsonRpcClient::prepare_json_request_one_string_three_int(char* method,int 
 	strcpy(result,json_object_to_json_string(main_object));
 
 	json_object_put(main_object);
-	json_object_put(param_object);
+	//json_object_put(param_object);
 	return 0;
 }
 /*****************************************************************************/
