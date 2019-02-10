@@ -13,8 +13,8 @@ BRBOX_GSTD_LICENSE = LGPL-2.1+
 BRBOX_GSTD_LICENSE_FILES = COPYING
 
 BRBOX_GSTD_AUTORECONF = YES
-BRBOX_GSTD_DEPENDENCIES = host-pkgconf gstreamer1 gst1-plugins-base json-glib ncurses readline
-#BRBOX_GSTD_CONF_OPTS = --disable-graphviz
+BRBOX_GSTD_DEPENDENCIES = host-pkgconf gstreamer1 gst1-plugins-base libglib2 json-glib ncurses readline
+BRBOX_GSTD_CONF_OPTS = --enable-gtk-doc=no
 
 $(eval $(autotools-package))
 
