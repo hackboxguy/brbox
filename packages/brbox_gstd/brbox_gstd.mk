@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-BRBOX_GSTD_VERSION = v0.6.2
+BRBOX_GSTD_VERSION = HEAD
 BRBOX_GSTD_SITE =  https://github.com/RidgeRun/gstd-1.x.git
 BRBOX_GSTD_SITE_METHOD = git
 BRBOX_GSTD_GIT_SUBMODULES = YES
