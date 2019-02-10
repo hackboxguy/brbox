@@ -72,4 +72,5 @@ source "package/brbox/brbox_dispsrv/Config.in"
 source "package/brbox/brbox_lightsense/Config.in"
 source "package/brbox/brbox_mplaysrv/Config.in"
 source "package/brbox/brbox_modbussrv/Config.in"
+source "package/brbox/brbox_gstd/Config.in"
 endmenu

@@ -1,0 +1,14 @@
+config BR2_PACKAGE_GSTD
+	bool "gstd"
+	select BR2_PACKAGE_GSTREAMER1_CHECK
+	select BR2_PACKAGE_GST1_PLUGINS_BASE
+	select BR2_PACKAGE_READLINE
+	select BR2_PACKAGE_NCURSES
+	select BR2_PACKAGE_JSON_GLIB
+	help
+	  GStreamer Daemon is a GStreamer framework for controlling
+	  audio and video streaming using TCP messages.
+	  This version is based on GStreamer 1.x 
+
+	  https://github.com/RidgeRun/gstd-1.x
+

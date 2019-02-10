@@ -1,0 +1,65 @@
+{
+	"energy":
+	{	
+		"voltage"  :"/energy/voltage.txt",
+		"current"  :"/energy/current.txt",
+		"frequency":"/energy/freq.txt",
+		"pfactor"  :"/energy/pfactor.txt"
+	},
+	"temps":
+	{	
+		"ambient"  :"/temps/ambient.txt",
+		"cpu"      :"/temps/cpu.txt",
+		"internal" :"/temps/internal.txt",
+		"external" : "/temps/external.txt"
+	},
+	"fan":
+	{
+		"fan1" :
+		{
+			"actualspeed":"/fan/fan1/actualspeed.txt",
+			"setspeed"   :"/fan/fan1/setspeed.txt"
+		},
+		"fan2" :
+		{
+			"actualspeed":"/fan/fan2/actualspeed.txt",
+			"setspeed"   :"/fan/fan2/setspeed.txt"
+		},
+		"fan3" :
+		{
+			"actualspeed":"/fan/fan3/actualspeed.txt",
+			"setspeed"   :"/fan/fan3/setspeed.txt"
+		}
+	},
+	"light":
+	{
+		"light1":
+		{
+			"light1s":
+			{
+				"light1ss":"lightone",
+				"light12s":"lighttwo"
+			},
+			"light11s":
+			{
+				"light11ss":"11lightone",
+				"light112s":"112lighttwo"
+			}
+
+		},
+		"light2":
+		{
+			"light2s":
+			{
+				"light2ss":"lightoneone",
+				"light22s":"lightonetwo"
+			},
+			"light22s":
+			{
+				"light22ss":"22lightoneone",
+				"light222s":"22lightonetwo"
+			}
+		}
+	},
+	"sensor":"test-sensor"
+}

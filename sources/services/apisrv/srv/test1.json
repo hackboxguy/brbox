@@ -1,0 +1,34 @@
+{
+	"energy":
+	{	
+		"voltage"  :"/energy/voltage.txt",
+		"current"  :"/energy/current.txt",
+		"frequency":"/energy/freq.txt",
+		"pfactor"  :"/energy/pfactor.txt"
+	},
+	"temps":
+	{	
+		"ambient"  :"/temps/ambient.txt",
+		"cpu"      :"/temps/cpu.txt",
+		"internal" :"/temps/internal.txt",
+		"external" :"/temps/external.txt"
+	},
+	"fan":
+	{
+		"fan1" :
+		{
+			"actualspeed":"/fan/fan1/actualspeed.txt",
+			"setspeed"   :"/fan/fan1/setspeed.txt"
+		},
+		"fan2" :
+		{
+			"actualspeed":"/fan/fan2/actualspeed.txt",
+			"setspeed"   :"/fan/fan2/setspeed.txt"
+		},
+		"fan3" :
+		{
+			"actualspeed":"/fan/fan3/actualspeed.txt",
+			"setspeed"   :"/fan/fan3/setspeed.txt"
+		}
+	}
+}
