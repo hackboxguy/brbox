@@ -16,15 +16,15 @@ BRBOX_GSTD_DEPENDENCIES = host-pkgconf gstreamer1 gst1-plugins-base libglib2 jso
 BRBOX_GSTD_AUTORECONF = YES
 BRBOX_GSTD_CONF_OPTS += --disable-gtk-doc
 
-define BRBOX_GSTD_CONFIGURE_CMDS
-	(cd $(@D) && rm -rf config.cache && \
-	$(TARGET_CONFIGURE_OPTS) \
-	$(TARGET_CONFIGURE_ARGS) \
-	PKG_CONFIG_PATH="$(STAGING_DIR)/usr/lib/pkgconfig" \
-	./configure \
-		--prefix=/usr \
-	)
-endef
+#define BRBOX_GSTD_CONFIGURE_CMDS
+#	(cd $(@D) && rm -rf config.cache && \
+#	$(TARGET_CONFIGURE_OPTS) \
+#	$(TARGET_CONFIGURE_ARGS) \
+#	PKG_CONFIG_PATH="$(STAGING_DIR)/usr/lib/pkgconfig" \
+#	./configure \
+#		--prefix=/usr \
+#	)
+#endef
 
 
 $(eval $(autotools-package))
