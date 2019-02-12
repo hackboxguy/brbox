@@ -1,0 +1,8 @@
+config BR2_PACKAGE_BRBOX_GSTDSTARTUP
+	bool "gstd daemon startup script and dependencies for brbox platform"
+	default n
+	depends on BR2_TARGET_BRBOX_PACKAGES
+	select BR2_PACKAGE_BRBOX_GSTD
+	help
+	  provides mechanism to auto start gstd-daemon on linux bootup.
+
