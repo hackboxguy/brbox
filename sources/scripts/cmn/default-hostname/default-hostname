@@ -17,8 +17,20 @@ GetDefaultHostname()
 	if [ $LEN = 12 ]; then
 		echo "brbox-$RES"
 	else
-		RES=$(cat /proc/cpuinfo | grep Serial | awk '{print $3}') #else print the cpu serial num(used incase of raspi-A)
-		echo "brbox-$RES"
+		RES=$(cat /proc/cpuinfo | grep Serial ) #else check if cpu serial number exists(valid for ARM)
+		if [ $? != "0" ]; then
+			#for intel based hw use dmidecode for cpu_id
+			if [ -x /usr/sbin/dmidecode ]; then
+				RES=$(dmidecode | grep -w ID | sed 's/^.ID\: //g' | sed 's/ //g' | tail -1|sed 's/.\{8\}$//')
+				echo "brbox-$RES"
+			else
+				echo "brbox-unknown"
+			fi
+
+		else
+			RES=$(cat /proc/cpuinfo | grep Serial | awk '{print $3}')
+			echo "brbox-$RES"
+		fi
 	fi
 	return 0
 }
