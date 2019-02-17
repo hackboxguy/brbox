@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #./play-multicast-stream.sh -g <gstd_ip> -p <stream_port> -i <multicast_ip>
 USAGE="./play-multicast-stream.sh -g <gstd_ip> -p <stream_port> -i <multicast_ip>"
 STREAM_PORT=5004

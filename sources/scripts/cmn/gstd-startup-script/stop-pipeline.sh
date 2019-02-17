@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #./stop-pipeline.sh -g <gstd_ip> -l <pipelineID>
 USAGE="./stop-pipeline.sh -g <gstd_ip> -l <pipelineID>"
 PIPELINE_ID=p1

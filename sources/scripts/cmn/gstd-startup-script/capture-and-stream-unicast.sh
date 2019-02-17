@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #./capture-and-stream-unicast.sh -g <gstd_ip> -i <target_ip> -p <stream_port> -d <video_device_index>
 USAGE="./capture-and-stream-unicast.sh -g <gstd_ip> -i <target_ip> -p <stream_port> -d <video_device_index>"
 VIDEO_DEV=/dev/video0

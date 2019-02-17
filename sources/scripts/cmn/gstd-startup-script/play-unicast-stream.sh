@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #./play-unicast-stream.sh -g <gstd_ip> -p <stream_port>
 USAGE="./play-unicast-stream.sh -g <gstd_ip> -p <stream_port>"
 STREAM_PORT=6000
