@@ -5,7 +5,7 @@ set(GSTD_STARTUP S26StartGstd)
 file(GLOB  STARTUPFILE ${GSTD_STARTUP})
 file(GLOB  GSTDSCRIPTS "*.sh")
 install(PROGRAMS ${STARTUPFILE} DESTINATION etc/init.d)
-install(PROGRAMS ${GSTDSCRIPTS} DESTINATION usb/bin)
+install(PROGRAMS ${GSTDSCRIPTS} DESTINATION usr/bin)
 
 
 #for cross compiling
