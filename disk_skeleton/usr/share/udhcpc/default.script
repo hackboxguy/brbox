@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # udhcpc script edited by Tim Riker <Tim@Rikers.org>
+SCREEN_ACTIVE_FLAG=/tmp/pipeline.active
 
 [ -z "$1" ] && echo "Error: should be called from udhcpc" && exit 1
 
@@ -27,9 +28,11 @@ case "$1" in
 	        FMWVER=$(cat /boot/version-num.txt)
 		CONFIG=$(cat /boot/sysconfig.txt)                                                           
 		/opt/fmw/bin/dispclt --dispclear --printline=line1,"BRBOX-$FMWVER" --printline=line2,"no-ip-defconfig"  --printline=line3,"Cfg-$CONFIG"
-		#update X11 desktop screen
+		#update X11 desktop screen (only if screen is not busy showing other content)
 		/etc/X11/draw-desktop-info.sh 
-		export DISPLAY=:0; xdotool key --window "$(xdotool search --class feh | head -n 1)" "r+r+v"
+		if [ ! -f $SCREEN_ACTIVE_FLAG ]; then
+			export DISPLAY=:0; xdotool key --window "$(xdotool search --class feh | head -n 1)" "r+r+v"
+		fi
 		;;
 		
 	leasefail|nak)
@@ -39,9 +42,11 @@ case "$1" in
 	        FMWVER=$(cat /boot/version-num.txt)
 		CONFIG=$(cat /boot/sysconfig.txt)                                                   
         	/opt/fmw/bin/dispclt --dispclear --printline=line1,"BRBOX-$FMWVER" --printline=line2,"no-ip-leasefail"  --printline=line3,"Cfg-$CONFIG"
-		#update X11 desktop screen
-		/etc/X11/draw-desktop-info.sh 
-		export DISPLAY=:0; xdotool key --window "$(xdotool search --class feh | head -n 1)" "r+r+v"
+		#update X11 desktop screen (only if screen is not busy showing other content)
+		/etc/X11/draw-desktop-info.sh
+		if [ ! -f $SCREEN_ACTIVE_FLAG ]; then
+			export DISPLAY=:0; xdotool key --window "$(xdotool search --class feh | head -n 1)" "r+r+v"
+		fi		
 		;;
 
 	renew|bound)
@@ -77,9 +82,11 @@ case "$1" in
         	FMWVER=$(cat /boot/version-num.txt)
 		CONFIG=$(cat /boot/sysconfig.txt)                                                   
         	/opt/fmw/bin/dispclt --dispclear --printline=line1,"BRBOX-$FMWVER" --printline=line2,"IP-$IPADDR"  --printline=line3,"Cfg-$CONFIG"
-		#update X11 desktop screen
-		/etc/X11/draw-desktop-info.sh 
-		export DISPLAY=:0; xdotool key --window "$(xdotool search --class feh | head -n 1)" "r+r+v"
+		#update X11 desktop screen (only if screen is not busy showing other content)
+		/etc/X11/draw-desktop-info.sh
+		if [ ! -f $SCREEN_ACTIVE_FLAG ]; then
+			export DISPLAY=:0; xdotool key --window "$(xdotool search --class feh | head -n 1)" "r+r+v"
+		fi
 		;;
 esac
 
