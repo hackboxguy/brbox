@@ -56,6 +56,7 @@ xset -dpms &
 xset s noblank &
 xset s off &
 xsetroot -solid darkblue &
+xset s off -dpms #permenantly disable screen from going off
 #exec xterm -geometry 0x0+0+0 -name login
 /etc/X11/draw-desktop-info.sh
 geometry=$(fbset |grep geometry |awk '{print $2"x"$3'})
