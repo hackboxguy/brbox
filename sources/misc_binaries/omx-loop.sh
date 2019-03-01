@@ -1,6 +1,6 @@
 #!/bin/sh
 while true; do
-        /usr/bin/omxplayer -b --layer 2 -r -o both $1 < /tmp/omxplay.fifo &
+        /usr/bin/omxplayer --loop -b --layer 2 -r -o both $1 < /tmp/omxplay.fifo &
 	echo . > /tmp/omxplay.fifo
 	wait
 	if [ -f /tmp/omxplay.stoploop ]; then
