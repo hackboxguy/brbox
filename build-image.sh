@@ -42,6 +42,7 @@ BOARD_TYPE_BBBMMC_RBOX="bbbmmc-rbox"      #remote-box-application-build
 BOARD_TYPE_WDB="wandboard"                #base-build
 BOARD_TYPE_RP3_64="raspi3-64"                #base-build
 BOARD_TYPE_RP3_QT5WE="raspi3-qt5we"
+BOARD_TYPE_PC_X86_EFI="pc-x86-64-efi"
 
 ###############################################################################
 while getopts b:o:v:c:s:ip f
@@ -109,6 +110,10 @@ elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_BBBMMC_RBOX" ]; then
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_BTR_MEDIA" ]; then
 	BR_BOARD_CONFIG=qemu_x86_64_defconfig
 	BR_BOARD_LINUX_CONFIG_PATH=board/qemu/x86_64/
+	BOOT_IMG_SCRIPT=$(pwd)/scripts/grub2-bootdisk.sh
+elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_PC_X86_EFI" ]; then
+	BR_BOARD_CONFIG=pc_x86_64_efi_defconfig
+	BR_BOARD_LINUX_CONFIG_PATH=board/pc/
 	BOOT_IMG_SCRIPT=$(pwd)/scripts/grub2-bootdisk.sh
 else   #default is baytrail(x86_64)
 	BR_BOARD_CONFIG=qemu_x86_64_defconfig
@@ -186,6 +191,9 @@ elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_BBBMMC_RBOX" ]; then
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 	ROOTFS_TYPE=$ROOTFS_TYPE_BBB
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_BTR_MEDIA" ]; then
+	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
+	ROOTFS_TYPE=$ROOTFS_TYPE_BTR
+elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_PC_X86_EFI" ]; then
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 	ROOTFS_TYPE=$ROOTFS_TYPE_BTR
 else 
