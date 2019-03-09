@@ -8,6 +8,12 @@ if [ ! -d "${TARGET_DIR}/boot" ]; then
 	#for bbb /target/boot folder doesnt exists
 	mkdir -p ${TARGET_DIR}/boot
 fi
+
+if [ ! -d "${TARGET_DIR}/boot/grub" ]; then
+        #for bbb /target/boot folder doesnt exists
+        mkdir -p ${TARGET_DIR}/boot/grub
+fi
+
 echo "$BRBOX_RELVERSION.$BRBOX_BUILDNUM" > ${TARGET_DIR}/boot/version-num.txt
 echo "$BRBOX_SYSCONFIG" > ${TARGET_DIR}/boot/sysconfig.txt
 rm -rf ${TARGET_DIR}/etc/avahi/services/http.service
