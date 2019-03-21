@@ -40,6 +40,8 @@ PrintLcdMsg line2 "   step-2-of-12   "
 printf "writing image to disk.......... "
 xzcat -d $DISK_IMAGE | dd of=/dev/sdb bs=1M 1>/dev/null 2>/dev/null
 test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
+sync
+sleep 1
 ###############################################################################
 PrintLcdMsg line2 "   step-3-of-12   "
 printf "syncing disk................... "
@@ -53,6 +55,8 @@ do
 	umount $f 1>/dev/null 2>/dev/null
 done
 echo "[OK]"
+sync
+sleep 1
 ###############################################################################
 #PrintLcdMsg line2 "   step-8-of-12   "
 #printf "formatting partition /dev/sda6. "
@@ -64,6 +68,8 @@ sgdisk -N 5 /dev/sdb 1>/dev/null 2>/dev/null
 umount /dev/sdb2 1>/dev/null 2>/dev/null
 umount /dev/sdb3 1>/dev/null 2>/dev/null
 
+sync
+sleep 1
 #partprobe /dev/sdb   1>/dev/null 2>/dev/null
 
 printf "unmounting partitions again.... "
@@ -73,16 +79,35 @@ do
 done
 echo "[OK]"
 
-e2fsck -f /dev/sdb5  1>/dev/null 2>/dev/null
+sync
+sleep 5
+
+umount /dev/sdb* 1>/dev/null 2>/dev/null
+
+sync
+sleep 5
+
+umount /dev/sdb* 1>/dev/null 2>/dev/null
+
+sync
+sleep 1
+
+e2fsck -f /dev/sdb5  #1>/dev/null 2>/dev/null
+
+sync 
+sleep 1
 
 for f in `ls /dev/sdb*`
 do
 	umount $f 1>/dev/null 2>/dev/null
 done
 
+sync
+sleep 1
+
 PrintLcdMsg line2 "   step-5-of-12   "
 printf "expanding userdata ............ "
-resize2fs /dev/sdb5 1>/dev/null 2>/dev/null
+resize2fs /dev/sdb5 #1>/dev/null 2>/dev/null
 test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 exit 0
 ###############################################################################
