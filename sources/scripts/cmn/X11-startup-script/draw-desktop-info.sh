@@ -6,6 +6,7 @@
 BKGND_IMAGE=/etc/X11/logo.png #/tmp/bkgnd.jpg # /etc/X11/logo.png
 OUTPUT_IMAGE=/tmp/desktop-screen.jpg
 INFO_COLOR=lime #black
+ETHIF=$(ifconfig|grep HWaddr|awk '{print $1}') #eth0
 #export DISPLAY=:0.0
 
 # Create white background image
@@ -14,7 +15,7 @@ INFO_COLOR=lime #black
 # Create IP image
 #convert $BKGND_IMAGE -pointsize 30 -fill black -draw "text 0,30 'IPv4: $(ip -4 a s eth0 | grep -Eo 'inet [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | awk '{print $2}')'" -fill black -draw "text -0,60 'Hostname: $(uname -n)'" -pointsize 30 -draw "text -0,90 'Date $(date)'" $OUTPUT_IMAGE
 
-convert $BKGND_IMAGE -pointsize 30 -fill $INFO_COLOR -draw "text 0,30 'IPv4: $(ip -4 a s eth0 | grep -Eo 'inet [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | awk '{print $2}')'" -fill $INFO_COLOR -draw "text -0,60 'Version: $(cat /boot/version-num.txt)'" $OUTPUT_IMAGE
+convert $BKGND_IMAGE -pointsize 30 -fill $INFO_COLOR -draw "text 0,30 'IPv4: $(ip -4 a s $ETHIF | grep -Eo 'inet [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | awk '{print $2}')'" -fill $INFO_COLOR -draw "text -0,60 'Version: $(cat /boot/version-num.txt)'" $OUTPUT_IMAGE
 
 #feh $OUTPUT_IMAGE  
 
