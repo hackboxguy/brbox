@@ -1,0 +1,64 @@
+#!/bin/sh
+#
+# Starts dropbear sshd.
+#
+
+# Make sure the dropbearkey progam exists
+[ -f /usr/bin/dropbearkey ] || exit 0
+[ -f /usr/sbin/dropbear   ] || exit 0
+
+# Path to writable etc directory
+CONFIG_PATH=/mnt/settings
+
+start() {
+ 	echo -n "Starting dropbear sshd: "
+	# Make sure dropbear directory exists
+	if [ ! -d ${CONFIG_PATH}/etc/dropbear ] ; then
+		mkdir -p ${CONFIG_PATH}/etc/dropbear
+	fi
+	# Check for the Dropbear RSA key
+	if [ ! -f ${CONFIG_PATH}/etc/dropbear/dropbear_rsa_host_key ] ; then
+		echo -n "generating rsa key... "
+		/usr/bin/dropbearkey -t rsa -f ${CONFIG_PATH}/etc/dropbear/dropbear_rsa_host_key > /dev/null 2>&1
+		sync
+	fi
+
+	# Check for the Dropbear DSS key
+	if [ ! -f ${CONFIG_PATH}/etc/dropbear/dropbear_dss_host_key ] ; then
+		echo -n "generating dsa key... "
+		/usr/bin/dropbearkey -t dss -f ${CONFIG_PATH}/etc/dropbear/dropbear_dss_host_key > /dev/null 2>&1
+		sync
+	fi
+	umask 077
+	start-stop-daemon -S -q -p /var/run/dropbear.pid --exec /usr/sbin/dropbear -- -d ${CONFIG_PATH}/etc/dropbear/dropbear_dss_host_key -r ${CONFIG_PATH}/etc/dropbear/dropbear_rsa_host_key -j -k
+	[ $? = 0 ] && echo "OK" || echo "FAIL"
+}
+
+stop() {
+	echo -n "Stopping dropbear sshd: "
+	start-stop-daemon -K -q -p /var/run/dropbear.pid
+	[ $? = 0 ] && echo "OK" || echo "FAIL"
+}
+
+restart() {
+	stop
+	start
+}
+
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
+  	stop
+	;;
+  restart|reload)
+  	restart
+	;;
+  *)
+	echo $"Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
+
