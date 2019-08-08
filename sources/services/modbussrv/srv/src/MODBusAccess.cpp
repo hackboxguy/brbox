@@ -21,7 +21,7 @@ MODBusAccess::MODBusAccess(std::string DevNode,bool debuglog,int baud,char parit
 	LogFlag=debuglog;
 
 	node=DevNode;
-	DevOpened=InitModbus(node.c_str(),baud,parity,stopbits,false);//9600,'N',1,false);
+	DevOpened=InitModbus(node.c_str(),baud,parity,stopbits,LogFlag);//false);//9600,'N',1,false);
 	if(DevOpened==RPC_SRV_RESULT_SUCCESS)
 	{
 		if(LogFlag)
@@ -123,6 +123,7 @@ RPC_SRV_RESULT MODBusAccess::getEnergyParam(EJSON_ENRGYPARM type,std::string &re
 		case EJSON_ENRGYPARM_TOTAL_REACT  :addr=TRENERGY ;break;
 		default: return RPC_SRV_RESULT_ARG_ERROR;
 	}
+
 	//read the parameter over modbus
 	RPC_SRV_RESULT res=getMeasureFloat(ctx, addr, 1, 2,param_value);//addr
 	char tmpstr[255];
@@ -159,7 +160,7 @@ RPC_SRV_RESULT MODBusAccess::getMeasureFloat(modbus_t *ctx, int address, int ret
 	{
 		if(LogFlag)
 			printf("MODBusAccess::getMeasureFloat: modbus_read_input_registers failed\n");
-		return RPC_SRV_RESULT_FAIL;;
+		return RPC_SRV_RESULT_FAIL;
 	}
 	// swap LSB and MSB
 	uint16_t tmp1 = tab_reg[0];
@@ -169,6 +170,39 @@ RPC_SRV_RESULT MODBusAccess::getMeasureFloat(modbus_t *ctx, int address, int ret
 
 	result = modbus_get_float(&tab_reg[0]);
 	return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+//return write_register(ctx, 1, 1, 0x0300);//toggle single relay having slave addr=1
+//return write_register(ctx, 1, 1, 0x0100);//switch-ON single relay having slave addr=1
+//return write_register(ctx, 1, 1, 0x0200);//switch-OFF single relay having slave addr=1
+//uint16_t tmp_value;return read_register(ctx,  1, 1, &tmp_value);//read switch state of single relay having slave addr=1
+//bin/modbusclt --relay=1,1,on
+//bin/modbusclt --relay=1,1,off
+//bin/modbusclt --relay=1,1,toggle
+//bin/modbusclt --relay=1,1
+RPC_SRV_RESULT MODBusAccess::write_register(modbus_t *ctx, uint16_t slave, uint16_t address, uint16_t value)
+{
+	modbus_set_slave(ctx, slave);
+	if(modbus_write_register(ctx, address, value) == 1)
+		return RPC_SRV_RESULT_SUCCESS;
+	else
+		return RPC_SRV_RESULT_FAIL;
+}
+RPC_SRV_RESULT MODBusAccess::read_register(modbus_t *ctx, uint16_t slave, uint16_t address, uint16_t *value)
+{
+	int nb=1;
+	uint16_t tab_reg[nb * sizeof(uint16_t)];
+	modbus_set_slave(ctx, slave);
+	int res=modbus_read_registers(ctx, address,nb, tab_reg);
+	if(res==-1)
+		return RPC_SRV_RESULT_FAIL;
+	else
+	{
+		//TODO: check exact number of bytes read
+		*value=tab_reg[0];
+		printf("res=%d value=%04X\n",res,tab_reg[0]);
+		return RPC_SRV_RESULT_SUCCESS;
+	}
 }
 /* ------------------------------------------------------------------------- */
 //how to set new baud rate
