@@ -20,6 +20,14 @@ public:
 	int json_to_bin_energyparm_get(JsonDataCommObj* pReq);
 	int bin_to_json_energyparm_get(JsonDataCommObj* pReq);
 	int process_energyparm_get(JsonDataCommObj* pReq);
+
+	int json_to_bin_iostate_get(JsonDataCommObj* pReq);
+	int bin_to_json_iostate_get(JsonDataCommObj* pReq);
+	int process_iostate_get(JsonDataCommObj* pReq);
+	int json_to_bin_iostate_set(JsonDataCommObj* pReq);
+	int bin_to_json_iostate_set(JsonDataCommObj* pReq);
+	int process_iostate_set(JsonDataCommObj* pReq);
+
 };
 /* ------------------------------------------------------------------------- */
 

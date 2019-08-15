@@ -20,7 +20,9 @@ public:
 	int push_energy_param_command(char* subarg);
 	int run_energy_param_command(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,
 				     ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);
-
+	int push_modbus_iostatecmd(char* subarg);
+	int run_modbus_iostatecmd(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,
+				     ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);
 
 };
 #endif

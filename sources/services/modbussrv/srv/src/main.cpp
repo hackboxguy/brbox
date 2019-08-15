@@ -46,9 +46,15 @@ int main(int argc, const char* argv[])
 
 	/****************************RPC list*************************************/
 	ModbusRpc EnergyParamGet(MODBUSSRV_RPC_ENRGYPARM_GET ,EJSON_MODBUSSRV_RPC_ENRGYPARM_GET ,emulat,dbglog,&DataCache);
+	ModbusRpc IoStateGet(MODBUSSRV_RPC_IOSTATE_GET   ,EJSON_MODBUSSRV_RPC_IOSTATE_GET   ,emulat,dbglog,&DataCache);
+	ModbusRpc IoStateSet(MODBUSSRV_RPC_IOSTATE_SET   ,EJSON_MODBUSSRV_RPC_IOSTATE_SET   ,emulat,dbglog,&DataCache);
+
 //	Pcf8574Rpc PCF8574Set(I2CSRV_RPC_PCF8574_SET ,EJSON_I2CSRV_RPC_PCF8574_SET ,emulat,dbglog,&DataCache);
 
 	RpcMgr.AttachRpc(&EnergyParamGet);
+	RpcMgr.AttachRpc(&IoStateGet);
+	RpcMgr.AttachRpc(&IoStateSet);
+
 //	RpcMgr.AttachRpc(&PCF8574Set);
 
 	//common rpc hadler object(eg: trigger-data-save/store-factory/restore-factory..etc)

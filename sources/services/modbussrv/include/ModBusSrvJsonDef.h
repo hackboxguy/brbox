@@ -10,7 +10,8 @@ typedef enum EJSON_MODBUSSRV_RPC_TYPES_T
 {
 	EJSON_MODBUSSRV_RPC_MODBUS_INIT,
 	EJSON_MODBUSSRV_RPC_ENRGYPARM_GET, //read energy parameter
-
+	EJSON_MODBUSSRV_RPC_IOSTATE_GET,
+	EJSON_MODBUSSRV_RPC_IOSTATE_SET,
 	EJSON_MODBUSSRV_RPC_END,
 	EJSON_MODBUSSRV_RPC_NONE
 }EJSON_MODBUSSRV_RPC_TYPES;
@@ -47,6 +48,26 @@ typedef struct MODBUSSRV_ENRGYPARM_ACCESS_PACKET_T
 	EJSON_ENRGYPARM param_type;
 	char parameter[255];
 }MODBUSSRV_ENRGYPARM_ACCESS_PACKET;
+/* ------------------------------------------------------------------------- */
+#define MODBUSSRV_RPC_IOSTATE_GET           "modbus_iostate_get"
+#define MODBUSSRV_RPC_IOSTATE_SET           "modbus_iostate_set"
+#define MODBUSSRV_RPC_IOSTATE_ARG           "state"
+#define MODBUSSRV_RPC_IOSTATE_ARG_TABL      {"off","on","unknown","none","\0"}
+#define MODBUSSRV_RPC_IOSTATE_SLAVEADDR_ARG "slaveaddr"
+#define MODBUSSRV_RPC_IOSTATE_IOADDR_ARG    "ioaddr"
+typedef enum EJSON_IOSTATE_T
+{
+	EJSON_IOSTATE_OFF,
+	EJSON_IOSTATE_ON,
+	EJSON_IOSTATE_UNKNOWN,
+	EJSON_IOSTATE_NONE
+}EJSON_IOSTATE;
+typedef struct MODBUSSRV_IO_ACCESS_PACKET_T
+{
+	int slaveaddr;
+	int ioaddr;
+	EJSON_IOSTATE state;
+}MODBUSSRV_IO_ACCESS_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to modbus-server here
 typedef struct MODBUSSRV_CMN_DATA_CACHE_T

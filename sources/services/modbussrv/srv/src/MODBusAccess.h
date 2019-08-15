@@ -31,15 +31,15 @@ class MODBusAccess
 	int fd;
 	std::string node;
 	RPC_SRV_RESULT DevOpened;
-	modbus_t *ctx;
 	RPC_SRV_RESULT getMeasureFloat(modbus_t *ctx, int address, int retries, int nb,float &result);
-	RPC_SRV_RESULT write_register(modbus_t *ctx, uint16_t slave, uint16_t address, uint16_t value);
-	RPC_SRV_RESULT read_register(modbus_t *ctx, uint16_t slave, uint16_t address, uint16_t *value);
 public:
+	modbus_t *ctx;
 	bool LogFlag;
 	MODBusAccess(std::string DevNode,bool debuglog=false,int baud=9600,char parity='N',int stopbits=1);
 	~MODBusAccess();
 	RPC_SRV_RESULT InitModbus(const char* devnode,int baud,char parity,int stop_bits,bool debug=false);
 	RPC_SRV_RESULT getEnergyParam(EJSON_ENRGYPARM,std::string &result);
+	RPC_SRV_RESULT write_register(modbus_t *ctx, uint16_t slave, uint16_t address, uint16_t value);
+	RPC_SRV_RESULT read_register(modbus_t *ctx, uint16_t slave, uint16_t address, uint16_t *value);
 };
 #endif
