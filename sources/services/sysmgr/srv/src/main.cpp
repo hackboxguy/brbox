@@ -12,6 +12,7 @@
 #include "DevIdentRaspiAZero.h"
 #include "DevIdentNexx3020.h"
 #include "DevIdentA5V11.h"
+#include "DevIdentGlMt300nv2.h"
 /* ------------------------------------------------------------------------- */
 #include "I2CDualPcfLcd.hpp"
 #include "I2CPcfLcd.hpp"
@@ -209,6 +210,7 @@ DevIdent* create_dev_ident_object(ADCMN_BOARD_TYPE board_type)
 		case ADCMN_BOARD_TYPE_RASPI_3      :pDevice = new DevIdentRaspiAZero;break;
 		case ADCMN_BOARD_TYPE_A5_V11       :pDevice = new DevIdentA5V11;break;
 		case ADCMN_BOARD_TYPE_NEXX_3020    :pDevice = new DevIdentNexx3020;break;
+		case ADCMN_BOARD_TYPE_GL_MT300NV2  :pDevice = new DevIdentGlMt300nv2;break;
 		default: break;
 	}
 	return pDevice;

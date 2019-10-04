@@ -16,7 +16,7 @@ GpioCltCmdline::GpioCltCmdline()
 	CmdlineHelper.insert_options_entry((char*)"omxact" ,optional_argument,EJSON_GPIOCTL_RPC_OMXACT_GET);
 	CmdlineHelper.insert_help_entry((char*)"--omxact=type              [get/set omx player action, type=<start/intr/stop/warn/idle>]");
 	CmdlineHelper.insert_options_entry((char*)"showimg" ,optional_argument,EJSON_MPLAYSRV_RPC_SHOWFBIMG_GET);
-	CmdlineHelper.insert_help_entry((char*)"--showimg=imagefilepath    [get/set image showing on the screen]");
+	CmdlineHelper.insert_help_entry((char*)"--showimg=imagefilepath    [get/set image showing on the screen,<none> for remove]");
 
 	CmdlineHelper.insert_help_entry((char*)"--qrcode=imgfile,qr-string [converts given qr-string to qrcode-png-image file]");
 	CmdlineHelper.insert_options_entry((char*)"qrcode" ,optional_argument,EJSON_MPLAYSRV_RPC_QRCODEIMG_SET);

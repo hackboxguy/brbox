@@ -28,6 +28,7 @@ bool SysRpc::openwrt_system(void)
 	{
 		case ADCMN_BOARD_TYPE_A5_V11    :return true;
 		case ADCMN_BOARD_TYPE_NEXX_3020 :return true;
+		case ADCMN_BOARD_TYPE_GL_MT300NV2:return true;
 		default: return false;
 	}
 }
