@@ -6,6 +6,12 @@ using namespace std;
 /* ------------------------------------------------------------------------- */
 DevIdentGlMt300nv2::DevIdentGlMt300nv2()
 {
+	//on startup Keep the power and wan LED off
+	char command[255];
+	sprintf(command,"echo 0 > /sys/class/leds/gl-mt300n-v2\\:green\\:power/brightness");
+	system(command);
+	sprintf(command,"echo 0 > /sys/class/leds/gl-mt300n-v2\\:green\\:wan/brightness");
+	system(command);
 }
 /* ------------------------------------------------------------------------- */
 DevIdentGlMt300nv2::~DevIdentGlMt300nv2()
@@ -28,7 +34,7 @@ RPC_SRV_RESULT DevIdentGlMt300nv2::device_identify()
 		usleep(250000);
 	}
 
-	//switch the blue led to ON
+	//Keep the power LED off
 	sprintf(command,"echo 0 > /sys/class/leds/gl-mt300n-v2\\:green\\:power/brightness");
 	if(system(command)!=0)
 	{
