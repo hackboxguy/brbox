@@ -5,6 +5,7 @@ CPU_TYPE_RP3="0xd03" #a02082
 #Board types supported by BrBox
 BD_TYP_RASPI_3="RASPI_3"
 BD_TYP_RASPI_0="RASPI_0"
+BD_TYP_RASPI_0W="RASPI_0W"
 BD_TYP_RASPI_A="RASPI_A"
 BD_TYP_RASPI_APLUS="RASPI_APLUS"
 BD_TYP_RASPI_B="RASPI_B"
@@ -46,6 +47,7 @@ ReadRaspiType()
 
 	[ "$RESULT" = "0010" ]  && { echo $BD_TYP_RASPI_BPLUS; return 0; }
 	[ "$RESULT" = "900093" ]  && { echo $BD_TYP_RASPI_0; return 0; }
+	[ "$RESULT" = "9000c1" ]  && { echo $BD_TYP_RASPI_0W; return 0; }
 	[ "$RESULT" = "a02082" ]  && { echo $BD_TYP_RASPI_3; return 0; }
 	
 	echo "$BD_TYP_DEFAULT"
