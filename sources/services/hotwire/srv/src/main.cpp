@@ -116,6 +116,7 @@ MPlayer* create_media_player(ADCMN_BOARD_TYPE Type,std::string edid_node)
 		case ADCMN_BOARD_TYPE_RASPI_BPLUS:
 		case ADCMN_BOARD_TYPE_RASPI_B2:
 		case ADCMN_BOARD_TYPE_RASPI_0:
+		case ADCMN_BOARD_TYPE_RASPI_0W:
 		case ADCMN_BOARD_TYPE_RASPI_3:pPlayer = new MPlayRaspi(edid_node);break;
 		case ADCMN_BOARD_TYPE_X86_64:
 		case ADCMN_BOARD_TYPE_X86_32:
