@@ -143,7 +143,7 @@ int ADCmdlineHelper::init_myself()
 		insert_help_entry((char*)"--settings=filepath        (settings text filepath to be loaded and stored)");
 
 		insert_options_entry((char*)"boardtype" ,optional_argument,'f',1);
-		insert_help_entry((char*)"--boardtype=[RASPI_0/RASPI_A/RASPI_APLUS/RASPI_B/RASPI_BPLUS/RASPI_B2/BAYTRAIL/BAYTRAIL_I210] (pass cpu board type to service)");
+		insert_help_entry((char*)"--boardtype=[RASPI_0/RASPI_0W,RASPI_A/RASPI_APLUS/RASPI_B/RASPI_BPLUS/RASPI_B2/BAYTRAIL/BAYTRAIL_I210] (pass cpu board type to service)");
 	
 	}
 	return 0;
