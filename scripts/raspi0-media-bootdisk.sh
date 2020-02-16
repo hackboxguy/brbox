@@ -39,6 +39,8 @@ ROOT2MOUNTPOINT=$(mktemp -d)
 STTNGMOUNTPOINT=$(mktemp -d)
 BOOT_MARKER_RPI=$(pwd)/sources/scripts/raspi2/boot/cmdline.txt #kernel cmdline args file 
 BOOT_CONFIG_RPI=$(pwd)/sources/scripts/raspi2/boot/config.txt
+SAMPLE_MEDIA=$(pwd)/sources/sample-media/sample-video.mkv
+CUSTOM_STARTUP=$(pwd)/sources/scripts/custom-startups/rc.local
 printf "creating image file ..................................... "
     fallocate -l "$IMAGESIZE" "$IMAGENAME" >/dev/null
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
@@ -55,10 +57,10 @@ printf "Creating loopdevice ..................................... "
 sudo parted -s $LOOPDEVICE mklabel msdos
 sudo parted -s $LOOPDEVICE mkpart primary fat32 0% 5%    #boot-partition
 sudo parted -s $LOOPDEVICE set 1 boot on  
-sudo parted -s $LOOPDEVICE mkpart primary ext3 5% 45%    #root1-partition
-sudo parted -s $LOOPDEVICE mkpart primary 45% 85%        #root2-partition
-sudo parted -s $LOOPDEVICE mkpart extended 85% 100%      #extended-partition
-sudo parted -s $LOOPDEVICE mkpart logical  ext3 85% 98%  #settings-partition
+sudo parted -s $LOOPDEVICE mkpart primary ext3 5% 40%    #root1-partition
+sudo parted -s $LOOPDEVICE mkpart primary 40% 75%        #root2-partition
+sudo parted -s $LOOPDEVICE mkpart extended 75% 100%      #extended-partition
+sudo parted -s $LOOPDEVICE mkpart logical  ext3 75% 98%  #settings-partition
 sudo parted -s $LOOPDEVICE mkpart logical  ext3 98% 100%
 
 ####################format the partitions############################
@@ -115,7 +117,8 @@ printf "copying root2 files - this may take some time ........... "
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "copying settings files - this may take some time ........ "
-    $SUDO cp $RPI_DTB "$STTNGMOUNTPOINT" #TODO: copy binaries here
+    $SUDO cp $SAMPLE_MEDIA "$STTNGMOUNTPOINT" #copy sample media file to settings partition
+    $SUDO cp $CUSTOM_STARTUP "$STTNGMOUNTPOINT" #copy startup script to settings partition
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 ##################unmount the partitions############################

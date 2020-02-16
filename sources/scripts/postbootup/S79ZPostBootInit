@@ -3,11 +3,16 @@
 # after linux boot, this script will run custom script as a last step for initialization
 #
 CUSTOM_POST_INIT_SCRIPT_PRIMARY=/mnt/userdata/rc.local
-CUSTOM_POST_INIT_SCRIPT=/media/usb0/rc.local
+CUSTOM_POST_INIT_SCRIPT_SECONDARY=/media/usb0/rc.local
+CUSTOM_POST_INIT_SCRIPT=/mnt/settings/rc.local
 start() {
-	#first check of custom rc.local in sdcard's userdata partition, if not there then check for usb
+	#first check of custom rc.local in sdcard's userdata partition, if not there then check for usb else settings partition
         if [ -f "$CUSTOM_POST_INIT_SCRIPT_PRIMARY" ]; then
 		cp $CUSTOM_POST_INIT_SCRIPT_PRIMARY /tmp/rc.local
+		chmod +x /tmp/rc.local
+		sh -c /tmp/rc.local
+        elif [ -f "$CUSTOM_POST_INIT_SCRIPT_SECONDARY" ]; then
+		cp $CUSTOM_POST_INIT_SCRIPT_SECONDARY /tmp/rc.local
 		chmod +x /tmp/rc.local
 		sh -c /tmp/rc.local
         elif [ -f "$CUSTOM_POST_INIT_SCRIPT" ]; then
