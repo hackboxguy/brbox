@@ -57,10 +57,10 @@ printf "Creating loopdevice ..................................... "
 sudo parted -s $LOOPDEVICE mklabel msdos
 sudo parted -s $LOOPDEVICE mkpart primary fat32 0% 5%    #boot-partition
 sudo parted -s $LOOPDEVICE set 1 boot on  
-sudo parted -s $LOOPDEVICE mkpart primary ext3 5% 40%    #root1-partition
-sudo parted -s $LOOPDEVICE mkpart primary 40% 75%        #root2-partition
-sudo parted -s $LOOPDEVICE mkpart extended 75% 100%      #extended-partition
-sudo parted -s $LOOPDEVICE mkpart logical  ext3 75% 98%  #settings-partition
+sudo parted -s $LOOPDEVICE mkpart primary ext3 5% 35%    #root1-partition
+sudo parted -s $LOOPDEVICE mkpart primary 35% 65%        #root2-partition
+sudo parted -s $LOOPDEVICE mkpart extended 65% 100%      #extended-partition
+sudo parted -s $LOOPDEVICE mkpart logical  ext3 65% 98%  #settings-partition
 sudo parted -s $LOOPDEVICE mkpart logical  ext3 98% 100%
 
 ####################format the partitions############################
@@ -117,7 +117,8 @@ printf "copying root2 files - this may take some time ........... "
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "copying settings files - this may take some time ........ "
-    $SUDO cp $SAMPLE_MEDIA "$STTNGMOUNTPOINT" #copy sample media file to settings partition
+    $SUDO mkdir -p "$STTNGMOUNTPOINT/media-files"
+    $SUDO cp $SAMPLE_MEDIA "$STTNGMOUNTPOINT/media-files/" #copy sample media file to settings partition
     $SUDO cp $CUSTOM_STARTUP "$STTNGMOUNTPOINT" #copy startup script to settings partition
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
