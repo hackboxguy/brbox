@@ -1,0 +1,9 @@
+config BR2_PACKAGE_BRBOX_FIM
+	bool "fim - fbv improved image viewer"
+	default n
+	help
+	  Dmidecode reports information about your system's hardware
+	  as described in your system BIOS according to the SMBIOS/DMI
+	  standard.
+
+	  http://www.nongnu.org/dmidecode/

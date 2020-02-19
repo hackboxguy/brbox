@@ -47,6 +47,7 @@ source "package/brbox/brbox_hellovideo/Config.in"
 source "package/brbox/brbox_postbootup/Config.in"
 source "package/brbox/brbox_preparebootdisk/Config.in"
 source "package/brbox/brbox_gphoto2/Config.in"
+source "package/brbox/brbox_fim/Config.in"
 endmenu
 endif
 
