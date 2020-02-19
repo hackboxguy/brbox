@@ -242,7 +242,7 @@ RPC_SRV_RESULT MPlayX86::set_media_action(MPLAYSRV_MEDIA_ACTION act)
 					//	sprintf(command,"echo . > /tmp/omxplay.fifo");
 					//}
 					//else
-					sprintf(command,"gst-loop.sh %s &",MediaFile.c_str());
+					sprintf(command,"/opt/fmw/bin/gst-loop.sh %s &",MediaFile.c_str());
 					system(command);
 				}
 				//system(command);

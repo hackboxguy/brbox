@@ -178,7 +178,7 @@ RPC_SRV_RESULT MPlayRaspi::set_media_action(MPLAYSRV_MEDIA_ACTION act)
 						sprintf(command,"echo . > /tmp/omxplay.fifo");
 					}
 					else
-						sprintf(command,"omx-loop.sh %s &",MediaFile.c_str());
+						sprintf(command,"/opt/fmw/bin/omx-loop.sh %s &",MediaFile.c_str());
 				}
 				system(command);
 				//VideoPaused=false;
