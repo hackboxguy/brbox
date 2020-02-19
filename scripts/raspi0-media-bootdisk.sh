@@ -112,9 +112,9 @@ printf "copying root1 files - this may take some time ........... "
     $SUDO tar -C "$ROOTMOUNTPOINT" -Jxf "$ROOTFS"
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
-printf "copying root2 files - this may take some time ........... "
-    $SUDO tar -C "$ROOT2MOUNTPOINT" -Jxf "$ROOTFS"
-    test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
+#printf "copying root2 files - this may take some time ........... "
+#    $SUDO tar -C "$ROOT2MOUNTPOINT" -Jxf "$ROOTFS"
+#    test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "copying settings files - this may take some time ........ "
     $SUDO mkdir -p "$STTNGMOUNTPOINT/media-files"
