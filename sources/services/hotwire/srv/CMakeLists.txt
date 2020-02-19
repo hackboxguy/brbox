@@ -33,7 +33,7 @@ target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pth
 file(GLOB  INCFILES "${INC_SRVCOMMN}/*.*")
 install(TARGETS ${COMPONENT_NAME} DESTINATION bin)
 install(PROGRAMS ${STARTUP_SCRIPT} DESTINATION etc/init.d) #copy server's startup script to init.d
-install(PROGRAMS ${MPLAYER_SCRIPT_FILES} DESTINATION usr/bin/)
+install(PROGRAMS ${MPLAYER_SCRIPT_FILES} DESTINATION bin/)
 if(${INSTALL_MY_HEADERS})
 	install(FILES ${INCFILES} DESTINATION include)
 endif()
