@@ -37,6 +37,7 @@ BOOTMOUNTPOINT=$(mktemp -d)
 ROOTMOUNTPOINT=$(mktemp -d)
 ROOT2MOUNTPOINT=$(mktemp -d)
 STTNGMOUNTPOINT=$(mktemp -d)
+USERDATMOUNTPOINT=$(mktemp -d)
 BOOT_MARKER_RPI=$(pwd)/sources/scripts/raspi2/boot/cmdline.txt #kernel cmdline args file 
 BOOT_CONFIG_RPI=$(pwd)/sources/scripts/raspi2/boot/config.txt
 SAMPLE_MEDIA=$(pwd)/sources/sample-media/sample-video.mkv
@@ -55,13 +56,13 @@ printf "Creating loopdevice ..................................... "
 
 ####################create the partitions############################
 sudo parted -s $LOOPDEVICE mklabel msdos
-sudo parted -s $LOOPDEVICE mkpart primary fat32 0% 36%  #large-boot-partition to store media files
+sudo parted -s $LOOPDEVICE mkpart primary fat32 0% 5%     #boot partition
 sudo parted -s $LOOPDEVICE set 1 boot on  
-sudo parted -s $LOOPDEVICE mkpart primary ext3 36% 66%    #root1-partition
-sudo parted -s $LOOPDEVICE mkpart primary 66% 96%        #root2-partition
-sudo parted -s $LOOPDEVICE mkpart extended 96% 100%      #extended-partition
-sudo parted -s $LOOPDEVICE mkpart logical  ext3 96% 98%  #settings-partition
-sudo parted -s $LOOPDEVICE mkpart logical  ext3 98% 100%
+sudo parted -s $LOOPDEVICE mkpart primary ext3 5% 35%     #root1-partition
+sudo parted -s $LOOPDEVICE mkpart primary 35% 65%         #root2-partition
+sudo parted -s $LOOPDEVICE mkpart extended 65% 100%       #extended-partition
+sudo parted -s $LOOPDEVICE mkpart logical  ext3 65% 68%   #settings-partition
+sudo parted -s $LOOPDEVICE mkpart logical  fat32 68% 100% #userdata-partition
 
 ####################format the partitions############################
 printf "Formating boot partition ................................ "
@@ -77,11 +78,15 @@ printf "Formating root2 partition ............................... "
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 #note: /dev/loop0p4 is allocated to extended partition
+#note: /dev/loop0p5 is allocated to settomgs partition
 printf "Formating settings partition ............................ "
     $SUDO mkfs.ext3 -L $STTNG_LABEL "${LOOPDEVICE}p5" 1>/dev/null 2>/dev/null
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
-#note: /dev/loop0p6 is allocated to userdata partition
 
+#note: /dev/loop0p6 is allocated to userdata partition
+printf "Formating userdat partition  ............................ "
+    $SUDO mkfs.vfat -n $USRDAT_LABEL "${LOOPDEVICE}p6" 1>/dev/null 2>/dev/null
+    test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 ####################mount the partitions############################
 printf "Mounting loopdevice boot partition ...................... "
     $SUDO mount "${LOOPDEVICE}p1" "$BOOTMOUNTPOINT"
@@ -99,6 +104,9 @@ printf "Mounting loopdevice settings partition .................. "
     $SUDO mount "${LOOPDEVICE}p5" "$STTNGMOUNTPOINT"
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
+printf "Mounting loopdevice userdata partition .................. " 
+    $SUDO mount "${LOOPDEVICE}p6" "$USERDATMOUNTPOINT"
+    test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 ##################copy data to partitions#########################
 printf "copying boot files - this may take some time ............ "
     $SUDO cp $RPI_FMW_DIR/* "$BOOTMOUNTPOINT" 1>/dev/null 2>/dev/null
@@ -106,11 +114,12 @@ printf "copying boot files - this may take some time ............ "
     $SUDO cp $RPI_DTB "$BOOTMOUNTPOINT"
     $SUDO cp $BOOT_MARKER_RPI "$BOOTMOUNTPOINT"
     $SUDO cp $BOOT_CONFIG_RPI "$BOOTMOUNTPOINT"
+
     #copy sample media files and auto-play-startup script
-    $SUDO mkdir -p "$BOOTMOUNTPOINT/media-files"
-    $SUDO mkdir -p "$BOOTMOUNTPOINT/image-files"
-    $SUDO cp $SAMPLE_MEDIA "$BOOTMOUNTPOINT/media-files/" #copy sample mkv file for autoplay
-    $SUDO cp $CUSTOM_STARTUP "$BOOTMOUNTPOINT" #copy startup script to settings partition
+    #$SUDO mkdir -p "$BOOTMOUNTPOINT/media-files"
+    #$SUDO mkdir -p "$BOOTMOUNTPOINT/image-files"
+    #$SUDO cp $SAMPLE_MEDIA "$BOOTMOUNTPOINT/media-files/" #copy sample mkv file for autoplay
+    #$SUDO cp $CUSTOM_STARTUP "$BOOTMOUNTPOINT" #copy startup script to settings partition
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "copying root1 files - this may take some time ........... "
@@ -125,6 +134,12 @@ printf "copying settings files - this may take some time ........ "
     #$SUDO mkdir -p "$STTNGMOUNTPOINT/media-files"
     #$SUDO cp $SAMPLE_MEDIA "$STTNGMOUNTPOINT/media-files/" #copy sample media file to settings partition
     #$SUDO cp $CUSTOM_STARTUP "$STTNGMOUNTPOINT" #copy startup script to settings partition
+    test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
+
+printf "copying userdata files - this may take some time ........ "
+    $SUDO mkdir -p "$USERDATMOUNTPOINT/media-files"
+    $SUDO cp $SAMPLE_MEDIA "$USERDATMOUNTPOINT/media-files/" #copy sample media file to settings partition
+    $SUDO cp $CUSTOM_STARTUP "$USERDATMOUNTPOINT" #copy startup script to settings partition
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 ##################unmount the partitions############################
@@ -146,6 +161,11 @@ printf "copying settings files - this may take some time ........ "
  printf "unmounting and deleting mountpoint3 %s .." "$STTNGMOUNTPOINT"
      $SUDO umount "$STTNGMOUNTPOINT"
      rm -rf "$STTNGMOUNTPOINT" 
+     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
+
+ printf "unmounting and deleting mountpoint4 %s .." "$USERDATMOUNTPOINT"
+     $SUDO umount "$USERDATMOUNTPOINT"
+     rm -rf "$USERDATMOUNTPOINT" 
      test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
  printf "syncing ................................................. "
