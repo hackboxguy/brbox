@@ -4,7 +4,7 @@
 #
 # start playing media file (mplayclt is a client that sends json-rpc over tcp to mplaysrv)
 /opt/fmw/bin/mplayclt --pattern=blue #after boot, show momentory blue screen
-/opt/fmw/bin/mplayclt --mfile=/mnt/settings/media-files/sample-video.mkv #change the media-file of your choice
+/opt/fmw/bin/mplayclt --mfile=/mnt/userdata/media-files/sample-video.mkv #change the media-file of your choice
 /opt/fmw/bin/mplayclt --mloop=enable #media keeps playing in a loop
 /opt/fmw/bin/mplayclt --seamlessloop=disable #enable needs .h264 file(no conatainer format, just raw h264 video)
 /opt/fmw/bin/mplayclt --maction=start #start playing the media file
