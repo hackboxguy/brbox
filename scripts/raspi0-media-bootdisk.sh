@@ -55,12 +55,12 @@ printf "Creating loopdevice ..................................... "
 
 ####################create the partitions############################
 sudo parted -s $LOOPDEVICE mklabel msdos
-sudo parted -s $LOOPDEVICE mkpart primary fat32 0% 5%    #boot-partition
+sudo parted -s $LOOPDEVICE mkpart primary fat32 0% 36%  #large-boot-partition to store media files
 sudo parted -s $LOOPDEVICE set 1 boot on  
-sudo parted -s $LOOPDEVICE mkpart primary ext3 5% 35%    #root1-partition
-sudo parted -s $LOOPDEVICE mkpart primary 35% 65%        #root2-partition
-sudo parted -s $LOOPDEVICE mkpart extended 65% 100%      #extended-partition
-sudo parted -s $LOOPDEVICE mkpart logical  ext3 65% 98%  #settings-partition
+sudo parted -s $LOOPDEVICE mkpart primary ext3 36% 66%    #root1-partition
+sudo parted -s $LOOPDEVICE mkpart primary 66% 96%        #root2-partition
+sudo parted -s $LOOPDEVICE mkpart extended 96% 100%      #extended-partition
+sudo parted -s $LOOPDEVICE mkpart logical  ext3 96% 98%  #settings-partition
 sudo parted -s $LOOPDEVICE mkpart logical  ext3 98% 100%
 
 ####################format the partitions############################
@@ -106,6 +106,11 @@ printf "copying boot files - this may take some time ............ "
     $SUDO cp $RPI_DTB "$BOOTMOUNTPOINT"
     $SUDO cp $BOOT_MARKER_RPI "$BOOTMOUNTPOINT"
     $SUDO cp $BOOT_CONFIG_RPI "$BOOTMOUNTPOINT"
+    #copy sample media files and auto-play-startup script
+    $SUDO mkdir -p "$BOOTMOUNTPOINT/media-files"
+    $SUDO mkdir -p "$BOOTMOUNTPOINT/image-files"
+    $SUDO cp $SAMPLE_MEDIA "$BOOTMOUNTPOINT/media-files/" #copy sample mkv file for autoplay
+    $SUDO cp $CUSTOM_STARTUP "$BOOTMOUNTPOINT" #copy startup script to settings partition
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "copying root1 files - this may take some time ........... "
@@ -117,9 +122,9 @@ printf "copying root1 files - this may take some time ........... "
 #    test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "copying settings files - this may take some time ........ "
-    $SUDO mkdir -p "$STTNGMOUNTPOINT/media-files"
-    $SUDO cp $SAMPLE_MEDIA "$STTNGMOUNTPOINT/media-files/" #copy sample media file to settings partition
-    $SUDO cp $CUSTOM_STARTUP "$STTNGMOUNTPOINT" #copy startup script to settings partition
+    #$SUDO mkdir -p "$STTNGMOUNTPOINT/media-files"
+    #$SUDO cp $SAMPLE_MEDIA "$STTNGMOUNTPOINT/media-files/" #copy sample media file to settings partition
+    #$SUDO cp $CUSTOM_STARTUP "$STTNGMOUNTPOINT" #copy startup script to settings partition
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 ##################unmount the partitions############################
