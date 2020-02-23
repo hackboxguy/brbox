@@ -1,10 +1,63 @@
-#!/bin/sh 
-#
-# rc.local
-#
-# start playing media file (mplayclt is a client that sends json-rpc over tcp to mplaysrv)
-/opt/fmw/bin/mplayclt --pattern=blue #after boot, show momentory blue screen
-/opt/fmw/bin/mplayclt --mfile=/mnt/userdata/media-files/sample-video.mkv #change the media-file of your choice
-/opt/fmw/bin/mplayclt --mloop=enable #media keeps playing in a loop
-/opt/fmw/bin/mplayclt --seamlessloop=disable #enable needs .h264 file(no conatainer format, just raw h264 video)
-/opt/fmw/bin/mplayclt --maction=start #start playing the media file
+#!/bin/sh
+#check for .h264 file, if exists, then play this in a loop.
+#check for video files, if exists then play all of them in a loop.
+#check for image files, if exists then play all of them in a loop.
+#check for audio files, if exists then play all of them in a loop.
+
+MEDIA_SEARCH_PATH=/media/usb0
+OMXPLAYER="/usr/bin/omxplayer"
+HELLO_VIDEO="/usr/bin/hello_video"
+
+find $MEDIA_SEARCH_PATH -type f -exec file -N -i -- {} + | sed -n 's!: video/[^:]*$!!p' > /tmp/video.pl
+find $MEDIA_SEARCH_PATH -type f -exec file -N -i -- {} + | sed -n 's!: audio/[^:]*$!!p' > /tmp/audio.pl
+find $MEDIA_SEARCH_PATH -type f -exec file -N -i -- {} + | sed -n 's!: image/[^:]*$!!p' > /tmp/image.pl
+find $MEDIA_SEARCH_PATH -type f -exec file -N -i -- {} + | sed -n 's!: application/octet-stream[^:]*$!!p' | grep h264 > /tmp/binary.pl
+#h264 file converter command : ffmpeg -i input_file.avi -vcodec copy -an -bsf:v h264_mp4toannexb output_file.h264
+
+
+##########first priority is to play first .h264 file found in /media/usb0##########
+H264_FILES=$(cat /tmp/binary.pl 2>/dev/null | wc -l)
+if [ $H264_FILES -le "0" ]; then #no h264 file is found, try next priority
+	echo "h264 file not found!!!! trying next priority"
+else
+	H264_FILE=$(cat /tmp/binary.pl 2>/dev/null | head -1)
+	$HELLO_VIDEO --loop $H264_FILE
+	exit 0
+fi
+
+##########second priority is to play all video files of /media/usb0 in a loop######
+VIDEO_FILES=`cat /tmp/video.pl`
+TOTAL_FILES=$(cat /tmp/video.pl 2>/dev/null | wc -l)
+if [ $TOTAL_FILES -le "0" ]; then #no video file is found, try next priority
+	echo "video file not found!!!! trying next priority"
+else
+	while true; do #play forever in a loop
+		for entry in $VIDEO_FILES
+		do
+		    $OMXPLAYER -b --layer 2 -r -o both $entry > /dev/null
+		done
+	done
+	exit 0
+fi
+
+##########third priority is to play all video files of /media/usb0 in a loop######
+AUDIO_FILES=`cat /tmp/audio.pl`
+TOTAL_FILES=$(cat /tmp/audio.pl 2>/dev/null | wc -l)
+if [ $TOTAL_FILES -le "0" ]; then #no audio file is found, try next priority
+	echo "audio file not found!!!! trying next priority"
+else
+	while true; do #play forever in a loop
+		for entry in $AUDIO_FILES
+		do
+		    $OMXPLAYER -o both $entry > /dev/null
+		done
+	done
+	exit 0
+fi
+
+##########fourth priority is to play image slide-show in a loop######
+#TODO
+
+##########atlast play default video included in this image###########
+$OMXPLAYER --loop -b --layer 2 -r -o both /mnt/userdata/media-files/sample-video.mkv
+
