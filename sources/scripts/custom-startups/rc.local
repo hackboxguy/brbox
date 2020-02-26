@@ -5,6 +5,7 @@
 #check for audio files, if exists then play all of them in a loop.
 
 MEDIA_SEARCH_PATH=/media/usb0
+DEFAULT_MEDIA_SEARCH_PATH=/mnt/userdata
 OMXPLAYER="/usr/bin/omxplayer"
 HELLO_VIDEO="/usr/bin/hello_video"
 
@@ -30,6 +31,10 @@ VIDEO_FILES=`cat /tmp/video.pl`
 TOTAL_FILES=$(cat /tmp/video.pl 2>/dev/null | wc -l)
 if [ $TOTAL_FILES -le "0" ]; then #no video file is found, try next priority
 	echo "video file not found!!!! trying next priority"
+elif [ $TOTAL_FILES -eq "1" ]; then
+	#echo "single vido file found!!!! playing in a seamlessloop"
+	#for seamless looping, use melt to combine multiple videos(https://www.mltframework.org/docs/melt/)
+	$OMXPLAYER --loop -b --layer 2 -r -o both $VIDEO_FILES
 else
 	while true; do #play forever in a loop
 		for entry in $VIDEO_FILES
@@ -56,8 +61,85 @@ else
 fi
 
 ##########fourth priority is to play image slide-show in a loop######
-#TODO
+IMAGE_FILES=`cat /tmp/image.pl`
+TOTAL_FILES=$(cat /tmp/image.pl 2>/dev/null | wc -l)
+if [ $TOTAL_FILES -le "0" ]; then #no image file is found, try next priority
+	echo "image file not found!!!! trying next priority"
+else
+	dd if=/dev/zero of=/dev/fb0 1>/dev/null 2>/dev/null #clear before looping the image
+	while true; do #play forever in a loop
+		for entry in $IMAGE_FILES
+		do
+		    fbv -f -s 1 $entry > /dev/null
+		done
+	done
+	exit 0
+fi
 
-##########atlast play default video included in this image###########
-$OMXPLAYER --loop -b --layer 2 -r -o both /mnt/userdata/media-files/sample-video.mkv
 
+##########look for media files in default path /mnt/userdata/###########
+find $DEFAULT_MEDIA_SEARCH_PATH -type f -exec file -N -i -- {} + | sed -n 's!: video/[^:]*$!!p' > /tmp/video.pl
+find $DEFAULT_MEDIA_SEARCH_PATH -type f -exec file -N -i -- {} + | sed -n 's!: audio/[^:]*$!!p' > /tmp/audio.pl
+find $DEFAULT_MEDIA_SEARCH_PATH -type f -exec file -N -i -- {} + | sed -n 's!: image/[^:]*$!!p' > /tmp/image.pl
+find $DEFAULT_MEDIA_SEARCH_PATH -type f -exec file -N -i -- {} + | sed -n 's!: application/octet-stream[^:]*$!!p' | grep h264 > /tmp/binary.pl
+
+
+##########first priority is to play first .h264 file found in /mnt/userdata##########
+H264_FILES=$(cat /tmp/binary.pl 2>/dev/null | wc -l)
+if [ $H264_FILES -le "0" ]; then #no h264 file is found, try next priority
+	echo "h264 file not found!!!! trying next priority"
+else
+	H264_FILE=$(cat /tmp/binary.pl 2>/dev/null | head -1)
+	$HELLO_VIDEO --loop $H264_FILE
+	exit 0
+fi
+
+##########second priority is to play all video files of /mnt/userdata in a loop######
+VIDEO_FILES=`cat /tmp/video.pl`
+TOTAL_FILES=$(cat /tmp/video.pl 2>/dev/null | wc -l)
+if [ $TOTAL_FILES -le "0" ]; then #no video file is found, try next priority
+	echo "video file not found!!!! trying next priority"
+elif [ $TOTAL_FILES -eq "1" ]; then
+	#echo "single vido file found!!!! playing in a seamlessloop"
+	#for seamless looping, use melt to combine multiple videos(https://www.mltframework.org/docs/melt/)
+	$OMXPLAYER --loop -b --layer 2 -r -o both $VIDEO_FILES
+else
+	while true; do #play forever in a loop (no smooth transition between videos - screen will go blank for few secs)
+		for entry in $VIDEO_FILES
+		do
+		    $OMXPLAYER -b --layer 2 -r -o both $entry > /dev/null
+		done
+	done
+	exit 0
+fi
+
+##########third priority is to play all video files of /mnt/userdata in a loop######
+AUDIO_FILES=`cat /tmp/audio.pl`
+TOTAL_FILES=$(cat /tmp/audio.pl 2>/dev/null | wc -l)
+if [ $TOTAL_FILES -le "0" ]; then #no audio file is found, try next priority
+	echo "audio file not found!!!! trying next priority"
+else
+	while true; do #play forever in a loop
+		for entry in $AUDIO_FILES
+		do
+		    $OMXPLAYER -o both $entry > /dev/null
+		done
+	done
+	exit 0
+fi
+
+##########fourth priority is to play image slide-show in a loop######
+IMAGE_FILES=`cat /tmp/image.pl`
+TOTAL_FILES=$(cat /tmp/image.pl 2>/dev/null | wc -l)
+if [ $TOTAL_FILES -le "0" ]; then #no image file is found, try next priority
+	echo "image file not found!!!! trying next priority"
+else
+	dd if=/dev/zero of=/dev/fb0 1>/dev/null 2>/dev/null #clear before looping the image
+	while true; do #play forever in a loop
+		for entry in $IMAGE_FILES
+		do
+		    fbv -f -s 1 $entry > /dev/null
+		done
+	done
+	exit 0
+fi
