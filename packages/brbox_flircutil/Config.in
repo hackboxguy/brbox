@@ -1,0 +1,9 @@
+config BR2_PACKAGE_BRBOX_FLIRCUTIL
+	bool "brbox-flircutil"
+	default n
+	select BR2_PACKAGE_READLINE
+	select BR2_PACKAGE_HIDAPI
+	select BR2_PACKAGE_LIBUSB
+	help
+	  flirc_util is IR-USB HW dongle management tool.
+	  https://github.com/hackboxguy/flirc-sdk
