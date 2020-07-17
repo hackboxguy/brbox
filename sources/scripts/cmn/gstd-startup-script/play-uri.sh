@@ -4,7 +4,7 @@ USAGE="./play-uri.sh -g <gstd_ip> -u <stream_port> -s <videosink>"
 URI=""
 VIDEOSINK="xvimagesink"
 GSTD_IP=127.0.0.1  #gstreamer-daemon ip
-GSTD_CLIENT_BIN=gstd-client
+GSTD_CLIENT_BIN=gst-client-1.0
 
 
 while getopts u:g:s: f
@@ -21,9 +21,9 @@ if [ $# -lt 2  ]; then
 	exit 1
 fi
 
-RES=$($GSTD_CLIENT_BIN --address=$GSTD_IP --port=5000 pipeline_delete p1)
+RES=$($GSTD_CLIENT_BIN --tcp-address=$GSTD_IP --tcp-port=5000 pipeline_delete p1)
 
-RES=$($GSTD_CLIENT_BIN --address=$GSTD_IP --port=5000 create /pipelines p1 playbin3 uri="$URI" video-sink=$VIDEOSINK)
+RES=$($GSTD_CLIENT_BIN --tcp-address=$GSTD_IP --tcp-port=5000 create /pipelines p1 playbin3 uri="$URI" video-sink=$VIDEOSINK)
 
-RES=$($GSTD_CLIENT_BIN --address=$GSTD_IP --port=5000 pipeline_play p1)
+RES=$($GSTD_CLIENT_BIN --tcp-address=$GSTD_IP --tcp-port=5000 pipeline_play p1)
 

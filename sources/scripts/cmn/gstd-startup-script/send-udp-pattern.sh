@@ -4,7 +4,7 @@ USAGE="./send-udp-pattern.sh -g <gstd_ip> -i <target_ip> -p <stream_port> -w <pa
 TARGET_IP=127.0.0.1
 STREAM_PORT=6000
 GSTD_IP=127.0.0.1  #gstreamer-daemon ip
-GSTD_CLIENT_BIN=gstd-client
+GSTD_CLIENT_BIN=gst-client-1.0
 WIDTH=1920
 HEIGHT=1080
 FPS=30
@@ -28,8 +28,8 @@ if [ $# -lt 2  ]; then
 fi
 
 #sysctl -w net.core.rmem_max=98214400
-RES=$($GSTD_CLIENT_BIN --address=$GSTD_IP --port=5000 pipeline_delete p1)
+RES=$($GSTD_CLIENT_BIN --tcp-address=$GSTD_IP --tcp-port=5000 pipeline_delete p1)
 
-RES=$($GSTD_CLIENT_BIN --address=$GSTD_IP --port=5000 create /pipelines p1 videotestsrc pattern=ball flip=0 is-live=1 ! video/x-raw,format=BGRA,width=$WIDTH,height=$HEIGHT,pixel-aspect-ratio=1/1,interlace-mode=progressive,framerate=$FPS/1 ! timeoverlay halignment=left valignment=bottom shaded-background=true ! rtpvrawpay mtu=65000 chunks-per-frame=1 ! queue ! udpsink host=$TARGET_IP buffer-size=100000000 port=$STREAM_PORT sync=false async=false)
+RES=$($GSTD_CLIENT_BIN --tcp-address=$GSTD_IP --tcp-port=5000 create /pipelines p1 videotestsrc pattern=ball flip=0 is-live=1 ! video/x-raw,format=BGRA,width=$WIDTH,height=$HEIGHT,pixel-aspect-ratio=1/1,interlace-mode=progressive,framerate=$FPS/1 ! timeoverlay halignment=left valignment=bottom shaded-background=true ! rtpvrawpay mtu=65000 chunks-per-frame=1 ! queue ! udpsink host=$TARGET_IP buffer-size=100000000 port=$STREAM_PORT sync=false async=false)
 
-RES=$($GSTD_CLIENT_BIN --address=$GSTD_IP --port=5000 pipeline_play p1)
+RES=$($GSTD_CLIENT_BIN --tcp-address=$GSTD_IP --tcp-port=5000 pipeline_play p1)

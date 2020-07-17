@@ -4,7 +4,7 @@ USAGE="./recv-udp-pattern.sh -g <gstd_ip> -p <stream_port> -w <pattern-width> -h
 #TARGET_IP=127.0.0.1
 STREAM_PORT=6000
 GSTD_IP=127.0.0.1  #gstreamer-daemon ip
-GSTD_CLIENT_BIN=gstd-client
+GSTD_CLIENT_BIN=gst-client-1.0
 WIDTH=1920
 HEIGHT=1080
 #FPS=30
@@ -26,8 +26,8 @@ if [ $# -lt 2  ]; then
 fi
 
 #sysctl -w net.core.rmem_max=98214400
-RES=$($GSTD_CLIENT_BIN --address=$GSTD_IP --port=5000 pipeline_delete p1)
+RES=$($GSTD_CLIENT_BIN --tcp-address=$GSTD_IP --tcp-port=5000 pipeline_delete p1)
 
-RES=$($GSTD_CLIENT_BIN --address=$GSTD_IP --port=5000  create /pipelines p1 udpsrc port=$STREAM_PORT caps=application/x-rtp,clock-rate=90000,encoding-name=RAW,sampling="(string)BGRA",width="(string)$WIDTH",height="(string)$HEIGHT" buffer-size=1000000000 ! queue ! rtpvrawdepay ! videoconvert ! xvimagesink)
+RES=$($GSTD_CLIENT_BIN --tcp-address=$GSTD_IP --tcp-port=5000  create /pipelines p1 udpsrc port=$STREAM_PORT caps=application/x-rtp,clock-rate=90000,encoding-name=RAW,sampling="(string)BGRA",width="(string)$WIDTH",height="(string)$HEIGHT" buffer-size=1000000000 ! queue ! rtpvrawdepay ! videoconvert ! xvimagesink)
 
-RES=$($GSTD_CLIENT_BIN --address=$GSTD_IP --port=5000 pipeline_play p1)
+RES=$($GSTD_CLIENT_BIN --tcp-address=$GSTD_IP --tcp-port=5000 pipeline_play p1)

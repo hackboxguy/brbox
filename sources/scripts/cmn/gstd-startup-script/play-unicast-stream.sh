@@ -3,7 +3,7 @@
 USAGE="./play-unicast-stream.sh -g <gstd_ip> -p <stream_port>"
 STREAM_PORT=6000
 GSTD_IP=127.0.0.1  #gstreamer-daemon ip
-GSTD_CLIENT_BIN=gstd-client
+GSTD_CLIENT_BIN=gst-client-1.0
 #caps for aver-media-BU110-hdmi-capture and stream-over rtp
 CAPS="caps=application/x-rtp,media=(string)video,clock-rate=(int)90000,\
 encoding-name=(string)RAW,sampling=(string)YCbCr-4:2:2,depth=(string)8,\
@@ -24,10 +24,10 @@ if [ $# -lt 2  ]; then
 	exit 1
 fi
 
-RES=$($GSTD_CLIENT_BIN --address=$GSTD_IP --port=5000 pipeline_delete p1)
+RES=$($GSTD_CLIENT_BIN --tcp-address=$GSTD_IP --tcp-port=5000 pipeline_delete p1)
 
-RES=$($GSTD_CLIENT_BIN --address=$GSTD_IP --port=5000 create /pipelines p1 udpsrc port=$STREAM_PORT $CAPS ! queue ! rtpvrawdepay ! queue ! videoconvert ! xvimagesink sync=false async=false)
+RES=$($GSTD_CLIENT_BIN --tcp-address=$GSTD_IP --tcp-port=5000 create /pipelines p1 udpsrc port=$STREAM_PORT $CAPS ! queue ! rtpvrawdepay ! queue ! videoconvert ! xvimagesink sync=false async=false)
 
-RES=$($GSTD_CLIENT_BIN --address=$GSTD_IP --port=5000 pipeline_play p1)
+RES=$($GSTD_CLIENT_BIN --tcp-address=$GSTD_IP --tcp-port=5000 pipeline_play p1)
 
 
