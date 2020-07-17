@@ -8,7 +8,9 @@ SERVER_PROTOCOL="-t"
 start() {
 	echo -n "Starting Gstd-daemon: "
 	sysctl -w net.core.rmem_max=98214400	
-	export DISPLAY=:0;$SERVER_NAME --base-port=$SERVER_PORT $SERVER_PROTOCOL &
+	mkdir -p /var/log/gstd/
+	mkdir -p /var/run/gstd/	
+	export DISPLAY=:0;$SERVER_NAME --tcp-base-port=$SERVER_PORT $SERVER_PROTOCOL &
 	echo "OK"
 }
 
