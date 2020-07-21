@@ -2,7 +2,7 @@
 #define __I2C_PCF_LCD_H_
 
 #define LCD_PCF_DATA_ADDRESS     (0x70>>1)
-#define LCD_PCF_ADDRESS     (0x4E>>1) //(0x72>>1) 0100 1110
+//#define LCD_PCF_ADDRESS     (0x4E>>1) //(0x72>>1) 0100 1110
 #include <stdint.h>
 //#include "I2CBusAccess.h"
 #include "DisplayDevice.hpp"
@@ -12,6 +12,7 @@ class I2CPcfLcd : public DisplayDevice //, public I2CBusAccess
 	int DISPLAY_TYPE;
 	ADLIB_DISPLAY_TYPE disp_type;
 	uint8_t io_ctrl_byte;
+	uint8_t LCD_PCF_ADDRESS;
 	void update_io_ctrl_device();
 	void update_io_ctrl_cache(uint8_t location,uint8_t value);
 	void write_inst(uint8_t byte);

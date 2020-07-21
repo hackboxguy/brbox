@@ -29,7 +29,11 @@ I2CPcfLcd::I2CPcfLcd(std::string DevNode,std::string DevType):DisplayDevice(DevN
 		default                              : DISPLAY_TYPE=16;break;
 	}
 
-
+	//there are 2 types of i2c-lcd-dot-matrix devices with 2 different addresses(0x7E/0x4E) or 7bit addr(0x3F/0x27)
+	io_ctrl_byte=0xFF;
+	LCD_PCF_ADDRESS=(0x7E>>1);//first try with address 0x7E
+	if(write_byte((uint32_t)LCD_PCF_ADDRESS,io_ctrl_byte)!=RPC_SRV_RESULT_SUCCESS)
+		LCD_PCF_ADDRESS=(0x4E>>1);//else try with address 0x4E
 	BkLight=true;
 	io_ctrl_byte=0xff;
 	init_lcd();
