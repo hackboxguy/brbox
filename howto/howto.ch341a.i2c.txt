@@ -1,0 +1,14 @@
+details are taken from here: https://patrickelectric.work/blog/2018/ch341a-dongle/
+ch341a programmer schematic: https://4.bp.blogspot.com/-nQk5fUPl6fg/XHFbRfvceJI/AAAAAAAAMSY/cN3t6fTZO400e9D-m_SIK27ro1HIkebYgCLcBGAs/s1600/ch341a_miniprogrammer.png
+
+## how to use ch341a based usb-to-i2c converter to drive i2c based 16x2 lcd-display
+git clone https://github.com/allanbian1017/i2c-ch341-usb
+make clean
+make
+sudo modprobe i2c-ch341-usb.ko speed=0 (set the speed to 20kh, else "dispsrv --disptype=1602_pcf --device=/dev/i2c-8" will not work)
+sudo i2cdetect -y 8
+sudo i2cset -y 8 0x20 0xff
+sudo i2cset -y 8 0x20 0x00
+sudo sh -c "export LD_LIBRARY_PATH=./lib/;./bin/dispsrv --disptype=1602_pcf --device=/dev/i2c-8"
+./bin/dispclt --printline=line2,hello12345678
+sudo rmmod i2c-ch341-usb.ko
