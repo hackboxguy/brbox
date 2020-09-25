@@ -1,6 +1,6 @@
 #!/bin/sh
 ###########################################################
-IMAGESIZE=460M #356M
+IMAGESIZE=500M #356M
 ROOT1_LABEL=ROOT1   #linux-1
 ROOT2_LABEL=ROOT2   #linux-2
 STTNG_LABEL=STTNG   #settings
