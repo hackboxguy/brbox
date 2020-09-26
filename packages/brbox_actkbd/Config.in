@@ -1,8 +1,6 @@
 config BR2_PACKAGE_BRBOX_ACTKBD
 	bool "brbox-actkbd"
 	default n
-	select BR2_PACKAGE_READLINE
-	select BR2_PACKAGE_HIDAPI
 	help
 	  actkbd is a daemon for keyboard shortcuts.
 	  https://github.com/thkala/actkbd
