@@ -41,6 +41,7 @@ USERDATMOUNTPOINT=$(mktemp -d)
 BOOT_MARKER_RPI=$(pwd)/sources/scripts/raspi2/boot/cmdline.txt #kernel cmdline args file 
 BOOT_CONFIG_RPI=$(pwd)/sources/scripts/raspi2/boot/config.txt
 SAMPLE_MEDIA=$(pwd)/sources/sample-media/sample-video.mkv
+MPLAY_KEY_MAP=$(pwd)/sources/sample-media/omx-key-config.txt
 CUSTOM_STARTUP=$(pwd)/sources/scripts/custom-startups/rc.local
 printf "creating image file ..................................... "
     fallocate -l "$IMAGESIZE" "$IMAGENAME" >/dev/null
@@ -115,30 +116,19 @@ printf "copying boot files - this may take some time ............ "
     $SUDO cp $BOOT_MARKER_RPI "$BOOTMOUNTPOINT"
     $SUDO cp $BOOT_CONFIG_RPI "$BOOTMOUNTPOINT"
 
-    #copy sample media files and auto-play-startup script
-    #$SUDO mkdir -p "$BOOTMOUNTPOINT/media-files"
-    #$SUDO mkdir -p "$BOOTMOUNTPOINT/image-files"
-    #$SUDO cp $SAMPLE_MEDIA "$BOOTMOUNTPOINT/media-files/" #copy sample mkv file for autoplay
-    #$SUDO cp $CUSTOM_STARTUP "$BOOTMOUNTPOINT" #copy startup script to settings partition
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "copying root1 files - this may take some time ........... "
     $SUDO tar -C "$ROOTMOUNTPOINT" -Jxf "$ROOTFS"
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
-#printf "copying root2 files - this may take some time ........... "
-#    $SUDO tar -C "$ROOT2MOUNTPOINT" -Jxf "$ROOTFS"
-#    test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
-
 printf "copying settings files - this may take some time ........ "
-    #$SUDO mkdir -p "$STTNGMOUNTPOINT/media-files"
-    #$SUDO cp $SAMPLE_MEDIA "$STTNGMOUNTPOINT/media-files/" #copy sample media file to settings partition
-    #$SUDO cp $CUSTOM_STARTUP "$STTNGMOUNTPOINT" #copy startup script to settings partition
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 
 printf "copying userdata files - this may take some time ........ "
     $SUDO mkdir -p "$USERDATMOUNTPOINT/media-files"
     $SUDO cp $SAMPLE_MEDIA "$USERDATMOUNTPOINT/media-files/" #copy sample media file to settings partition
+    $SUDO cp $MPLAY_KEY_MAP "$USERDATMOUNTPOINT/" #copy key-board-shortcut override for omxplayer
     $SUDO cp $CUSTOM_STARTUP "$USERDATMOUNTPOINT" #copy startup script to settings partition
     test 0 -eq $? && echo "[OK]" || echo "[FAIL]"
 

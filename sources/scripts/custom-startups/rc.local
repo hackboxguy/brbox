@@ -5,7 +5,9 @@
 #check for audio files, if exists then play all of them in a loop.
 
 MEDIA_SEARCH_PATH=/media/usb0
+OMX_KEY_CONFIG=/media/usb0/omx-key-config.txt #override default key-shortcut behaviour of omxplayer
 DEFAULT_MEDIA_SEARCH_PATH=/mnt/userdata
+DEFAULT_OMX_KEY_CONFIG=/mnt/userdata/omx-key-config.txt #override default key-shortcut behaviour of omxplayer
 OMXPLAYER="/usr/bin/omxplayer"
 HELLO_VIDEO="/usr/bin/hello_video"
 
@@ -16,11 +18,12 @@ find $MEDIA_SEARCH_PATH -type f -exec file -N -i -- {} + | sed -n 's!: applicati
 #h264 file converter command : ffmpeg -i input_file.avi -vcodec copy -an -bsf:v h264_mp4toannexb output_file.h264
 
 
-##########first priority is to play first .h264 file found in /media/usb0##########
+##########first priority is to play first .h264 file found in /media/usb0######
 H264_FILES=$(cat /tmp/binary.pl 2>/dev/null | wc -l)
 if [ $H264_FILES -le "0" ]; then #no h264 file is found, try next priority
 	echo "h264 file not found!!!! trying next priority"
 else
+	#play seam-less-loop of single file with hello-video binary
 	H264_FILE=$(cat /tmp/binary.pl 2>/dev/null | head -1)
 	$HELLO_VIDEO --loop $H264_FILE
 	exit 0
@@ -34,18 +37,27 @@ if [ $TOTAL_FILES -le "0" ]; then #no video file is found, try next priority
 elif [ $TOTAL_FILES -eq "1" ]; then
 	#echo "single vido file found!!!! playing in a seamlessloop"
 	#for seamless looping, use melt to combine multiple videos(https://www.mltframework.org/docs/melt/)
-	$OMXPLAYER --loop -b --layer 2 -r -o both $VIDEO_FILES
+	if [ -f "$OMX_KEY_CONFIG" ]; then
+    	$OMXPLAYER --key-config=$OMX_KEY_CONFIG --loop -b --layer 2 -r -o both $VIDEO_FILES
+	else
+		$OMXPLAYER --loop -b --layer 2 -r -o both $VIDEO_FILES
+	fi
+	
 else
 	while true; do #play forever in a loop
 		for entry in $VIDEO_FILES
 		do
-		    $OMXPLAYER -b --layer 2 -r -o both $entry > /dev/null
+			if [ -f "$OMX_KEY_CONFIG" ]; then
+		    	$OMXPLAYER --key-config=$OMX_KEY_CONFIG -b --layer 2 -r -o both $entry > /dev/null
+			else
+				$OMXPLAYER -b --layer 2 -r -o both $entry > /dev/null
+			fi
 		done
 	done
 	exit 0
 fi
 
-##########third priority is to play all video files of /media/usb0 in a loop######
+##########third priority is to play all audio files of /media/usb0 in a loop######
 AUDIO_FILES=`cat /tmp/audio.pl`
 TOTAL_FILES=$(cat /tmp/audio.pl 2>/dev/null | wc -l)
 if [ $TOTAL_FILES -le "0" ]; then #no audio file is found, try next priority
@@ -54,7 +66,11 @@ else
 	while true; do #play forever in a loop
 		for entry in $AUDIO_FILES
 		do
-		    $OMXPLAYER -o both $entry > /dev/null
+			if [ -f "$OMX_KEY_CONFIG" ]; then
+		    	$OMXPLAYER --key-config=$OMX_KEY_CONFIG -o both $entry > /dev/null
+			else
+				$OMXPLAYER -o both $entry > /dev/null
+			fi
 		done
 	done
 	exit 0
@@ -90,6 +106,7 @@ if [ $H264_FILES -le "0" ]; then #no h264 file is found, try next priority
 	echo "h264 file not found!!!! trying next priority"
 else
 	H264_FILE=$(cat /tmp/binary.pl 2>/dev/null | head -1)
+	#play seam-less-loop of single file with hello-video binary
 	$HELLO_VIDEO --loop $H264_FILE
 	exit 0
 fi
@@ -102,18 +119,26 @@ if [ $TOTAL_FILES -le "0" ]; then #no video file is found, try next priority
 elif [ $TOTAL_FILES -eq "1" ]; then
 	#echo "single vido file found!!!! playing in a seamlessloop"
 	#for seamless looping, use melt to combine multiple videos(https://www.mltframework.org/docs/melt/)
-	$OMXPLAYER --loop -b --layer 2 -r -o both $VIDEO_FILES
+	if [ -f "$DEFAULT_OMX_KEY_CONFIG" ]; then
+		$OMXPLAYER --key-config=$DEFAULT_OMX_KEY_CONFIG --loop -b --layer 2 -r -o both $VIDEO_FILES
+	else
+		$OMXPLAYER --loop -b --layer 2 -r -o both $VIDEO_FILES
+	fi
 else
 	while true; do #play forever in a loop (no smooth transition between videos - screen will go blank for few secs)
 		for entry in $VIDEO_FILES
 		do
-		    $OMXPLAYER -b --layer 2 -r -o both $entry > /dev/null
+			if [ -f "$DEFAULT_OMX_KEY_CONFIG" ]; then
+		    	$OMXPLAYER --key-config=$DEFAULT_OMX_KEY_CONFIG -b --layer 2 -r -o both $entry > /dev/null
+			else
+				$OMXPLAYER -b --layer 2 -r -o both $entry > /dev/null
+			fi
 		done
 	done
 	exit 0
 fi
 
-##########third priority is to play all video files of /mnt/userdata in a loop######
+##########third priority is to play all audio files of /mnt/userdata in a loop######
 AUDIO_FILES=`cat /tmp/audio.pl`
 TOTAL_FILES=$(cat /tmp/audio.pl 2>/dev/null | wc -l)
 if [ $TOTAL_FILES -le "0" ]; then #no audio file is found, try next priority
@@ -122,7 +147,11 @@ else
 	while true; do #play forever in a loop
 		for entry in $AUDIO_FILES
 		do
-		    $OMXPLAYER -o both $entry > /dev/null
+			if [ -f "$DEFAULT_OMX_KEY_CONFIG" ]; then
+		    	$OMXPLAYER --key-config=$DEFAULT_OMX_KEY_CONFIG -o both $entry > /dev/null
+			else
+				$OMXPLAYER -o both $entry > /dev/null
+			fi
 		done
 	done
 	exit 0
