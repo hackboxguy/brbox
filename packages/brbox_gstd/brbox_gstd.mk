@@ -12,7 +12,7 @@ BRBOX_GSTD_GIT_SUBMODULES = YES
 BRBOX_GSTD_LICENSE = LGPL-2.1+
 BRBOX_GSTD_LICENSE_FILES = COPYING
 
-BRBOX_GSTD_DEPENDENCIES = host-pkgconf gstreamer1 gst1-plugins-base libglib2 json-glib jansson ncurses readline
+BRBOX_GSTD_DEPENDENCIES = libsoup host-pkgconf gstreamer1 gst1-plugins-base libglib2 json-glib jansson ncurses readline
 BRBOX_GSTD_AUTORECONF = YES
 BRBOX_GSTD_CONF_OPTS += --disable-gtk-doc
 
