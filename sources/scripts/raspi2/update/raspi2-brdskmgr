@@ -184,8 +184,8 @@ FlipBootMarker()
 	#raspi3-64: there is no zImage, instead there is just "Image" file: note: as of 02.19 rpi-3 image is zImage
 	RESULT=$(cat /tmp/BrBoxDevType.txt)
 	if [ $RESULT = "RASPI_3" ]; then
-		RP_KERNEL1=zImage
-		RP_KERNEL2=zImage2
+		RP_KERNEL1=Image
+		RP_KERNEL2=Image2
 	fi
 
 	#if 1, then flip to 2

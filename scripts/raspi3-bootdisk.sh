@@ -2,7 +2,7 @@
 #sudo ./raspi-bootdisk.sh -o /home/adav/tmp/rp/ -i /home/adav/tmp/rp/images/rp-sd.img
 #sudo dd if=/home/adav/tmp/rp/images/rp-sd.img of=/dev/sdd bs=1M
 ###########################################################
-IMAGESIZE=500M #460M #356M
+IMAGESIZE=550M #460M #356M
 BOOTSIZE=16M
 ROOT1SIZE=180M #130M
 ROOT2SIZE=180M #130M
@@ -61,10 +61,10 @@ printf "Creating loopdevice ..................................... "
 
 sudo parted -s $LOOPDEVICE mklabel msdos
 #sudo parted -s $LOOPDEVICE unit cyl mkpart primary fat32 -- 0 2    #old
-sudo parted -s $LOOPDEVICE mkpart primary fat32 0% 6%
+sudo parted -s $LOOPDEVICE mkpart primary fat32 0% 10%
 sudo parted -s $LOOPDEVICE set 1 boot on  
 #sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 2 26    #old
-sudo parted -s $LOOPDEVICE mkpart primary ext3 6% 51%
+sudo parted -s $LOOPDEVICE mkpart primary ext3 10% 51%
 
 #sudo parted -s $LOOPDEVICE unit cyl mkpart primary ext3 -- 26 50   #old
 sudo parted -s $LOOPDEVICE mkpart primary 51% 96%
