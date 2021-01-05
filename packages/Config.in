@@ -78,4 +78,5 @@ source "package/brbox/brbox_modbussrv/Config.in"
 source "package/brbox/brbox_gstd/Config.in"
 source "package/brbox/brbox_nrtp/Config.in"
 source "package/brbox/brbox_gstdstartup/Config.in"
+source "package/brbox/brbox_chandongle/Config.in"
 endmenu

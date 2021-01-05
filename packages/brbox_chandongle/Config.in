@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BRBOX_CHANDONGLE
+	bool "asterisk-chan-dongle"
+	default n
+	depends on BR2_PACKAGE_ASTERISK
+	help
+	  chan-dongle module for adding gsm modem suppor to asterisk
+

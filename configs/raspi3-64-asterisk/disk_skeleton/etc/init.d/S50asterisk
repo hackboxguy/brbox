@@ -1,0 +1,39 @@
+#!/bin/sh
+
+IFACE=eth0
+IF_WAIT_DELAY=10
+
+asterisk_start()
+{
+  echo "Starting Asterisk"
+  asterisk
+}
+
+asterisk_stop()
+{
+  asterisk -rx 'core stop now'
+  sleep 2
+  if [ -r /var/run/asterisk/asterisk.pid ]; then
+    # seems like asterisk didn't stop
+    kill $(cat /var/run/asterisk/asterisk.pid)
+    sleep 2
+  fi
+}
+
+case "$1" in
+  start)
+    asterisk_start
+    ;;
+  stop)
+    asterisk_stop
+    ;;
+  restart)
+    asterisk_stop
+    asterisk_start
+    ;;
+  *)
+    echo "usage $0 {start|stop|restart}"
+    ;;
+esac
+
+exit 0
