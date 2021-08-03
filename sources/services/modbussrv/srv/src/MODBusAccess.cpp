@@ -1,4 +1,5 @@
 #include "MODBusAccess.h"
+#include <sys/time.h>
 using namespace std;
 #define VOLTAGE   0x0000
 #define CURRENT   0x0006
