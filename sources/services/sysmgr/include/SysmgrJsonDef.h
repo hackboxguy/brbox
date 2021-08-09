@@ -245,6 +245,7 @@ typedef struct SYSMGR_DEVTYPE_PACKET_T
 #define SYSMGR_RPC_HOSTNAME_SET        "set_hostname"
 #define SYSMGR_RPC_HOSTNAME_ARG        "hostname"
 #define HOST_NAME_FILE_PATH            "/mnt/settings/etc/hostname"
+#define DEF_HOST_NAME_FILE_PATH        "/etc/hostname"
 typedef struct SYSMGR_HOSTNAME_PACKET_T
 {
 	char hostname[1024];

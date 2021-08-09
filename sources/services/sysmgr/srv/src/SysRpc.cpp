@@ -843,8 +843,20 @@ int SysRpc::process_get_hostname(JsonDataCommObj* pReq)
 		strcpy(pPacket->hostname,name.c_str());
 		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 	}
-	else 
-		pPanelReq->result=RPC_SRV_RESULT_FILE_OPEN_ERR;
+	else
+	{
+		//else just try to read from default hostname file(i.e /etc/hostname)
+		ifstream hostNameFile(DEF_HOST_NAME_FILE_PATH);
+		if (hostNameFile.is_open())
+		{
+			hostNameFile >> name;
+			hostNameFile.close();
+			strcpy(pPacket->hostname,name.c_str());
+			pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+		}
+		else
+			pPanelReq->result=RPC_SRV_RESULT_FILE_OPEN_ERR;
+	}
 	return 0;
 }
 /* ------------------------------------------------------------------------- */

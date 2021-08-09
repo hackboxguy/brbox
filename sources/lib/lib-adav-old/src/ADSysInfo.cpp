@@ -503,7 +503,8 @@ RPC_SRV_RESULT ADSysInfo::run_shell_script(char* cmd,char*ret_val,bool emulation
 	if(fgets(temp_str,250,shell)!=NULL)
 	{
 		temp_str[255]='\0';
-		temp_str[strlen(temp_str)-1]='\0';//remove trailing '/n' nextline character
+		//temp_str[strlen(temp_str)-1]='\0';//remove trailing '/n' nextline character
+		temp_str[strlen(temp_str)]='\0';//ip addr read was returning one less char, hence -1 has been removed
 		strcpy(ret_val,temp_str);
 	}
 	pclose(shell);
