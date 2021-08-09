@@ -1,0 +1,15 @@
+[Unit]
+Description=xmproxysrv
+Requires=sysmgr.service
+
+[Service]
+Environment=LD_LIBRARY_PATH=/home/pi/brbox/output/lib
+Environment=BRBOX_XMPLOGIN=/home/pi/brbox/output/etc/xmpp-login.txt
+Environment=BRBOX_XMPALIAS=/home/pi/brbox/output/etc/xmpp-alias-list.txt
+Environment=BRBOX_XMPBOTNAME=/home/pi/brbox/output/etc/xmpp-login.txt
+Environment=BRBOX_BOARD_TYPE=RASPI_BPLUS
+ExecStart=/home/pi/brbox/output/bin/xmproxysrv --boardtype=${BRBOX_BOARD_TYPE} --loginfile=${BRBOX_XMPLOGIN} --aliaslist=${BRBOX_XMPALIAS} --botname=${BRBOX_XMPBOTNAME} --usbgsm=0
+ExecStop=/home/pi/brbox/output/bin/xmproxyclt --shutdown
+
+[Install]
+WantedBy=multi-user.target

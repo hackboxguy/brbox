@@ -14,6 +14,7 @@ set(AUTO_SVN_VERSION    ON CACHE BOOL ON)  #by default include svn revision numb
 set(INSTALL_MY_HEADERS  ON CACHE BOOL ON)  #by default install header files to target-install-directory
 set(STARTUP_SCRIPT SysmgrStartupScr)          #server startup script
 set(WRTSTARTUP_SCRIPT WrtSysmgrStartupScr)          #server startup script
+set(SYSTEMDSTARTUP_SCRIPT sysmgr.service)          #server startup script
 #set(STARTUP_SCRIPT_ALIAS S70SysMgr)           #todo: automate numbering of startup scripts
 set(STARTNUM "70" CACHE STRING "70")       #init order number of the service
 file(GLOB SOURCES "src/*.cpp")
@@ -34,6 +35,7 @@ file(GLOB  INCFILES "${INC_SRVCOMMN}/*.*")
 install(TARGETS ${COMPONENT_NAME} DESTINATION bin)
 install(PROGRAMS ${STARTUP_SCRIPT} DESTINATION etc/init.d) #copy server's startup script to init.d
 install(PROGRAMS ${WRTSTARTUP_SCRIPT} DESTINATION etc/init.d) #copy server's startup script to init.d
+install(PROGRAMS ${SYSTEMDSTARTUP_SCRIPT} DESTINATION etc/systemd/system) #copy server's startup script to systemd/system
 if(${INSTALL_MY_HEADERS})
 	install(FILES ${INCFILES} DESTINATION include)
 endif()
