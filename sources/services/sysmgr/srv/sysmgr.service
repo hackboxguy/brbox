@@ -2,6 +2,7 @@
 Description=sysmgr
 
 [Service]
+User=pi
 Environment=LD_LIBRARY_PATH=/home/pi/brbox/output/lib
 Environment=BRBOX_BOARD_TYPE=RASPI_BPLUS
 ExecStart=/home/pi/brbox/output/bin/sysmgr --boardtype=${BRBOX_BOARD_TYPE}

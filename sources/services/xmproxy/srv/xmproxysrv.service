@@ -3,6 +3,7 @@ Description=xmproxysrv
 Requires=sysmgr.service
 
 [Service]
+User=pi
 Environment=LD_LIBRARY_PATH=/home/pi/brbox/output/lib
 Environment=BRBOX_XMPLOGIN=/home/pi/brbox/output/etc/xmpp-login.txt
 Environment=BRBOX_XMPALIAS=/home/pi/brbox/output/etc/xmpp-alias-list.txt
