@@ -14,7 +14,7 @@ add_subdirectory(services)
 #for local compiling
 #cmake -H. -BOutput -DCMAKE_INSTALL_PREFIX=/home/adav/tmp/brbox -DAUTO_SVN_VERSION=OFF -DINSTALL_CLIENT=ON
 #cmake -H. -BOutput
-#cmake --build Output -- all
+#cmake --build Output -- all -j$(nproc)
 
 #for cleaning make generated output
 #rm -rf Output

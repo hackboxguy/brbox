@@ -12,6 +12,7 @@ add_subdirectory(i2csrv)
 add_subdirectory(dispsrv)
 #add_subdirectory(lightsense)
 add_subdirectory(modbussrv)
+add_subdirectory(monitsrv)
 
 
 #for cross compiling
@@ -20,8 +21,8 @@ add_subdirectory(modbussrv)
 #cmake --build Output -- install
 
 #for local compiling
-#cmake -H. -BOutput
-#cmake --build Output -- all
+#cmake -H. -BOutput -DAUTO_SVN_VERSION=OFF
+#cmake --build Output -- all -j$(nproc)
 
 #for cleaning make generated output
 #rm -rf Output
