@@ -25,7 +25,7 @@ typedef enum EJSON_DISPSRV_RPC_TYPES_T
 #define	DISPSRV_RPC_DISP_PRINT           "display_print"
 #define DISPSRV_RPC_DISP_PRINT_LINE_ARG  "line"
 #define DISPSRV_RPC_DISP_PRINT_MESG_ARG  "msg"
-#define DISPSRV_RPC_DISP_LINE_ARG_TABL    {"line1","line2","line3","line4","lineall","none","none","\0"} //
+#define DISPSRV_RPC_DISP_LINE_ARG_TABL    {"line1","line2","line3","line4","line5","line6","line7","line8","lineall","none","none","\0"} //
 //important: keep enum DISPLAY_LINE and EJSON_DISPSRV_LINE same
 typedef enum EJSON_DISPSRV_LINE_T
 {
@@ -33,6 +33,10 @@ typedef enum EJSON_DISPSRV_LINE_T
 	EJSON_DISPSRV_LINE_2,
 	EJSON_DISPSRV_LINE_3,
 	EJSON_DISPSRV_LINE_4,
+	EJSON_DISPSRV_LINE_5,
+	EJSON_DISPSRV_LINE_6,
+	EJSON_DISPSRV_LINE_7,
+	EJSON_DISPSRV_LINE_8,
 	EJSON_DISPSRV_LINE_FULL,
 	EJSON_DISPSRV_LINE_UNKNOWN,
 	EJSON_DISPSRV_LINE_NONE

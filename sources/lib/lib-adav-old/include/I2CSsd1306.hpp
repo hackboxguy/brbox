@@ -7,6 +7,7 @@
 #define STEP_SIZE 16
 #include <stdint.h>
 #include "DisplayDevice.hpp"
+#include "ss_oled.h"
 class I2CSsd1306 : public DisplayDevice //, public I2CBusAccess
 {
 	/*uint8_t io_ctrl_byte;
@@ -24,6 +25,12 @@ class I2CSsd1306 : public DisplayDevice //, public I2CBusAccess
 	void write_inst(unsigned char data,unsigned char cmdtype);
 	void write_data(unsigned char data);
 	void LCD_goto(unsigned char row, unsigned char column);*/
+
+	//using new ssd1306 library
+	SSOLED ssoled;
+	unsigned char ucBackBuf[1024];
+	bool ssoledinit;
+	std::string devNode,devType;
 
 	uint8_t *screenBuf_;
 	uint8_t *data_;
@@ -54,6 +61,9 @@ public:
 	//RPC_SRV_RESULT test_function(){return print_line((char*)"ssd1306-testfunc",DISPLAY_LINE_2,TEXT_ALIGNMENT_CENTER);};
 	RPC_SRV_RESULT set_back_light(bool sts);
 	RPC_SRV_RESULT get_back_light(bool &sts);
+
+	//functions using new ssd1306 library
+	RPC_SRV_RESULT init_display_new();
 };
 #endif
 

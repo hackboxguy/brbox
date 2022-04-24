@@ -20,14 +20,19 @@ I2CSsd1306::I2CSsd1306(std::string DevNode,std::string DevType):DisplayDevice(De
 //	init_lcd();
 //	LCD_goto(1,1);
 //	print_lcd("hello world");
+	devNode=DevNode;
+	devType=DevType;
 	screenBuf_=NULL;
 	data_=NULL;
 	tmp_=NULL;
+	ssoledinit=false;
 	init_display();
 }
 I2CSsd1306::~I2CSsd1306()
 {
-   if (screenBuf_)
+	if(ssoledinit)
+		oledPower(&ssoled, 0);
+   if (screenBuf_ != NULL )
    {
       delete [] screenBuf_;
       screenBuf_ = 0;
@@ -42,8 +47,9 @@ void I2CSsd1306::clearBuffer ()
 /*****************************************************************************/
 void I2CSsd1306::clearScreen ()
 {
-   clearBuffer(); // Clear internal buffer
-   writeScreen(); // Write cleared buffer to screen
+	oledFill(&ssoled, 0,1);
+//	clearBuffer(); // Clear internal buffer
+//	writeScreen(); // Write cleared buffer to screen
 }
 /*****************************************************************************/
 bool I2CSsd1306::writeScreen ()
@@ -75,8 +81,19 @@ bool I2CSsd1306::writeScreen ()
 /*****************************************************************************/
 bool I2CSsd1306::writeCenter (std::string text, uint8_t row)
 {
+	//#define FONT_NORMAL FONT_8x8
+	//#define FONT_SMALL FONT_6x8
+	//#define FONT_LARGE FONT_16x32
+	//#define FONT_STRETCHED FONT_16x16
+
+	//note: ssd1306: 128pix width ==> FONT_NORMAL    ==> max 16chars wide
+	//note: ssd1306: 128pix width ==> FONT_STRETCHED ==> max 8chars wide
+	int center = (128 - (text.length()*8))/2;
+	oledWriteString(&ssoled, 0,center,row,(char*)text.c_str(),FONT_NORMAL,0,1);
+	return true;
+
 	if ((text.length()*6) <127) // If there is not more than 1 space left, don't center
-	// To center, multiply # of characters * 6 (5+space), subtract the last space, then divide by 2
+		// To center, multiply # of characters * 6 (5+space), subtract the last space, then divide by 2
 		return writeText (text, row, (128 - ((text.length()*6)-1))/2);
 	else
 		return writeText (text, row, 0);
@@ -104,6 +121,7 @@ bool I2CSsd1306::writeText (std::string text, uint8_t row, uint8_t col) //
 /*****************************************************************************/
 RPC_SRV_RESULT I2CSsd1306::init_display()	
 {
+	return init_display_new();
 	bool retval = false;
 	screenBuf_ = new uint8_t[WIDTH * HEIGHT]; // Create a block of memory for the screen buffer
 	memset(screenBuf_, 0, (WIDTH * HEIGHT));
@@ -311,11 +329,24 @@ RPC_SRV_RESULT I2CSsd1306::print_line(char* msg,DISPLAY_LINE line,TEXT_ALIGNMENT
 		case DISPLAY_LINE_4:
 			writeCenter(str,3);
 			break;
+		case DISPLAY_LINE_5:
+			writeCenter(str,4);
+			break;
+		case DISPLAY_LINE_6:
+			writeCenter(str,5);
+			break;
+		case DISPLAY_LINE_7:
+			writeCenter(str,6);
+			break;
+		case DISPLAY_LINE_8:
+			writeCenter(str,7);
+			break;
 		default://arg error
 			return RPC_SRV_RESULT_ARG_ERROR;
 			break;
 	}
-	writeScreen();
+	//writeScreen();
+
 	//writeCenter(str,0);//"hello-world1",0);
 	return RPC_SRV_RESULT_SUCCESS;
 }
@@ -327,6 +358,42 @@ RPC_SRV_RESULT I2CSsd1306::set_back_light(bool sts)
 RPC_SRV_RESULT I2CSsd1306::get_back_light(bool &sts)
 {
 	return RPC_SRV_RESULT_SUCCESS;
+}
+/*****************************************************************************/
+RPC_SRV_RESULT I2CSsd1306::init_display_new()
+{
+	if(ssoledinit)
+		return RPC_SRV_RESULT_SUCCESS;
+	const char *table[]   = ADLIB_DISPLAY_TYPE_TABL;
+
+	int i=-1, iChannel=0;
+	int iOLEDAddr = -1; // typical address; it can also be 0x3d
+	int iOLEDType = OLED_128x32; // Change this for your specific display
+	int bFlip = 1, bInvert = 0;
+
+	if(strcmp(devType.c_str(),table[ADLIB_DISPLAY_TYPE_SSD1306_128x32]) == 0)
+		iOLEDType = OLED_128x32;
+	else if(strcmp(devType.c_str(),table[ADLIB_DISPLAY_TYPE_SSD1306_128x64]) == 0)
+		iOLEDType = OLED_128x64;
+	else
+		iOLEDType = OLED_128x32;
+
+    std::string node(devNode);
+    int position = node.find("i2c-");
+    std::string value = node.substr(position+4);//(devNode.length()-position)+3);
+	cout<<"node:"<<node<<":pos="<<position<<" : dev-node="<<value<<" : type="<<iOLEDType<<endl;
+	iChannel = std::stoi(value);
+
+	i=oledInit(&ssoled, iOLEDType, iOLEDAddr, bFlip, bInvert, 1, iChannel, iOLEDAddr, -1, 400000);
+	if ( i != OLED_NOT_FOUND )
+	{
+		oledSetBackBuffer(&ssoled, ucBackBuf);
+		oledFill(&ssoled, 0,1);
+		ssoledinit=true;
+		return RPC_SRV_RESULT_SUCCESS;
+	}
+	else
+		return RPC_SRV_RESULT_FAIL;
 }
 /*****************************************************************************/
 

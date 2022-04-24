@@ -85,7 +85,7 @@ DisplayDevice* create_display_device(std::string DevNode,std::string Type)
 		return NULL;//unable to determine which display object is needed
 	switch(disp_type)
 	{
-		case ADLIB_DISPLAY_TYPE_SSD1306_128x32   :break;
+		case ADLIB_DISPLAY_TYPE_SSD1306_128x32   :pDevice = new I2CSsd1306(DevNode,Type);break;
 		case ADLIB_DISPLAY_TYPE_SSD1306_128x64   :pDevice = new I2CSsd1306(DevNode,Type);break;
 		case ADLIB_DISPLAY_TYPE_SSD1306_128x32_PI:
 		case ADLIB_DISPLAY_TYPE_SSD1306_128x64_PI:pDevice = new DispAccess(DevNode,Type);break;
