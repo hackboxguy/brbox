@@ -6,10 +6,10 @@
 
 // connection bw digispark-attiny85 and rotary-knob-board
 //                         +-\/-+
-// ENC_SW--- A0 (D5) PB5  1|    |8  Vcc
-// USB-  --- A3 (D3) PB3  2|    |7  PB2 (D2) A1 --- ENC_A(CLK)
-// USB+  --- A2 (D4) PB4  3|    |6  PB1 (D1) ------ ENC SW(SW)
-//                   GND  4|    |5  PB0 (D0) ------ ENC_B(DT)
+// ENC_A(CLK)A0 (D5) PB5  1|    |8  Vcc
+// USB-  --- A3 (D3) PB3  2|    |7  PB2 (D2) A1 --- ENC_B(DT)
+// USB+  --- A2 (D4) PB4  3|    |6  PB1 (D1) ------
+//                   GND  4|    |5  PB0 (D0) ------ ENC_SW(SW)
 //                         +----+    
 //
 
@@ -32,9 +32,9 @@
 #include "oddebug.h"
 
 // Rotary encoder pins
-#define ENC_SW      0b00100000    // PB5
-#define ENC_A       0b00000100    // PB2
-#define ENC_B       0b00000001    // PB0
+#define ENC_SW      0b00000001    // PB0 ==> (SW)
+#define ENC_B       0b00000100    // PB2 ==> (DT)
+#define ENC_A       0b00100000    // PB5 ==> (CLK)
 
 // Keyboard codes
 #define VOLUMEMUTE  0xE2          // Keyboard Volume Mute

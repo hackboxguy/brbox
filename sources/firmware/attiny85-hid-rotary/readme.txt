@@ -6,9 +6,9 @@ rotary-knob-board       : https://www.amazon.de/-/en/AZDelivery-KY-040-Encoder-C
 
 connection between rotary-knob and digispart-attiny85
 Rotary_encoder ==> Digispark-attiny85
-           CLK ==> P2
-           DT  ==> P0
-           SW  ==> P1
+           CLK ==> P5
+           DT  ==> P2
+           SW  ==> P0
            +   ==> 5V
            GND ==> GND
 
