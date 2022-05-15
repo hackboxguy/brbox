@@ -16,7 +16,7 @@
 #include <iostream>
 #include <vector>
 #include <arpa/inet.h>
-#include <stdlib.h> 
+#include <stdlib.h>
 //#include "i2cbusses.h"
 //#include <linux/i2c.h>
 #include <linux/i2c-dev.h>
@@ -83,7 +83,7 @@ RPC_SRV_RESULT I2CBusAccess::is_it_network_node(std::string devnode,int &port,st
 	istringstream f(devnode);//"192.168.1.1,40001");
 	string s,str1,str2;
 	ip="none";
-	port=-1;    
+	port=-1;
 
 	while (getline(f, s, ':'))
 	{
@@ -140,7 +140,7 @@ RPC_SRV_RESULT I2CBusAccess::is_it_device_node(std::string devnode)
 /*****************************************************************************/
 RPC_SRV_RESULT I2CBusAccess::SetSlaveAddr(uint8_t addr)
 {
-	if (ioctl(fd, I2C_SLAVE, addr) < 0) 
+	if (ioctl(fd, I2C_SLAVE, addr) < 0)
 	{
 		//cout<<"I2CBusAccess::SetSlaveAddr:Unable to Set Slave Addr to "<<addr<<endl;
 		return RPC_SRV_RESULT_BUS_ERROR;//RPC_SRV_RESULT_FAIL;
@@ -178,7 +178,7 @@ RPC_SRV_RESULT I2CBusAccess::read_byte(uint32_t addr, uint8_t *data)
 		RPC_SRV_RESULT retval=Client.get_integer_type_with_addr_para((char*)RPCMGR_RPC_MW_BYTE_GET,(char*)RPCMGR_RPC_MW_ARGADDR,addr,(char*)RPCMGR_RPC_MW_ARGDATA,tmpbuf);
 		if(retval==RPC_SRV_RESULT_SUCCESS)
 			*data=(uint8_t)atoi(tmpbuf);
-		return retval;	
+		return retval;
 	}
 	else
 		return RPC_SRV_RESULT_FAIL;
@@ -236,7 +236,7 @@ RPC_SRV_RESULT I2CBusAccess::read_word(uint32_t addr, uint16_t *data)
 		RPC_SRV_RESULT retval=Client.get_integer_type_with_addr_para((char*)RPCMGR_RPC_MW_WORD_GET,(char*)RPCMGR_RPC_MW_ARGADDR,addr,(char*)RPCMGR_RPC_MW_ARGDATA,tmpbuf);
 		if(retval==RPC_SRV_RESULT_SUCCESS)
 			*data=(uint16_t)atoi(tmpbuf);
-		return retval;	
+		return retval;
 	}
 	else
 		return RPC_SRV_RESULT_FAIL;
@@ -288,7 +288,7 @@ RPC_SRV_RESULT I2CBusAccess::read_dword(uint32_t addr, uint32_t *data)
 		RPC_SRV_RESULT retval=Client.get_integer_type_with_addr_para((char*)RPCMGR_RPC_MW_DWORD_GET,(char*)RPCMGR_RPC_MW_ARGADDR,addr,(char*)RPCMGR_RPC_MW_ARGDATA,tmpbuf);
 		if(retval==RPC_SRV_RESULT_SUCCESS)
 			*data=(uint32_t)atoi(tmpbuf);//TODO: check if atol is needed
-		return retval;	
+		return retval;
 	}
 	else
 		return RPC_SRV_RESULT_FAIL;
@@ -351,7 +351,7 @@ RPC_SRV_RESULT I2CBusAccess::test_write_byte(char* dev,uint8_t addr, uint8_t dat
 {
 	int myfd;
 	myfd = open(dev, O_RDWR);
-	if (myfd < 0) 
+	if (myfd < 0)
 	{
 		//printf("I2CBusAccess::test_write_byte:Error opening file: %s\n", strerror(errno));
 		//return RPC_SRV_RESULT_FILE_OPEN_ERR;
@@ -364,7 +364,7 @@ RPC_SRV_RESULT I2CBusAccess::test_write_byte(char* dev,uint8_t addr, uint8_t dat
 		}
 	}
 	//fcntl(myfd, F_SETFL,fcntl(myfd, F_GETFL) | O_NONBLOCK);
-	if (ioctl(myfd, I2C_SLAVE, addr) < 0) 
+	if (ioctl(myfd, I2C_SLAVE, addr) < 0)
 	{
 		//printf("I2CBusAccess::test_write_byte:ioctl error: %s\n", strerror(errno));
 		return RPC_SRV_RESULT_FILE_WRITE_ERR;
@@ -372,7 +372,7 @@ RPC_SRV_RESULT I2CBusAccess::test_write_byte(char* dev,uint8_t addr, uint8_t dat
 	uint8_t buff[16];buff[0]=data;
 	//int val=atoi(argv[1]);
 	unsigned int tst=data;
-	int sz=I2C_WRITE(myfd, &tst, 1);// != 1) 
+	int sz=I2C_WRITE(myfd, &tst, 1);// != 1)
 	if(sz!=1)
 	{
 		//printf("I2CBusAccess::test_write_byte:Error writing file:written %d bytes, errorno:%s\n",sz,strerror(errno));
@@ -419,6 +419,3 @@ int32_t I2CBusAccess::i2c_smbus_write_byte(int file,uint8_t value)
 #endif
 }
 /*****************************************************************************/
-
-
-

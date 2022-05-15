@@ -12,7 +12,7 @@ using namespace std;
 #define I2C_SMBUS_WRITE	0
 #define I2C_SMBUS_QUICK		    0
 #define I2C_SMBUS_BYTE		    1
-#define I2C_SMBUS_BYTE_DATA	    2 
+#define I2C_SMBUS_BYTE_DATA	    2
 #define I2C_SMBUS_WORD_DATA	    3
 #define I2C_SMBUS_PROC_CALL	    4
 #define I2C_SMBUS_BLOCK_DATA	    5
@@ -42,9 +42,9 @@ do			\
 		return(-1);\
 	}\
 } while (0)*/
-#define I2C_SMBUS_BLOCK_MAX	32	/* As specified in SMBus standard */	
+#define I2C_SMBUS_BLOCK_MAX	32	/* As specified in SMBus standard */
 #define I2C_SMBUS_I2C_BLOCK_MAX	32	/* Not specified but we use same structure */
-union i2c_smbus_data 
+union i2c_smbus_data
 {
 	uint8_t byte;
 	uint16_t word;
@@ -65,7 +65,6 @@ class I2CBusAccess
 	bool is_number(const std::string& s);
 	bool validateIpAddress(const string &ipAddress);
 	RPC_SRV_RESULT is_it_network_node(std::string devnode,int &port,std::string &ip);
-	RPC_SRV_RESULT is_it_device_node(std::string devnode);
 	int32_t i2c_smbus_access(int file, char read_write, uint8_t command,int size, union i2c_smbus_data *data);
 	int32_t i2c_smbus_read_byte(int file);
 	int32_t i2c_smbus_write_byte(int file,uint8_t value);
@@ -82,5 +81,6 @@ public:
 	RPC_SRV_RESULT write_dword(uint32_t addr, uint32_t data);
 	RPC_SRV_RESULT write_array(uint32_t addr, uint8_t *data,uint32_t len);
 	RPC_SRV_RESULT read_array(uint32_t addr, uint8_t *data,uint32_t len);
+	RPC_SRV_RESULT is_it_device_node(std::string devnode);
 };
 #endif

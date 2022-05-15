@@ -14,9 +14,10 @@
 #include "I2CDualPcfLcd.hpp"
 #include "I2CPcfLcd.hpp"
 #include "I2CSsd1306.hpp"
+#include "DispScanner.h"
 /* ------------------------------------------------------------------------- */
 using namespace std;
-DisplayDevice* create_display_device(std::string DevNode,std::string Type);
+DisplayDevice* create_display_device(std::string DevNode,std::string Type,DISPSRV_CMN_DATA_CACHE* pDataCache);
 int main(int argc, const char* argv[])
 {
 	//cmdline parsing
@@ -41,10 +42,12 @@ int main(int argc, const char* argv[])
 	DataCache.pDevInfo=(void*)&DevInfo;//rpc's needs to know board or device type
 	DataCache.pEventNotifier=(void*)&EventNotifier;
 	//I2CDualPcfLcd lcd(CmdLine.get_dev_node(),CmdLine.get_disp_type());//"/dev/i2c-0");
-	DataCache.pDisplay=create_display_device(CmdLine.get_dev_node(),CmdLine.get_disp_type());
+	DataCache.pDisplay=create_display_device(CmdLine.get_dev_node(),CmdLine.get_disp_type(),&DataCache);
 	//if(DataCache.pDisplay!=NULL)
 	//	DataCache.pDisplay->print_line((char*)"BBROX",DISPLAY_LINE_1);//,1);
-	
+
+	DispScanner Scanner(&DataCache);//DisplayScanner object will keep monitoring the attached i2c displays in runtime
+
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 
@@ -60,6 +63,7 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&DisplayBklGet);
 	RpcMgr.AttachRpc(&DisplayBklSet);
 
+	Scanner.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to Scanner
 	//start listening for rpc-commands
 	RpcMgr.AttachHeartBeat(&AppTimer);//attach 100ms heartbeat to ADJsonRpcMgr
 	RpcMgr.Start(CmdLine.get_port_number(),CmdLine.get_socket_log(),CmdLine.get_emulation_mode());
@@ -74,13 +78,15 @@ int main(int argc, const char* argv[])
 	return 0;
 }
 //following function creates a display object based on user passed cmd argument
-DisplayDevice* create_display_device(std::string DevNode,std::string Type)
+DisplayDevice* create_display_device(std::string DevNode,std::string Type,DISPSRV_CMN_DATA_CACHE* pDataCache)
 {
+	//cout<<"devnode:"<<DevNode<<" devtype:"<<Type<<endl;
 	DisplayDevice* pDevice=NULL;
 	ADLIB_DISPLAY_TYPE disp_type;
 	const char *dispTbl[] = ADLIB_DISPLAY_TYPE_TABL;
 	ADCmnStringProcessor string_proc;
 	disp_type=(ADLIB_DISPLAY_TYPE)string_proc.string_to_enum(dispTbl,(char*)Type.c_str(),ADLIB_DISPLAY_TYPE_UNKNOWN);
+	pDataCache->disp_type=disp_type;
 	if(disp_type>=ADLIB_DISPLAY_TYPE_UNKNOWN)
 		return NULL;//unable to determine which display object is needed
 	switch(disp_type)
@@ -104,4 +110,3 @@ DisplayDevice* create_display_device(std::string DevNode,std::string Type)
 	//"DISPLAY_TYPE_1602_PCF"
 	return pDevice;
 }
-

@@ -119,7 +119,7 @@ bool I2CSsd1306::writeText (std::string text, uint8_t row, uint8_t col) //
 	return true;
 }
 /*****************************************************************************/
-RPC_SRV_RESULT I2CSsd1306::init_display()	
+RPC_SRV_RESULT I2CSsd1306::init_display()
 {
 	return init_display_new();
 	bool retval = false;
@@ -381,7 +381,7 @@ RPC_SRV_RESULT I2CSsd1306::init_display_new()
     std::string node(devNode);
     int position = node.find("i2c-");
     std::string value = node.substr(position+4);//(devNode.length()-position)+3);
-	cout<<"node:"<<node<<":pos="<<position<<" : dev-node="<<value<<" : type="<<iOLEDType<<endl;
+	//cout<<"node:"<<node<<":pos="<<position<<" : dev-node="<<value<<" : type="<<iOLEDType<<endl;
 	iChannel = std::stoi(value);
 
 	i=oledInit(&ssoled, iOLEDType, iOLEDAddr, bFlip, bInvert, 1, iChannel, iOLEDAddr, -1, 400000);
@@ -396,5 +396,3 @@ RPC_SRV_RESULT I2CSsd1306::init_display_new()
 		return RPC_SRV_RESULT_FAIL;
 }
 /*****************************************************************************/
-
-

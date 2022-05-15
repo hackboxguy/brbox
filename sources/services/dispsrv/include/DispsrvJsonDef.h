@@ -55,7 +55,7 @@ typedef enum EJSON_DISPSRV_LINE_T
 #define	DISPSRV_RPC_DISP_GET_BKLT        "display_backlight_get"
 #define	DISPSRV_RPC_DISP_SET_BKLT        "display_backlight_set"
 #define DISPSRV_RPC_DISP_BKLT_ARG        "status"
-#define DISPSRV_RPC_DISP_BKLT_ARG_TABL   {"off","on","unknown","none","\0"} 
+#define DISPSRV_RPC_DISP_BKLT_ARG_TABL   {"off","on","unknown","none","\0"}
 typedef enum DISPSRV_BKLT_STS_T
 {
 	DISPSRV_BKLT_STS_OFF,
@@ -81,12 +81,14 @@ typedef struct DISPSRV_CMN_DATA_CACHE_T
 	//unsigned int gpio_data[GPIOCTL_MAX_GPIO_PINS];//allow max 64gpio addresses(0 to 63)
 	//unsigned int gpio_data_prev[GPIOCTL_MAX_GPIO_PINS];//comparing the last value for eventing
 	DisplayDevice *pDisplay;
+	ADLIB_DISPLAY_TYPE disp_type;//display-type suggested by user via commandline
 	DISPSRV_CMN_DATA_CACHE_T() //constructor(initializer)
 	{
 		pDevInfo=NULL;
 		pEventNotifier=NULL;
 		//pDispAccess=NULL;
 		pDisplay=NULL;
+		disp_type=ADLIB_DISPLAY_TYPE_UNKNOWN;
 	};
 }DISPSRV_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */
@@ -98,4 +100,3 @@ typedef enum DISPSRV_EVENT_TYPE_T
 }DISPSRV_EVENT_TYPE;
 #define SERVER_JSON_PORT_NUM DISPSRV_JSON_PORT_NUMBER
 #endif
-
