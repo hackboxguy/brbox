@@ -85,7 +85,7 @@ RPC_SRV_RESULT ADFpgaMem::connect(char* fpga_mem_device,unsigned long fpga_mem_a
 			return RPC_SRV_RESULT_DEV_NOT_ACCESSIBLE;
 		/********************************Write Data to device***********************************/
 		void *pTemp=mmap(NULL,fpga_mem_size,PROT_READ|PROT_WRITE, MAP_SHARED,fpga_mem_node,fpga_mem_addr);
-		if ( pTemp < 0)
+		if ( pTemp < MAP_FAILED)
 		{
 			close(fpga_mem_node);
 			//printf("FpgaAccessMmap::connect(): dev not accessible\n");	
