@@ -6,6 +6,7 @@
 #include <sstream>
 #include <fstream>
 #include <cerrno>
+#include <iterator>
 #include "ADCmnStringProcessor.hpp"
 #include "ADJsonRpcClient.hpp"
 #include "ADCmnPortList.h"
@@ -538,7 +539,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sms_get(std::string msg,std::string &returnval)
 		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
 	if(cmdArg.size()<=0)
 		return RPC_SRV_RESULT_ARG_ERROR;
-
+	xpandarg(cmdArg); //e.g: smsget $index
 	ADJsonRpcClient Client;
 	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_BBOXSMS)!=0)
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
@@ -561,9 +562,10 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sms_send(std::string msg,std::string &returnval
 		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
 	if(destArg.size()<=0)
 		return RPC_SRV_RESULT_ARG_ERROR;
+	xpandarg(destArg); //e.g: smssend $phonenum $msg
 	if(msgArg.size()<=0)
 		return RPC_SRV_RESULT_ARG_ERROR;
-
+	xpandargs(msgArg); //e.g: smssend $phonenum $msg
 	char tID[255];tID[254]='\0';
 	ADJsonRpcClient Client;
 	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_BBOXSMS)!=0)
@@ -815,6 +817,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_hostname(std::string msg,std::string &retur
 	msgstream >> cmdArg;
 	if(cmd.size()<=0)
 		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	xpandarg(cmdArg); //e.g: hostname $myhostname
 	if(cmdArg.size()<=0)//get-hostname-cmd
 		return proc_cmd_fmw_get_hostname(msg,returnval);
 	else
@@ -831,6 +834,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_gpio(std::string msg,std::string &returnval)
 		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
 	if(cmdArg.size()<=0)//get-gpio pin number
 		return RPC_SRV_RESULT_ARG_ERROR;
+	xpandarg(cmdArg); //e.g: gpio $num $laststate
 	if(cmdArg2.size()<=0)//read gpio pin
 	{
 		int gpioAddr=atoi(cmdArg.c_str());
@@ -846,6 +850,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_gpio(std::string msg,std::string &returnval)
 	}
 	else //write gpio pin
 	{
+		xpandarg(cmdArg2); //e.g: gpio $num $laststate
 		int gpioAddr=atoi(cmdArg.c_str());
 		int gpioVal=atoi(cmdArg2.c_str());
 		ADJsonRpcClient Client;
@@ -921,7 +926,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_dial_voice(std::string msg,std::string &returnv
 		return RPC_SRV_RESULT_ARG_ERROR;
 	//if(msgArg.size()<=0)
 	//	return RPC_SRV_RESULT_ARG_ERROR;
-
+	xpandarg(destArg); //e.g: dialvoice $phonenum
 	char tID[255];tID[254]='\0';
 	ADJsonRpcClient Client;
 	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_BBOXSMS)!=0)
@@ -1108,7 +1113,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_event_gpio(std::string msg,std::string sender,s
 		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
 	if(cmdArg.size()<=0) //gpio number
 		return RPC_SRV_RESULT_ARG_ERROR;
-
+	xpandarg(cmdArg); //e.g: evntgpio $ionum $laststate
 	int io=atoi(cmdArg.c_str());//gpio number
 	std::vector<EventSubscrEntry>::iterator it = find_if(myEventList.begin(), myEventList.end(), FindEventSubscrEntry(sender,io,EXMPP_EVNT_GPIO));
 	if(cmdArgVal.size()<=0) //read status
@@ -1125,6 +1130,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_event_gpio(std::string msg,std::string sender,s
 	}
 	else //write status
 	{
+		xpandarg(cmdArgVal); //e.g: evntgpio $ionum $laststate
 		if(it != myEventList.end())//found entry, modify existing entry
 		{
 			if(cmdArgVal=="1")
@@ -1269,6 +1275,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sleep(std::string msg)
 		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
 	if(cmdArg.size()<=0)
 		return RPC_SRV_RESULT_ARG_ERROR;
+	xpandarg(cmdArg); //e.g: sleep $timesec
 	int sec=atoi(cmdArg.c_str());
 	usleep(sec *1000 * 1000);
 	return RPC_SRV_RESULT_SUCCESS;
@@ -1336,6 +1343,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_bot_name(std::string msg,std::string &returnval
 	}
 	else
 	{
+		xpandarg(cmdArg); //e.g: botname $name
 		XmppBotName=cmdArg;
 		if(XmppBotNameFilePath.size()>0)
 		{
@@ -1396,6 +1404,8 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_shellcmd(std::string msg,std::string &returnval
 		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
 	if(destArg.size()<=0)
 		return RPC_SRV_RESULT_ARG_ERROR;
+
+	xpandargs(destArg); //expand argarray if any of them have $ prefix
 
 	char tID[255];tID[254]='\0';
 	char rpccmd[512];
@@ -1497,6 +1507,15 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sonoff(std::string msg,std::string &returnval)
 		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
 	if(cmdArg.size()<=0)//get sonoff host/ip string
 		return RPC_SRV_RESULT_ARG_ERROR;
+	xpandarg(cmdArg); //e.g: sonoff $ip on
+	//if(cmdArg.at(0) == '$')
+	//{
+	//	cmdArg.erase(0,1);//remote first $ char
+	//	transform(cmdArg.begin(), cmdArg.end(), cmdArg.begin(), ::tolower);
+	//	Alias::iterator it = AliasList.find(cmdArg);
+	//	if (it != AliasList.end())
+	//		cmdArg=it->second;
+	//}
 	if(cmdArg2.size()<=0)//read sonoff
 	{
 		char ip[128];SONOFF_STATE state;
@@ -1519,6 +1538,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sonoff(std::string msg,std::string &returnval)
 	}
 	else //write sonoff
 	{
+		xpandarg(cmdArg2); //e.g: sonoff $ip $laststate
 		char ip[128];
 		ADSonOffHttpClient Client;
 		//resolve hostname/ip addr to ip
@@ -1590,6 +1610,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_disp_print(std::string msg,std::string &returnv
 		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
 	if(cmdArg.size()<=0)//get-line number
 		return RPC_SRV_RESULT_ARG_ERROR;
+	xpandarg(cmdArg); //e.g: display $line $msg
 	if(cmdArg2.size()<=0)//read printed message
 	{
 		int gpioAddr=atoi(cmdArg.c_str());
@@ -1605,6 +1626,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_disp_print(std::string msg,std::string &returnv
 	}
 	else //write gpio pin
 	{
+		xpandarg(cmdArg2); //e.g: display $line $msg
 		ADJsonRpcClient Client;
 		if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)//ADCMN_PORT_DISPSRV
 			return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
@@ -1655,6 +1677,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_set_display_backlight(std::string msg)
 		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
 	if(cmdArg.size()<=0)
 		return RPC_SRV_RESULT_ARG_ERROR;
+	xpandarg(cmdArg); //e.g: dispbklt $sts
 	//char temp_str[255];temp_str[0]='\0';
 	ADJsonRpcClient Client;
 	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
@@ -1662,5 +1685,47 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_set_display_backlight(std::string msg)
 	RPC_SRV_RESULT result = Client.set_single_string_type((char*)"display_backlight_set",(char*)"status",(char*)cmdArg.c_str());
 	Client.rpc_server_disconnect();
 	return result;
+}
+/* ------------------------------------------------------------------------- */
+//removes first $ sign and expands the argument with alias if found
+RPC_SRV_RESULT XmppMgr::xpandarg(std::string &cmdArg)
+{
+	if(cmdArg.at(0) == '$')
+	{
+		cmdArg.erase(0,1);//remote first $ char
+		transform(cmdArg.begin(), cmdArg.end(), cmdArg.begin(), ::tolower);
+		Alias::iterator it = AliasList.find(cmdArg);
+		if (it != AliasList.end())
+			cmdArg=it->second;
+	}
+	RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+//split strings by space, expand string if prefixed with  $ sign and merge back the string
+RPC_SRV_RESULT XmppMgr::xpandargs(std::string &cmdArg)
+{
+	//cout <<"before: "<< cmdArg <<endl;
+    std::string buf;                 // Have a buffer string
+    std::stringstream ss(cmdArg);    // Insert the string into a stream
+    std::vector<std::string> tokens; // Create vector to hold our words
+    while (ss >> buf)
+        tokens.push_back(buf);
+	for( std::vector<std::string>::iterator it = tokens.begin(); it != tokens.end(); ++it)
+	{
+		if((*it).at(0) == '$')
+		{
+			(*it).erase(0,1);//remote first $ char
+			transform((*it).begin(), (*it).end(), (*it).begin(), ::tolower);
+			Alias::iterator myit = AliasList.find((*it));
+			if (myit != AliasList.end())
+				(*it)=myit->second;
+		}
+	}
+	std::ostringstream result_stream;
+	std::ostream_iterator < std::string > oit( result_stream," " );
+	std::copy( tokens.begin(), tokens.end(), oit );
+	cmdArg = result_stream.str();//merge strings back with space as saparator
+	//cout <<"after: "<< cmdArg <<endl;
+	RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
