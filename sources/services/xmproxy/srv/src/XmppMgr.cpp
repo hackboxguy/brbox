@@ -13,7 +13,7 @@
 using namespace std;
 /* ------------------------------------------------------------------------- */
 //supported commands over xmpp-channel
-XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] = 
+XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 {
 	{true ,EXMPP_CMD_GSM_MODEM_IDENT         , "gsmcheck"     ,""},
 	{true ,EXMPP_CMD_SMS_LIST_UPDATE         , "smsupdate"    ,""},
@@ -47,10 +47,11 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{true ,EXMPP_CMD_BUDDY_LIST              , "buddylist"    ,""}, //prints buddy list
 	{true ,EXMPP_CMD_SHELLCMD                , "shellcmd"     ,"<command>"}, //executes remote shell command
 	{true ,EXMPP_CMD_SHELLCMD_RESP           , "shellcmdresp" ,""}, //reads response of last executed shell command
+	{true ,EXMPP_CMD_SHELLCMD_TRIG           , "shellcmdtrig" ,"<command>"}, //executes remote shell command but without redirecting the output
 	{true ,EXMPP_CMD_DEVIDENT                , "identify" ,""},  //identify board by blinking onboard LED
 	{true ,EXMPP_CMD_SHUTDOWN                , "xmpshutdown" ,""}, //shutdown xmpp server(for xmpp logout)
 	{true ,EXMPP_CMD_SONOFF                  , "sonoff" ,"<ip/hostname> [sts(on/off/toggle)]"},//http based control of sonoff relay(tasmota fmw)
-	{true ,EXMPP_CMD_DISPCLEAR               , "dispclear" ,""}, 
+	{true ,EXMPP_CMD_DISPCLEAR               , "dispclear" ,""},
 	{true ,EXMPP_CMD_DISPPRINT               , "display" ,"<line1/line2/line3..]> <message>"},
 	{true ,EXMPP_CMD_DISPBKLT                , "dispbklt" ,"<sts[on/off]>"}
 };
@@ -76,7 +77,7 @@ XmppMgr::XmppMgr() //:AckToken(0)
 	XmppProxy.attach_callback(this);
 	XmppClientThread.subscribe_thread_callback(this);
 	XmppClientThread.set_thread_properties(THREAD_TYPE_NOBLOCK,(void *)this);
-	
+
 	XmppCmdProcessThread.subscribe_thread_callback(this);
 	XmppCmdProcessThread.set_thread_properties(THREAD_TYPE_MONOSHOT,(void *)this);
 	XmppCmdProcessThread.start_thread();
@@ -99,7 +100,7 @@ XmppMgr::~XmppMgr()
 int XmppMgr::AttachHeartBeat(ADTimer* pTimer)
 {
 	//give 100ms heartbeat to ADDisplayMgr
-	//this is needed for detecting 3sec timeout for uart communication	
+	//this is needed for detecting 3sec timeout for uart communication
 	pTimer->subscribe_timer_notification(this);
 	pMyTimer=pTimer;
 	return 0;
@@ -219,7 +220,7 @@ int XmppMgr::thread_callback_function(void* pUserData,ADThreadProducer* pObj)
 		//cout<<"XmppMgr::thread_callback_function: exited xmpp connect"<<endl;
 		//XmppProxy.disconnect();
 		if(XmppProxy.getForcedDisconnect())break;
-		
+
 		//before retrying wait 5sec
 		usleep(800000);if(XmppProxy.getForcedDisconnect())break;
 		usleep(800000);if(XmppProxy.getForcedDisconnect())break;
@@ -238,7 +239,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 	{
 		//TODO: handle semicolon separated multiple commands
 		XmppCmdEntry cmd = processCmd.front();
-		
+
 		//std::string temp=cmd.cmdMsg;
 		stringstream mystream(cmd.cmdMsg);
 		std::string mycmd;
@@ -284,7 +285,7 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 			else
 				result.push_back( substr );
 		}
-		while (!result.empty()) 
+		while (!result.empty())
 		{
 			std::string returnval="";
 			RPC_SRV_RESULT res=RPC_SRV_RESULT_UNKNOWN_COMMAND;//RPC_SRV_RESULT_FAIL;
@@ -331,8 +332,9 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_ACCOUNT         :res=proc_cmd_account_name(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_BOTNAME         :res=proc_cmd_bot_name(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_BUDDY_LIST      :res=proc_cmd_buddy_list(cmdcmdMsg,returnval);break;
-				case EXMPP_CMD_SHELLCMD        :res=proc_cmd_shellcmd(cmdcmdMsg,returnval,cmd.sender);break;//inProgbreak;
+				case EXMPP_CMD_SHELLCMD        :res=proc_cmd_shellcmd(cmdcmdMsg,returnval,cmd.sender,EXMPP_CMD_SHELLCMD);break;//inProgbreak;
 				case EXMPP_CMD_SHELLCMD_RESP   :res=proc_cmd_shellcmdresp(cmdcmdMsg,returnval,cmd.sender);break;//inProgbreak;
+				case EXMPP_CMD_SHELLCMD_TRIG   :res=proc_cmd_shellcmd(cmdcmdMsg,returnval,cmd.sender,EXMPP_CMD_SHELLCMD_TRIG);break;//inProgbreak;
 				case EXMPP_CMD_DEVIDENT        :res=proc_cmd_devident(cmdcmdMsg,returnval,cmd.sender);break;//inProg
 				case EXMPP_CMD_SHUTDOWN        :res=proc_cmd_xmpshutdown(cmdcmdMsg,returnval,cmd.sender);break;//inProg
 				case EXMPP_CMD_SONOFF          :res=proc_cmd_sonoff(cmdcmdMsg,returnval);break;
@@ -376,7 +378,7 @@ RPC_SRV_RESULT XmppMgr::RpcResponseCallback(std::string taskRes,int taskID,std::
 	return RPC_SRV_RESULT_SUCCESS;
 }
 //RAII function, used for inserting entry or searching for existing entry
-RPC_SRV_RESULT XmppMgr::AccessAsyncTaskList(int tid, int port, bool insertEntryFlag,int *xmpptID,std::string &sender) 
+RPC_SRV_RESULT XmppMgr::AccessAsyncTaskList(int tid, int port, bool insertEntryFlag,int *xmpptID,std::string &sender)
 {
 	// mutex to protect cmn resource access (shared across threads)
 	static std::mutex mutex;
@@ -664,7 +666,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg,std::string &returnv
 //01:19:27.440-->{ "jsonrpc": "2.0", "method": "firmware_update", "params": { "module": "project", "filepath": "\/tmp\/messages" }, "id": 0 }
 //01:19:27.449<--{ "jsonrpc": "2.0", "result": { "return": "InProgress", "taskId": 4 }, "id": 0 }
 	if(result==RPC_SRV_RESULT_IN_PROG)
-	{	
+	{
 		result=Client.set_double_string_get_single_string_type((char*)"firmware_update",(char*)"module",(char*)"project",
 									(char*)"filepath",(char*)"/tmp/uBrBoxRoot.uimg",
 									(char*)"taskId",temp_str);
@@ -1135,7 +1137,7 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_event_gpio(std::string msg,std::string sender,s
 		{
 			bool sts=false;
 			if(cmdArgVal=="1")
-			{	
+			{
 				sts=true;
 				myEventList.push_back(EventSubscrEntry(sender,EXMPP_EVNT_GPIO,io,sts));
 				ExtendEventSubscrList(EventSubscrListFile,sender,EXMPP_EVNT_GPIO,io);
@@ -1382,7 +1384,7 @@ RPC_SRV_RESULT XmppMgr::GpioEventCallback(int evntNum,int evntArg)
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
-RPC_SRV_RESULT XmppMgr::proc_cmd_shellcmd(std::string msg,std::string &returnval,std::string sender)
+RPC_SRV_RESULT XmppMgr::proc_cmd_shellcmd(std::string msg,std::string &returnval,std::string sender,EXMPP_CMD_TYPES cmdtype)
 {
 	std::string cmd,destArg;//,msgArg;
 	stringstream msgstream(msg);
@@ -1396,12 +1398,17 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_shellcmd(std::string msg,std::string &returnval
 		return RPC_SRV_RESULT_ARG_ERROR;
 
 	char tID[255];tID[254]='\0';
-
+	char rpccmd[512];
 	//send shell command to system-manager service
 	ADJsonRpcClient Client;
 	if(Client.rpc_server_connect(bboxSmsServerAddr.c_str(),ADCMN_PORT_SYSMGR)!=0)
 		return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
-	RPC_SRV_RESULT result=Client.set_single_string_get_single_string_type((char*)"run_shellcmd",
+	if(cmdtype==EXMPP_CMD_SHELLCMD_TRIG)
+		sprintf(rpccmd,"run_shellcmdtrig");
+	else
+		sprintf(rpccmd,"run_shellcmd");
+
+	RPC_SRV_RESULT result=Client.set_single_string_get_single_string_type(rpccmd,
 				(char*)"command",(char*)destArg.c_str(),
 				(char*)"taskId",(char*)tID);
 	Client.rpc_server_disconnect();
@@ -1535,9 +1542,9 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_sonoff(std::string msg,std::string &returnval)
 				return RPC_SRV_RESULT_HOST_NOT_REACHABLE_ERR;
 			result=Client.set_sonoff_toggle();
 		}
-		else 
+		else
 			return RPC_SRV_RESULT_ARG_ERROR;
-			
+
 		Client.rpc_server_disconnect();
 		return result;
 	}
@@ -1548,10 +1555,10 @@ RPC_SRV_RESULT XmppMgr::hostname_to_ip(char * hostname , char* ip)
 	struct hostent *he;
 	struct in_addr **addr_list;
 	int i;
-	if ( (he = gethostbyname( hostname ) ) == NULL) 
+	if ( (he = gethostbyname( hostname ) ) == NULL)
 		return RPC_SRV_RESULT_FAIL;
 	addr_list = (struct in_addr **) he->h_addr_list;
-	for(i = 0; addr_list[i] != NULL; i++) 
+	for(i = 0; addr_list[i] != NULL; i++)
 	{
 		//Return the first one;
 		strcpy(ip , inet_ntoa(*addr_list[i]) );
@@ -1657,4 +1664,3 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_set_display_backlight(std::string msg)
 	return result;
 }
 /* ------------------------------------------------------------------------- */
-

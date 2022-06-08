@@ -67,6 +67,7 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_DISPCLEAR,   //clear-display
 	EXMPP_CMD_DISPPRINT,   //display-print
 	EXMPP_CMD_DISPBKLT,    //display-backlight-control
+	EXMPP_CMD_SHELLCMD_TRIG,
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -185,7 +186,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 #else
 	ADXmppProxy XmppProxy;//xmpp client
 #endif
-	
+
 
 	std::string AliasListFile;
 	typedef std::map<std::string, std::string> Alias;
@@ -217,7 +218,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	virtual int monoshot_callback_function(void* pUserData,ADThreadProducer* pObj);//{return 0;};
 	virtual int thread_callback_function(void* pUserData,ADThreadProducer* pObj);//{return 0;};//we are not using this one..
 
-	//ADTimerConsumer overrides: 100ms timer and sigio 
+	//ADTimerConsumer overrides: 100ms timer and sigio
 	virtual int sigio_notification(){return 0;};
 	virtual int timer_notification();//{return 0;};
 	virtual int custom_sig_notification(int signum){return 0;};
@@ -257,7 +258,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_account_name(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_bot_name(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_buddy_list(std::string msg,std::string &returnval);
-	RPC_SRV_RESULT proc_cmd_shellcmd(std::string msg,std::string &returnval,std::string sender);
+	RPC_SRV_RESULT proc_cmd_shellcmd(std::string msg,std::string &returnval,std::string sender,EXMPP_CMD_TYPES cmdtype);
 	RPC_SRV_RESULT proc_cmd_shellcmdresp(std::string msg,std::string &returnval,std::string sender);
 	RPC_SRV_RESULT proc_cmd_devident(std::string msg,std::string &returnval,std::string sender);
 	RPC_SRV_RESULT proc_cmd_xmpshutdown(std::string msg,std::string &returnval,std::string sender);
@@ -298,4 +299,3 @@ public:
 	void SetBotNameFilePath(std::string filepath);
 };
 #endif
-
