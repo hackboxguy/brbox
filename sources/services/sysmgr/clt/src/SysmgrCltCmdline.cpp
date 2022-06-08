@@ -55,6 +55,8 @@ SysmgrCltCmdline::SysmgrCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--devident                 [identify board by blinking onboard LED]");
 	CmdlineHelper.insert_options_entry((char*)"evntsubscr" ,optional_argument,EJSON_SYSMGR_RPC_EVNT_SUBSCRIBE);
 	CmdlineHelper.insert_help_entry((char*)"--evntsubscr               [re-subscribe events foe event logging]");
+	CmdlineHelper.insert_options_entry((char*)"shellcmdtrig",optional_argument,EJSON_SYSMGR_RPC_RUN_SHELLCMDTRIG);
+	CmdlineHelper.insert_help_entry((char*)"--shellcmdtrig=cmd         [run a command in linux shell without output]");
 }
 /* ------------------------------------------------------------------------- */
 SysmgrCltCmdline::~SysmgrCltCmdline()
@@ -189,6 +191,9 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 		case EJSON_SYSMGR_RPC_RUN_SHELLCMD:
 			push_shell_cmd(sub_arg,EJSON_SYSMGR_RPC_RUN_SHELLCMD,(char*)SYSMGR_RPC_RUN_SHELLCMD);
 			break;
+		case EJSON_SYSMGR_RPC_RUN_SHELLCMDTRIG:
+			push_shell_cmd(sub_arg,EJSON_SYSMGR_RPC_RUN_SHELLCMDTRIG,(char*)SYSMGR_RPC_RUN_SHELLCMDTRIG);
+			break;
 		case EJSON_SYSMGR_RPC_DEVIDENT:
 			CmdlineHelper.push_action_type_noarg_command(EJSON_SYSMGR_RPC_DEVIDENT,
 				(char*)SYSMGR_RPC_DEVIDENT,(char*)RPCMGR_RPC_TASK_STS_ARGID);
@@ -198,7 +203,7 @@ int SysmgrCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			break;
 		default:
 			return 0;
-			break;	
+			break;
 	}
 	return 0;
 }
@@ -228,6 +233,7 @@ int SysmgrCltCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *
 			run_get_indexed_msg_command(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
 			break;
 		case EJSON_SYSMGR_RPC_RUN_SHELLCMD:
+		case EJSON_SYSMGR_RPC_RUN_SHELLCMDTRIG:
 			run_shell_cmd(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
 			break;
 		default:return -1;
@@ -273,7 +279,7 @@ int SysmgrCltCmdline::push_get_string_of_index(char* subarg,char* rpc_name,int r
 		printf("please specify correct index number\n");
 		return -1;
 	}
-	else 
+	else
 	{
 			strcpy(pCmdObj->first_arg_param_name,arg_name);
 			strcpy(pCmdObj->first_arg_param_value,subarg);//index
@@ -370,7 +376,7 @@ int SysmgrCltCmdline::push_fmw_version_read_command(char* subarg)
 		printf("please specify correct module type []!!!\n");
 		return -1;
 	}
-	else 
+	else
 	{
 		const char *table[]   = SYSMGR_RPC_FMW_VER_ARG_TABL;
 		SYSMGR_FMW_MODULE_TYPE module=(SYSMGR_FMW_MODULE_TYPE)string_to_enum(table,subarg,SYSMGR_FMW_MODULE_UNKNOWN);
@@ -381,7 +387,7 @@ int SysmgrCltCmdline::push_fmw_version_read_command(char* subarg)
 			return -1;
 		}
 		else
-		{	
+		{
 			strcpy(pCmdObj->first_arg_param_name,SYSMGR_RPC_FMW_VER_ARG_MODULE);//"module"
 			strcpy(pCmdObj->first_arg_param_value,table[module]);//"MrcSpiImg"
 			strcpy(pCmdObj->second_arg_param_name,SYSMGR_RPC_FMW_VER_ARG);//"version"
@@ -429,7 +435,7 @@ int SysmgrCltCmdline::push_fmw_update_command(char* subarg)
 	pCmdObj->cmd_type=CLIENT_CMD_TYPE_USER_DEFINED;
 
 	if(CmdlineHelper.get_next_subargument(&subarg)==0)//read
-	{	
+	{
 		printf("for fmw update module_type and file_path must be specified\n");
 		OBJ_MEM_DELETE(pCmdObj);
 		return -1;
@@ -445,13 +451,13 @@ int SysmgrCltCmdline::push_fmw_update_command(char* subarg)
 			return -1;
 		}
 		else
-		{	
+		{
 			strcpy(pCmdObj->first_arg_param_name,SYSMGR_RPC_FMWUPDATE_ARG);//"module"
-			strcpy(pCmdObj->first_arg_param_value,table[module]);//"module-type"		
+			strcpy(pCmdObj->first_arg_param_value,table[module]);//"module-type"
 			pCmdObj->command=EJSON_SYSMGR_RPC_SET_FMWUPDATE;
 			pCmdObj->action=RPC_SRV_ACT_WRITE;
 			if(CmdlineHelper.get_next_subargument(&subarg)==0)//read
-			{	
+			{
 				printf("For fmw update, file_path must be specified\n");
 				OBJ_MEM_DELETE(pCmdObj);
 				return -1;
@@ -512,18 +518,18 @@ int SysmgrCltCmdline::push_file_download(char* subarg,EJSON_SYSMGR_RPC_TYPES rpc
 	pCmdObj->action=RPC_SRV_ACT_WRITE;
 
 	if(CmdlineHelper.get_next_subargument(&subarg)==0)
-	{	
+	{
 		printf("for file download,  ftp server's URL(or tftp server ip) must be specified\n");
 		OBJ_MEM_DELETE(pCmdObj);
 		return -1;
 	}
-	else 
+	else
 	{
 		strcpy(pCmdObj->first_arg_param_name,SYSMGR_RPC_DOWNLOADFILE_ARG_SRCADDR);
 		strcpy(pCmdObj->first_arg_param_value,subarg);
 
 		if(CmdlineHelper.get_next_subargument(&subarg)==0)
-		{	
+		{
 			printf("for file download,  please specify target download location\n");
 			OBJ_MEM_DELETE(pCmdObj);
 			return -1;
@@ -535,12 +541,12 @@ int SysmgrCltCmdline::push_file_download(char* subarg,EJSON_SYSMGR_RPC_TYPES rpc
 		if(rpc_cmd==EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP)
 		{
 			if(CmdlineHelper.get_next_subargument(&subarg)==0)
-			{	
+			{
 				printf("for file download,  tftp server's filename must be specified\n");
 				OBJ_MEM_DELETE(pCmdObj);
 				return -1;
 			}
-			else 
+			else
 			{
 				strcpy(pCmdObj->third_arg_param_name,SYSMGR_RPC_DOWNLOADFILE_ARG_SRCFILE);
 				strcpy(pCmdObj->third_arg_param_value,subarg);
@@ -610,7 +616,7 @@ int SysmgrCltCmdline::push_get_indexed_msg_command(char* subarg,char* rpc_name,i
 		printf("please specify correct msg index number\n");
 		return -1;
 	}
-	else 
+	else
 	{
 			strcpy(pCmdObj->first_arg_param_name,arg_name);
 			//strcpy(pCmdObj->first_arg_param_value,subarg);
@@ -661,12 +667,12 @@ int SysmgrCltCmdline::push_shell_cmd(char* subarg,EJSON_SYSMGR_RPC_TYPES cmd,cha
 	pCmdObj->action=RPC_SRV_ACT_WRITE;
 
 	if(CmdlineHelper.get_next_subargument(&subarg)==0)
-	{	
+	{
 		printf("for shellcmd,  command must be specified\n");
 		OBJ_MEM_DELETE(pCmdObj);
 		return -1;
 	}
-	else 
+	else
 	{
 		strcpy(pCmdObj->first_arg_param_name,SYSMGR_RPC_SHELLCMD_ARG_CMD);
 		strcpy(pCmdObj->first_arg_param_value,subarg);
@@ -702,5 +708,3 @@ int SysmgrCltCmdline::run_shell_cmd(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pS
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
-
-

@@ -104,36 +104,38 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&FmwVerGet);
 	SysRpc BootSysGet(SYSMGR_RPC_BOOT_SYSTEM_GET,EJSON_SYSMGR_RPC_GET_BOOT_SYSTEM ,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&BootSysGet);
-	SysRpc FmwUpdateSet(SYSMGR_RPC_FMWUPDATE_SET,EJSON_SYSMGR_RPC_SET_FMWUPDATE   ,emulat,dbglog,&DataCache); 
+	SysRpc FmwUpdateSet(SYSMGR_RPC_FMWUPDATE_SET,EJSON_SYSMGR_RPC_SET_FMWUPDATE   ,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&FmwUpdateSet);
-	SysRpc TftpGet(SYSMGR_RPC_DOWNLOADTFTP_SET  ,EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP,emulat,dbglog,&DataCache); 
+	SysRpc TftpGet(SYSMGR_RPC_DOWNLOADTFTP_SET  ,EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&TftpGet);
-	SysRpc FtpGet(SYSMGR_RPC_DOWNLOADFTP_SET    ,EJSON_SYSMGR_RPC_SET_DOWNLOADFTP ,emulat,dbglog,&DataCache); 
+	SysRpc FtpGet(SYSMGR_RPC_DOWNLOADFTP_SET    ,EJSON_SYSMGR_RPC_SET_DOWNLOADFTP ,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&FtpGet);
-	SysRpc AsyncGet(SYSMGR_RPC_ASYNCTASK_GET    ,EJSON_SYSMGR_RPC_GET_ASYNCTASK   ,emulat,dbglog,&DataCache); 
+	SysRpc AsyncGet(SYSMGR_RPC_ASYNCTASK_GET    ,EJSON_SYSMGR_RPC_GET_ASYNCTASK   ,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&AsyncGet);
-	SysRpc DevTypeGet(SYSMGR_RPC_DEVTYPE_GET    ,EJSON_SYSMGR_RPC_GET_DEVTYPE   ,emulat,dbglog,&DataCache); 
+	SysRpc DevTypeGet(SYSMGR_RPC_DEVTYPE_GET    ,EJSON_SYSMGR_RPC_GET_DEVTYPE   ,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&DevTypeGet);
-	SysRpc HostnameGet(SYSMGR_RPC_HOSTNAME_GET    ,EJSON_SYSMGR_RPC_GET_HOSTNAME   ,emulat,dbglog,&DataCache); 
+	SysRpc HostnameGet(SYSMGR_RPC_HOSTNAME_GET    ,EJSON_SYSMGR_RPC_GET_HOSTNAME   ,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&HostnameGet);
-	SysRpc HostnameSet(SYSMGR_RPC_HOSTNAME_SET    ,EJSON_SYSMGR_RPC_SET_HOSTNAME   ,emulat,dbglog,&DataCache); 
+	SysRpc HostnameSet(SYSMGR_RPC_HOSTNAME_SET    ,EJSON_SYSMGR_RPC_SET_HOSTNAME   ,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&HostnameSet);
-	SysRpc MyIp(SYSMGR_RPC_MY_PUBLIC_IP_GET    ,EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP   ,emulat,dbglog,&DataCache); 
+	SysRpc MyIp(SYSMGR_RPC_MY_PUBLIC_IP_GET    ,EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP   ,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&MyIp);
-	SysRpc DefHostname(SYSMGR_RPC_DEFAULT_HOSTNAME_SET,EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME,emulat,dbglog,&DataCache); 
+	SysRpc DefHostname(SYSMGR_RPC_DEFAULT_HOSTNAME_SET,EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&DefHostname);
-	SysRpc UpdtLogList(SYSMGR_RPC_UPDATE_LOG_SET,EJSON_SYSMGR_RPC_SET_UPDATE_LOG,emulat,dbglog,&DataCache); 
+	SysRpc UpdtLogList(SYSMGR_RPC_UPDATE_LOG_SET,EJSON_SYSMGR_RPC_SET_UPDATE_LOG,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&UpdtLogList);
-	SysRpc GetLogCount(SYSMGR_RPC_LOG_COUNT_GET,EJSON_SYSMGR_RPC_GET_LOG_COUNT,emulat,dbglog,&DataCache); 
+	SysRpc GetLogCount(SYSMGR_RPC_LOG_COUNT_GET,EJSON_SYSMGR_RPC_GET_LOG_COUNT,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&GetLogCount);
-	SysRpc GetLogLine(SYSMGR_RPC_LOG_LINE_GET,EJSON_SYSMGR_RPC_GET_LOG_LINE,emulat,dbglog,&DataCache); 
+	SysRpc GetLogLine(SYSMGR_RPC_LOG_LINE_GET,EJSON_SYSMGR_RPC_GET_LOG_LINE,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&GetLogLine);
-	SysRpc RunShellCmd(SYSMGR_RPC_RUN_SHELLCMD,EJSON_SYSMGR_RPC_RUN_SHELLCMD,emulat,dbglog,&DataCache); 
+	SysRpc RunShellCmd(SYSMGR_RPC_RUN_SHELLCMD,EJSON_SYSMGR_RPC_RUN_SHELLCMD,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&RunShellCmd);
 	SysRpc DevIdent (SYSMGR_RPC_DEVIDENT,EJSON_SYSMGR_RPC_DEVIDENT,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&DevIdent);
 	SysRpc EvntSubscr (SYSMGR_RPC_EVNT_SUBSCRIBE,EJSON_SYSMGR_RPC_EVNT_SUBSCRIBE,emulat,dbglog,&DataCache);
 	RpcMgr.AttachRpc(&EvntSubscr);
+	SysRpc RunShellCmdTrig(SYSMGR_RPC_RUN_SHELLCMDTRIG,EJSON_SYSMGR_RPC_RUN_SHELLCMDTRIG,emulat,dbglog,&DataCache);
+	RpcMgr.AttachRpc(&RunShellCmdTrig);
 
 	//for low memory device, support display-clear and display-print commands.
 	//if(CmdLine.get_sys_config()=="a5v11-xmpp")
@@ -279,4 +281,3 @@ DisplayDevice* low_memory_device_special_action(std::string sysconf,std::string 
 	return pDevice;
 }
 /* ------------------------------------------------------------------------- */
-

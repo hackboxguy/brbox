@@ -11,7 +11,7 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_SET_MAC_ADDR,
 	EJSON_SYSMGR_RPC_GET_ETH_COUNT, //returns number of eth interfaces available on the device
 	EJSON_SYSMGR_RPC_GET_ETH_NAME,
-	
+
 	EJSON_SYSMGR_RPC_GET_LOADINFO,
 	EJSON_SYSMGR_RPC_GET_MEMINFO,
 	EJSON_SYSMGR_RPC_GET_CPUINFO,
@@ -28,7 +28,7 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_SET_HOSTNAME,
 	EJSON_SYSMGR_RPC_GET_MY_PUBLIC_IP, //internet ip
 	EJSON_SYSMGR_RPC_SET_DEFAULT_HOSTNAME, //set default hostname
-	EJSON_SYSMGR_RPC_SET_UPDATE_LOG, //reads BRBOX specific log lines from /tmp/messages and fills in vectorList 
+	EJSON_SYSMGR_RPC_SET_UPDATE_LOG, //reads BRBOX specific log lines from /tmp/messages and fills in vectorList
 	EJSON_SYSMGR_RPC_GET_LOG_COUNT,  //returns total number of log lines which was filled in vectorList
 	EJSON_SYSMGR_RPC_GET_LOG_LINE,   //returns log-message of a given index from vectorList
 	EJSON_SYSMGR_RPC_GET_IP_ADDR,    //returns ip-addr of given "ethX" string
@@ -43,6 +43,7 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 	EJSON_SYSMGR_RPC_DISP_PRINT,     //print string on display
 	EJSON_SYSMGR_RPC_DISP_GET_BKLT,  //read display backlight status
 	EJSON_SYSMGR_RPC_DISP_SET_BKLT,  //control display backlight
+	EJSON_SYSMGR_RPC_RUN_SHELLCMDTRIG, //runs a shell command but doesnt re-direct to /tmp/shellcmd.resp
 	EJSON_SYSMGR_RPC_END,
 	EJSON_SYSMGR_RPC_NONE
 }EJSON_SYSMGR_RPC_TYPES;
@@ -126,7 +127,7 @@ typedef struct SYSMGR_CPU_INFO_PACKET_T
 typedef enum EJSON_SYSMGR_DEV_OP_T
 {
 	EJSON_SYSMGR_DEV_OP_IDLE,        //IDLE
-	EJSON_SYSMGR_DEV_OP_ON,          //ON  
+	EJSON_SYSMGR_DEV_OP_ON,          //ON
 	EJSON_SYSMGR_DEV_OP_LAST_STATE,  //used for autostartup action
 	EJSON_SYSMGR_DEV_OP_STANDBY,     //STANDBY(low power Wake-On-Lan mode)
 	EJSON_SYSMGR_DEV_OP_REBOOT,      //RESTART
@@ -198,7 +199,7 @@ typedef SYSMGR_FMW_MODULE_PACKET SYSMGR_FMWUPDATE_PACKET;
 #define SYSMGR_RPC_DOWNLOADFTP_SET           "download_ftp_file"
 #define SYSMGR_RPC_DOWNLOADTFTP_SET          "download_tftp_file"
 #define SYSMGR_RPC_DOWNLOADFILE_ARG_SRCADDR  "srcaddr" //incase of ftp it is the url, incase of tftp it is the serverip
-#define SYSMGR_RPC_DOWNLOADFILE_ARG_SRCFILE  "srcfile" 
+#define SYSMGR_RPC_DOWNLOADFILE_ARG_SRCFILE  "srcfile"
 #define SYSMGR_RPC_DOWNLOADFILE_ARG_TARFILE  "targetpath"
 typedef struct SYSMGR_DOWNLOAD_FILE_PACKET_T
 {
@@ -211,7 +212,7 @@ typedef struct SYSMGR_DOWNLOAD_FILE_PACKET_T
 //EJSON_SYSMGR_RPC_GET_ASYNCTASK //get-async-task-in-progress
 #define SYSMGR_RPC_ASYNCTASK_GET         "get_async_task"
 #define SYSMGR_RPC_ASYNCTASK_ARG         "task"
-#define SYSMGR_RPC_ASYNCTASK_ARG_TABL    {"devop","fupdate","ftpdownload","tftpdownload","loglistupdt","shellcmd","devident","none","none","\0"} //show unknown as none
+#define SYSMGR_RPC_ASYNCTASK_ARG_TABL    {"devop","fupdate","ftpdownload","tftpdownload","loglistupdt","shellcmd","devident","shellcmdtrig","none","none","\0"} //show unknown as none
 typedef enum SYSMGR_ASYNCTASK_TYPE_T
 {
 	SYSMGR_ASYNCTASK_DEVOP,
@@ -221,6 +222,7 @@ typedef enum SYSMGR_ASYNCTASK_TYPE_T
 	SYSMGR_ASYNCTASK_LOGLISTUPDATE,
 	SYSMGR_ASYNCTASK_SHELLCMD,
 	SYSMGR_ASYNCTASK_DEVIDENT,
+	SYSMGR_ASYNCTASK_SHELLCMDTRIG,
 	SYSMGR_ASYNCTASK_UNKNOWN,
 	SYSMGR_ASYNCTASK_NONE
 }SYSMGR_ASYNCTASK_TYPE;
@@ -301,7 +303,9 @@ typedef struct SYSMGR_NET_INFO_PACKET_T //common communication object for netinf
 }SYSMGR_NET_INFO_PACKET;
 /* ------------------------------------------------------------------------- */
 //EJSON_SYSMGR_RPC_RUN_SHELLCMD
+//EJSON_SYSMGR_RPC_RUN_SHELLCMDTRIG
 #define SYSMGR_RPC_RUN_SHELLCMD      "run_shellcmd"
+#define SYSMGR_RPC_RUN_SHELLCMDTRIG  "run_shellcmdtrig"
 #define SYSMGR_RPC_SHELLCMD_ARG_CMD  "command"
 typedef struct SYSMGR_SHELLCMD_PACKET_T
 {
@@ -349,7 +353,7 @@ typedef enum EJSON_SYSMGR_LINE_T
 #define	SYSMGR_RPC_DISP_GET_BKLT        "display_backlight_get"
 #define	SYSMGR_RPC_DISP_SET_BKLT        "display_backlight_set"
 #define SYSMGR_RPC_DISP_BKLT_ARG        "status"
-#define SYSMGR_RPC_DISP_BKLT_ARG_TABL   {"off","on","unknown","none","\0"} 
+#define SYSMGR_RPC_DISP_BKLT_ARG_TABL   {"off","on","unknown","none","\0"}
 typedef enum SYSMGR_BKLT_STS_T
 {
 	SYSMGR_BKLT_STS_OFF,
@@ -384,14 +388,13 @@ typedef struct SYSMGR_CMN_DATA_CACHE_T
 	SYSMGR_CMN_DATA_CACHE_T()
 	{
 		AsyncCmdInProgress=EJSON_SYSMGR_RPC_NONE;
-		pLogger=NULL;		
+		pLogger=NULL;
 		pDevIdent=NULL;
 		EvntMonitorConfigFile="";
-		pEventDefault=NULL;		
+		pEventDefault=NULL;
 		pEventCustom=NULL;
 	};//initialize variables here
 	~ SYSMGR_CMN_DATA_CACHE_T(){};
 }SYSMGR_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */
 #endif
-

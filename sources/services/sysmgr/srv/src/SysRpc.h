@@ -102,7 +102,7 @@ public:
 
 	int json_to_bin_run_shellcmd(JsonDataCommObj* pReq);
 	int bin_to_json_run_shellcmd(JsonDataCommObj* pReq);
-	int process_run_shellcmd(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj);
+	int process_run_shellcmd(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj,EJSON_SYSMGR_RPC_TYPES cmdtype);
 	RPC_SRV_RESULT process_async_run_shellcmd(SYSMGR_SHELLCMD_PACKET* pPacket);
 
 	int json_to_bin_devident(JsonDataCommObj* pReq);
@@ -113,6 +113,11 @@ public:
 	int json_to_bin_subscribe_events(JsonDataCommObj* pReq);
 	int bin_to_json_subscribe_events(JsonDataCommObj* pReq);
 	int process_subscribe_events(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj);
+
+	//int json_to_bin_run_shellcmdtrig(JsonDataCommObj* pReq);
+	//int bin_to_json_run_shellcmdtrig(JsonDataCommObj* pReq);
+	//int process_run_shellcmdtrig(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj);
+	//RPC_SRV_RESULT process_async_run_shellcmdtrig(SYSMGR_SHELLCMD_PACKET* pPacket);
 };
 /* ------------------------------------------------------------------------- */
 
