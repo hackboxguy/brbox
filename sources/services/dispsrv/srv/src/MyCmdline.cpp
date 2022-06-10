@@ -5,6 +5,7 @@ typedef enum DISPSRV_CMDLINE_OPT_T
 {
 	DISPSRV_CMDLINE_OPT_DISPTYPE = 100,
 	DISPSRV_CMDLINE_OPT_DEVICE, //device node
+	DISPSRV_CMDLINE_OPT_NETINTERFACE, //iface
 	DISPSRV_CMDLINE_OPT_UNKNOWN,
 	DISPSRV_CMDLINE_OPT_NONE
 }DISPSRV_CMDLINE_OPT;
@@ -13,6 +14,7 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 {
 	DispType="none";
 	DevNode="none";
+	NetInterface="";
 	port_number=portnum;
 	strcpy(version_number,version_str);
 	CmdlineHelper.attach_helper(this);
@@ -21,6 +23,8 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 	CmdlineHelper.insert_help_entry((char*)"--disptype=<type>           (display type[ssd1306_128x64/ssd1306_128x64_pi/1602_pcf/1604_pcf/2002_pcf/2004_pcf])");
 	CmdlineHelper.insert_options_entry((char*)"device" ,optional_argument,DISPSRV_CMDLINE_OPT_DEVICE);
 	CmdlineHelper.insert_help_entry((char*)"--device=/dev/i2c-x         (i2c device node if applicable)");
+	CmdlineHelper.insert_options_entry((char*)"iface" ,optional_argument,DISPSRV_CMDLINE_OPT_NETINTERFACE);
+	CmdlineHelper.insert_help_entry((char*)"--iface=ethx                (ip of netinterface to print on display)");
 }
 /*****************************************************************************/
 MyCmdline::~MyCmdline()
@@ -44,6 +48,12 @@ int MyCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 				DevNode="none";
 			else
 				DevNode=sub_arg;
+			break;
+		case DISPSRV_CMDLINE_OPT_NETINTERFACE:
+			if(CmdlineHelper.get_next_subargument(&sub_arg)==0)//ethx option passed by user
+				NetInterface="";
+			else
+				NetInterface=sub_arg;
 			break;
 		default:return 0;break;	
 	}
@@ -120,5 +130,8 @@ std::string MyCmdline::get_dev_node()
 	return DevNode;
 }
 /*****************************************************************************/
-
-
+std::string MyCmdline::get_net_interface()
+{
+	return NetInterface;
+}
+/*****************************************************************************/

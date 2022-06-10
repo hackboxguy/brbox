@@ -23,7 +23,7 @@ class DispScanner : public ADTimerConsumer
     int check_for_i2c_addr(uint8_t addr,char* node);
     int probe_i2c_addr(char* devnode, uint8_t addr);
     DisplayDevice* create_display_device(std::string DevNode,std::string Type);
-    std::string get_my_ipaddr();
+    std::string get_my_ipaddr(std::string interface="");
 public:
 	DispScanner(DISPSRV_CMN_DATA_CACHE *pDataCache=NULL);
 	~DispScanner();

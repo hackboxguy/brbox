@@ -9,20 +9,20 @@ SERVICE_WRITE_PID=1
 SERVICE_DAEMONIZE=1
 
 start() {
-	DEVNODE=$(ls -la /dev/i2c-* |head -1|grep -oh "/dev/.*") #choose the first i2c device node in the list
-	service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt) --disptype=ssd1306_128x64 --device=$DEVNODE
-        sleep 5
-	if [ -f /opt/fmw/bin/sysmgrclt ]
-	then
-		IPADDR=$(/opt/fmw/bin/sysmgrclt --ipaddr=eth0 | awk '{print $9}'|sed 's/result=//')
-	else
-		IPADDR=$(ifconfig |grep -A1 eth0|grep "inet addr"|awk '{print $2}'|sed 's/addr://')
-	fi
-
-        FMWVER=$(cat /etc/version.txt)
-	#CONFIG=$(cat /boot/sysconfig.txt)                                                   
-	sleep 1                          
-        /opt/fmw/bin/dispclt --dispclear --printline=line3,"BRBOX-$FMWVER" --printline=line4,"IP-$IPADDR"  
+	#DEVNODE=$(ls -la /dev/i2c-* |head -1|grep -oh "/dev/.*") #choose the first i2c device node in the list
+	#service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt) --disptype=ssd1306_128x64 --device=$DEVNODE
+	service_start /opt/fmw/bin/$APP --iface=$(cat /etc/dispsrv/iface-name.txt)
+        #sleep 5
+	#if [ -f /opt/fmw/bin/sysmgrclt ]
+	#then
+	#	IPADDR=$(/opt/fmw/bin/sysmgrclt --ipaddr=eth0 | awk '{print $9}'|sed 's/result=//')
+	#else
+	#	IPADDR=$(ifconfig |grep -A1 eth0|grep "inet addr"|awk '{print $2}'|sed 's/addr://')
+	#fi
+        #FMWVER=$(cat /etc/version.txt)
+	sleep 2                          
+        #/opt/fmw/bin/dispclt --dispclear --printline=line3,"BRBOX-$FMWVER" --printline=line4,"IP-$IPADDR"  
+        /opt/fmw/bin/dispclt --printline=line3,"V-$FMWVER"  
 }
 
 stop() {

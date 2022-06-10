@@ -43,6 +43,7 @@ int main(int argc, const char* argv[])
 	DataCache.pEventNotifier=(void*)&EventNotifier;
 	//I2CDualPcfLcd lcd(CmdLine.get_dev_node(),CmdLine.get_disp_type());//"/dev/i2c-0");
 	DataCache.pDisplay=create_display_device(CmdLine.get_dev_node(),CmdLine.get_disp_type(),&DataCache);
+	DataCache.net_interface=CmdLine.get_net_interface();
 	//if(DataCache.pDisplay!=NULL)
 	//	DataCache.pDisplay->print_line((char*)"BBROX",DISPLAY_LINE_1);//,1);
 

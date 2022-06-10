@@ -80,7 +80,7 @@ int DispScanner::timer_notification()
                 pRpcData->pDisplay->init_display();
                 pRpcData->pDisplay->clear_display();
                 pRpcData->pDisplay->print_line("Welcome",DISPLAY_LINE_1);
-                std::string tmp = get_my_ipaddr();
+                std::string tmp = get_my_ipaddr(pRpcData->net_interface);//override specific net interface if requested via cmdline arg
                 pRpcData->pDisplay->print_line((char*)tmp.c_str(),DISPLAY_LINE_2);
             }
         }
@@ -200,19 +200,27 @@ DisplayDevice* DispScanner::create_display_device(std::string DevNode,std::strin
 	return pDevice;
 }
 /*****************************************************************************/
-std::string DispScanner::get_my_ipaddr()
+std::string DispScanner::get_my_ipaddr(std::string interface)
 {
     char mac[256];
     char ip[256];
     char netmask[256];
     ADSysInfo info;
-	int total_detected=0;
-	eth_name_ip_str if_list[MAX_ALLOWED_INTERFACES];
-	if(info.probe_eth_interface_details(&total_detected,if_list)!=0)
-	{
-		//printf("probe_eth_interface_details_failed\n");
+    int total_detected=0;
+    eth_name_ip_str if_list[MAX_ALLOWED_INTERFACES];
+    if(info.probe_eth_interface_details(&total_detected,if_list)!=0)
+    {
+	//printf("probe_eth_interface_details_failed\n");
+	return "unknownip";
+    }
+    
+    if( interface != "" )
+    {
+	if(info.read_network_info((char*)interface.c_str(),mac,ip,netmask)==0)
+		return ip;
+	else
 		return "unknownip";
-	}
+    } 
     for(int i=0;i<total_detected;i++)
     {
         if(info.read_network_info(if_list[i].dev,mac,ip,netmask)==0)

@@ -82,6 +82,7 @@ typedef struct DISPSRV_CMN_DATA_CACHE_T
 	//unsigned int gpio_data_prev[GPIOCTL_MAX_GPIO_PINS];//comparing the last value for eventing
 	DisplayDevice *pDisplay;
 	ADLIB_DISPLAY_TYPE disp_type;//display-type suggested by user via commandline
+	std::string net_interface;
 	DISPSRV_CMN_DATA_CACHE_T() //constructor(initializer)
 	{
 		pDevInfo=NULL;
@@ -89,6 +90,7 @@ typedef struct DISPSRV_CMN_DATA_CACHE_T
 		//pDispAccess=NULL;
 		pDisplay=NULL;
 		disp_type=ADLIB_DISPLAY_TYPE_UNKNOWN;
+		net_interface="";
 	};
 }DISPSRV_CMN_DATA_CACHE;
 /* ------------------------------------------------------------------------- */
