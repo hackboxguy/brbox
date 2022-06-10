@@ -1,5 +1,8 @@
 #include "DispScanner.h"
 #include <linux/i2c-dev.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <glob.h>
 
 #include "DispsrvJsonDef.h"
 #include "DispAccess.h"
@@ -15,6 +18,7 @@ DispScanner::DispScanner(DISPSRV_CMN_DATA_CACHE *pDataCache)//std::string DevNod
     pRpcData=pDataCache;
     TimerCount=0;
     last_found_dev=0;
+    last_ip="none";
 }
 /*****************************************************************************/
 DispScanner::~DispScanner()
@@ -71,6 +75,7 @@ int DispScanner::timer_notification()
         {
                 delete pRpcData->pDisplay;
                 pRpcData->pDisplay=NULL;
+		last_ip="none";
         }
         if(pRpcData->pDisplay == NULL && last_found_dev!=0)//display has been plugged
         {
@@ -78,12 +83,24 @@ int DispScanner::timer_notification()
             if(pRpcData->pDisplay != NULL)
             {
                 pRpcData->pDisplay->init_display();
-                pRpcData->pDisplay->clear_display();
-                pRpcData->pDisplay->print_line("Welcome",DISPLAY_LINE_1);
-                std::string tmp = get_my_ipaddr(pRpcData->net_interface);//override specific net interface if requested via cmdline arg
-                pRpcData->pDisplay->print_line((char*)tmp.c_str(),DISPLAY_LINE_2);
+		last_ip="none";
+                //pRpcData->pDisplay->clear_display();
+                //pRpcData->pDisplay->print_line("Welcome",DISPLAY_LINE_1);
+                //std::string tmp = get_my_ipaddr();
+                //pRpcData->pDisplay->print_line((char*)tmp.c_str(),DISPLAY_LINE_2);
             }
         }
+        if(pRpcData->pDisplay != NULL) //check if ip address has changed during normal operation
+	{
+	    std::string tmp = get_my_ipaddr(pRpcData->net_interface);
+	    if( tmp != last_ip )
+	    {
+                pRpcData->pDisplay->clear_display();
+                pRpcData->pDisplay->print_line("Welcome",DISPLAY_LINE_1);
+		pRpcData->pDisplay->print_line((char*)tmp.c_str(),DISPLAY_LINE_2);
+		last_ip=tmp;
+	    }
+	}
     }
     return 0;
 }
@@ -93,9 +110,12 @@ int DispScanner::check_for_i2c_addr(uint8_t addr,char *node)
     char devnode[255];
     uint8_t data[255];
     int file;int res;
-    for(int i=0;i<128;i++)
+    std::vector<std::string> I2cNodeList;
+    fetch_i2c_devnode_list(I2cNodeList);
+    //for(int i=0;i<128;i++)
+    for(const auto & pEntry : I2cNodeList)
     {
-        sprintf(devnode,"/dev/i2c-%d",i);
+        sprintf(devnode,"%s",pEntry.c_str());
         res = probe_i2c_addr(devnode,addr);
         switch(res)
         {
@@ -216,16 +236,42 @@ std::string DispScanner::get_my_ipaddr(std::string interface)
     
     if( interface != "" )
     {
-	if(info.read_network_info((char*)interface.c_str(),mac,ip,netmask)==0)
+	if(info.read_network_info_new((char*)interface.c_str(),mac,ip,netmask)==0)
 		return ip;
 	else
 		return "unknownip";
-    } 
+    }
     for(int i=0;i<total_detected;i++)
     {
-        if(info.read_network_info(if_list[i].dev,mac,ip,netmask)==0)
+        if(info.read_network_info_new(if_list[i].dev,mac,ip,netmask)==0)
             return ip;
     }
     return "unknownip";
+}
+/*****************************************************************************/
+int DispScanner::fetch_i2c_devnode_list(std::vector<std::string> &I2cNodeList)
+{
+    char **found;
+    glob_t gstruct;
+    int r;
+
+    r = glob("/dev/i2c*", GLOB_ERR , NULL, &gstruct);
+    // check for errors
+    if( r!=0 )
+    {
+        if( r==GLOB_NOMATCH )
+            fprintf(stderr,"No matches\n");
+        else
+            fprintf(stderr,"Some kinda glob error\n");
+        return -1;
+    }
+
+    found = gstruct.gl_pathv;
+    while(*found)
+    {
+        I2cNodeList.push_back(*found);
+        found++;
+    }
+    return 0;
 }
 /*****************************************************************************/

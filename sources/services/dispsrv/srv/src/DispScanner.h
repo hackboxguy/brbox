@@ -14,6 +14,7 @@ using namespace std;
 class DispScanner : public ADTimerConsumer
 {
     uint8_t last_found_dev;
+    std::string last_ip;
     DISPSRV_CMN_DATA_CACHE* pRpcData;
     unsigned int TimerCount;
     ADTimer* myTimer;
@@ -24,6 +25,7 @@ class DispScanner : public ADTimerConsumer
     int probe_i2c_addr(char* devnode, uint8_t addr);
     DisplayDevice* create_display_device(std::string DevNode,std::string Type);
     std::string get_my_ipaddr(std::string interface="");
+    int fetch_i2c_devnode_list(std::vector<std::string> &I2cNodeList);
 public:
 	DispScanner(DISPSRV_CMN_DATA_CACHE *pDataCache=NULL);
 	~DispScanner();

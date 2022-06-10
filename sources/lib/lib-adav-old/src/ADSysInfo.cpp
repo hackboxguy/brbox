@@ -46,7 +46,7 @@ int ADSysInfo::get_cpu_cores(void)
 	FILE *cmdline = fopen("/proc/cpuinfo", "rb");
 	char *arg = 0;
 	size_t size = 0;
-	int cpu_count=0;	
+	int cpu_count=0;
 	while(getdelim(&arg, &size, 0, cmdline) != -1)
 	{
 		;
@@ -64,12 +64,12 @@ int ADSysInfo::get_current_and_average_load(float *current,float *average)
 	FILE *cmdline = fopen("/proc/loadavg", "rb");
 	char *arg = 0;
 	size_t size = 0;
-	//int cpu_count;	
+	//int cpu_count;
 	while(getdelim(&arg, &size, 0, cmdline) != -1)
 	{
 		;
 	}
-	sscanf(arg,"%f %f",current,average); 
+	sscanf(arg,"%f %f",current,average);
 	free(arg);
 	fclose(cmdline);
 	return 0;
@@ -80,20 +80,20 @@ int ADSysInfo::get_mem_and_free_mem(int *mem_kb,int *mem_free_kb)
 	FILE *cmdline = fopen("/proc/meminfo", "rb");
 	char *arg = 0;
 	size_t size = 0;
-	char* find_str; 
+	char* find_str;
 	while(getdelim(&arg, &size, 0, cmdline) != -1)
 	{
 		;
 	}
-	find_str = strstr (arg, "MemTotal:"); 
-	if (find_str == NULL) 
-		return -1; 
-	sscanf (find_str, "MemTotal: %d",mem_kb); 
+	find_str = strstr (arg, "MemTotal:");
+	if (find_str == NULL)
+		return -1;
+	sscanf (find_str, "MemTotal: %d",mem_kb);
 
-	find_str = strstr (arg, "MemFree:"); 
-	if (find_str == NULL) 
-		return -1; 
-	sscanf (find_str, "MemFree: %d",mem_free_kb); 
+	find_str = strstr (arg, "MemFree:");
+	if (find_str == NULL)
+		return -1;
+	sscanf (find_str, "MemFree: %d",mem_free_kb);
 	free(arg);
 	fclose(cmdline);
 	return 0;
@@ -105,13 +105,13 @@ int ADSysInfo::get_uptime(int* uptime)
 	char *arg = 0;
 	size_t size = 0;
 	float tmp_time=0.0;
-	//int cpu_count;	
+	//int cpu_count;
 	while(getdelim(&arg, &size, 0, cmdline) != -1)
 	{
 		;
 	}
 	sscanf(arg,"%f",&tmp_time);//this value is float in proc file system.
-	*uptime=(int)tmp_time; 
+	*uptime=(int)tmp_time;
 	free(arg);
 	fclose(cmdline);
 	return 0;
@@ -122,7 +122,7 @@ int ADSysInfo::get_cpu_model_name(char* model)
 	FILE *cmdline = fopen("/proc/cpuinfo", "rb");
 	char *arg = 0;
 	size_t size = 0;
-	char* find_str; 
+	char* find_str;
 	char tmp_str[256];
 
 	while(getdelim(&arg, &size, 0, cmdline) != -1)
@@ -132,8 +132,8 @@ int ADSysInfo::get_cpu_model_name(char* model)
 
 	//our arm's proc system doesnt have "model name" string, hence this hack first checks
 	//if this board is arm.. else it goes onto next scan for "model name"
-	find_str = strstr (arg, "Processor	:"); 
-	if (find_str != NULL) 
+	find_str = strstr (arg, "Processor	:");
+	if (find_str != NULL)
 	{
 		//printf("found Processor string\n");
 		sscanf (find_str, "Processor	: %s",model);
@@ -148,10 +148,10 @@ int ADSysInfo::get_cpu_model_name(char* model)
 	}
 
 	//else go on with next scan for "model name"
-	find_str = strstr (arg, "model name	:"); 
-	if (find_str == NULL) 
-		return -1; 
-	sscanf (find_str, "model name	: %s",model); 
+	find_str = strstr (arg, "model name	:");
+	if (find_str == NULL)
+		return -1;
+	sscanf (find_str, "model name	: %s",model);
 
 	free(arg);
 	fclose(cmdline);
@@ -162,7 +162,7 @@ int ADSysInfo::get_cpu_frequency(char* freq)
 	FILE *cmdline = fopen("/proc/cpuinfo", "rb");
 	char *arg = 0;
 	size_t size = 0;
-	char* find_str; 
+	char* find_str;
 	//char tmp_str[256];
 	//char model[256];
 
@@ -174,8 +174,8 @@ int ADSysInfo::get_cpu_frequency(char* freq)
 	sprintf(freq,"unknown");
 	//our arm's proc system doesnt have "model name" string, hence this hack first checks
 	//if this board is arm.. else it goes onto next scan for "model name"
-	find_str = strstr (arg, "BogoMIPS        :"); 
-	if (find_str != NULL) 
+	find_str = strstr (arg, "BogoMIPS        :");
+	if (find_str != NULL)
 	{
 		//printf("found BogoMIPS string\n");
 		sscanf (find_str, "BogoMIPS        : %s",freq);
@@ -190,13 +190,13 @@ int ADSysInfo::get_cpu_frequency(char* freq)
 	}
 
 	//else go on with next scan for "model name"
-	find_str = strstr (arg, "cpu MHz      :"); 
-	if (find_str == NULL) 
+	find_str = strstr (arg, "cpu MHz      :");
+	if (find_str == NULL)
 	{
 		//printf("cpu MHz      : not found\n");
-		return -1; 
+		return -1;
 	}
-	sscanf (find_str, "cpu MHz      : %s",freq); 
+	sscanf (find_str, "cpu MHz      : %s",freq);
 
 	free(arg);
 	fclose(cmdline);
@@ -229,7 +229,7 @@ int ADSysInfo::probe_eth_interface_details(int *total_detected, eth_name_ip_str 
 		return -1;
 	}
 	ifend = ifs + (ifc.ifc_len / sizeof(struct ifreq));
-	
+
 	for (ifr = ifc.ifc_req; ifr < ifend; ifr++)
 	{
 		if (ifr->ifr_addr.sa_family == AF_INET)
@@ -237,10 +237,10 @@ int ADSysInfo::probe_eth_interface_details(int *total_detected, eth_name_ip_str 
 			strncpy(ifreq.ifr_name, ifr->ifr_name,sizeof(ifreq.ifr_name));
 			if (ioctl (SockFD, SIOCGIFHWADDR, &ifreq) < 0)
 			{
-				close(SockFD);				
+				close(SockFD);
 				return -1;
 			}
-	
+
 			if(i>MAX_ALLOWED_INTERFACES)
 			{
 				*total_detected=i;
@@ -257,7 +257,7 @@ int ADSysInfo::probe_eth_interface_details(int *total_detected, eth_name_ip_str 
 				(int) ((unsigned char *) &ifreq.ifr_hwaddr.sa_data)[3],
 				(int) ((unsigned char *) &ifreq.ifr_hwaddr.sa_data)[4],
 				(int) ((unsigned char *) &ifreq.ifr_hwaddr.sa_data)[5]);
-		
+
 			//this is a hack, whole function needs cleanup to have clean interface.
 			strncpy(ifreq.ifr_name, ifr->ifr_name,sizeof(ifreq.ifr_name));
 			if (ioctl (SockFD, SIOCGIFNETMASK, &ifreq) < 0)
@@ -275,7 +275,7 @@ int ADSysInfo::probe_eth_interface_details(int *total_detected, eth_name_ip_str 
 /*****************************************************************************/
 int ADSysInfo::read_system_status(int *mem,int* memfree,int *cores,int* cur_load,int* avg_load,int* uptime,char* cpu_model)
 {
-	float cload=0,aload=0;	
+	float cload=0,aload=0;
 	*cores=get_cpu_cores();
 	if(*cores<1)*cores=1;//atleast there has to be one core :-)
 
@@ -320,7 +320,7 @@ int ADSysInfo::read_network_info(char* eth,char *mac,char* ip,char* netmask)
 	{
 		if(strcmp(if_list[i].dev,"lo")==0)continue;//we dont want details of loopback device
 		else if(strcmp(if_list[i].dev,eth)==0)
-		{		
+		{
 			strcpy(mac,if_list[i].mac);
 			strcpy(ip,if_list[i].ip);
 			strcpy(netmask,if_list[i].netmask);
@@ -330,6 +330,36 @@ int ADSysInfo::read_network_info(char* eth,char *mac,char* ip,char* netmask)
 		//else continue;
 	}
 	return -1;
+}
+/*****************************************************************************/
+int ADSysInfo::read_network_info_new(char* eth,char *mac,char* ip,char* netmask)
+{
+        int total_detected=0,i=0;
+        eth_name_ip_str if_list[MAX_ALLOWED_INTERFACES];
+        sprintf(mac,"unknown");
+        sprintf(ip,"unknown");
+        sprintf(netmask,"unknown");
+
+        if(probe_eth_interface_details(&total_detected,if_list)!=0)
+        {
+                //printf("probe_eth_interface_details_failed\n");
+                return -1;
+        }
+        //printf("total detected = %d\n",total_detected);
+        for(i=0;i<total_detected;i++)
+        {
+                if(strcmp(if_list[i].dev,"lo")==0)continue;//we dont want details of loopback device
+                else if(strcmp(if_list[i].dev,eth)==0)
+                {
+                        strcpy(mac,if_list[i].mac);
+                        strcpy(ip,if_list[i].ip);
+                        strcpy(netmask,if_list[i].netmask);
+                        //printf("found valid entries for %s\n",eth);
+                        return 0;
+                }
+                //else continue;
+        }
+        return -1;
 }
 /*****************************************************************************/
 int ADSysInfo::read_network_info_ifconfig(char* eth,char* mac,char* ip,char* netmask)
@@ -511,4 +541,3 @@ RPC_SRV_RESULT ADSysInfo::run_shell_script(char* cmd,char*ret_val,bool emulation
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /*****************************************************************************/
-
