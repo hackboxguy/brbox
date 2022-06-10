@@ -11,6 +11,7 @@ SERVICE_DAEMONIZE=1
 start() {
 	#DEVNODE=$(ls -la /dev/i2c-* |head -1|grep -oh "/dev/.*") #choose the first i2c device node in the list
 	#service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt) --disptype=ssd1306_128x64 --device=$DEVNODE
+        sleep 5
 	service_start /opt/fmw/bin/$APP --iface=$(cat /etc/dispsrv/iface-name.txt)
         #sleep 5
 	#if [ -f /opt/fmw/bin/sysmgrclt ]
