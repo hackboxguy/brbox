@@ -332,36 +332,6 @@ int ADSysInfo::read_network_info(char* eth,char *mac,char* ip,char* netmask)
 	return -1;
 }
 /*****************************************************************************/
-int ADSysInfo::read_network_info_new(char* eth,char *mac,char* ip,char* netmask)
-{
-        int total_detected=0,i=0;
-        eth_name_ip_str if_list[MAX_ALLOWED_INTERFACES];
-        sprintf(mac,"unknown");
-        sprintf(ip,"unknown");
-        sprintf(netmask,"unknown");
-
-        if(probe_eth_interface_details(&total_detected,if_list)!=0)
-        {
-                //printf("probe_eth_interface_details_failed\n");
-                return -1;
-        }
-        //printf("total detected = %d\n",total_detected);
-        for(i=0;i<total_detected;i++)
-        {
-                if(strcmp(if_list[i].dev,"lo")==0)continue;//we dont want details of loopback device
-                else if(strcmp(if_list[i].dev,eth)==0)
-                {
-                        strcpy(mac,if_list[i].mac);
-                        strcpy(ip,if_list[i].ip);
-                        strcpy(netmask,if_list[i].netmask);
-                        //printf("found valid entries for %s\n",eth);
-                        return 0;
-                }
-                //else continue;
-        }
-        return -1;
-}
-/*****************************************************************************/
 int ADSysInfo::read_network_info_ifconfig(char* eth,char* mac,char* ip,char* netmask)
 {
 	char cmd[512];char temp_str[256];

@@ -233,17 +233,17 @@ std::string DispScanner::get_my_ipaddr(std::string interface)
 	//printf("probe_eth_interface_details_failed\n");
 	return "unknownip";
     }
-    
+
     if( interface != "" )
     {
-	if(info.read_network_info_new((char*)interface.c_str(),mac,ip,netmask)==0)
+	if(info.read_network_info((char*)interface.c_str(),mac,ip,netmask)==0)
 		return ip;
 	else
 		return "unknownip";
     }
     for(int i=0;i<total_detected;i++)
     {
-        if(info.read_network_info_new(if_list[i].dev,mac,ip,netmask)==0)
+        if(info.read_network_info(if_list[i].dev,mac,ip,netmask)==0)
             return ip;
     }
     return "unknownip";

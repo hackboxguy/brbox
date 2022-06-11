@@ -4,7 +4,7 @@
 /* ------------------------------------------------------------------------- */
 NetRpc:: NetRpc(std::string rpcName,int myIndex,bool emu,bool log,SYSMGR_CMN_DATA_CACHE *pData):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
 {
-	pDataCache=pData;	
+	pDataCache=pData;
 }
 /* ------------------------------------------------------------------------- */
 NetRpc::~ NetRpc()
@@ -77,7 +77,8 @@ int NetRpc::json_to_bin_get_mac_addr(JsonDataCommObj* pReq)
 	SYSMGR_MAC_ADDR_PACKET* pPanelCmdObj=NULL;
 	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_MAC_ADDR_PACKET,RPC_SRV_ACT_READ,EJSON_SYSMGR_RPC_GET_MAC_ADDR);
 	//after assigning pointer to pPanelReq->dataRef, modify cmd-req-obj with correct client arguments
-JSON_STRING_TO_ENUM(SYSMGR_RPC_MAC_ADDR_ARG_IFACE,SYSMGR_RPC_MAC_ADDR_ARG_IFACE_TABL,EJSON_SYSMGR_IFACE_TYPE,EJSON_SYSMGR_IFACE_TYPE_UNKNOWN,pPanelCmdObj->eth_type);
+//JSON_STRING_TO_ENUM(SYSMGR_RPC_MAC_ADDR_ARG_IFACE,SYSMGR_RPC_MAC_ADDR_ARG_IFACE_TABL,EJSON_SYSMGR_IFACE_TYPE,EJSON_SYSMGR_IFACE_TYPE_UNKNOWN,pPanelCmdObj->eth_type);
+	JSON_STRING_TO_STRING(SYSMGR_RPC_IP_ADDR_ARG_IFACE,pPanelCmdObj->eth_name);//changed from fixed enum list to string
 	return 0;
 }
 int NetRpc::bin_to_json_get_mac_addr(JsonDataCommObj* pReq)
@@ -97,12 +98,14 @@ int NetRpc::process_get_mac_addr(JsonDataCommObj* pReq)
 
 	const char *table[]   = SYSMGR_RPC_MAC_ADDR_ARG_IFACE_TABL;
 	//if network is connected,then read details from SysInfo
-	if(SysInfo.read_network_info((char*)table[pPacket->eth_type],pPacket->mac_addr,ip,netmask)==0)
+	//if(SysInfo.read_network_info((char*)table[pPacket->eth_type],pPacket->mac_addr,ip,netmask)==0)
+	if(SysInfo.read_network_info(pPacket->eth_name,pPacket->mac_addr,ip,netmask)==0)
 		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 	else
 	{
 		//if network is not connected, use ifconfig method
-		if(SysInfo.read_network_info_ifconfig((char*)table[pPacket->eth_type],pPacket->mac_addr,ip,netmask)==0)
+		//if(SysInfo.read_network_info_ifconfig((char*)table[pPacket->eth_type],pPacket->mac_addr,ip,netmask)==0)
+		if(SysInfo.read_network_info_ifconfig(pPacket->eth_name,pPacket->mac_addr,ip,netmask)==0)
 			pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 		else
 			pPanelReq->result=RPC_SRV_RESULT_FAIL;
@@ -201,7 +204,8 @@ int NetRpc::json_to_bin_get_ip_addr(JsonDataCommObj* pReq)
 	SYSMGR_NET_INFO_PACKET* pPanelCmdObj=NULL;
 	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_NET_INFO_PACKET,RPC_SRV_ACT_READ,EJSON_SYSMGR_RPC_GET_IP_ADDR);
 	//after assigning pointer to pPanelReq->dataRef, modify cmd-req-obj with correct client arguments
-JSON_STRING_TO_ENUM(SYSMGR_RPC_IP_ADDR_ARG_IFACE,SYSMGR_RPC_IP_ADDR_ARG_IFACE_TABL,EJSON_SYSMGR_IFACE_TYPE,EJSON_SYSMGR_IFACE_TYPE_UNKNOWN,pPanelCmdObj->eth_type);
+//JSON_STRING_TO_ENUM(SYSMGR_RPC_IP_ADDR_ARG_IFACE,SYSMGR_RPC_IP_ADDR_ARG_IFACE_TABL,EJSON_SYSMGR_IFACE_TYPE,EJSON_SYSMGR_IFACE_TYPE_UNKNOWN,pPanelCmdObj->eth_type);
+	JSON_STRING_TO_STRING(SYSMGR_RPC_IP_ADDR_ARG_IFACE,pPanelCmdObj->eth_name);//changed from fixed enum list to string
 	return 0;
 }
 int NetRpc::bin_to_json_get_ip_addr(JsonDataCommObj* pReq)
@@ -221,12 +225,14 @@ int NetRpc::process_get_ip_addr(JsonDataCommObj* pReq)
 
 	const char *table[]   = SYSMGR_RPC_MAC_ADDR_ARG_IFACE_TABL;
 	//if network is connected,then read details from SysInfo
-	if(SysInfo.read_network_info((char*)table[pPacket->eth_type],mac,pPacket->addr,netmask)==0)
+	//if(SysInfo.read_network_info((char*)table[pPacket->eth_type],mac,pPacket->addr,netmask)==0)
+	if(SysInfo.read_network_info(pPacket->eth_name,mac,pPacket->addr,netmask)==0)
 		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 	else
 	{
 		//if network is not connected, use ifconfig method
-		if(SysInfo.read_network_info_ifconfig((char*)table[pPacket->eth_type],mac,pPacket->addr,netmask)==0)
+		//if(SysInfo.read_network_info_ifconfig((char*)table[pPacket->eth_type],mac,pPacket->addr,netmask)==0)
+		if(SysInfo.read_network_info_ifconfig(pPacket->eth_name,mac,pPacket->addr,netmask)==0)
 			pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 		else
 			pPanelReq->result=RPC_SRV_RESULT_FAIL;
@@ -260,7 +266,8 @@ int NetRpc::json_to_bin_get_netmask(JsonDataCommObj* pReq)
 	SYSMGR_NET_INFO_PACKET* pPanelCmdObj=NULL;
 	PREPARE_JSON_REQUEST(RPC_SRV_REQ,SYSMGR_NET_INFO_PACKET,RPC_SRV_ACT_READ,EJSON_SYSMGR_RPC_GET_NETMASK);
 	//after assigning pointer to pPanelReq->dataRef, modify cmd-req-obj with correct client arguments
-JSON_STRING_TO_ENUM(SYSMGR_RPC_NETMASK_ARG_IFACE,SYSMGR_RPC_NETMASK_ARG_IFACE_TABL,EJSON_SYSMGR_IFACE_TYPE,EJSON_SYSMGR_IFACE_TYPE_UNKNOWN,pPanelCmdObj->eth_type);
+//JSON_STRING_TO_ENUM(SYSMGR_RPC_NETMASK_ARG_IFACE,SYSMGR_RPC_NETMASK_ARG_IFACE_TABL,EJSON_SYSMGR_IFACE_TYPE,EJSON_SYSMGR_IFACE_TYPE_UNKNOWN,pPanelCmdObj->eth_type);
+	JSON_STRING_TO_STRING(SYSMGR_RPC_IP_ADDR_ARG_IFACE,pPanelCmdObj->eth_name);//changed from fixed enum list to string
 	return 0;
 }
 int NetRpc::bin_to_json_get_netmask(JsonDataCommObj* pReq)
@@ -280,12 +287,14 @@ int NetRpc::process_get_netmask(JsonDataCommObj* pReq)
 
 	const char *table[]   = SYSMGR_RPC_MAC_ADDR_ARG_IFACE_TABL;
 	//if network is connected,then read details from SysInfo
-	if(SysInfo.read_network_info((char*)table[pPacket->eth_type],mac,ip,pPacket->addr)==0)
+	//if(SysInfo.read_network_info((char*)table[pPacket->eth_type],mac,ip,pPacket->addr)==0)
+	if(SysInfo.read_network_info(pPacket->eth_name,mac,ip,pPacket->addr)==0)
 		pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 	else
 	{
 		//if network is not connected, use ifconfig method
-		if(SysInfo.read_network_info_ifconfig((char*)table[pPacket->eth_type],mac,ip,pPacket->addr)==0)
+		//if(SysInfo.read_network_info_ifconfig((char*)table[pPacket->eth_type],mac,ip,pPacket->addr)==0)
+		if(SysInfo.read_network_info_ifconfig(pPacket->eth_name,mac,ip,pPacket->addr)==0)
 			pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
 		else
 			pPanelReq->result=RPC_SRV_RESULT_FAIL;
@@ -314,4 +323,3 @@ int NetRpc::process_set_netmask(JsonDataCommObj* pReq)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
-
