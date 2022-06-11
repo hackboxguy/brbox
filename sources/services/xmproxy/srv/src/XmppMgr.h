@@ -181,6 +181,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	std::string XmppUserPw;
 	std::string XmppBotName;
 	std::string XmppBotNameFilePath;
+	std::string XmppNetInterface;
 #ifdef USE_CXMPP_LIB
 	CXmppProxy XmppProxy;//xmpp client
 #else
@@ -299,5 +300,6 @@ public:
 	void SetBotNameFilePath(std::string filepath);
 	RPC_SRV_RESULT xpandarg(std::string &cmdArg);
 	RPC_SRV_RESULT xpandargs(std::string &cmdArg);
+	inline void SetNetInterface(std::string interface){XmppNetInterface=interface;};
 };
 #endif

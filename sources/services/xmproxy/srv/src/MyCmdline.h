@@ -13,8 +13,8 @@ class MyCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 	char AliasListFilePath[512];
 	char BotNameFilePath[512];
 	char EvntSubscrListFilePath[512];
-
-	//Chain-callback functions	
+	std::string NetInterface;
+	//Chain-callback functions
 	virtual int parse_my_cmdline_options(int arg, char* sub_arg);
 	virtual int run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);//char* ip);
 	virtual int run_my_autotest(char* ip,int interval_us,int max_loop,int test_num);
@@ -35,6 +35,7 @@ public:
 	std::string get_alias_list_filepath();//char* filepath);
 	std::string get_botname_filepath();
 	std::string get_evnt_subscr_list_filepath();//char* filepath);
+	std::string get_net_interface();
 	//service specific part
 };
 #endif

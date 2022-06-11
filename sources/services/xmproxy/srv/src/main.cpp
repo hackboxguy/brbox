@@ -45,10 +45,11 @@ int main(int argc, const char* argv[])
 	XmpManager.SetAliasListFilePath(CmdLine.get_alias_list_filepath());//persistant alias list file
 	XmpManager.SetBotNameFilePath(CmdLine.get_botname_filepath());//persistent bot-name-file
 	XmpManager.SetEventSubscrListFilePath(CmdLine.get_evnt_subscr_list_filepath());//persistent event subscriber's list file
+	XmpManager.SetNetInterface(CmdLine.get_net_interface());
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 
-	XmppRpc AsyncGet (XMPROXY_RPC_ASYNCTASK_GET   ,EJSON_XMPROXY_RPC_GET_ASYNCTASK   ,emulat,dbglog,&DataCache); 
+	XmppRpc AsyncGet (XMPROXY_RPC_ASYNCTASK_GET   ,EJSON_XMPROXY_RPC_GET_ASYNCTASK   ,emulat,dbglog,&DataCache);
 /*	SmsRpc DeletAll (BBOXSMS_RPC_SMS_DELETE_ALL  ,EJSON_BBOXSMS_RPC_SMS_DELETE_ALL  ,emulat,dbglog,&DataCache);
 	SmsRpc Delete   (BBOXSMS_RPC_SMS_DELETE      ,EJSON_BBOXSMS_RPC_SMS_DELETE      ,emulat,dbglog,&DataCache);
 	SmsRpc TotalGet (BBOXSMS_RPC_SMS_TOTAL_GET   ,EJSON_BBOXSMS_RPC_SMS_TOTAL_GET   ,emulat,dbglog,&DataCache);
@@ -101,4 +102,3 @@ bool openwrt_system(ADCMN_BOARD_TYPE BoardType)
 		default: return false;
 	}
 }
-
