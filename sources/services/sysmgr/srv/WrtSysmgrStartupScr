@@ -20,7 +20,7 @@ start() {
 		swconfig dev switch0 port 2 set disable 1
 		swconfig dev switch0 port 3 set disable 1
 		swconfig dev switch0 port 4 set disable 1
-		swconfig dev switch0 set apply 
+		swconfig dev switch0 set apply
 	fi
 
 	#auto detect
@@ -32,7 +32,7 @@ start() {
 		DISPTYPE=$(cat $DISPTYPE_FILE)
 	fi
 
-        service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt) --syscfg=$(cat /boot/sysconfig.txt) --disptype=$DISPTYPE
+        service_start /opt/fmw/bin/$APP --boardtype=$(cat /tmp/BrBoxDevType.txt) --syscfg=$(cat /etc/sysconfig.txt) --disptype=$DISPTYPE
 }
 
 stop() {
