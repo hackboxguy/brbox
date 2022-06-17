@@ -54,7 +54,7 @@ typedef enum EJSON_SYSMGR_RPC_TYPES_T
 #define SYSMGR_RPC_MAC_ADDR_SET             "set_mac_addr"
 #define SYSMGR_RPC_MAC_ADDR_ARG             "addr"
 #define SYSMGR_RPC_MAC_ADDR_ARG_IFACE       "iface"
-#define SYSMGR_RPC_MAC_ADDR_ARG_IFACE_TABL  {"eth0","eth1","wlan0","br-lan","eth0.1","eth0.2","br0","tun1","enp110s0","unknown","none","\0"}
+#define SYSMGR_RPC_MAC_ADDR_ARG_IFACE_TABL  {"eth0","eth1","wlan0","br-lan","eth0.1","eth0.2","br0","tun1","enp110s0","usb0","unknown","none","\0"}
 typedef enum EJSON_SYSMGR_IFACE_TYPE_T
 {
 	EJSON_SYSMGR_IFACE_TYPE_ETH0,
@@ -66,6 +66,7 @@ typedef enum EJSON_SYSMGR_IFACE_TYPE_T
 	EJSON_SYSMGR_IFACE_TYPE_BR0,
 	EJSON_SYSMGR_IFACE_TYPE_TUN1,
 	EJSON_SYSMGR_IFACE_TYPE_ENP110S0,
+	EJSON_SYSMGR_IFACE_TYPE_USB0,
 	EJSON_SYSMGR_IFACE_TYPE_UNKNOWN,
 	EJSON_SYSMGR_IFACE_TYPE_NONE,
 }EJSON_SYSMGR_IFACE_TYPE;
