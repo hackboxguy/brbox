@@ -17,7 +17,8 @@
 using namespace std;
 #define CLIENT_ALIVE_PING_DURATION_MS 90000;//90seconds
 #define GITHUB_FMW_DOWNLOAD_FOLDER "http://github.com/hackboxguy/downloads/raw/master/"
-#define BRBOX_SYS_CONFIG_FILE_PATH "/boot/sysconfig.txt"
+//#define BRBOX_SYS_CONFIG_FILE_PATH "/boot/sysconfig.txt"
+#define BRBOX_SYS_CONFIG_FILE_PATH "/etc/sysconfig.txt"
 #define BBOXSMS_SERVER_ADDR "127.0.0.1"
 //#define EXMPP_CMD_TABL    {"smsdeleteall","smsdelete","smsget","smssend","smsupdate","smstotal","fmwver","fmwupdt","fmwupsts","fmwupres","reboot","uptime","hostname","myip","resethostname","dialvoice","dialussd","readussd","logsts","gsmcheck","logupdate","logcount","logmsg","unknown","none","\0"}
 //#define EXMPP_CMD_TABL_HELP    {"","<zero_based_index>","<zero_based_index>","<phone-num> <msg>","","","","<filename>","","","","","","","","<phone-num>","<ussd-code>","","<port> [sts]","","","","<index>","unknown","none","\0"}
