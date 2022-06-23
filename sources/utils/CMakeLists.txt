@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 2.8.9)
 set(PROJECT_NAME BrBoxUtils)
 project(${PROJECT_NAME})
-add_subdirectory(libtester)
+set(BRBOX_MKIMAGE_UTIL    OFF CACHE BOOL OFF)
+if(${BRBOX_MKIMAGE_UTIL})
+add_subdirectory(brbox-mkimage)
+endif()
+#add_subdirectory(brbox-mkimage)
 #add_subdirectory(hello_video)
 
 

@@ -3,7 +3,7 @@ set(PROJECT_NAME BrBoxComponents)
 project(${PROJECT_NAME})
 add_subdirectory(lib)
 add_subdirectory(services)
-#add_subdirectory(utils)
+add_subdirectory(utils)
 #add_subdirectory(kmods)
 
 #for cross compiling
