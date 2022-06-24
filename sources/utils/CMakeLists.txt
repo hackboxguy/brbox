@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 2.8.9)
 set(PROJECT_NAME BrBoxUtils)
 project(${PROJECT_NAME})
-set(BRBOX_MKIMAGE_UTIL    OFF CACHE BOOL OFF)
-if(${BRBOX_MKIMAGE_UTIL})
+set(BRBOX_MIPS_UPDATE_UTILS    OFF CACHE BOOL OFF)
+if(${BRBOX_MIPS_UPDATE_UTILS})
 add_subdirectory(brbox-mkimage)
+add_subdirectory(mips-update)
 endif()
 #add_subdirectory(brbox-mkimage)
 #add_subdirectory(hello_video)
@@ -20,4 +21,3 @@ endif()
 
 #for cleaning make generated output
 #rm -rf Output
-
