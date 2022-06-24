@@ -122,7 +122,7 @@ table_entry_t os_name[] = {
     {	-1,		"",		"",			},
 };
 
-table_entry_t type_name[] = 
+table_entry_t type_name[] =
 {
     {	IH_TYPE_INVALID,    NULL,	  "Invalid Image",	},
     {	IH_TYPE_FILESYSTEM, "filesystem", "Filesystem Image",	},
@@ -450,7 +450,7 @@ NXTARG:;
 	}
 
 	imagefile = *argv;
-	
+
 	if(compareflag && ( skipflag == 1 || seekflag == 1 ) )
 	{
 		int tmpfile;
@@ -472,7 +472,7 @@ NXTARG:;
 	}
 
 
-	
+
 	if(mtd_flag)
 	{
 		if(check_mtdfile(imagefile))
@@ -483,7 +483,7 @@ NXTARG:;
 		}
 		imagefile=mtdfile;
 	}
-	
+
 	if (lflag)
 	{
 		ifd = open(imagefile, O_RDONLY|O_BINARY);
@@ -508,7 +508,7 @@ NXTARG:;
 		/*
 		 * list header information of existing image
 		 */
-		
+
 		if (fstat(ifd, &sbuf) < 0) {
 			sprintf (temp_buffer, "%s: Can't stat %s: %s\n",
 				cmdname, imagefile, strerror(errno));
@@ -526,7 +526,12 @@ NXTARG:;
 
 		ptr = (unsigned char *)mmap(0,sbuf.st_size,
 					    PROT_READ, MAP_SHARED, ifd, 0);
+
+#ifdef SDSRV_USE_MUSL_LIB
+		if ((void*)ptr == (void*)-1)
+#else
 		if ((caddr_t)ptr == (caddr_t)-1)
+#endif
 		{
 			sprintf (temp_buffer, "%s: Can't read %s: %s\n",
 				cmdname, imagefile, strerror(errno));
@@ -584,7 +589,7 @@ NXTARG:;
 		}
 		if(queryflag)
 		{
-			int32_t image_type=get_image_type(query_file);//atoi(query_file);			
+			int32_t image_type=get_image_type(query_file);//atoi(query_file);
 			if(extract_file_from_multi((uint8_t)image_type,imagefile,output_file,(image_header_t *)ptr,query,&image_count)!=0)
 				exit(-1);
 		}
@@ -592,7 +597,7 @@ NXTARG:;
 		{
 			if(outputfileflag)
 			{
-				int32_t image_type=get_image_type(extract_file);//atoi(extract_file);			
+				int32_t image_type=get_image_type(extract_file);//atoi(extract_file);
 				if(xtractflag)
 				{
 					if(extract_file_from_multi((uint8_t)image_type,imagefile,output_file,(image_header_t *)ptr,extract,&image_count)!=0)
@@ -603,7 +608,7 @@ NXTARG:;
 					if(extract_file_from_multi((uint8_t)image_type,imagefile,output_file,(image_header_t *)ptr,exthdr,&image_count)!=0)
 						exit(-1);
 				}
-				
+
 			}
 			else
 			{
@@ -616,7 +621,7 @@ NXTARG:;
 		{
 			if( skipflag == 1 || seekflag == 1 )
 			{
-				
+
 				int tmpfile;
 				uint32_t compare_file_size=0;
 				tmpfile = open(compare_file, O_RDONLY|O_BINARY);
@@ -641,7 +646,7 @@ NXTARG:;
 				{
 					//printf("%s open error!\n",compare_file);
 					exit(-1);
-				}	
+				}
 				if( fread(&temp_image_hdr,sizeof(char),sizeof(image_header_t),imgfile) < sizeof(image_header_t) )
 				{
 					fclose(imgfile);
@@ -655,7 +660,7 @@ NXTARG:;
 				fclose(imgfile);
 				if(extract_file_from_multi(temp_image_hdr.ih_type,imagefile,compare_file,(image_header_t *)ptr,compare,&image_count)!=0)
 					exit(-1);
-			}	
+			}
 		}
 		if(countimage_flag)
 		{
@@ -675,7 +680,7 @@ NXTARG:;
 
 		(void) munmap((void *)ptr, sbuf.st_size);
 		(void) close (ifd);
-		
+
 		if(mtd_flag)/*delete the temp file*/
 		{
 			sprintf(mtdfile,"rm -rf %s",TEMP_MTD_FILE);
@@ -943,7 +948,7 @@ static int print_header_only (image_header_t *hdr)
 	time_t timestamp;
 	uint32_t size;
 	image_header_t temp_header;
-	
+
 	memcpy (&temp_header,hdr,sizeof(image_header_t));
 	if(!check_header (&temp_header))
 	{
@@ -969,7 +974,7 @@ static int print_header (image_header_t *hdr)
 	int multi_image_result=0,i;
 
 	print_header_only (hdr);
-	
+
 	//i=1; /*in a normal case total images will be 1*/
 	if (hdr->ih_type == IH_TYPE_MULTI  || hdr->ih_type == IH_TYPE_SCRIPT)
 	{
@@ -1124,7 +1129,7 @@ static int printmsg(char *Msg)
 {
 	if(!silent_flag)
 		fprintf (stderr,"%s",Msg);
-	return 0;	
+	return 0;
 }
 
 static int check_header (image_header_t *hdr)
@@ -1139,15 +1144,15 @@ static int check_header (image_header_t *hdr)
 		//exit (-1);
 		return -1;
 	}
-	
+
 	data = (char *)hdr;
-	
+
 	len  = sizeof(image_header_t);
-	
+
 	checksum = ntohl(hdr->ih_hcrc);
-	
+
 	hdr->ih_hcrc = htonl(0);	/* clear for re-calculation */
-	
+
 	if (crc32 (0, data, len) != checksum)
 	{
 		sprintf (temp_buffer,"*** Warning: image has bad header checksum!\n");
@@ -1165,20 +1170,20 @@ static int check_mtdfile(char *imagefile)
 
 	file = open(imagefile, O_RDONLY|O_BINARY);
 	hdr_len=sizeof(image_header_t);
-	
+
 	if( read(file,hdr,hdr_len) < hdr_len)
 	{
 		printmsg("check_mtdfile:unable to read header from input file\n");
 		return (-1);
 	}
 	close(file);
-	
+
 	if(check_header(hdr))
 		return -1;
 	size = ntohl(hdr->ih_size);
 
 	if(file_copy(imagefile,TEMP_MTD_FILE,0,(size+hdr_len)))
-		return -1;	
+		return -1;
 	strcpy(mtdfile,TEMP_MTD_FILE);
 	return 0;
 }
@@ -1226,7 +1231,7 @@ static int extract_file_from_multi(uint8_t image_type,char *input_file,char *out
 							return 0;
 							break;
 						default:return -1;
-										
+
 
 					}
 					if(action==query)//requested file is found, return success.
@@ -1305,18 +1310,18 @@ static int file_compare_binary(char *file1,char *file2,uint32_t skip,uint32_t se
 	uint32_t max_len=2048,i=0;
 	uint32_t read_len_f1=0,read_len_f2=0,read_len_img=0;
 	FILE *file1node,*file2node;
-	
+
 	file1node=fopen(file1,"r");
 	if(file1node==NULL)
 	{
 		return -1;
-	}	
+	}
 	file2node=fopen(file2,"r");
 	if(file2node==NULL)
 	{
 		fclose(file1node);
 		return -1;
-	}	
+	}
 
 	if(fseek(file1node,skip,SEEK_SET) != 0 )
 	{
@@ -1337,7 +1342,7 @@ static int file_compare_binary(char *file1,char *file2,uint32_t skip,uint32_t se
 	{
 		read_len_f1=fread(f1_buff,sizeof(char),max_len,file1node);
 		read_len_f2=fread(f2_buff,sizeof(char),max_len,file2node);
-		
+
 		if((i+read_len_f1) < file1_len)
 		{
 			read_len_img=max_len;
@@ -1355,7 +1360,7 @@ static int file_compare_binary(char *file1,char *file2,uint32_t skip,uint32_t se
 			return -1;
 		}
 		i+=read_len_img;
-	}	
+	}
 	fclose(file1node);
 	fclose(file2node);
 	return 0;
@@ -1369,20 +1374,20 @@ static int file_compare(char *file2,char *file1,uint32_t skip,uint32_t proj_file
 	uint32_t read_len_prj,read_len_img;
 	FILE *imgfile,*projfile;
 
-	
+
 	image_header_t *hdr;
 	imgfile=fopen(file2,"r");
 	if(imgfile==NULL)
 	{
 		return -1;
-	}	
+	}
 
 	projfile=fopen(file1,"r");
 	if(projfile==NULL)
 	{
 		fclose(imgfile);
 		return -1;
-	}	
+	}
 
 	img_size=fread(img_buff,sizeof(char),sizeof(image_header_t),imgfile);
 	if( img_size < sizeof(image_header_t) )
@@ -1408,7 +1413,7 @@ static int file_compare(char *file2,char *file1,uint32_t skip,uint32_t proj_file
 	{
 		read_len_img=fread(img_buff,sizeof(char),max_len,imgfile);
 		read_len_prj=fread(prj_buff,sizeof(char),max_len,projfile);
-		
+
 		if((i+read_len_prj) < proj_file_len)
 		{
 			read_len_img=max_len;
@@ -1425,7 +1430,7 @@ static int file_compare(char *file2,char *file1,uint32_t skip,uint32_t proj_file
 			return -1;
 		}
 		i+=read_len_img;
-	}	
+	}
 	fclose(imgfile);
 	fclose(projfile);
 	return 0;
@@ -1435,7 +1440,7 @@ static int extract_file_number(int image_no,char *input_file,char *output_file,i
 	uint32_t size;
 	size = ntohl(hdr->ih_size);
 	image_header_t temp_header;
-	
+
 
 	if (hdr->ih_type == IH_TYPE_MULTI)
 	{
@@ -1509,4 +1514,3 @@ unsigned char get_image_type(char *image_name)
 	else
 		return IH_TYPE_INVALID;
 }
-
