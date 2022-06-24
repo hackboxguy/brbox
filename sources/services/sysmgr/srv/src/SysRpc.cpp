@@ -684,7 +684,8 @@ RPC_SRV_RESULT SysRpc::process_async_set_fmwupdate(SYSMGR_FMWUPDATE_PACKET* pPac
 	{
 		case SYSMGR_FMW_MODULE_BRBOX_PROJECT :
 			if(openwrt_system()) //sleep 2 is to ensure that previous file download result has already been delivered
-				sprintf(cmdline,"sleep 2;%s %s","sysupgrade",pPacket->cmn_fname_ver_str);
+				//sprintf(cmdline,"sleep 2;%s %s","sysupgrade",pPacket->cmn_fname_ver_str);
+				sprintf(cmdline,"sleep 2;%s -u %s > /tmp/update.result",MIPS_UPDATE_TOOL,pPacket->cmn_fname_ver_str);
 			else
 				sprintf(cmdline,"%s -u %s",SYSMGR_UPDATE_TOOL,pPacket->cmn_fname_ver_str);
 			ret_val=SysInfo.run_shell_script(cmdline,get_emulation_flag());//backup-fmw will be updated

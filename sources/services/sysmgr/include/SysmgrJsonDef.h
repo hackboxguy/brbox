@@ -200,6 +200,7 @@ typedef struct SYSMGR_BOOT_SYSTEM_PACKET_T
 #define SYSMGR_RPC_FMWUPDATE_ARG_FILEPATH    "filepath"
 typedef SYSMGR_FMW_MODULE_PACKET SYSMGR_FMWUPDATE_PACKET;
 #define SYSMGR_UPDATE_TOOL         "update"
+#define MIPS_UPDATE_TOOL           "mips-update.sh"
 /* ------------------------------------------------------------------------- */
 //EJSON_SYSMGR_RPC_SET_DOWNLOADFTP,
 //EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP,

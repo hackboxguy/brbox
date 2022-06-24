@@ -125,9 +125,20 @@ do
 done
 
 [ ! -f  "$UPDATE_FILE"  ] && { echo "Error: Update file not found!!!"; return 1; }
+
+sysupgrade --test $UPDATE_FILE 1>/dev/null 2>/dev/null
+if [ $? = "0" ]; then
+  #this is a valid openwrt image, for backward compatibility, dont do any extra checks(just trigger update)
+  sysupgrade $UPDATE_FILE
+  exit $?
+fi
+
+
 TMP_IMAGEFILE=$(mktemp) #creates an emptyfile which will be filled by ProcessUpdate as rootfs.tar.xz
 ProcessUpdate $UPDATE_FILE $TMP_IMAGEFILE
-[ $? != "0" ] && { echo "Error: Invalid filetype" ; return 1; }
+[ $? != "0" ] && { echo "Error: Invalid filetype" ; return 1; } #TODO: check if this file is encrypted
 sysupgrade --test $TMP_IMAGEFILE
 [ $? != "0" ] && { echo "Error: Invalid openwrt-image" ; return 1; }
 echo "Openwrt image health........................ [OK]"
+sysupgrade $TMP_IMAGEFILE #system will automatically reboot
+exit $?
