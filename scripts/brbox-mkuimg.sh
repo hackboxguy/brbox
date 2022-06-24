@@ -4,7 +4,7 @@ MKIMAGE=./brbox-mkimage
 BRBOX_PROJ="BrBoxProj"    #complete project including all sub-modules
 BRBOX_ROOT="BrBoxRtBtr"   #rootfs-baytrail
 BRBOX_STTNG="BrBoxSttng"  #settings partition
-BRBOX_USRDAT="BrBoxUsrDt" #user-data partition 
+BRBOX_USRDAT="BrBoxUsrDt" #user-data partition
 USAGE="script for generating BrBox binary update packages"
 USAGE1="usage:./$0 -r <rootfs.tar.xz> -v <version.xx.yy> -m <mkimage_tool_path> -t <rootfs_type>"
 ROOTFS_FILE="rootfs.tar.xz"
@@ -13,6 +13,7 @@ OUT_FILE=./uOutFile.uimg
 PACKAGE_HEADER_STRING=BrBox
 ###############################################################################
 #./brbox-mkuimg.sh -r rootfs.tar.xz -v 00.02 -o out.uimg -m ../disk_skeleton/usr/sbin/brbox-mkimage
+#./brbox-mkuimg.sh -r gl-mt300nv2-remote-kit.bin -t BrBoxGl300Nv2 -v 00.02 -o out.uimg -m ../disk_skeleton/usr/sbin/brbox-mkimage
 ###############################################################################
 CreateBrBoxRoot() #$1=in-rootfs.tar.xz-file $2=VersionString $3=out-file-path
 {
@@ -29,8 +30,22 @@ CreateBrBoxRoot() #$1=in-rootfs.tar.xz-file $2=VersionString $3=out-file-path
     	test 0 -eq $? && echo "[OK]" || { echo "[FAIL]";return 1;}
 	return 0
 }
+CreateMipsImage() #$1=mips-image.bin $2=VersionString $3=out-file-path $4=type
+{
+	printf "Creating MIPS Upgrade package  .......................... "
+	VERSION_STR="$PACKAGE_HEADER_STRING $4 V-$2"
+	$MKIMAGE -T $4 \
+		-C none \
+		-a 0x00000000 \
+		-e 0x00000000 \
+		-n "$VERSION_STR" \
+                -A mips \
+		-d $1 $3 1>/dev/null 2>/dev/null
+        test 0 -eq $? && echo "[OK]" || { echo "[FAIL]";return 1;}
+	return 0
+}
 ###############################################################################
-if [ $# -lt 1  ]; then 
+if [ $# -lt 1  ]; then
 	echo $USAGE
 	echo $USAGE1
 	exit $ERR_ARGC
@@ -46,5 +61,8 @@ do
 	t) BRBOX_ROOT=$OPTARG;;
     esac
 done
-
-CreateBrBoxRoot $ROOTFS_FILE $VERSION $OUT_FILE
+if [ $BRBOX_ROOT = "BrBoxGl300Nv2" ]; then
+	CreateMipsImage $ROOTFS_FILE $VERSION $OUT_FILE $BRBOX_ROOT
+else
+	CreateBrBoxRoot $ROOTFS_FILE $VERSION $OUT_FILE
+fi
