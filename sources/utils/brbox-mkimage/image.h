@@ -134,6 +134,9 @@
 #define IH_TYPE_BRBOX_ROOT_BBB	15 //beaglebone black
 #define IH_TYPE_BRBOX_ROOT_WDB	16 //wandboard
 #define IH_TYPE_BRBOX_ROOT_RP3	17 //raspi3
+#define IH_TYPE_BRBOX_ROOT_RP0	18 //raspi0
+#define IH_TYPE_BRBOX_GLMT300NV2 19 //mips
+#define IH_TYPE_BRBOX_GLAR150   20 //mips
 
 #define STR_TYPE_BRBOX_PROJ	  "BrBoxProj"  //complete project including all sub-modules
 #define STR_TYPE_BRBOX_STTNG	  "BrBoxSttng" //settings partition
@@ -144,7 +147,9 @@
 #define STR_TYPE_BRBOX_ROOT_BBB	  "BrBoxRtBbb" //root-fs beagle-bone-black
 #define STR_TYPE_BRBOX_ROOT_WDB	  "BrBoxRtWdb" //root-fs wandboard
 #define STR_TYPE_BRBOX_ROOT_RP3	  "BrBoxRtRp3" //root-fs raspi3
-
+#define STR_TYPE_BRBOX_ROOT_RP0	  "BrBoxRtRp0" //root-fs raspi0
+#define STR_TYPE_BRBOX_GLMT300NV2 "BrBoxGl300Nv2" //mips upgrade image
+#define STR_TYPE_BRBOX_GLAR150    "BrBoxGlAr150" //mips upgrade image
 
 
 

@@ -142,6 +142,9 @@ table_entry_t type_name[] =
     {	IH_TYPE_BRBOX_ROOT_BBB,  STR_TYPE_BRBOX_ROOT_BBB, "BrBox RfsBbb Image",},
     {	IH_TYPE_BRBOX_ROOT_WDB,  STR_TYPE_BRBOX_ROOT_WDB, "BrBox RfsWdb Image",},
     {	IH_TYPE_BRBOX_ROOT_RP3,  STR_TYPE_BRBOX_ROOT_RP3, "BrBox RfsRp3 Image",},
+    {	IH_TYPE_BRBOX_ROOT_RP0,  STR_TYPE_BRBOX_ROOT_RP0, "BrBox RfsRp0 Image",},
+    {	IH_TYPE_BRBOX_GLMT300NV2,STR_TYPE_BRBOX_GLMT300NV2,"BrBox Gl300Nv2 Image",},
+    {	IH_TYPE_BRBOX_GLAR150,   STR_TYPE_BRBOX_GLAR150,   "BrBox GlAr150 Image",},
     {	-1,		    "",		  "",			},
 };
 
@@ -1511,6 +1514,12 @@ unsigned char get_image_type(char *image_name)
 		return IH_TYPE_BRBOX_ROOT_WDB;
 	else if(strcmp(image_name,STR_TYPE_BRBOX_ROOT_RP3) == 0 )
 		return IH_TYPE_BRBOX_ROOT_RP3;
+	else if(strcmp(image_name,STR_TYPE_BRBOX_ROOT_RP0) == 0 )
+		return IH_TYPE_BRBOX_ROOT_RP0;
+	else if(strcmp(image_name,STR_TYPE_BRBOX_GLMT300NV2) == 0 )
+		return IH_TYPE_BRBOX_GLMT300NV2;
+	else if(strcmp(image_name,STR_TYPE_BRBOX_GLAR150) == 0 )
+		return IH_TYPE_BRBOX_GLAR150;
 	else
 		return IH_TYPE_INVALID;
 }
