@@ -136,7 +136,7 @@ fi
 
 TMP_IMAGEFILE=$(mktemp) #creates an emptyfile which will be filled by ProcessUpdate as rootfs.tar.xz
 ProcessUpdate $UPDATE_FILE $TMP_IMAGEFILE
-[ $? != "0" ] && { echo "Error: Invalid filetype" ; return 1; } #TODO: check if this file is encrypted
+[ $? != "0" ] && { echo "Error: Invalid filetype" ; rm -rf $TMP_IMAGEFILE ; return 1; } #TODO: check if this file is encrypted
 sysupgrade --test $TMP_IMAGEFILE
 [ $? != "0" ] && { echo "Error: Invalid openwrt-image" ; return 1; }
 echo "Openwrt image health........................ [OK]"
