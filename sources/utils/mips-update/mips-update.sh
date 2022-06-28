@@ -8,8 +8,20 @@ MULTI_MK_OK="multi_mk_ok"
 MULTI_MK_NOK="multi_mk_nok"
 SINGL_BINARY="singl_binary"
 DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
-BD_TYP_GLMT300NV2="GL_MT300NV2"
-BRBOX_IMGTYPE_GLMT300NV2="BrBoxGl300Nv2"
+BD_TYP_GLMT300NV2="GL_MT300NV2" #board-type
+BRBOX_IMGTYPE_GLMT300NV2="BrBoxGl300N"
+BRBOX_IMGTYPE_GLA150="BrBoxGlA150"
+BRBOX_IMGTYPE_SIGNATURE="BrBoxSign"
+PUBLIC_KEY_FILE=/etc/update_signature.txt
+###############################################################################
+ExtractSubImage() #$1=input-proj-file $2=header-info-from-previous-probe $3=output-signature-file $4-filetype
+{
+  #cat $2 | grep $4 > /dev/null
+  #[ $? != "0" ] && return 1 #signature file not found
+  $MKIMAGE -s -l -X $4 -o $3 $1
+  [ $? != "0" ] && return 1 #unable to extract signature file
+  return 0 #signature file extracted successfully
+}
 ###############################################################################
 IsItMultiMkFile() #$1=file $2=text-file-to-store-mkimage-header-text
 {
@@ -97,7 +109,7 @@ ProcessUpdate() #$1=input-update-file $2-output-file(if-applicable)
 		#echo "$IMGTYPE.... [OK]"
 		ProcessImageType $1 $IMGTYPE $2
 		[ $? != "0" ] && { echo "[FAIL]" ; return 1; }
-		echo "$IMGTYPE [OK]"
+		echo "$IMGTYPE.. [OK]"
 		return 0
 	elif [ "$FILE_TYPE" = "$MULTI_MK_OK" ]; then
 		TOTAL_SUB_IMAGES=$(grep "total-sub-images=" $TMPFILE)
@@ -133,12 +145,59 @@ if [ $? = "0" ]; then
   exit $?
 fi
 
+#############check if this is a project file(image+signature)###############
+TMP_HEADERFILE=$(mktemp)
+TMP_SIGFILEUIMG=$(mktemp)
+TMP_SIGFILE=$(mktemp)
+TMP_SUBIMAGE=$(mktemp)
+echo -n "Probing for project file:................... "
+IsItMultiMkFile $UPDATE_FILE $TMP_HEADERFILE
+if [ $? = "0" ]; then
+  echo -e "[OK]"
+  #extract and strip signature sub-image(BrBoxSign)
+  ExtractSubImage $UPDATE_FILE $TMP_HEADERFILE $TMP_SIGFILEUIMG $BRBOX_IMGTYPE_SIGNATURE
+  [ $? != "0" ] && { echo "Error: unable to extract signature file" ; rm -rf $TMP_HEADERFILE $TMP_SIGFILEUIMG $TMP_SIGFILE ;return 1; }
+	echo "Extracting BrBoxSign........................ [OK]"
+  dd if=$TMP_SIGFILEUIMG bs=64 skip=1 of=$TMP_SIGFILE 1>/dev/null 2>/dev/null #just strip 64byte mkheader and create .sigfile
+  [ $? != "0" ] && { echo "Error: unable to strip mkheader from signature" ; rm -rf $TMP_HEADERFILE $TMP_SIGFILEUIMG $TMP_SIGFILE ;return 1; }
 
+ #extract and strig sub-image(BrBoxGl300N)
+  ExtractSubImage $UPDATE_FILE $TMP_HEADERFILE $TMP_SUBIMAGE $BRBOX_IMGTYPE_GLMT300NV2
+  if [ $? = "0" ]; then
+    echo "Extracting BrBoxGl300N...................... [OK]"
+    TMP_SUBIMAGE_RAW=$(mktemp)
+    dd if=$TMP_SUBIMAGE bs=64 skip=1 of=$TMP_SUBIMAGE_RAW 1>/dev/null 2>/dev/null #just strip 64byte mkheader and create subimg
+    openssl dgst -verify $PUBLIC_KEY_FILE -keyform PEM -sha256 -signature $TMP_SIGFILE -binary $TMP_SUBIMAGE_RAW > /dev/null
+    if [ $? = "0" ]; then
+      echo "Signature verification of BrBoxGl300N....... [OK]"
+      rm -rf $TMP_HEADERFILE $TMP_SIGFILEUIMG $TMP_SIGFILE $TMP_SUBIMAGE_RAW
+      UPDATE_FILE=$TMP_SUBIMAGE #replace update image with extracted file and continue normal update process
+    else
+      echo "Signature verification of BrBoxGl300N....... [NOK]"
+      rm -rf $TMP_HEADERFILE $TMP_SIGFILEUIMG $TMP_SIGFILE $TMP_SUBIMAGE $TMP_SUBIMAGE_RAW
+      return 1
+    fi
+  else
+    echo "Extracting BrBoxGl300N Failed!!............. [NOK]"
+    rm -rf $TMP_HEADERFILE $TMP_SIGFILEUIMG $TMP_SIGFILE $TMP_SUBIMAGE
+    return 1
+  fi
+else
+  echo -e "[NO]" #not a project file
+  #return from here to force always signed image update
+fi
+#############################################################################
 TMP_IMAGEFILE=$(mktemp) #creates an emptyfile which will be filled by ProcessUpdate as rootfs.tar.xz
 ProcessUpdate $UPDATE_FILE $TMP_IMAGEFILE
 [ $? != "0" ] && { echo "Error: Invalid filetype" ; rm -rf $TMP_IMAGEFILE ; return 1; } #TODO: check if this file is encrypted
 sysupgrade --test $TMP_IMAGEFILE
 [ $? != "0" ] && { echo "Error: Invalid openwrt-image" ; return 1; }
 echo "Openwrt image health........................ [OK]"
-sysupgrade $TMP_IMAGEFILE #system will automatically reboot
+
+#check if project file check in the beginning has already created a tmp file
+if [ $UPDATE_FILE = $TMP_SUBIMAGE ]; then
+  rm -rf $TMP_SUBIMAGE
+fi
+sysupgrade -i $TMP_IMAGEFILE #system will automatically reboot
+rm -rf $TMP_IMAGEFILE
 exit $?
