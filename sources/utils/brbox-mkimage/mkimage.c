@@ -145,6 +145,7 @@ table_entry_t type_name[] =
     {	IH_TYPE_BRBOX_ROOT_RP0,  STR_TYPE_BRBOX_ROOT_RP0, "BrBox RfsRp0 Image",},
     {	IH_TYPE_BRBOX_GLMT300NV2,STR_TYPE_BRBOX_GLMT300NV2,"BrBox Gl300Nv2 Image",},
     {	IH_TYPE_BRBOX_GLAR150,   STR_TYPE_BRBOX_GLAR150,   "BrBox GlAr150 Image",},
+	{	IH_TYPE_BRBOX_SIGNATURE, STR_TYPE_BRBOX_SIGNATURE, "BrBox Sign Image",},
     {	-1,		    "",		  "",			},
 };
 
@@ -1520,6 +1521,8 @@ unsigned char get_image_type(char *image_name)
 		return IH_TYPE_BRBOX_GLMT300NV2;
 	else if(strcmp(image_name,STR_TYPE_BRBOX_GLAR150) == 0 )
 		return IH_TYPE_BRBOX_GLAR150;
+	else if(strcmp(image_name,STR_TYPE_BRBOX_SIGNATURE) == 0 )
+		return IH_TYPE_BRBOX_SIGNATURE;
 	else
 		return IH_TYPE_INVALID;
 }

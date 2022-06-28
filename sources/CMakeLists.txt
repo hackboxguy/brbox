@@ -13,7 +13,7 @@ add_subdirectory(utils)
 #for cross compiling
 #cmake -H. -BOutput -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain-arm-backup.cmake -DCMAKE_INSTALL_PREFIX=/home/user/tmp/
 #cmake --build Output -- all
-#cmake --build Output -- install -j5 (-j option is for multi-cpu system for faster compilation)
+#cmake --build Output -- install -j$(nproc)
 
 #for local compiling
 #cmake -H. -BOutput -DCMAKE_INSTALL_PREFIX=/home/adav/tmp/brbox -DAUTO_SVN_VERSION=OFF -DINSTALL_CLIENT=ON

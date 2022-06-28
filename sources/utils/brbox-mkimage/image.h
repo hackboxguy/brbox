@@ -137,10 +137,11 @@
 #define IH_TYPE_BRBOX_ROOT_RP0	18 //raspi0
 #define IH_TYPE_BRBOX_GLMT300NV2 19 //mips
 #define IH_TYPE_BRBOX_GLAR150   20 //mips
+#define IH_TYPE_BRBOX_SIGNATURE 21 //Signature file
 
-#define STR_TYPE_BRBOX_PROJ	  "BrBoxProj"  //complete project including all sub-modules
+#define STR_TYPE_BRBOX_PROJ	      "BrBoxProj"  //complete project including all sub-modules
 #define STR_TYPE_BRBOX_STTNG	  "BrBoxSttng" //settings partition
-#define STR_TYPE_BRBOX_USRDAT	  "BrBoxUsrDt" //user-data partition 
+#define STR_TYPE_BRBOX_USRDAT	  "BrBoxUsrDt" //user-data partition
 #define STR_TYPE_BRBOX_ROOT_BTR	  "BrBoxRtBtr" //root-fs bay-trail
 #define STR_TYPE_BRBOX_ROOT_RP1	  "BrBoxRtRp1" //root-fs raspi1
 #define STR_TYPE_BRBOX_ROOT_RP2	  "BrBoxRtRp2" //root-fs raspi2
@@ -150,7 +151,7 @@
 #define STR_TYPE_BRBOX_ROOT_RP0	  "BrBoxRtRp0" //root-fs raspi0
 #define STR_TYPE_BRBOX_GLMT300NV2 "BrBoxGl300Nv2" //mips upgrade image
 #define STR_TYPE_BRBOX_GLAR150    "BrBoxGlAr150" //mips upgrade image
-
+#define STR_TYPE_BRBOX_SIGNATURE  "BrBoxSign"   //signature file for verification
 
 
 
