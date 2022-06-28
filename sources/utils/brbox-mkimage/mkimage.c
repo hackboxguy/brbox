@@ -1030,7 +1030,7 @@ static int print_header (image_header_t *hdr)
 				multi_image_result=-1;
 			}
 
-			sprintf (temp_buffer,"   Image %d: %-10s %-13s %-8d Bytes = %4d kB = %d MB %s %s\n",
+			sprintf (temp_buffer,"   Image %d: %-11s %-13s %-8d Bytes = %4d kB = %d MB %s %s\n",
 				i,image_name,image_ver, size, size>>10, size>>20,image_health,put_comp (temp_header.ih_comp));
 			printmsg(temp_buffer);
 			/* copy_file() will pad the first files to even word align */

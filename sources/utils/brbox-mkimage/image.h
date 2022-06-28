@@ -149,8 +149,8 @@
 #define STR_TYPE_BRBOX_ROOT_WDB	  "BrBoxRtWdb" //root-fs wandboard
 #define STR_TYPE_BRBOX_ROOT_RP3	  "BrBoxRtRp3" //root-fs raspi3
 #define STR_TYPE_BRBOX_ROOT_RP0	  "BrBoxRtRp0" //root-fs raspi0
-#define STR_TYPE_BRBOX_GLMT300NV2 "BrBoxGl300Nv2" //mips upgrade image
-#define STR_TYPE_BRBOX_GLAR150    "BrBoxGlAr150" //mips upgrade image
+#define STR_TYPE_BRBOX_GLMT300NV2 "BrBoxGl300N" //mips upgrade image
+#define STR_TYPE_BRBOX_GLAR150    "BrBoxGlA150" //mips upgrade image
 #define STR_TYPE_BRBOX_SIGNATURE  "BrBoxSign"   //signature file for verification
 
 
