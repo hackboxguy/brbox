@@ -13,14 +13,21 @@ BRBOX_IMGTYPE_GLMT300NV2="BrBoxGl300N"
 BRBOX_IMGTYPE_GLA150="BrBoxGlA150"
 BRBOX_IMGTYPE_SIGNATURE="BrBoxSign"
 PUBLIC_KEY_FILE=/etc/update_signature.txt
+TEST_ONLY="no"
+PRINT_HELP="no"
 ###############################################################################
+PrintHelp()
+{
+	echo "mips-update.sh: firmware update tool"
+	echo "usage:$0 -u <mipsProject.uimg> (updates the system with provided file)"
+	echo "usage:$0 -u <mipsProject.uimg> -t (tests the image but actual flash will not be updated)"
+	return 0
+}
 ExtractSubImage() #$1=input-proj-file $2=header-info-from-previous-probe $3=output-signature-file $4-filetype
 {
-  #cat $2 | grep $4 > /dev/null
-  #[ $? != "0" ] && return 1 #signature file not found
-  $MKIMAGE -s -l -X $4 -o $3 $1
-  [ $? != "0" ] && return 1 #unable to extract signature file
-  return 0 #signature file extracted successfully
+	$MKIMAGE -s -l -X $4 -o $3 $1
+	[ $? != "0" ] && return 1 #unable to extract signature file
+	return 0 #signature file extracted successfully
 }
 ###############################################################################
 IsItMultiMkFile() #$1=file $2=text-file-to-store-mkimage-header-text
@@ -129,12 +136,17 @@ ProcessUpdate() #$1=input-update-file $2-output-file(if-applicable)
 	fi
 }
 ###############################################################################
-while getopts u: f
+while getopts u:th f
 do
     case $f in
 	    u) UPDATE_FILE=$OPTARG ;;    #update file path
+		t) TEST_ONLY="yes";;
+		h) PRINT_HELP="yes";;
     esac
 done
+
+[ "$PRINT_HELP" = "yes"  ] && { PrintHelp; return 0; }
+[ -z "$UPDATE_FILE"  ] && { PrintHelp; return 0; }
 
 [ ! -f  "$UPDATE_FILE"  ] && { echo "Error: Update file not found!!!"; return 1; }
 
@@ -194,10 +206,23 @@ sysupgrade --test $TMP_IMAGEFILE
 [ $? != "0" ] && { echo "Error: Invalid openwrt-image" ; return 1; }
 echo "Openwrt image health........................ [OK]"
 
+echo -n "Updating flash.............................. "
 #check if project file check in the beginning has already created a tmp file
 if [ $UPDATE_FILE = $TMP_SUBIMAGE ]; then
   rm -rf $TMP_SUBIMAGE
 fi
-sysupgrade -i $TMP_IMAGEFILE #system will automatically reboot
+if [ "$TEST_ONLY" = "no"  ]; then
+	sysupgrade $TMP_IMAGEFILE #system will automatically reboot
+else
+	sysupgrade --test $TMP_IMAGEFILE
+fi
+#sysupgrade -i $TMP_IMAGEFILE #system will automatically reboot
 rm -rf $TMP_IMAGEFILE
-exit $?
+
+if [ $? = "0" ]; then
+	echo -e "[OK]"
+	return 0
+else
+	echo -e "[NOK]"
+	return 1
+fi
