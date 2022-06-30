@@ -10,8 +10,10 @@ SINGL_BINARY="singl_binary"
 DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
 BD_TYP_GLMT300NV2="GL_MT300NV2" #board-type
 BD_TYP_GLAR150="GL_AR150"
+BD_TYP_HLKRM04="HLK_RM04"
 BRBOX_IMGTYPE_GLMT300NV2="BrBoxGl300N"
 BRBOX_IMGTYPE_GLA150="BrBoxGlA150"
+BRBOX_IMGTYPE_HLKRM04="BrBoxHlRm04"
 BRBOX_IMGTYPE_SIGNATURE="BrBoxSign"
 PUBLIC_KEY_FILE=/etc/update_signature.txt
 TEST_ONLY="no"
@@ -93,6 +95,8 @@ ProcessImageType() #$1-inputfile $2=IMGTYPE $3=outputfile
 	BRBOX_ROOT="unknown"
 
 	[ "$BOARD_TYPE" = "$BD_TYP_GLMT300NV2"     ]  && BRBOX_IMG=$BRBOX_IMGTYPE_GLMT300NV2
+	[ "$BOARD_TYPE" = "$BD_TYP_GLAR150"        ]  && BRBOX_IMG=$BRBOX_IMGTYPE_GLA150
+	[ "$BOARD_TYPE" = "$BD_TYP_HLKRM04"        ]  && BRBOX_IMG=$BRBOX_IMGTYPE_HLKRM04
 
 	if [ "$2" = "$BRBOX_IMG" ]; then
 		dd if=$1 bs=64 skip=1 of=$3 1>/dev/null 2>/dev/null #just strip 64byte mkheader and create rootfs.tar.xz
@@ -179,6 +183,9 @@ if [ $? = "0" ]; then
 	#scan through all supported device types, if not found, then exit
 	[ "$BOARD_TYPE" = "$BD_TYP_GLMT300NV2" ]  && BRBOX_IMG=$BRBOX_IMGTYPE_GLMT300NV2
 	[ "$BOARD_TYPE" = "$BD_TYP_GLAR150"    ]  && BRBOX_IMG=$BRBOX_IMGTYPE_GLA150
+	[ "$BOARD_TYPE" = "$BD_TYP_HLKRM04"    ]  && BRBOX_IMG=$BRBOX_IMGTYPE_HLKRM04
+
+
 	if [ "$BRBOX_IMG" = "unknown"    ]; then
 		echo "Error: missing fmw-binary for detected board type"
 		rm -rf $TMP_HEADERFILE

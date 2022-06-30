@@ -8,6 +8,7 @@ BRBOX_USRDAT="BrBoxUsrDt" #user-data partition
 BRBOX_SIGNATURE="BrBoxSign" #signature file
 BRBOX_GL300NV2="BrBoxGl300N"
 BRBOX_GLA150="BrBoxGlA150"
+BRBOX_HLKRM04="BrBoxHlRm04"
 
 USAGE="script for generating BrBox binary update packages"
 USAGE1="usage:./$0 -r <rootfs.tar.xz> -v <version.xx.yy> -m <mkimage_tool_path> -t <rootfs_type>"
@@ -95,6 +96,10 @@ do
     esac
 done
 if [ $BRBOX_ROOT = $BRBOX_GL300NV2 ]; then
+	CreateMipsImage $ROOTFS_FILE $VERSION $OUT_FILE $BRBOX_ROOT
+elif [ $BRBOX_ROOT = $BRBOX_GLA150 ]; then
+	CreateMipsImage $ROOTFS_FILE $VERSION $OUT_FILE $BRBOX_ROOT
+elif [ $BRBOX_ROOT = $BRBOX_HLKRM04 ]; then
 	CreateMipsImage $ROOTFS_FILE $VERSION $OUT_FILE $BRBOX_ROOT
 elif [ $BRBOX_ROOT = $BRBOX_SIGNATURE ]; then
 	Create_SignatureImage $ROOTFS_FILE $VERSION $OUT_FILE

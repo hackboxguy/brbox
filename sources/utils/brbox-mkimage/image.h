@@ -138,6 +138,7 @@
 #define IH_TYPE_BRBOX_GLMT300NV2 19 //mips
 #define IH_TYPE_BRBOX_GLAR150   20 //mips
 #define IH_TYPE_BRBOX_SIGNATURE 21 //Signature file
+#define IH_TYPE_BRBOX_HLKRM04   22 //mips
 
 #define STR_TYPE_BRBOX_PROJ	      "BrBoxProj"  //complete project including all sub-modules
 #define STR_TYPE_BRBOX_STTNG	  "BrBoxSttng" //settings partition
@@ -152,6 +153,7 @@
 #define STR_TYPE_BRBOX_GLMT300NV2 "BrBoxGl300N" //mips upgrade image
 #define STR_TYPE_BRBOX_GLAR150    "BrBoxGlA150" //mips upgrade image
 #define STR_TYPE_BRBOX_SIGNATURE  "BrBoxSign"   //signature file for verification
+#define STR_TYPE_BRBOX_HLKRM04    "BrBoxHlRm04" //mips upgrade image
 
 
 

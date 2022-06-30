@@ -146,6 +146,7 @@ table_entry_t type_name[] =
     {	IH_TYPE_BRBOX_GLMT300NV2,STR_TYPE_BRBOX_GLMT300NV2,"BrBox Gl300Nv2 Image",},
     {	IH_TYPE_BRBOX_GLAR150,   STR_TYPE_BRBOX_GLAR150,   "BrBox GlAr150 Image",},
 	{	IH_TYPE_BRBOX_SIGNATURE, STR_TYPE_BRBOX_SIGNATURE, "BrBox Sign Image",},
+	{	IH_TYPE_BRBOX_HLKRM04,   STR_TYPE_BRBOX_HLKRM04,   "BrBox HlkRm04 Image",},
     {	-1,		    "",		  "",			},
 };
 
@@ -915,7 +916,7 @@ copy_file (int ifd, const char *datafile, int pad)
 void
 usage ()
 {
-	fprintf (stderr, "%s build-version: %d\n",cmdname,SRC_CONTROL_VERSION);//MKIMG_BUILD_NUMBER);
+	fprintf (stderr, "%s build-version: %d\n",cmdname,1);//MKIMG_BUILD_NUMBER);//SRC_CONTROL_VERSION
 
 	fprintf (stderr, "Usage: %s -l image\n"
 			 "          -l ==> list image header information\n"
@@ -1523,6 +1524,8 @@ unsigned char get_image_type(char *image_name)
 		return IH_TYPE_BRBOX_GLAR150;
 	else if(strcmp(image_name,STR_TYPE_BRBOX_SIGNATURE) == 0 )
 		return IH_TYPE_BRBOX_SIGNATURE;
+	else if(strcmp(image_name,STR_TYPE_BRBOX_HLKRM04) == 0 )
+		return IH_TYPE_BRBOX_HLKRM04;
 	else
 		return IH_TYPE_INVALID;
 }
