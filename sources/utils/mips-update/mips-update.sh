@@ -9,6 +9,7 @@ MULTI_MK_NOK="multi_mk_nok"
 SINGL_BINARY="singl_binary"
 DEV_TYPE_FILE=/tmp/BrBoxDevType.txt
 BD_TYP_GLMT300NV2="GL_MT300NV2" #board-type
+BD_TYP_GLAR150="GL_AR150"
 BRBOX_IMGTYPE_GLMT300NV2="BrBoxGl300N"
 BRBOX_IMGTYPE_GLA150="BrBoxGlA150"
 BRBOX_IMGTYPE_SIGNATURE="BrBoxSign"
@@ -147,15 +148,14 @@ done
 
 [ "$PRINT_HELP" = "yes"  ] && { PrintHelp; return 0; }
 [ -z "$UPDATE_FILE"  ] && { PrintHelp; return 0; }
-
 [ ! -f  "$UPDATE_FILE"  ] && { echo "Error: Update file not found!!!"; return 1; }
 
-sysupgrade --test $UPDATE_FILE 1>/dev/null 2>/dev/null
-if [ $? = "0" ]; then
-  #this is a valid openwrt image, for backward compatibility, dont do any extra checks(just trigger update)
-  sysupgrade $UPDATE_FILE
-  exit $?
-fi
+#sysupgrade --test $UPDATE_FILE 1>/dev/null 2>/dev/null
+#if [ $? = "0" ]; then
+   #this is a valid openwrt image, for backward compatibility, dont do any extra checks(just trigger update)
+#  sysupgrade $UPDATE_FILE
+#  exit $?
+#fi
 
 #############check if this is a project file(image+signature)###############
 TMP_HEADERFILE=$(mktemp)
@@ -165,38 +165,54 @@ TMP_SUBIMAGE=$(mktemp)
 echo -n "Probing for project file:................... "
 IsItMultiMkFile $UPDATE_FILE $TMP_HEADERFILE
 if [ $? = "0" ]; then
-  echo -e "[OK]"
-  #extract and strip signature sub-image(BrBoxSign)
-  ExtractSubImage $UPDATE_FILE $TMP_HEADERFILE $TMP_SIGFILEUIMG $BRBOX_IMGTYPE_SIGNATURE
-  [ $? != "0" ] && { echo "Error: unable to extract signature file" ; rm -rf $TMP_HEADERFILE $TMP_SIGFILEUIMG $TMP_SIGFILE ;return 1; }
+	echo -e "[OK]"
+	#extract and strip signature sub-image(BrBoxSign)
+	ExtractSubImage $UPDATE_FILE $TMP_HEADERFILE $TMP_SIGFILEUIMG $BRBOX_IMGTYPE_SIGNATURE
+	[ $? != "0" ] && { echo "Error: unable to extract signature file" ; rm -rf $TMP_HEADERFILE $TMP_SIGFILEUIMG $TMP_SIGFILE $TMP_SUBIMAGE ;return 1; }
 	echo "Extracting BrBoxSign........................ [OK]"
-  dd if=$TMP_SIGFILEUIMG bs=64 skip=1 of=$TMP_SIGFILE 1>/dev/null 2>/dev/null #just strip 64byte mkheader and create .sigfile
-  [ $? != "0" ] && { echo "Error: unable to strip mkheader from signature" ; rm -rf $TMP_HEADERFILE $TMP_SIGFILEUIMG $TMP_SIGFILE ;return 1; }
+	dd if=$TMP_SIGFILEUIMG bs=64 skip=1 of=$TMP_SIGFILE 1>/dev/null 2>/dev/null #just strip 64byte mkheader and create .sigfile
+	[ $? != "0" ] && { echo "Error: unable to strip mkheader from signature" ; rm -rf $TMP_HEADERFILE $TMP_SIGFILEUIMG $TMP_SIGFILE $TMP_SUBIMAGE ;return 1; }
 
- #extract and strig sub-image(BrBoxGl300N)
-  ExtractSubImage $UPDATE_FILE $TMP_HEADERFILE $TMP_SUBIMAGE $BRBOX_IMGTYPE_GLMT300NV2
-  if [ $? = "0" ]; then
-    echo "Extracting BrBoxGl300N...................... [OK]"
-    TMP_SUBIMAGE_RAW=$(mktemp)
-    dd if=$TMP_SUBIMAGE bs=64 skip=1 of=$TMP_SUBIMAGE_RAW 1>/dev/null 2>/dev/null #just strip 64byte mkheader and create subimg
-    openssl dgst -verify $PUBLIC_KEY_FILE -keyform PEM -sha256 -signature $TMP_SIGFILE -binary $TMP_SUBIMAGE_RAW > /dev/null
-    if [ $? = "0" ]; then
-      echo "Signature verification of BrBoxGl300N....... [OK]"
-      rm -rf $TMP_HEADERFILE $TMP_SIGFILEUIMG $TMP_SIGFILE $TMP_SUBIMAGE_RAW
-      UPDATE_FILE=$TMP_SUBIMAGE #replace update image with extracted file and continue normal update process
-    else
-      echo "Signature verification of BrBoxGl300N....... [NOK]"
-      rm -rf $TMP_HEADERFILE $TMP_SIGFILEUIMG $TMP_SIGFILE $TMP_SUBIMAGE $TMP_SUBIMAGE_RAW
-      return 1
-    fi
-  else
-    echo "Extracting BrBoxGl300N Failed!!............. [NOK]"
-    rm -rf $TMP_HEADERFILE $TMP_SIGFILEUIMG $TMP_SIGFILE $TMP_SUBIMAGE
-    return 1
-  fi
+	#check the board type and extract corresponding sub-image(e.g GL_MT300NV2==>BrBoxGl300N)
+	BOARD_TYPE=$(cat $DEV_TYPE_FILE)
+	BRBOX_IMG="unknown"
+	#scan through all supported device types, if not found, then exit
+	[ "$BOARD_TYPE" = "$BD_TYP_GLMT300NV2" ]  && BRBOX_IMG=$BRBOX_IMGTYPE_GLMT300NV2
+	[ "$BOARD_TYPE" = "$BD_TYP_GLAR150"    ]  && BRBOX_IMG=$BRBOX_IMGTYPE_GLA150
+	if [ "$BRBOX_IMG" = "unknown"    ]; then
+		echo "Error: missing fmw-binary for detected board type"
+		rm -rf $TMP_HEADERFILE
+		rm -rf TMP_SIGFILEUIMG
+		rm -rf TMP_SIGFILE
+		rm -rf TMP_SUBIMAGE
+		return 1
+	fi
+
+
+	ExtractSubImage $UPDATE_FILE $TMP_HEADERFILE $TMP_SUBIMAGE $BRBOX_IMG
+	if [ $? = "0" ]; then
+		echo "Extracting $BRBOX_IMG...................... [OK]"
+		TMP_SUBIMAGE_RAW=$(mktemp)
+		dd if=$TMP_SUBIMAGE bs=64 skip=1 of=$TMP_SUBIMAGE_RAW 1>/dev/null 2>/dev/null #just strip 64byte mkheader and create subimg
+		openssl dgst -verify $PUBLIC_KEY_FILE -keyform PEM -sha256 -signature $TMP_SIGFILE -binary $TMP_SUBIMAGE_RAW > /dev/null
+		if [ $? = "0" ]; then
+			echo "Signature verification of $BRBOX_IMG....... [OK]"
+			rm -rf $TMP_HEADERFILE $TMP_SIGFILEUIMG $TMP_SIGFILE $TMP_SUBIMAGE_RAW
+			UPDATE_FILE=$TMP_SUBIMAGE #replace update image with extracted file and continue normal update process
+		else
+			echo "Signature verification of $BRBOX_IMG....... [NOK]"
+			rm -rf $TMP_HEADERFILE $TMP_SIGFILEUIMG $TMP_SIGFILE $TMP_SUBIMAGE $TMP_SUBIMAGE_RAW
+			return 1
+	    fi
+	else
+		echo "Extracting $BRBOX_IMG Failed!!............. [NOK]"
+		rm -rf $TMP_HEADERFILE $TMP_SIGFILEUIMG $TMP_SIGFILE $TMP_SUBIMAGE
+		return 1
+	fi
 else
-  echo -e "[NO]" #not a project file
-  #return from here to force always signed image update
+	echo -e "[NO]" #not a project file
+	echo    "Signed Project file is required for update:. [Exiting]"
+	return 1
 fi
 #############################################################################
 TMP_IMAGEFILE=$(mktemp) #creates an emptyfile which will be filled by ProcessUpdate as rootfs.tar.xz
@@ -207,10 +223,13 @@ sysupgrade --test $TMP_IMAGEFILE
 echo "Openwrt image health........................ [OK]"
 
 echo -n "Updating flash.............................. "
+
 #check if project file check in the beginning has already created a tmp file
+#do not leave dynamically created tmp file, delete them before this script returns
 if [ $UPDATE_FILE = $TMP_SUBIMAGE ]; then
   rm -rf $TMP_SUBIMAGE
 fi
+
 if [ "$TEST_ONLY" = "no"  ]; then
 	sysupgrade $TMP_IMAGEFILE #system will automatically reboot
 else
