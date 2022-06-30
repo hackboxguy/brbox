@@ -916,7 +916,7 @@ copy_file (int ifd, const char *datafile, int pad)
 void
 usage ()
 {
-	fprintf (stderr, "%s build-version: %d\n",cmdname,1);//MKIMG_BUILD_NUMBER);//SRC_CONTROL_VERSION
+	fprintf (stderr, "%s build-version: %d\n",cmdname,SRC_CONTROL_VERSION);//MKIMG_BUILD_NUMBER);//SRC_CONTROL_VERSION
 
 	fprintf (stderr, "Usage: %s -l image\n"
 			 "          -l ==> list image header information\n"

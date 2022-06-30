@@ -35,8 +35,8 @@ mkimage:	$(SOURCES) $(HEADERS)
 .PHONY: version
 version:
 	@echo -n "#define SRC_CONTROL_VERSION " > SrcControlVersion.h
-	svn info | grep "Revision:" | sed -e 's/.* //' >> SrcControlVersion.h
-
+	#svn info | grep "Revision:" | sed -e 's/.* //' >> SrcControlVersion.h
+	git rev-list --count --first-parent HEAD >> SrcControlVersion.h
 clean:
 	rm -f SrcControlVersion.h
 	rm -f brbox-mkimage
