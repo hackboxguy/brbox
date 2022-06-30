@@ -747,10 +747,14 @@ RPC_SRV_RESULT SysRpc::process_async_download_file(SYSMGR_DOWNLOAD_FILE_PACKET* 
 	char cmdline[512];
 	ADSysInfo SysInfo;
 	RPC_SRV_RESULT ret_val=RPC_SRV_RESULT_ARG_ERROR;
+	ADCMN_DEV_INFO *pDevInfo=(ADCMN_DEV_INFO *)pDataCache->pDevInfo;
 	switch(command)
 	{
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADFTP :
-			sprintf(cmdline,"wget --tries=2 %s -O %s",pPacket->srcurl,pPacket->targetfilepath);//targetfilepath must be fullpath+filename
+			if(pDevInfo->BoardType == ADCMN_BOARD_TYPE_GL_MT300NV2)
+				sprintf(cmdline,"wget %s -O %s",pPacket->srcurl,pPacket->targetfilepath);//targetfilepath must be fullpath+filename
+			else
+				sprintf(cmdline,"wget --tries=2 %s -O %s",pPacket->srcurl,pPacket->targetfilepath);//targetfilepath must be fullpath+filename
 			ret_val=SysInfo.run_shell_script(cmdline,get_emulation_flag());//backup-fmw will be updated
 			break;
 		case EJSON_SYSMGR_RPC_SET_DOWNLOADTFTP :
