@@ -48,7 +48,7 @@ class ADXmppProducer
 protected:
 	int onXmppMessage(std::string msg,std::string sender="")
 	{
-		if(pConsumer!=NULL)		
+		if(pConsumer!=NULL)
 			return pConsumer->onXmppMessage(msg,sender,this);
 		return -1;
 	}
@@ -57,7 +57,7 @@ public:
 	virtual ~ADXmppProducer(){};
 	int attach_callback(ADXmppConsumer* c)
 	{
-		//allow only one Consumer to be attached		
+		//allow only one Consumer to be attached
 		if(pConsumer==NULL)
 		{
 			pConsumer=c;
@@ -85,9 +85,13 @@ public:
 	const std::string currentDateTime();
 	bool getForcedDisconnect(){return DisconnectNow;}
 	void setForcedDisconnect(){DisconnectNow=true;}
+	bool getOnDemandDisconnect(){return OnDemandDisconnect;}
+	void setOnDemandDisconnect(bool flag){OnDemandDisconnect=flag;}
+
 	//for sending asyc-event to a buddy
 	bool SendMessageToBuddy(std::string address, const std::string & body, const std::string & subject);
 	int get_buddy_list(std::string &returnval);
+	bool get_connected_status();
 
 	virtual void handleEvent( const Event& event );// = 0;
 	virtual void onConnect();
@@ -121,11 +125,12 @@ public:
 	ADThread PingThread;
 	virtual int monoshot_callback_function(void* pUserData,ADThreadProducer* pObj);//{return 0;};
 	virtual int thread_callback_function(void* pUserData,ADThreadProducer* pObj){return 0;};
-	
+
 private:
 	vector<std::string> BuddyList;//authorized accounts that can contact me
 	bool iConnect;//shows status of onConnect/onDisconnect
 	bool DisconnectNow;
+	bool OnDemandDisconnect;
 	bool DebugLog;
 	bool failed_authorization;
 	bool connected;

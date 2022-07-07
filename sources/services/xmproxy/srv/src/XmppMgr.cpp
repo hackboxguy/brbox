@@ -217,7 +217,8 @@ int XmppMgr::thread_callback_function(void* pUserData,ADThreadProducer* pObj)
 	{
 		//cout<<"XmppMgr::thread_callback_function: entering xmpp connect"<<endl;
 		LOG_DEBUG_MSG_1_ARG(DebugLog,"BRBOX:xmproxy","XmppMgr::thread_callback_function::xmpp login attempt=%d",++loginAttempt);
-		XmppProxy.connect((char*)XmppUserName.c_str(),(char*)XmppUserPw.c_str());
+		if(XmppProxy.getOnDemandDisconnect()==false)//user has requested for disconnect via rpc
+			XmppProxy.connect((char*)XmppUserName.c_str(),(char*)XmppUserPw.c_str());
 		//cout<<"XmppMgr::thread_callback_function: exited xmpp connect"<<endl;
 		//XmppProxy.disconnect();
 		if(XmppProxy.getForcedDisconnect())break;
@@ -496,6 +497,17 @@ RPC_SRV_RESULT XmppMgr::Stop()
 	//}
 	//XmppClientThread.stop_thread();
 	XmppClientThread.stop_thread();
+	return RPC_SRV_RESULT_SUCCESS;
+}
+RPC_SRV_RESULT XmppMgr::set_online_status(bool status)
+{
+	if(status == true) //go online
+		XmppProxy.setOnDemandDisconnect(false);//thread will notice this in next 5sec sampling, and then will go online
+	else //go offline
+	{
+		XmppProxy.setOnDemandDisconnect(true);
+		XmppProxy.disconnect();//force the disconnection if already online
+	}
 	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */

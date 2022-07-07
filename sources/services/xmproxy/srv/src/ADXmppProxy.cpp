@@ -17,6 +17,7 @@ ADXmppProxy::ADXmppProxy()
 	connected=false;
 	HeartBeat=0;
 	DisconnectNow=false;
+	OnDemandDisconnect=false;//user requested disconnection via rpc
 	//m_session=0;
 	//m_messageEventFilter=0;
 	//m_chatStateFilter=0;
@@ -75,7 +76,7 @@ int ADXmppProxy::connect(char* user,char* password)
 		j->logInstance().registerLogHandler( LogLevelDebug, LogAreaAll, this );
 	else
 		j->logInstance().registerLogHandler( LogLevelWarning, LogAreaAll, this );
-		
+
 	HeartBeat=0;
 
 	ConnectionError ce = ConnNoError;
@@ -95,7 +96,7 @@ int ADXmppProxy::connect(char* user,char* password)
 
 	delete( j );
 	j=NULL;
-	
+
 	connected=false;
 
 	if(DebugLog)
@@ -140,7 +141,7 @@ void ADXmppProxy::handleMessage( const Message& msg, MessageSession * session )
 	cout<<"ADXmppProxy::handleMessage:arrived:msg:"<<msg.body()<<":len:"<<msg.body().size()<<" from="<<session->target().bare()<<endl;
 	if(msg.body().size()>0)
 		receive_request(msg.body(),session->target().bare());
-	//else 
+	//else
 		//ignore-the-message
 }
 /*****************************************************************************/
@@ -237,7 +238,7 @@ void ADXmppProxy::handleLog( LogLevel level, LogArea area, const std::string& me
 }
 /*****************************************************************************/
 // Get current date/time, format is YYYY-MM-DD.HH:mm:ss
-const std::string ADXmppProxy::currentDateTime() 
+const std::string ADXmppProxy::currentDateTime()
 {
 	time_t     now = time(0);
 	struct tm  tstruct;
@@ -439,4 +440,8 @@ int ADXmppProxy::get_buddy_list(std::string &returnval)
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
-
+bool ADXmppProxy::get_connected_status()
+{
+	return iConnect;
+}
+/* ------------------------------------------------------------------------- */

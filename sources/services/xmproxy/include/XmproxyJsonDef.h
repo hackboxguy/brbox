@@ -14,6 +14,8 @@ typedef enum EJSON_XMPROXY_RPC_TYPES_T
 	//EJSON_XMPROXY_RPC_SMS_SEND,
 	//EJSON_XMPROXY_RPC_SMS_LIST_UPDATE,
 	//EJSON_XMPROXY_RPC_SMS_IDENTIFY_DEV, //check if modem device is detected correctly
+	EJSON_XMPROXY_RPC_GET_ONLINE_STATUS,
+	EJSON_XMPROXY_RPC_SET_ONLINE_STATUS, //via rpc, force to go offline
 	EJSON_XMPROXY_RPC_END,
 	EJSON_XMPROXY_RPC_NONE
 }EJSON_XMPROXY_RPC_TYPES;
@@ -56,6 +58,24 @@ typedef struct BBOXSMS_SMS_PACKET_T
 	int taskID;
 }BBOXSMS_SMS_PACKET;*/
 /* ------------------------------------------------------------------------- */
+//EJSON_XMPROXY_RPC_GET_ONLINE_STATUS (get_online_status)
+//EJSON_XMPROXY_RPC_SET_ONLINE_STATUS (set_online_status)
+#define XMPROXY_RPC_ONLINE_STATUS_GET        "get_online_status"
+#define XMPROXY_RPC_ONLINE_STATUS_SET        "set_online_status"
+#define XMPROXY_RPC_ONLINE_STATUS_ARG        "status"
+#define XMPROXY_RPC_ONLINE_STATUS_ARG_TABL   {"online","offline","unknown","none","\0"}
+typedef enum XMPROXY_ONLINESTS_TYPE_T
+{
+	XMPROXY_ONLINESTS_ONLINE,
+	XMPROXY_ONLINESTS_OFFLINE,
+	XMPROXY_ONLINESTS_UNKNOWN,
+	XMPROXY_ONLINESTS_NONE
+}XMPROXY_ONLINESTS_TYPE;
+typedef struct XMPROXY_ONLINESTS_PACKET_T
+{
+	XMPROXY_ONLINESTS_TYPE status;
+}XMPROXY_ONLINESTS_PACKET;
+/* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct XMPROXY_CMN_DATA_CACHE_T
 {
@@ -72,4 +92,3 @@ typedef struct XMPROXY_CMN_DATA_CACHE_T
 /* ------------------------------------------------------------------------- */
 
 #endif
-

@@ -302,5 +302,7 @@ public:
 	RPC_SRV_RESULT xpandarg(std::string &cmdArg);
 	RPC_SRV_RESULT xpandargs(std::string &cmdArg);
 	inline void SetNetInterface(std::string interface){XmppNetInterface=interface;};
+	inline bool get_connected_status(){return XmppProxy.get_connected_status();};
+	RPC_SRV_RESULT set_online_status(bool status);//user set online/offline status via rpc
 };
 #endif

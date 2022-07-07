@@ -1,9 +1,10 @@
 #include "XmppRpc.h"
+#include "XmppMgr.h"
 //#include "SmsMgr.h"
 /* ------------------------------------------------------------------------- */
 XmppRpc:: XmppRpc(std::string rpcName,int myIndex,bool emu, bool log,XMPROXY_CMN_DATA_CACHE *pData):ADJsonRpcMgrConsumer(rpcName,myIndex,emu,log)
 {
-	pDataCache=pData;	
+	pDataCache=pData;
 }
 /* ------------------------------------------------------------------------- */
 XmppRpc::~ XmppRpc()
@@ -15,7 +16,9 @@ int XmppRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 	EJSON_XMPROXY_RPC_TYPES command =(EJSON_XMPROXY_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_XMPROXY_RPC_GET_ASYNCTASK   :return json_to_bin_get_async_task_in_progress(pReq);
+		case EJSON_XMPROXY_RPC_GET_ASYNCTASK    :return json_to_bin_get_async_task_in_progress(pReq);
+		case EJSON_XMPROXY_RPC_GET_ONLINE_STATUS:return json_to_bin_get_online_status(pReq);
+		case EJSON_XMPROXY_RPC_SET_ONLINE_STATUS:return json_to_bin_set_online_status(pReq);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL  :return json_to_bin_delete_all(pReq);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE      :break;
 		//case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET   :return json_to_bin_get_total_sms(pReq);
@@ -33,7 +36,9 @@ int XmppRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 	EJSON_XMPROXY_RPC_TYPES command =(EJSON_XMPROXY_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_XMPROXY_RPC_GET_ASYNCTASK   :return bin_to_json_get_async_task_in_progress(pReq);
+		case EJSON_XMPROXY_RPC_GET_ASYNCTASK    :return bin_to_json_get_async_task_in_progress(pReq);
+		case EJSON_XMPROXY_RPC_GET_ONLINE_STATUS:return bin_to_json_get_online_status(pReq);
+		case EJSON_XMPROXY_RPC_SET_ONLINE_STATUS:return bin_to_json_set_online_status(pReq);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL  :return bin_to_json_delete_all(pReq);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE      :break;
 		//case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET   :return bin_to_json_get_total_sms(pReq);
@@ -51,7 +56,9 @@ int XmppRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* p
 	EJSON_XMPROXY_RPC_TYPES command =(EJSON_XMPROXY_RPC_TYPES)index;
 	switch(command)
 	{
-		case EJSON_XMPROXY_RPC_GET_ASYNCTASK   :return process_get_async_task_in_progress(pReq);
+		case EJSON_XMPROXY_RPC_GET_ASYNCTASK    :return process_get_async_task_in_progress(pReq);
+		case EJSON_XMPROXY_RPC_GET_ONLINE_STATUS:return process_get_online_status(pReq);
+		case EJSON_XMPROXY_RPC_SET_ONLINE_STATUS:return process_set_online_status(pReq);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL  :return process_delete_all(pReq,pObj);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE      :break;
 		//case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET   :return process_get_total_sms(pReq);
@@ -179,11 +186,11 @@ RPC_SRV_RESULT SmsRpc::process_async_delete_all(BBOXSMS_SMS_PACKET* pPacket)
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
 	if(pMgr->DeleteAllSMS(1)!=0) //0,1,2,3,4(5 fails)
 		return RPC_SRV_RESULT_FAIL;
-	if(pMgr->DeleteAllSMS(2)!=0) 
+	if(pMgr->DeleteAllSMS(2)!=0)
 		return RPC_SRV_RESULT_FAIL;
-	if(pMgr->DeleteAllSMS(3)!=0) 
+	if(pMgr->DeleteAllSMS(3)!=0)
 		return RPC_SRV_RESULT_FAIL;
-	if(pMgr->DeleteAllSMS(4)!=0) 
+	if(pMgr->DeleteAllSMS(4)!=0)
 		return RPC_SRV_RESULT_FAIL;
 	return RPC_SRV_RESULT_SUCCESS;
 }*/
@@ -207,7 +214,7 @@ int SmsRpc::process_get_sms(JsonDataCommObj* pReq)
 	BBOXSMS_SMS_PACKET* pPacket;
 	pPacket=(BBOXSMS_SMS_PACKET*)pPanelReq->dataRef;
 	SmsMgr *pMgr=(SmsMgr*)pDataCache->pSmsMgr;
-	pPanelReq->result=pMgr->GetSms(pPacket->index,pPacket->sms);	
+	pPanelReq->result=pMgr->GetSms(pPacket->index,pPacket->sms);
 	return 0;
 }*/
 /* ------------------------------------------------------------------------- */
@@ -317,5 +324,64 @@ RPC_SRV_RESULT SmsRpc::process_async_ident_device(BBOXSMS_SMS_PACKET* pPacket)
 		return RPC_SRV_RESULT_FAIL;
 }*/
 /* ------------------------------------------------------------------------- */
-
-
+int XmppRpc::json_to_bin_get_online_status(JsonDataCommObj* pReq)
+{
+	XMPROXY_ONLINESTS_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,XMPROXY_ONLINESTS_PACKET,RPC_SRV_ACT_READ,EJSON_XMPROXY_RPC_GET_ONLINE_STATUS);
+	return 0;
+}
+int XmppRpc::bin_to_json_get_online_status(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP_ENUM(RPC_SRV_REQ,XMPROXY_ONLINESTS_PACKET,XMPROXY_RPC_ONLINE_STATUS_ARG,status,XMPROXY_RPC_ONLINE_STATUS_ARG_TABL,XMPROXY_ONLINESTS_UNKNOWN);
+	return 0;
+}
+int XmppRpc::process_get_online_status(JsonDataCommObj* pReq)
+{
+	XmppMgr *pMgr=(XmppMgr*)pDataCache->pXmpMgr;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	XMPROXY_ONLINESTS_PACKET* pPacket;
+	pPacket=(XMPROXY_ONLINESTS_PACKET*)pPanelReq->dataRef;
+	if(pPanelReq->action!=RPC_SRV_ACT_READ)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+		return 0;
+	}
+	if ( pMgr->get_connected_status() == true )
+		pPacket->status=XMPROXY_ONLINESTS_ONLINE;
+	else
+		pPacket->status=XMPROXY_ONLINESTS_OFFLINE;
+	pPanelReq->result=RPC_SRV_RESULT_SUCCESS;
+	return 0;
+}
+int XmppRpc::json_to_bin_set_online_status(JsonDataCommObj* pReq)
+{
+	XMPROXY_ONLINESTS_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,XMPROXY_ONLINESTS_PACKET,RPC_SRV_ACT_WRITE,EJSON_XMPROXY_RPC_SET_ONLINE_STATUS);
+	JSON_STRING_TO_ENUM(XMPROXY_RPC_ONLINE_STATUS_ARG,XMPROXY_RPC_ONLINE_STATUS_ARG_TABL,XMPROXY_ONLINESTS_TYPE,XMPROXY_ONLINESTS_UNKNOWN,pPanelCmdObj->status);
+	return 0;
+}
+int XmppRpc::bin_to_json_set_online_status(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,XMPROXY_ONLINESTS_PACKET);
+	return 0;
+}
+int XmppRpc::process_set_online_status(JsonDataCommObj* pReq)
+{
+	XmppMgr *pMgr=(XmppMgr*)pDataCache->pXmpMgr;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	XMPROXY_ONLINESTS_PACKET* pPacket;
+	pPacket=(XMPROXY_ONLINESTS_PACKET*)pPanelReq->dataRef;
+	if(pPanelReq->action!=RPC_SRV_ACT_WRITE)
+	{
+		pPanelReq->result=RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+		return 0;
+	}
+	if(pPacket->status == XMPROXY_ONLINESTS_ONLINE)
+		pPanelReq->result=pMgr->set_online_status(true);
+	else
+		pPanelReq->result=pMgr->set_online_status(false);
+	return 0;
+}
+/* ------------------------------------------------------------------------- */

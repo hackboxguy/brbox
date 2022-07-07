@@ -7,6 +7,8 @@ XmproxyCltCmdline::XmproxyCltCmdline()
 	CmdlineHelper.attach_helper(this);
 	CmdlineHelper.insert_options_entry((char*)"asynctasksts" ,optional_argument,EJSON_XMPROXY_RPC_GET_ASYNCTASK);
 	CmdlineHelper.insert_help_entry((char*)"--asynctasksts             [read async-task-in-progress if any]");
+	CmdlineHelper.insert_options_entry((char*)"connectsts" ,optional_argument,EJSON_XMPROXY_RPC_GET_ONLINE_STATUS);
+	CmdlineHelper.insert_help_entry((char*)"--connectsts               [get the online status of xmpp connection]");
 	/*CmdlineHelper.insert_options_entry((char*)"deleteall" ,optional_argument,EJSON_BBOXSMS_RPC_SMS_DELETE_ALL);
 	CmdlineHelper.insert_help_entry((char*)"--deleteall                [delete all sms]");
 	CmdlineHelper.insert_options_entry((char*)"delete" ,optional_argument,EJSON_BBOXSMS_RPC_SMS_DELETE);
@@ -41,6 +43,15 @@ int XmproxyCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			(char*)XMPROXY_RPC_ASYNCTASK_ARG,sub_arg);
 			}
 			break;
+		case EJSON_XMPROXY_RPC_GET_ONLINE_STATUS:
+			{
+				const char *table[]   = XMPROXY_RPC_ONLINE_STATUS_ARG_TABL;
+				CmdlineHelper.push_single_enum_get_set_command( EJSON_XMPROXY_RPC_GET_ONLINE_STATUS,
+				EJSON_XMPROXY_RPC_SET_ONLINE_STATUS,XMPROXY_RPC_ONLINE_STATUS_GET,
+				XMPROXY_RPC_ONLINE_STATUS_SET,&table[0],XMPROXY_ONLINESTS_UNKNOWN,
+				(char*)XMPROXY_RPC_ONLINE_STATUS_ARG,sub_arg);
+			}
+			break;
 /*		case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL:
 			CmdlineHelper.push_action_type_noarg_command(EJSON_BBOXSMS_RPC_SMS_DELETE_ALL,
 				(char*)BBOXSMS_RPC_SMS_DELETE_ALL,(char*)RPCMGR_RPC_TASK_STS_ARGID);
@@ -68,7 +79,7 @@ int XmproxyCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			break;*/
 		default:
 			return 0;
-			break;	
+			break;
 	}
 	return 0;
 }
@@ -123,7 +134,7 @@ int XmproxyCltCmdline::push_get_indexed_msg_command(char* subarg,char* rpc_name,
 		printf("please specify correct msg index number\n");
 		return -1;
 	}
-	else 
+	else
 	{
 			strcpy(pCmdObj->first_arg_param_name,arg_name);
 			//strcpy(pCmdObj->first_arg_param_value,subarg);
@@ -158,4 +169,3 @@ int XmproxyCltCmdline::run_get_indexed_msg_command(CmdExecutionObj *pCmdObj,ADJs
 	}
 */	return 0;
 }
-
