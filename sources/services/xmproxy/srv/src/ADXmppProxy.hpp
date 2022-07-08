@@ -25,6 +25,8 @@
 #include <gloox/messagehandler.h>
 #include <gloox/eventhandler.h>
 #include <gloox/rostermanager.h>
+#include <gloox/connectionbosh.h>
+#include <gloox/connectionhttpproxy.h>
 #include "ADThread.hpp"
 #include <deque>
 #include <vector>

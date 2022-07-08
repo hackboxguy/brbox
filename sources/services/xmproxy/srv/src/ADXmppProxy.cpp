@@ -68,7 +68,7 @@ int ADXmppProxy::connect(char* user,char* password)
 	j->disco()->setIdentity( "client", "jsonbot" );
 	j->disco()->addFeature( XMLNS_CHAT_STATES );
 	//StringList ca;
-	//ca.push_back( "./cacert.crt" );
+	//ca.push_back( "/home/usr/prosody.crt" );
 	//j->setCACerts( ca );
 
 	//LogLevelDebug
@@ -76,6 +76,17 @@ int ADXmppProxy::connect(char* user,char* password)
 		j->logInstance().registerLogHandler( LogLevelDebug, LogAreaAll, this );
 	else
 		j->logInstance().registerLogHandler( LogLevelWarning, LogAreaAll, this );
+
+	//if(BOSH_Connection==true)
+	//{
+	//	j->setCompression(false);
+	//	ConnectionTCPClient* conn0 = new ConnectionTCPClient( j->logInstance(), "bind.jabber.de", 443 );
+	//	ConnectionBOSH* conn1 = new ConnectionBOSH( j, conn0, j->logInstance(), "bind.jabber.de", "jabber.de" );
+		//conn1->setMode( ConnectionBOSH::ModeLegacyHTTP );
+		//conn1->setMode( ConnectionBOSH::ModePersistentHTTP );
+	//	j->setConnectionImpl( conn1 );
+	//	j->setForceNonSasl( true );
+	//}
 
 	HeartBeat=0;
 
@@ -132,6 +143,18 @@ void ADXmppProxy::onDisconnect( ConnectionError e )
 /*****************************************************************************/
 bool ADXmppProxy::onTLSConnect( const CertInfo& info )
 {
+	if(DebugLog)
+	{
+		cout<<"ADXmppProxy::onTLSConnect:called!!!"<<endl;
+		time_t from( info.date_from );
+		time_t to( info.date_to );
+		printf( "status: %d\nissuer: %s\npeer: %s\nprotocol: %s\nmac: %s\ncipher: %s\ncompression: %s\n",
+				info.status, info.issuer.c_str(), info.server.c_str(),
+				info.protocol.c_str(), info.mac.c_str(), info.cipher.c_str(),
+				info.compression.c_str() );
+		printf( "from: %s", ctime( &from ) );
+		printf( "to:   %s", ctime( &to ) );
+	}
 	return true;
 }
 /*****************************************************************************/
@@ -367,6 +390,7 @@ void ADXmppProxy::handleSelfPresence( const RosterItem& item, const std::string&
 }
 bool ADXmppProxy::handleSubscriptionRequest( const JID& jid, const std::string& /*msg*/ )
 {
+	//"request for subscriptionsubscription: adav@ubuntu-jabber.de"
 	//printf("request for subscription");//dont allow auto subscribing
 	//printf( "subscription: %s\n", jid.bare().c_str() );
 	//StringList groups;
