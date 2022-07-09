@@ -23,6 +23,7 @@ ADXmppProxy::ADXmppProxy()
 	//m_chatStateFilter=0;
 	j=NULL;
 	AdminBuddy="";
+	//AcceptThisBuddy="";
 	PingThread.subscribe_thread_callback(this);
 	PingThread.set_thread_properties(THREAD_TYPE_MONOSHOT,(void *)this);
 	PingThread.start_thread();
@@ -173,7 +174,15 @@ int ADXmppProxy::receive_request(std::string req,std::string sender)
 {
 	if(DebugLog)
 		cout<<"ADXmppProxy::receive_request:received from="<<sender<<" msg="<<req<<endl;
-	onXmppMessage(req,sender);//callback to the attached msg-processing-object
+
+	//process sender message only if sender is part of our roster(respond to only authorized users)
+	vector<std::string>::iterator it;
+	for(it = BuddyList.begin(); it != BuddyList.end(); it++)
+	{
+		string str = *it;
+		if(sender==str)
+			onXmppMessage(req,sender);//callback to the attached msg-processing-object
+	}
 	return 0;
 }
 int ADXmppProxy::send_reply(std::string reply,std::string sender)
@@ -384,7 +393,15 @@ void ADXmppProxy::handleRoster( const Roster& roster )
 		RosterItem::ResourceMap::const_iterator rit = (*it).second->resources().begin();
 		for( ; rit != (*it).second->resources().end(); ++rit )
 			printf( "resource: %s\n", (*rit).first.c_str() );*/
-		BuddyList.push_back((*it).second->jidJID().full());
+
+		vector<std::string>::iterator bit;
+		for(bit = BuddyList.begin(); bit != BuddyList.end(); bit++)
+		{
+			string str = *bit;
+			if((*it).second->jidJID().full()==str) //if this buddy is already in our list, then dont add duplicate entry
+				continue;
+		}
+		BuddyList.push_back((*it).second->jidJID().full());//this user is not found in our BuddyList, hence add to our list
 		if(DebugLog)
 			cout<<"ADXmppProxy::handleRoster:"<<(*it).second->jidJID().full()<<endl;
 	}
@@ -413,11 +430,8 @@ bool ADXmppProxy::handleSubscriptionRequest( const JID& jid, const std::string& 
 {
 	if(DebugLog)
 		cout<<"ADXmppProxy::handleSubscriptionRequest:from:"<<jid.bare().c_str()<<endl;
-	//"request for subscriptionsubscription: adav@ubuntu-jabber.de"
-	//printf("request for subscription");//dont allow auto subscribing
-	//printf( "subscription: %s\n", jid.bare().c_str() );
 
-	//TODO: check if subscriber-buddy needs to be accepted based on available cmdline-arg or through some other means,
+	//check if subscriber-buddy needs to be accepted based on available cmdline-arg or through some other means(AdminBuddy),
 	//if subscriber-buddy is to be accepted, then accept the subscription and also send subscription-request to buddy in return
 	if(jid.bare()==AdminBuddy)
 	{
@@ -430,6 +444,21 @@ bool ADXmppProxy::handleSubscriptionRequest( const JID& jid, const std::string& 
 	}
 	else
 	{
+		//check if this buddy is to be accepted if available in approved-AcceptBuddyList
+		vector<std::string>::iterator bit;
+		for(bit = AcceptBuddyList.begin(); bit != AcceptBuddyList.end(); bit++)
+		{
+			string str = *bit;
+			if(jid.bare()==str) //accept this buddy as this buddy is already part of our approved list
+			{
+				StringList groups;
+				JID id( jid );
+				j->rosterManager()->subscribe( id, "", groups, "" );
+				if(DebugLog)
+					cout<<"ADXmppProxy::handleSubscriptionRequest:Accepting pre-approved buddy:"<<str<<endl;
+				return true;
+			}
+		}
 		if(DebugLog)
 			cout<<"ADXmppProxy::handleSubscriptionRequest: this buddy has not been authorized"<<AdminBuddy<<endl;
 		return false;
@@ -438,6 +467,7 @@ bool ADXmppProxy::handleSubscriptionRequest( const JID& jid, const std::string& 
 bool ADXmppProxy::handleUnsubscriptionRequest( const JID& jid, const std::string& /*msg*/ )
 {
 	//printf( "unsubscription: %s\n", jid.bare().c_str() );
+	//TODO: remove this user from our BuddyList so that we dont send events to this user.
 	if(DebugLog)
 		cout<<"ADXmppProxy::handleUnsubscriptionRequest: user "<<jid.bare().c_str()<<" removed from buddy-list"<<endl;
 	return true;
@@ -533,5 +563,19 @@ std::string ADXmppProxy::convert_presence_enum_to_str(Presence::PresenceType pre
 		default:
 			return "Unknown";
 	}
+}
+/* ------------------------------------------------------------------------- */
+//note: only admin-buddy shall call this function
+int ADXmppProxy::accept_buddy(std::string buddy)
+{
+	vector<std::string>::iterator bit;
+	for(bit = AcceptBuddyList.begin(); bit != AcceptBuddyList.end(); bit++)
+	{
+		string str = *bit;
+		if(buddy==str) //if this buddy is already in our list, then just return success
+			return 0;
+	}
+	AcceptBuddyList.push_back(buddy);//next-time, when this buddy subscribes, then accept it
+	return 0;
 }
 /* ------------------------------------------------------------------------- */

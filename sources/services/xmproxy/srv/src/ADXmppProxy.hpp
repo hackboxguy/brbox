@@ -128,8 +128,10 @@ public:
 	virtual int monoshot_callback_function(void* pUserData,ADThreadProducer* pObj);//{return 0;};
 	virtual int thread_callback_function(void* pUserData,ADThreadProducer* pObj){return 0;};
 	std::string convert_presence_enum_to_str(Presence::PresenceType presence);
+	int accept_buddy(std::string buddy);
 private:
 	vector<std::string> BuddyList;//authorized accounts that can contact me
+	vector<std::string> AcceptBuddyList;//Accept these buddies if requested by admin
 	bool iConnect;//shows status of onConnect/onDisconnect
 	bool DisconnectNow;
 	bool OnDemandDisconnect;
