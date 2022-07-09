@@ -22,7 +22,7 @@ ADXmppProxy::ADXmppProxy()
 	//m_messageEventFilter=0;
 	//m_chatStateFilter=0;
 	j=NULL;
-
+	AdminBuddy="";
 	PingThread.subscribe_thread_callback(this);
 	PingThread.set_thread_properties(THREAD_TYPE_MONOSHOT,(void *)this);
 	PingThread.start_thread();
@@ -44,13 +44,14 @@ int ADXmppProxy::disconnect()
 	return 0;
 }
 /*****************************************************************************/
-int ADXmppProxy::connect(char* user,char* password)
+int ADXmppProxy::connect(char* user,char* password, std::string adminbuddy)
 {
 	if(j!=NULL)
 		return 0;
 
 	if(DebugLog)
 		cout<<"ADXmppProxy::connect: Entering===>"<<endl;
+	AdminBuddy=adminbuddy;
 
 	JID jid( user);
 	//myJid=jid;
@@ -328,30 +329,44 @@ void ADXmppProxy::handleEvent( const Event& event )
 void ADXmppProxy::onResourceBindError( ResourceBindError error )
 {
 	//printf( "onResourceBindError: %d\n", error );
+	if(DebugLog)
+		cout<<"ADXmppProxy::onResourceBindError: error:"<<error<<endl;
 }
 void ADXmppProxy::onSessionCreateError( SessionCreateError error )
 {
 	//printf( "onSessionCreateError: %d\n", error );
+	if(DebugLog)
+		cout<<"ADXmppProxy::onSessionCreateError: error:"<<error<<endl;
 }
 void ADXmppProxy::handleItemSubscribed( const JID& jid )
 {
 	//printf( "subscribed %s\n", jid.bare().c_str() );
+	if(DebugLog)
+		cout<<"ADXmppProxy::handleItemSubscribed: subscribed:"<<jid.bare().c_str()<<endl;
 }
 void ADXmppProxy::handleItemAdded( const JID& jid )
 {
 	//printf( "added %s\n", jid.bare().c_str() );
+	if(DebugLog)
+		cout<<"ADXmppProxy::handleItemAdded: added:"<<jid.bare().c_str()<<endl;
 }
 void ADXmppProxy::handleItemUnsubscribed( const JID& jid )
 {
 	//printf( "unsubscribed %s\n", jid.bare().c_str() );
+	if(DebugLog)
+		cout<<"ADXmppProxy::handleItemUnsubscribed: unsubscribed:"<<jid.bare().c_str()<<endl;
 }
 void ADXmppProxy::handleItemRemoved( const JID& jid )
 {
 	//printf( "removed %s\n", jid.bare().c_str() );
+	if(DebugLog)
+		cout<<"ADXmppProxy::handleItemRemoved: removed:"<<jid.bare().c_str()<<endl;
 }
 void ADXmppProxy::handleItemUpdated( const JID& jid )
 {
 	//printf( "updated %s\n", jid.bare().c_str() );
+	if(DebugLog)
+		cout<<"ADXmppProxy::handleItemUpdated: updated:"<<jid.bare().c_str()<<endl;
 }
 void ADXmppProxy::handleRoster( const Roster& roster )
 {
@@ -377,26 +392,48 @@ void ADXmppProxy::handleRoster( const Roster& roster )
 void ADXmppProxy::handleRosterError( const IQ& /*iq*/ )
 {
 	//printf( "a roster-related error occured\n" );
+	if(DebugLog)
+		cout<<"ADXmppProxy::handleRosterError: roster-related error occured"<<endl;
 }
 void ADXmppProxy::handleRosterPresence( const RosterItem& item, const std::string& resource,
 Presence::PresenceType presence, const std::string& /*msg*/ )
 {
 	//printf( "presence received: %s/%s -- %d\n", item.jidJID().full().c_str(), resource.c_str(), presence );
+	if(DebugLog)
+		cout<<"ADXmppProxy::handleRosterPresence: received:"<<item.jidJID().full().c_str()<<":"<<resource.c_str()<<":"<<convert_presence_enum_to_str(presence)<<endl;
 }
 void ADXmppProxy::handleSelfPresence( const RosterItem& item, const std::string& resource,
 	Presence::PresenceType presence, const std::string& /*msg*/ )
 {
 	//printf( "self presence received: %s/%s -- %d\n", item.jidJID().full().c_str(), resource.c_str(), presence );
+	if(DebugLog)
+		cout<<"ADXmppProxy::handleSelfPresence: received:"<<item.jidJID().full().c_str()<<":"<<resource.c_str()<<":"<<presence<<endl;
 }
 bool ADXmppProxy::handleSubscriptionRequest( const JID& jid, const std::string& /*msg*/ )
 {
+	if(DebugLog)
+		cout<<"ADXmppProxy::handleSubscriptionRequest:from:"<<jid.bare().c_str()<<endl;
 	//"request for subscriptionsubscription: adav@ubuntu-jabber.de"
 	//printf("request for subscription");//dont allow auto subscribing
 	//printf( "subscription: %s\n", jid.bare().c_str() );
-	//StringList groups;
-	//JID id( jid );
-	//j->rosterManager()->subscribe( id, "", groups, "" );
-	return false;//true;
+
+	//TODO: check if subscriber-buddy needs to be accepted based on available cmdline-arg or through some other means,
+	//if subscriber-buddy is to be accepted, then accept the subscription and also send subscription-request to buddy in return
+	if(jid.bare()==AdminBuddy)
+	{
+		StringList groups;
+		JID id( jid );
+		j->rosterManager()->subscribe( id, "", groups, "" );
+		if(DebugLog)
+			cout<<"ADXmppProxy::handleSubscriptionRequest:AdminBuddy has been accepted:"<<AdminBuddy<<endl;
+		return true;//true;
+	}
+	else
+	{
+		if(DebugLog)
+			cout<<"ADXmppProxy::handleSubscriptionRequest: this buddy has not been authorized"<<AdminBuddy<<endl;
+		return false;
+	}
 }
 bool ADXmppProxy::handleUnsubscriptionRequest( const JID& jid, const std::string& /*msg*/ )
 {
@@ -408,6 +445,8 @@ bool ADXmppProxy::handleUnsubscriptionRequest( const JID& jid, const std::string
 void ADXmppProxy::handleNonrosterPresence( const Presence& presence )
 {
 	//printf( "received presence from entity not in the roster: %s\n", presence.from().full().c_str() );
+	if(DebugLog)
+		cout<<"ADXmppProxy::handleNonrosterPresence: entity not in the roster: "<<presence.from().full().c_str()<<endl;
 }
 /* ------------------------------------------------------------------------- */
 //following function is used for sending async-event-notification to subscribed buddy
@@ -467,5 +506,32 @@ int ADXmppProxy::get_buddy_list(std::string &returnval)
 bool ADXmppProxy::get_connected_status()
 {
 	return iConnect;
+}
+/* ------------------------------------------------------------------------- */
+std::string ADXmppProxy::convert_presence_enum_to_str(Presence::PresenceType presence)
+{
+	switch(presence)
+	{
+		case Presence::Available:
+			return "Available";
+		case Presence::Chat:
+			return "Chat";
+		case Presence::Away:
+			return "Away";
+		case Presence::DND: //do-not-disturb
+			return "DND";
+		case Presence::XA: //extended-away
+			return "XA";
+		case Presence::Unavailable:
+			return "Unavailable";
+		case Presence::Probe:
+			return "Probe";
+		case Presence::Error:
+			return "Error";
+		case Presence::Invalid:
+			return "Invalid";
+		default:
+			return "Unknown";
+	}
 }
 /* ------------------------------------------------------------------------- */

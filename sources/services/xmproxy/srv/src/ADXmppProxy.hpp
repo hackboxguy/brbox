@@ -78,7 +78,7 @@ public:
 	ADXmppProxy();
 	~ADXmppProxy();//{}
 	int disconnect();
-	int connect(char* user,char* password);
+	int connect(char* user,char* password,std::string adminbuddy="");
 	int send_reply(std::string reply,std::string sender="");
 	int receive_request(std::string request,std::string sender);
 	bool get_connect_sts(){return connected;};
@@ -127,7 +127,7 @@ public:
 	ADThread PingThread;
 	virtual int monoshot_callback_function(void* pUserData,ADThreadProducer* pObj);//{return 0;};
 	virtual int thread_callback_function(void* pUserData,ADThreadProducer* pObj){return 0;};
-
+	std::string convert_presence_enum_to_str(Presence::PresenceType presence);
 private:
 	vector<std::string> BuddyList;//authorized accounts that can contact me
 	bool iConnect;//shows status of onConnect/onDisconnect
@@ -151,5 +151,6 @@ private:
 	};
 	typedef std::map<std::string, Session> Sessions;
 	Sessions mySessions;
+	std::string AdminBuddy;
 };
 #endif

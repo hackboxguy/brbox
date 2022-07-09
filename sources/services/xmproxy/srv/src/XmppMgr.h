@@ -180,6 +180,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 
 	std::string XmppUserName;
 	std::string XmppUserPw;
+	std::string XmppAdminBuddy;//main roster-contact as admin for remote management
 	std::string XmppBotName;
 	std::string XmppBotNameFilePath;
 	std::string XmppNetInterface;
