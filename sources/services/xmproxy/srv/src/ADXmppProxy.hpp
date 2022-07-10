@@ -128,7 +128,11 @@ public:
 	virtual int monoshot_callback_function(void* pUserData,ADThreadProducer* pObj);//{return 0;};
 	virtual int thread_callback_function(void* pUserData,ADThreadProducer* pObj){return 0;};
 	std::string convert_presence_enum_to_str(Presence::PresenceType presence);
-	int accept_buddy(std::string buddy);
+	int accept_buddy(std::string buddy);//add to accept list
+	int remove_buddy(std::string buddy);//remove from the accept list
+	bool is_admin_user(std::string user);
+	int subscribe_buddy(std::string buddy);
+	int unsubscribe_buddy(std::string buddy);
 private:
 	vector<std::string> BuddyList;//authorized accounts that can contact me
 	vector<std::string> AcceptBuddyList;//Accept these buddies if requested by admin

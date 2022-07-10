@@ -69,6 +69,8 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_DISPPRINT,   //display-print
 	EXMPP_CMD_DISPBKLT,    //display-backlight-control
 	EXMPP_CMD_SHELLCMD_TRIG,
+	EXMPP_CMD_BUDDY_ADD,
+	EXMPP_CMD_BUDDY_REMOVE,
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -152,12 +154,22 @@ public:
 	}
 };
 /* ------------------------------------------------------------------------- */
+//#define EXMPP_EVNT_TYPES_TABL    {"gsm","gpio","unknown","none","\0"}
+typedef enum EXMPP_USER_ACCESS_TYPES_T
+{
+	EXMPP_USER_ACCESS_ADMIN=0,  //allow only for admin user
+	EXMPP_USER_ACCESS_READWRITE,      //allow read/write
+	EXMPP_USER_ACCESS_READONLY, //allow only for users with limited privilages
+	EXMPP_USER_ACCESS_UNKNOWN,
+	EXMPP_USER_ACCESS_NONE
+}EXMPP_USER_ACCESS_TYPES;
 typedef struct XMPROXY_CMD_TABLE_T
 {
 	bool cmdsts;
 	EXMPP_CMD_TYPES cmd;
 	char cmd_name[128];
 	char cmd_arg[128];
+	EXMPP_USER_ACCESS_TYPES cmdaccess;//access-level
 }XMPROXY_CMD_TABLE;
 /* ------------------------------------------------------------------------- */
 #ifdef USE_CXMPP_LIB
@@ -271,6 +283,8 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_disp_backlight(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_get_display_backlight(std::string msg,std::string &returnval);
 	RPC_SRV_RESULT proc_cmd_set_display_backlight(std::string msg);
+	RPC_SRV_RESULT proc_cmd_buddy_add(std::string msg,std::string &returnval,std::string sender);
+	RPC_SRV_RESULT proc_cmd_buddy_remove(std::string msg,std::string &returnval,std::string sender);
 
 	std::string print_help();
 	RPC_SRV_RESULT LoadAliasList(std::string listFile);

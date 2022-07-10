@@ -29,6 +29,10 @@ public:
 	int bin_to_json_set_online_status(JsonDataCommObj* pReq);
 	int process_set_online_status(JsonDataCommObj* pReq);
 
+	int json_to_bin_set_send_message(JsonDataCommObj* pReq);
+	int bin_to_json_set_send_message(JsonDataCommObj* pReq);
+	int process_set_send_message(JsonDataCommObj* pReq);
+
 	/*int json_to_bin_delete_all(JsonDataCommObj* pReq);
 	int bin_to_json_delete_all(JsonDataCommObj* pReq);
 	int process_delete_all(JsonDataCommObj* pReq,ADJsonRpcMgrProducer* pObj);

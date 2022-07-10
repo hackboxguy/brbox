@@ -16,45 +16,48 @@ using namespace std;
 //supported commands over xmpp-channel
 XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 {
-	{true ,EXMPP_CMD_GSM_MODEM_IDENT         , "gsmcheck"     ,""},
-	{true ,EXMPP_CMD_SMS_LIST_UPDATE         , "smsupdate"    ,""},
-	{true ,EXMPP_CMD_SMS_GET_TOTAL           , "smstotal"     ,""},
-	{true ,EXMPP_CMD_SMS_GET                 , "smsget"       ,"<zero_index_msg>"},
-	{true ,EXMPP_CMD_SMS_DELETE_ALL          , "smsdeleteall" ,""},
-	{true ,EXMPP_CMD_SMS_SEND                , "smssend"      ,"<phone-num> <msg>"},
-	{true ,EXMPP_CMD_DIAL_VOICE              , "dialvoice"    ,"<phone-num>"},
-	{true ,EXMPP_CMD_DIAL_USSD               , "dialussd"     ,"<ussd-code>"},
-	{true ,EXMPP_CMD_GET_USSD                , "readussd"     ,""},
-	{true ,EXMPP_CMD_FMW_GET_VERSION         , "version"      ,""},
-	{true ,EXMPP_CMD_FMW_UPDATE              , "sysupdate"    ,""},
-	{true ,EXMPP_CMD_FMW_REBOOT              , "reboot"       ,""},
-	{true ,EXMPP_CMD_FMW_POWEROFF            , "poweroff"     ,""},
-	{true ,EXMPP_CMD_FMW_UPTIME              , "uptime"       ,""},
-	{true ,EXMPP_CMD_FMW_HOSTNAME            , "hostname"     ,"[name]"},
-	{true ,EXMPP_CMD_FMW_RESET_HOSTNAME      , "resethostname",""},
-	{true ,EXMPP_CMD_FMW_GET_MYIP            , "publicip"     ,""},
-	{true ,EXMPP_CMD_FMW_GET_LOCALIP         , "localip"      ,""},
-	{false,EXMPP_CMD_DEBUG_LOG_STS           , "logsts"       ,""},//due to bug, disabled(to be fixed later)
-	{false,EXMPP_CMD_LOG_UPDATE              , "logupdate"    ,""},//due to bug, disabled(to be fixed later)
-	{false,EXMPP_CMD_LOG_COUNT               , "logcount"     ,""},//due to bug, disabled(to be fixed later)
-	{false,EXMPP_CMD_LOG_MSG                 , "logmsg"       ,"<zero_index_lineNum>"},//due to bug, disabled(to be fixed later)
-	{true ,EXMPP_CMD_GPIO                    , "gpio"         ,"<gpio_num> [sts(0/1)]"},
-	{true ,EXMPP_CMD_GSM_EVENT_NOTIFY        , "eventgsm"     ,"<sts[0/1]>"},
-	{true ,EXMPP_CMD_GPIO_EVENT_NOTIFY       , "eventgpio"    ,"<gpio_num> [sts(0/1)]"},
-	{true ,EXMPP_CMD_ALIAS                   , "alias"        ,"name=cmd"},
-	{true ,EXMPP_CMD_SLEEP                   , "sleep"        ,"<seconds>"}, //adding delay between multiple commands
-	{true ,EXMPP_CMD_ACCOUNT                 , "account"      ,""}, //xmpp logid ID used for logging into server
-	{true ,EXMPP_CMD_BOTNAME                 , "botname"      ,"[name]"}, //xmpp chat-bot name for identification
-	{true ,EXMPP_CMD_BUDDY_LIST              , "buddylist"    ,""}, //prints buddy list
-	{true ,EXMPP_CMD_SHELLCMD                , "shellcmd"     ,"<command>"}, //executes remote shell command
-	{true ,EXMPP_CMD_SHELLCMD_RESP           , "shellcmdresp" ,""}, //reads response of last executed shell command
-	{true ,EXMPP_CMD_SHELLCMD_TRIG           , "shellcmdtrig" ,"<command>"}, //executes remote shell command but without redirecting the output
-	{true ,EXMPP_CMD_DEVIDENT                , "identify" ,""},  //identify board by blinking onboard LED
-	{true ,EXMPP_CMD_SHUTDOWN                , "xmpshutdown" ,""}, //shutdown xmpp server(for xmpp logout)
-	{true ,EXMPP_CMD_SONOFF                  , "sonoff" ,"<ip/hostname> [sts(on/off/toggle)]"},//http based control of sonoff relay(tasmota fmw)
-	{true ,EXMPP_CMD_DISPCLEAR               , "dispclear" ,""},
-	{true ,EXMPP_CMD_DISPPRINT               , "display" ,"<line1/line2/line3..]> <message>"},
-	{true ,EXMPP_CMD_DISPBKLT                , "dispbklt" ,"<sts[on/off]>"}
+	{true ,EXMPP_CMD_GSM_MODEM_IDENT         , "gsmcheck"     ,"",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_SMS_LIST_UPDATE         , "smsupdate"    ,"",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_SMS_GET_TOTAL           , "smstotal"     ,"",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_SMS_GET                 , "smsget"       ,"<zero_index_msg>",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_SMS_DELETE_ALL          , "smsdeleteall" ,"",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_SMS_SEND                , "smssend"      ,"<phone-num> <msg>",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_DIAL_VOICE              , "dialvoice"    ,"<phone-num>",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_DIAL_USSD               , "dialussd"     ,"<ussd-code>",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_GET_USSD                , "readussd"     ,"",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_FMW_GET_VERSION         , "version"      ,"",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_FMW_UPDATE              , "sysupdate"    ,"",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_FMW_REBOOT              , "reboot"       ,"",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_FMW_POWEROFF            , "poweroff"     ,"",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_FMW_UPTIME              , "uptime"       ,"",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_FMW_HOSTNAME            , "hostname"     ,"[name]",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_FMW_RESET_HOSTNAME      , "resethostname","",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_FMW_GET_MYIP            , "publicip"     ,"",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_FMW_GET_LOCALIP         , "localip"      ,"",EXMPP_USER_ACCESS_READWRITE},
+	{false,EXMPP_CMD_DEBUG_LOG_STS           , "logsts"       ,"",EXMPP_USER_ACCESS_READWRITE},//due to bug, disabled(to be fixed later)
+	{false,EXMPP_CMD_LOG_UPDATE              , "logupdate"    ,"",EXMPP_USER_ACCESS_READWRITE},//due to bug, disabled(to be fixed later)
+	{false,EXMPP_CMD_LOG_COUNT               , "logcount"     ,"",EXMPP_USER_ACCESS_READWRITE},//due to bug, disabled(to be fixed later)
+	{false,EXMPP_CMD_LOG_MSG                 , "logmsg"       ,"<zero_index_lineNum>",EXMPP_USER_ACCESS_READWRITE},//due to bug, disabled(to be fixed later)
+	{true ,EXMPP_CMD_GPIO                    , "gpio"         ,"<gpio_num> [sts(0/1)]",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_GSM_EVENT_NOTIFY        , "eventgsm"     ,"<sts[0/1]>",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_GPIO_EVENT_NOTIFY       , "eventgpio"    ,"<gpio_num> [sts(0/1)]",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_ALIAS                   , "alias"        ,"name=cmd",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_SLEEP                   , "sleep"        ,"<seconds>",EXMPP_USER_ACCESS_READWRITE}, //adding delay between multiple commands
+	{true ,EXMPP_CMD_ACCOUNT                 , "account"      ,"",EXMPP_USER_ACCESS_READWRITE}, //xmpp logid ID used for logging into server
+	{true ,EXMPP_CMD_BOTNAME                 , "botname"      ,"[name]",EXMPP_USER_ACCESS_READWRITE}, //xmpp chat-bot name for identification
+	{true ,EXMPP_CMD_BUDDY_LIST              , "buddylist"    ,"",EXMPP_USER_ACCESS_READWRITE}, //prints buddy list
+	{true ,EXMPP_CMD_SHELLCMD                , "shellcmd"     ,"<command>",EXMPP_USER_ACCESS_READWRITE}, //executes remote shell command
+	{true ,EXMPP_CMD_SHELLCMD_RESP           , "shellcmdresp" ,"",EXMPP_USER_ACCESS_READWRITE}, //reads response of last executed shell command
+	{true ,EXMPP_CMD_SHELLCMD_TRIG           , "shellcmdtrig" ,"<command>",EXMPP_USER_ACCESS_READWRITE}, //executes remote shell command but without redirecting the output
+	{true ,EXMPP_CMD_DEVIDENT                , "identify" ,"",EXMPP_USER_ACCESS_READWRITE},  //identify board by blinking onboard LED
+	{true ,EXMPP_CMD_SHUTDOWN                , "xmpshutdown" ,"",EXMPP_USER_ACCESS_ADMIN}, //shutdown xmpp server(for xmpp logout)
+	{true ,EXMPP_CMD_SONOFF                  , "sonoff" ,"<ip/hostname> [sts(on/off/toggle)]",EXMPP_USER_ACCESS_READWRITE},//http based control of sonoff relay(tasmota fmw)
+	{true ,EXMPP_CMD_DISPCLEAR               , "dispclear" ,"",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_DISPPRINT               , "display" ,"<line1/line2/line3..]> <message>",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_DISPBKLT                , "dispbklt" ,"<sts[on/off]>",EXMPP_USER_ACCESS_READWRITE},
+	{true ,EXMPP_CMD_BUDDY_ADD               , "buddyadd"    ,"[buddyID]",EXMPP_USER_ACCESS_ADMIN}, //only admin-buddy can run this command
+	{true ,EXMPP_CMD_BUDDY_REMOVE            , "buddyremove" ,"[buddyID]",EXMPP_USER_ACCESS_ADMIN} //only admin-buddy can run this command
+	//{true ,EXMPP_CMD_CHANGE_ADMIN           , "changeadmin"    ,"[buddyID]"},//only admin-buddy can run this command
 };
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
@@ -344,6 +347,8 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_DISPCLEAR       :res=proc_cmd_disp_clear(cmdcmdMsg);break;//,returnval,cmd.sender);break;
 				case EXMPP_CMD_DISPPRINT       :res=proc_cmd_disp_print(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_DISPBKLT        :res=proc_cmd_disp_backlight(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_BUDDY_ADD       :res=proc_cmd_buddy_add(cmdcmdMsg,returnval,cmd.sender);break;
+				case EXMPP_CMD_BUDDY_REMOVE    :res=proc_cmd_buddy_remove(cmdcmdMsg,returnval,cmd.sender);break;
 				default                        :break;
 			}
 			result.pop_front();
@@ -1759,5 +1764,53 @@ RPC_SRV_RESULT XmppMgr::xpandargs(std::string &cmdArg)
 	cmdArg = result_stream.str();//merge strings back with space as saparator
 	//cout <<"after: "<< cmdArg <<endl;
 	RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_buddy_add(std::string msg,std::string &returnval,std::string sender)
+{
+	//check if sender has the appropriate access for this command
+	if(!XmppProxy.is_admin_user(sender))
+		return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+
+	std::string cmd,cmdArg;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	getline(msgstream, cmdArg); //get rest of the string!
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0) //user-id must be passed
+		return RPC_SRV_RESULT_ARG_ERROR;
+	else
+	{
+		xpandarg(cmdArg); //e.g: addbuddy $name readonly //TODO: pass access level for this buddy.
+		//remove white space in the beginning
+		std::string::iterator end_pos = std::remove(cmdArg.begin(), cmdArg.end(), ' ');
+		cmdArg.erase(end_pos, cmdArg.end());
+
+		XmppProxy.accept_buddy(cmdArg);
+	}
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_buddy_remove(std::string msg,std::string &returnval,std::string sender)
+{
+	//check if sender has the appropriate access for this command
+	if(!XmppProxy.is_admin_user(sender))
+		return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+
+	std::string cmd,cmdArg;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	getline(msgstream, cmdArg); //get rest of the string!
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0) //user-id must be passed
+		return RPC_SRV_RESULT_ARG_ERROR;
+	else
+	{
+		xpandarg(cmdArg); //e.g: addbuddy $name readonly //TODO: pass access level for this buddy.
+		XmppProxy.remove_buddy(cmdArg);
+	}
+	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */

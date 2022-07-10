@@ -16,6 +16,7 @@ typedef enum EJSON_XMPROXY_RPC_TYPES_T
 	//EJSON_XMPROXY_RPC_SMS_IDENTIFY_DEV, //check if modem device is detected correctly
 	EJSON_XMPROXY_RPC_GET_ONLINE_STATUS,
 	EJSON_XMPROXY_RPC_SET_ONLINE_STATUS, //via rpc, force to go offline
+	EJSON_XMPROXY_RPC_SET_SEND_MESSAGE, //send xmpp message to clients from roster
 	EJSON_XMPROXY_RPC_END,
 	EJSON_XMPROXY_RPC_NONE
 }EJSON_XMPROXY_RPC_TYPES;
@@ -75,6 +76,16 @@ typedef struct XMPROXY_ONLINESTS_PACKET_T
 {
 	XMPROXY_ONLINESTS_TYPE status;
 }XMPROXY_ONLINESTS_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_XMPROXY_RPC_SET_SEND_MESSAGE
+#define XMPROXY_RPC_SEND_MESSAGE_SET        "send_message"
+#define XMPROXY_RPC_SEND_MESSAGE_TO_ARG     "to"
+#define XMPROXY_RPC_SEND_MESSAGE_MSG_ARG    "msg"
+typedef struct XMPROXY_SENDMSG_PACKET_T
+{
+	char to[512];
+	char msg[1024];
+}XMPROXY_SENDMSG_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct XMPROXY_CMN_DATA_CACHE_T

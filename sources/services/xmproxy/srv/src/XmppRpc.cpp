@@ -19,6 +19,7 @@ int XmppRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_XMPROXY_RPC_GET_ASYNCTASK    :return json_to_bin_get_async_task_in_progress(pReq);
 		case EJSON_XMPROXY_RPC_GET_ONLINE_STATUS:return json_to_bin_get_online_status(pReq);
 		case EJSON_XMPROXY_RPC_SET_ONLINE_STATUS:return json_to_bin_set_online_status(pReq);
+		case EJSON_XMPROXY_RPC_SET_SEND_MESSAGE :return json_to_bin_set_send_message(pReq);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL  :return json_to_bin_delete_all(pReq);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE      :break;
 		//case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET   :return json_to_bin_get_total_sms(pReq);
@@ -39,6 +40,7 @@ int XmppRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_XMPROXY_RPC_GET_ASYNCTASK    :return bin_to_json_get_async_task_in_progress(pReq);
 		case EJSON_XMPROXY_RPC_GET_ONLINE_STATUS:return bin_to_json_get_online_status(pReq);
 		case EJSON_XMPROXY_RPC_SET_ONLINE_STATUS:return bin_to_json_set_online_status(pReq);
+		case EJSON_XMPROXY_RPC_SET_SEND_MESSAGE :return bin_to_json_set_send_message(pReq);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL  :return bin_to_json_delete_all(pReq);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE      :break;
 		//case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET   :return bin_to_json_get_total_sms(pReq);
@@ -59,6 +61,7 @@ int XmppRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* p
 		case EJSON_XMPROXY_RPC_GET_ASYNCTASK    :return process_get_async_task_in_progress(pReq);
 		case EJSON_XMPROXY_RPC_GET_ONLINE_STATUS:return process_get_online_status(pReq);
 		case EJSON_XMPROXY_RPC_SET_ONLINE_STATUS:return process_set_online_status(pReq);
+		case EJSON_XMPROXY_RPC_SET_SEND_MESSAGE :return process_set_send_message(pReq);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL  :return process_delete_all(pReq,pObj);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE      :break;
 		//case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET   :return process_get_total_sms(pReq);
@@ -382,6 +385,19 @@ int XmppRpc::process_set_online_status(JsonDataCommObj* pReq)
 		pPanelReq->result=pMgr->set_online_status(true);
 	else
 		pPanelReq->result=pMgr->set_online_status(false);
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int XmppRpc::json_to_bin_set_send_message(JsonDataCommObj* pReq)
+{
+	return 0;
+}
+int XmppRpc::bin_to_json_set_send_message(JsonDataCommObj* pReq)
+{
+	return 0;
+}
+int XmppRpc::process_set_send_message(JsonDataCommObj* pReq)
+{
 	return 0;
 }
 /* ------------------------------------------------------------------------- */
