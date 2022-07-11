@@ -390,14 +390,33 @@ int XmppRpc::process_set_online_status(JsonDataCommObj* pReq)
 /* ------------------------------------------------------------------------- */
 int XmppRpc::json_to_bin_set_send_message(JsonDataCommObj* pReq)
 {
+	XMPROXY_SENDMSG_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,XMPROXY_SENDMSG_PACKET,RPC_SRV_ACT_WRITE,EJSON_XMPROXY_RPC_SET_SEND_MESSAGE);
+	JSON_STRING_TO_STRING(XMPROXY_RPC_SEND_MESSAGE_TO_ARG,pPanelCmdObj->to);
+	JSON_STRING_TO_STRING(XMPROXY_RPC_SEND_MESSAGE_MSG_ARG,pPanelCmdObj->msg);
 	return 0;
 }
 int XmppRpc::bin_to_json_set_send_message(JsonDataCommObj* pReq)
 {
+	PREPARE_JSON_RESP(RPC_SRV_REQ,XMPROXY_SENDMSG_PACKET);
 	return 0;
 }
 int XmppRpc::process_set_send_message(JsonDataCommObj* pReq)
 {
+	XmppMgr *pMgr=(XmppMgr*)pDataCache->pXmpMgr;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	XMPROXY_SENDMSG_PACKET* pPacket;
+	pPacket=(XMPROXY_SENDMSG_PACKET*)pPanelReq->dataRef;
+	//pPacket->to;pPacket->msg;
+	//TODO
+	//cout<<"to:"<<pPacket->to<<":msg:"<<pPacket->msg<<endl;
+	std::string To(pPacket->to);
+	std::string Msg(pPacket->msg);
+	pPanelReq->result=pMgr->proc_cmd_send_message(To,Msg);
+	//TODO: sleep for a while so that response arrives from other end
+	usleep(500000);//sleep 500ms
+	cout<<"ResponseMsg: "<<pMgr->ResponseMsg<<endl;
 	return 0;
 }
 /* ------------------------------------------------------------------------- */

@@ -63,7 +63,7 @@ typedef enum ADLIB_ASYNC_RESP_TYPE_T
 #define ADLIB_RPC_INDX_SHUTDOWN_SERVICE     4
 
 //cleanup task status-result chain and reset ID to 0
-//calling this rpc may cause result of work-in-progress to be lost(so use this carefully) 
+//calling this rpc may cause result of work-in-progress to be lost(so use this carefully)
 #define ADLIB_RPC_NAME_RESET_TASK_STS     "reset_task_status" //shall remain same in all services
 #define ADLIB_RPC_INDX_RESET_TASK_STS     5
 
@@ -397,11 +397,12 @@ typedef enum rpc_srv_result_t
 	RPC_SRV_RESULT_UNKNOWN_COMMAND,
 	RPC_SRV_RESULT_DEVNODE_ACCERR, //device node access error(run service as sudo to fix this issue)
 	RPC_SRV_RESULT_DEVNODE_OPENERR, //device node open error
+	RPC_SRV_RESULT_OFFLINE_NODE, //recipient is node is offline
 	RPC_SRV_RESULT_UNKNOWN,
 	RPC_SRV_RESULT_NONE
 }RPC_SRV_RESULT;
-#define STR_RPC_SRV_RESULT_STRING_TABLE  {"Success","Fail","InProgress","Busy","NotStarted","Timeout","ArgError","MemError","BusError","ActionBlocked","DeviceError","FileNotFound","FeatureNotAvailable","UnsupportedFeature","taskIDNotFound","valueOutOfRange","FileOpenErr","FileReadErr","FileWriteErr","FileSame","FileNotSame","HostUnreachable","resend","csExposureError","csI2CErr","ItemNotFound","FileError","DevInfoErr","FileEmpty","DuplicateItem","UnknownCmd","DevNodeAccErr","DevNodeOpenErr","Unknown","none","\0"}
-/*#define STR_RPC_SRV_RESULT_SUCCESS        "Success"    
+#define STR_RPC_SRV_RESULT_STRING_TABLE  {"Success","Fail","InProgress","Busy","NotStarted","Timeout","ArgError","MemError","BusError","ActionBlocked","DeviceError","FileNotFound","FeatureNotAvailable","UnsupportedFeature","taskIDNotFound","valueOutOfRange","FileOpenErr","FileReadErr","FileWriteErr","FileSame","FileNotSame","HostUnreachable","resend","csExposureError","csI2CErr","ItemNotFound","FileError","DevInfoErr","FileEmpty","DuplicateItem","UnknownCmd","DevNodeAccErr","DevNodeOpenErr","OfflineNode","Unknown","none","\0"}
+/*#define STR_RPC_SRV_RESULT_SUCCESS        "Success"
 #define STR_RPC_SRV_RESULT_FAIL           "Fail"
 #define STR_RPC_SRV_RESULT_IN_PROGRESS    "InProgress"    //request is in progress
 #define STR_RPC_SRV_RESULT_NOT_STARTED    "NotStarted"    //request processing not started
@@ -425,7 +426,7 @@ typedef struct rpc_srv_request_t
 	unsigned char	   *dataRef; //actual data object of a command
 }RPC_SRV_REQ;
 /*****************************************************************************/
-//macros for mappers 
+//macros for mappers
 #define PREPARE_JSON_REQUEST(REQ_OBJ,REQ_PACKET,REQ_ACTION,REQ_CMD)\
 do			\
 {			\

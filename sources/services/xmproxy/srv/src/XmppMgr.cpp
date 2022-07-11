@@ -55,9 +55,13 @@ XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
 	{true ,EXMPP_CMD_DISPCLEAR               , "dispclear" ,"",EXMPP_USER_ACCESS_READWRITE},
 	{true ,EXMPP_CMD_DISPPRINT               , "display" ,"<line1/line2/line3..]> <message>",EXMPP_USER_ACCESS_READWRITE},
 	{true ,EXMPP_CMD_DISPBKLT                , "dispbklt" ,"<sts[on/off]>",EXMPP_USER_ACCESS_READWRITE},
-	{true ,EXMPP_CMD_BUDDY_ADD               , "buddyadd"    ,"[buddyID]",EXMPP_USER_ACCESS_ADMIN}, //only admin-buddy can run this command
-	{true ,EXMPP_CMD_BUDDY_REMOVE            , "buddyremove" ,"[buddyID]",EXMPP_USER_ACCESS_ADMIN} //only admin-buddy can run this command
-	//{true ,EXMPP_CMD_CHANGE_ADMIN           , "changeadmin"    ,"[buddyID]"},//only admin-buddy can run this command
+	{true ,EXMPP_CMD_BUDDY_ADD               , "acceptbuddy"    ,"[buddyID]",EXMPP_USER_ACCESS_ADMIN}, //only admin-buddy can run this command
+	{true ,EXMPP_CMD_BUDDY_REMOVE            , "rejectbuddy" ,"[buddyID]",EXMPP_USER_ACCESS_ADMIN}, //only admin-buddy can run this command
+	{true ,EXMPP_CMD_BUDDY_SUBSCRIBE         , "subscribe"   ,"[buddyID]",EXMPP_USER_ACCESS_ADMIN},  //only admin-buddy can run this command
+	{true ,EXMPP_CMD_BUDDY_UNSUBSCRIBE       , "unsubscribe" ,"[buddyID]",EXMPP_USER_ACCESS_ADMIN},  //only admin-buddy can run this command
+	{true ,EXMPP_CMD_ACCEPT_BUDDY_LIST       , "acceptbuddylist","",EXMPP_USER_ACCESS_READWRITE}, //prints buddy list
+	{true ,EXMPP_CMD_RELAY_MESSAGE           , "relaymsg","<buddyID> <message>",EXMPP_USER_ACCESS_ADMIN} //relays a message to given recipient
+	//{true ,EXMPP_CMD_CHANGE_ADMIN          , "changeadmin"    ,"[buddyID]"},//only admin-buddy can run this command
 };
 /* ------------------------------------------------------------------------- */
 XmppMgr::XmppMgr() //:AckToken(0)
@@ -205,6 +209,13 @@ int XmppMgr::onXmppMessage(std::string msg,std::string sender,ADXmppProducer* pO
 		XmppProxy.send_reply(msg,sender);
 	else if(msg=="Help" || msg=="help") //print help
 		XmppProxy.send_reply(print_help(),sender);
+	else if (msg.find("return=") != std::string::npos)
+	{
+		//this is the respose from another bot for a request from this bot
+		//cout<<"###reveived resp from another bot####### : "<<msg<<endl;
+		ResponseMsg=msg;//keep this in a cache for later use
+		return 0;//just consume this message(do not autoreply)
+	}
 	else
 	{
 		processCmd.push_back(XmppCmdEntry(msg,sender));
@@ -349,6 +360,10 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 				case EXMPP_CMD_DISPBKLT        :res=proc_cmd_disp_backlight(cmdcmdMsg,returnval);break;
 				case EXMPP_CMD_BUDDY_ADD       :res=proc_cmd_buddy_add(cmdcmdMsg,returnval,cmd.sender);break;
 				case EXMPP_CMD_BUDDY_REMOVE    :res=proc_cmd_buddy_remove(cmdcmdMsg,returnval,cmd.sender);break;
+				case EXMPP_CMD_BUDDY_SUBSCRIBE :res=proc_cmd_buddy_subscribe(cmdcmdMsg,returnval,cmd.sender);break;
+				case EXMPP_CMD_BUDDY_UNSUBSCRIBE:res=proc_cmd_buddy_unsubscribe(cmdcmdMsg,returnval,cmd.sender);break;
+				case EXMPP_CMD_ACCEPT_BUDDY_LIST:res=proc_cmd_accept_buddy_list(cmdcmdMsg,returnval);break;
+				case EXMPP_CMD_RELAY_MESSAGE   :res=proc_cmd_relay_message(cmdcmdMsg,returnval,cmd.sender);break;
 				default                        :break;
 			}
 			result.pop_front();
@@ -1786,7 +1801,6 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_buddy_add(std::string msg,std::string &returnva
 		//remove white space in the beginning
 		std::string::iterator end_pos = std::remove(cmdArg.begin(), cmdArg.end(), ' ');
 		cmdArg.erase(end_pos, cmdArg.end());
-
 		XmppProxy.accept_buddy(cmdArg);
 	}
 	return RPC_SRV_RESULT_SUCCESS;
@@ -1809,8 +1823,106 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_buddy_remove(std::string msg,std::string &retur
 	else
 	{
 		xpandarg(cmdArg); //e.g: addbuddy $name readonly //TODO: pass access level for this buddy.
-		XmppProxy.remove_buddy(cmdArg);
+		//remove white space in the beginning
+		std::string::iterator end_pos = std::remove(cmdArg.begin(), cmdArg.end(), ' ');
+		cmdArg.erase(end_pos, cmdArg.end());
+		if(XmppProxy.remove_buddy(cmdArg)==0)
+			return RPC_SRV_RESULT_SUCCESS;
+		else
+			return RPC_SRV_RESULT_ITEM_NOT_FOUND;
+	}
+	return RPC_SRV_RESULT_FAIL;
+}
+/* ------------------------------------------------------------------------- */
+//this function can be called via local rpcclient or via external jabber client(admin)
+RPC_SRV_RESULT XmppMgr::proc_cmd_send_message(std::string to,std::string message,std::string subject)
+{
+	//cout<<"buddy state########:"<<XmppProxy.get_buddy_online_state(to)<<endl;
+	if(XmppProxy.get_buddy_online_state(to)==0)
+		return RPC_SRV_RESULT_OFFLINE_NODE;
+	if(XmppProxy.SendMessageToBuddy(to,message,subject) == true)
+		return RPC_SRV_RESULT_SUCCESS;
+	else //to address is not in our roster??
+		return RPC_SRV_RESULT_FAIL;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_buddy_subscribe(std::string msg,std::string &returnval,std::string sender)
+{
+	//check if sender has the appropriate access for this command
+	if(!XmppProxy.is_admin_user(sender))
+		return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+	std::string cmd,cmdArg;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	getline(msgstream, cmdArg); //get rest of the string!
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0) //user-id must be passed
+		return RPC_SRV_RESULT_ARG_ERROR;
+	else
+	{
+		xpandarg(cmdArg); //e.g: addbuddy $name readonly
+		//remove white space in the beginning
+		std::string::iterator end_pos = std::remove(cmdArg.begin(), cmdArg.end(), ' ');
+		cmdArg.erase(end_pos, cmdArg.end());
+		XmppProxy.subscribe_buddy(cmdArg);
 	}
 	return RPC_SRV_RESULT_SUCCESS;
+}
+RPC_SRV_RESULT XmppMgr::proc_cmd_buddy_unsubscribe(std::string msg,std::string &returnval,std::string sender)
+{
+	//check if sender has the appropriate access for this command
+	if(!XmppProxy.is_admin_user(sender))
+		return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+	std::string cmd,cmdArg;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	getline(msgstream, cmdArg); //get rest of the string!
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0) //user-id must be passed
+		return RPC_SRV_RESULT_ARG_ERROR;
+	else
+	{
+		xpandarg(cmdArg); //e.g: addbuddy $name readonly
+		//remove white space in the beginning
+		std::string::iterator end_pos = std::remove(cmdArg.begin(), cmdArg.end(), ' ');
+		cmdArg.erase(end_pos, cmdArg.end());
+		XmppProxy.unsubscribe_buddy(cmdArg);
+	}
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_accept_buddy_list(std::string msg,std::string &returnval)
+{
+	returnval='\n';
+	XmppProxy.get_accept_buddy_list(returnval);
+	return RPC_SRV_RESULT_SUCCESS;
+}
+/* ------------------------------------------------------------------------- */
+RPC_SRV_RESULT XmppMgr::proc_cmd_relay_message(std::string msg,std::string &returnval,std::string sender)
+{
+	//if the request comes via xmpp channel, then allow only admin to run this command
+	//but if this request comes via rpcclient, we cannot check if this was called by admin
+	if(!XmppProxy.is_admin_user(sender))
+		return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;
+
+	std::string cmd,cmdArg,cmdArg2;
+	stringstream msgstream(msg);
+	msgstream >> cmd;
+	msgstream >> cmdArg;
+	getline(msgstream, cmdArg2); //get rest of the string!
+	if(cmd.size()<=0)
+		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
+	if(cmdArg.size()<=0)//get-line number
+		return RPC_SRV_RESULT_ARG_ERROR;//recipients address is must
+	xpandarg(cmdArg); //e.g: display $line $msg
+	if(cmdArg2.size()<=0)//read printed message
+		return RPC_SRV_RESULT_ARG_ERROR;//message argument is a must
+	else //required arguments are there
+	{
+		xpandarg(cmdArg2); //e.g: display $line $msg
+		return proc_cmd_send_message(cmdArg,cmdArg2);
+	}
 }
 /* ------------------------------------------------------------------------- */

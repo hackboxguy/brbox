@@ -468,12 +468,11 @@ bool ADXmppProxy::handleSubscriptionRequest( const JID& jid, const std::string& 
 	//if subscriber-buddy is to be accepted, then accept the subscription and also send subscription-request to buddy in return
 	if(jid.bare()==AdminBuddy)
 	{
-		StringList groups;
-		JID id( jid );
-		j->rosterManager()->subscribe( id, "", groups, "" );
+		//StringList groups;
+		//JID id( jid );
+		//j->rosterManager()->subscribe( id, "", groups, "" );
 		if(DebugLog)
 			cout<<"ADXmppProxy::handleSubscriptionRequest:AdminBuddy has been accepted:"<<AdminBuddy<<endl;
-		//TODO: update roster list
 		return true;//true;
 	}
 	else
@@ -484,13 +483,11 @@ bool ADXmppProxy::handleSubscriptionRequest( const JID& jid, const std::string& 
 		std::vector<string>::iterator itr = std::find(AcceptBuddyList.begin(), AcceptBuddyList.end(), tmp);//jid.bare());
 		if (itr != AcceptBuddyList.end())
 		{
-			//AcceptBuddyList.erase(itr);
-			StringList groups;
-			JID id( jid );
-			j->rosterManager()->subscribe( id, "", groups, "" );
+			//StringList groups;
+			//JID id( jid );
+			//j->rosterManager()->subscribe( id, "", groups, "" );
 			if(DebugLog)
 				cout<<"ADXmppProxy::handleSubscriptionRequest:Accepting pre-approved buddy:"<<*itr<<endl;
-			//TODO: update roster list
 			return true;
 		}
 
@@ -551,7 +548,7 @@ bool ADXmppProxy::SendMessageToBuddy(std::string address, const std::string & bo
 	for( ; it != pRoster->end(); ++it )
 	{
 		string str = (*it).second->jidJID().full();//*it;
-		if(address==str)
+		if(address==str)//send message only if sender is in our Roster()
 		{
 			Sessions::iterator it = mySessions.find(address);
 			if (it != mySessions.end()) //check if session already exists in my list
@@ -651,10 +648,18 @@ int ADXmppProxy::remove_buddy(std::string buddy)
 {
 	std::vector<string>::iterator itr = std::find(AcceptBuddyList.begin(), AcceptBuddyList.end(), buddy);
 	if (itr != AcceptBuddyList.end())
+	{
 		AcceptBuddyList.erase(itr);
-	if(DebugLog)
-		cout<<"ADXmppProxy::accept_buddy:buddy has been removed from our list:"<<buddy<<endl;
-	return 0;
+		if(DebugLog)
+			cout<<"ADXmppProxy::remove_buddy:buddy has been removed from our list:"<<buddy<<endl;
+		return 0;
+	}
+	else
+	{
+		if(DebugLog)
+			cout<<"ADXmppProxy::remove_buddy:requested buddy is not in the list!!!!:"<<buddy<<endl;
+		return -1;
+	}
 }
 /* ------------------------------------------------------------------------- */
 bool ADXmppProxy::is_admin_user(std::string user)
@@ -678,6 +683,31 @@ int ADXmppProxy::unsubscribe_buddy(std::string buddy)
 	//StringList groups;
 	JID id( buddy );
 	j->rosterManager()->unsubscribe(id);//, "", groups, "" );
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int ADXmppProxy::get_buddy_online_state(std::string buddy)
+{
+	JID id( buddy );
+	return j->rosterManager()->getRosterItem(id)->online();
+	//j->rosterManager()->getRosterItem(id)->subscription();
+}
+/* ------------------------------------------------------------------------- */
+int ADXmppProxy::get_accept_buddy_list(std::string &returnval)
+{
+	vector<std::string>::iterator it;
+	for(it = AcceptBuddyList.begin(); it != AcceptBuddyList.end(); it++)
+	{
+		returnval+=*it;
+		returnval+='\n';
+	}
+	//Roster *pRoster=j->rosterManager()->roster();
+	//Roster::const_iterator it = pRoster->begin();
+	//for( ; it != pRoster->end(); ++it )
+	//{
+	//	returnval+=(*it).second->jidJID().full();
+	//	returnval+='\n';
+	//}
 	return 0;
 }
 /* ------------------------------------------------------------------------- */

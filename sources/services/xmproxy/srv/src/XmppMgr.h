@@ -71,6 +71,10 @@ typedef enum EXMPP_CMD_TYPES_T
 	EXMPP_CMD_SHELLCMD_TRIG,
 	EXMPP_CMD_BUDDY_ADD,
 	EXMPP_CMD_BUDDY_REMOVE,
+	EXMPP_CMD_BUDDY_SUBSCRIBE,
+	EXMPP_CMD_BUDDY_UNSUBSCRIBE,
+	EXMPP_CMD_ACCEPT_BUDDY_LIST,
+	EXMPP_CMD_RELAY_MESSAGE,
 	EXMPP_CMD_UNKNOWN,
 	EXMPP_CMD_NONE
 }EXMPP_CMD_TYPES;
@@ -285,6 +289,10 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT proc_cmd_set_display_backlight(std::string msg);
 	RPC_SRV_RESULT proc_cmd_buddy_add(std::string msg,std::string &returnval,std::string sender);
 	RPC_SRV_RESULT proc_cmd_buddy_remove(std::string msg,std::string &returnval,std::string sender);
+	RPC_SRV_RESULT proc_cmd_buddy_subscribe(std::string msg,std::string &returnval,std::string sender);
+	RPC_SRV_RESULT proc_cmd_buddy_unsubscribe(std::string msg,std::string &returnval,std::string sender);
+	RPC_SRV_RESULT proc_cmd_accept_buddy_list(std::string msg,std::string &returnval);
+	RPC_SRV_RESULT proc_cmd_relay_message(std::string msg,std::string &returnval,std::string sender);
 
 	std::string print_help();
 	RPC_SRV_RESULT LoadAliasList(std::string listFile);
@@ -319,5 +327,7 @@ public:
 	inline void SetNetInterface(std::string interface){XmppNetInterface=interface;};
 	inline bool get_connected_status(){return XmppProxy.get_connected_status();};
 	RPC_SRV_RESULT set_online_status(bool status);//user set online/offline status via rpc
+	RPC_SRV_RESULT proc_cmd_send_message(std::string to,std::string message,std::string subject="message");//used for sending message to other clients
+	std::string ResponseMsg;
 };
 #endif

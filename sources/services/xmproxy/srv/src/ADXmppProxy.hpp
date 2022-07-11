@@ -91,7 +91,7 @@ public:
 	void setOnDemandDisconnect(bool flag){OnDemandDisconnect=flag;}
 
 	//for sending asyc-event to a buddy
-	bool SendMessageToBuddy(std::string address, const std::string & body, const std::string & subject);
+	bool SendMessageToBuddy(std::string address, const std::string & body, const std::string & subject="message");
 	int get_buddy_list(std::string &returnval);
 	bool get_connected_status();
 
@@ -133,6 +133,9 @@ public:
 	bool is_admin_user(std::string user);
 	int subscribe_buddy(std::string buddy);
 	int unsubscribe_buddy(std::string buddy);
+	int proc_cmd_send_message(std::string to,std::string message,std::string subject);//used for sending messages to other clients
+	int get_buddy_online_state(std::string buddy);
+	int get_accept_buddy_list(std::string &returnval);//accept_buddy list filled/removed by accept_buddy/remove_buddy calls
 private:
 	vector<std::string> BuddyList;//authorized accounts that can contact me
 	vector<std::string> AcceptBuddyList;//Accept these buddies if requested by admin
