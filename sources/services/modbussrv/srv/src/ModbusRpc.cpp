@@ -188,16 +188,16 @@ int ModbusRpc::process_iostate_set(JsonDataCommObj* pReq)
 	}
 
 	uint16_t value;
-	if(pPacket->state=EJSON_IOSTATE_OFF)
-		value=0;
-	else if(pPacket->state=EJSON_IOSTATE_ON)
+	if(pPacket->state==EJSON_IOSTATE_OFF)
+		value=2;
+	else if(pPacket->state==EJSON_IOSTATE_ON)
 		value=1;
 	else
 	{
 		pPanelReq->result=RPC_SRV_RESULT_ARG_ERROR;
 		return 0;
 	}
-
+	value<<=8; //lsb must be first in the packet
 	pPanelReq->result=pMODBus->write_register(pMODBus->ctx,pPacket->slaveaddr,pPacket->ioaddr,value);
 	return 0;
 }

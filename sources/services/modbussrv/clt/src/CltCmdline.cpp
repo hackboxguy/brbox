@@ -45,6 +45,7 @@ int CltCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSo
 			run_energy_param_command(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
 			break;
 		case EJSON_MODBUSSRV_RPC_IOSTATE_GET:
+		case EJSON_MODBUSSRV_RPC_IOSTATE_SET:
 			run_modbus_iostatecmd(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
 			break;
 		default:return -1;
@@ -201,7 +202,6 @@ int CltCmdline::run_modbus_iostatecmd(CmdExecutionObj *pCmdObj,ADJsonRpcClient *
 	ADThreadedSockClient *pOrig = (ADThreadedSockClient*)pWorker;
 	if(pCmdObj->action == RPC_SRV_ACT_WRITE)
 	{
-	printf("going to run write cmd\n");
 	pCmdObj->result=pSrvSockConn->set_tripple_string_type(pCmdObj->set_rpc_name,
 			pCmdObj->first_arg_param_name,pCmdObj->first_arg_param_value,
 			pCmdObj->second_arg_param_name,pCmdObj->second_arg_param_value,
