@@ -208,7 +208,15 @@ int CltCmdline::run_modbus_iostatecmd(CmdExecutionObj *pCmdObj,ADJsonRpcClient *
 			pCmdObj->third_arg_param_name,pCmdObj->third_arg_param_value);
 	pOrig->log_print_message(pSrvSockConn,pCmdObj->set_rpc_name,RPC_SRV_ACT_READ,pCmdObj->result,
 				pOutMsgList,pCmdObj->third_arg_param_value);
-	//pCmdObj->my_log_print_message(pSrvSockConn,pCmdObj->set_rpc_name,RPC_SRV_ACT_WRITE,pCmdObj->result,pOutMsgList);
+	}
+	else if(pCmdObj->action == RPC_SRV_ACT_READ)
+	{
+	pCmdObj->result=pSrvSockConn->set_double_string_get_single_string_type(pCmdObj->get_rpc_name,
+			pCmdObj->first_arg_param_name,pCmdObj->first_arg_param_value,
+			pCmdObj->second_arg_param_name,pCmdObj->second_arg_param_value,
+			pCmdObj->third_arg_param_name,pCmdObj->third_arg_param_value);
+	pOrig->log_print_message(pSrvSockConn,pCmdObj->get_rpc_name,RPC_SRV_ACT_READ,pCmdObj->result,
+				pOutMsgList,pCmdObj->third_arg_param_value);
 	}
 	else
 	{
