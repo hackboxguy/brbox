@@ -1,6 +1,6 @@
 #!/bin/bash
 #this script prepares the buildroot and dependencies
-BR_LAST_STABLE_VERSION=2018.02.x #2016.02 #2016.05-rc3 #2016.02 #2015.11.1 #2015.08.1 #2015.05 #2015.02
+BR_LAST_STABLE_VERSION=2019.02.x #2016.02 #2016.05-rc3 #2016.02 #2015.11.1 #2015.08.1 #2015.05 #2015.02
 BR_DOWNLOAD_FOLDER=dl
 
 while getopts v: f
