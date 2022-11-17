@@ -34,6 +34,7 @@ BOARD_TYPE_RP0_MEDIA="raspi0-media"       #raspi0-media-player(video-looper)
 BOARD_TYPE_RP1="raspi1"                   #base-build
 BOARD_TYPE_RP1_SMSW="raspi1-smartsw"      #relayswitch-application-build
 BOARD_TYPE_RP1_RBOX="raspi1-rbox"         #remote-box-application-build
+BOARD_TYPE_RP1_RBOX_NEW="raspi1-rbox-new" #remote-box-application-build
 BOARD_TYPE_RP1_DSPT="raspi1-disptst"      #display-test-application-build
 BOARD_TYPE_RP2="raspi2"                   #base-build
 BOARD_TYPE_RP3="raspi3"                   #base-build
@@ -78,6 +79,10 @@ elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1_SMSW" ]; then
 	BR_BOARD_LINUX_CONFIG_PATH=board/raspberrypi/
 	BOOT_IMG_SCRIPT=$(pwd)/scripts/raspi-bootdisk.sh
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1_RBOX" ]; then
+	BR_BOARD_CONFIG=raspberrypi_defconfig
+	BR_BOARD_LINUX_CONFIG_PATH=board/raspberrypi/
+	BOOT_IMG_SCRIPT=$(pwd)/scripts/raspi-bootdisk.sh
+elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1_RBOX_NEW" ]; then
 	BR_BOARD_CONFIG=raspberrypi_defconfig
 	BR_BOARD_LINUX_CONFIG_PATH=board/raspberrypi/
 	BOOT_IMG_SCRIPT=$(pwd)/scripts/raspi-bootdisk.sh
@@ -177,6 +182,9 @@ elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1_SMSW" ]; then
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 	ROOTFS_TYPE=$ROOTFS_TYPE_RP1
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1_RBOX" ]; then
+	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
+	ROOTFS_TYPE=$ROOTFS_TYPE_RP1
+elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1_RBOX_NEW" ]; then
 	./scripts/sudo-grub2-bootdisk.sh $BOOT_IMG_SCRIPT $BR_OUTPUT_FOLDER $BUILDNUMBER $BR_OUTPUT_FOLDER/images/$BOOTABLE_USB_IMG $SUDOPW
 	ROOTFS_TYPE=$ROOTFS_TYPE_RP1
 elif [ $BR_BOARD_SYSTEM_CONFIG = "$BOARD_TYPE_RP1_DSPT" ]; then
