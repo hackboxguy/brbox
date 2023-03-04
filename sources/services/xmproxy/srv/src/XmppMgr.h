@@ -210,6 +210,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	std::string AliasListFile;
 	typedef std::map<std::string, std::string> Alias;
 	Alias AliasList;
+	std::string UpdateUrlFile;
 
 	//struct EventSubscription
 	//{
@@ -321,6 +322,7 @@ public:
 	void SetOpenWrtCmdGroupSts(bool sts);
 	inline void SetAliasListFilePath(std::string filepath){AliasListFile=filepath;};
 	inline void SetEventSubscrListFilePath(std::string filepath){EventSubscrListFile=filepath;};
+	inline void SetUpdateurlFilePath(std::string filepath){UpdateUrlFile=filepath;};
 	void SetBotNameFilePath(std::string filepath);
 	RPC_SRV_RESULT xpandarg(std::string &cmdArg);
 	RPC_SRV_RESULT xpandargs(std::string &cmdArg);

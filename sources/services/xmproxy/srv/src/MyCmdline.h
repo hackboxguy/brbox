@@ -13,6 +13,7 @@ class MyCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 	char AliasListFilePath[512];
 	char BotNameFilePath[512];
 	char EvntSubscrListFilePath[512];
+	char UpdateUrlFilePath[1024];
 	std::string NetInterface;
 	//Chain-callback functions
 	virtual int parse_my_cmdline_options(int arg, char* sub_arg);
@@ -36,6 +37,7 @@ public:
 	std::string get_botname_filepath();
 	std::string get_evnt_subscr_list_filepath();//char* filepath);
 	std::string get_net_interface();
+	std::string get_updateurl_filepath();
 	//service specific part
 };
 #endif

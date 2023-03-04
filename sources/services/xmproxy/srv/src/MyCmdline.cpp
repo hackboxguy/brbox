@@ -9,6 +9,7 @@ typedef enum XMPROXY_CMDLINE_OPT_T
 	XMPROXY_CMDLINE_OPT_BOT_NAME_FILE,
 	XMPROXY_CMDLINE_OPT_EVNT_SUBSCR_LIST_FILE,
 	XMPROXY_CMDLINE_OPT_NETINTERFACE, //iface
+	XMPROXY_CMDLINE_OPT_UPDATEURL, //updateurl
 	XMPROXY_CMDLINE_OPT_UNKNOWN,
 	XMPROXY_CMDLINE_OPT_NONE
 }XMPROXY_CMDLINE_OPT;
@@ -32,12 +33,16 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 	CmdlineHelper.insert_options_entry((char*)"evntsubscr" ,optional_argument,XMPROXY_CMDLINE_OPT_EVNT_SUBSCR_LIST_FILE);
 	CmdlineHelper.insert_help_entry((char*)"--evntsubscr=filepath(file path of event subscriber's list)");
 	CmdlineHelper.insert_options_entry((char*)"iface" ,optional_argument,XMPROXY_CMDLINE_OPT_NETINTERFACE);
-	CmdlineHelper.insert_help_entry((char*)"--iface=ethx                (ip of netinterface to print on display)");
+	CmdlineHelper.insert_help_entry((char*)"--iface=ethx         (ip of netinterface to print on display)");
+	CmdlineHelper.insert_options_entry((char*)"updateurl" ,optional_argument,XMPROXY_CMDLINE_OPT_LOGIN_FILE);
+	CmdlineHelper.insert_help_entry((char*)"--updateurl=filepath (sysupdate fmw-file url)");
+
 	strcpy(LoginFilePath,XMPROXY_DEFAULT_LOGIN_FILE_PATH);
 	UsbGSMSts=false;
 	AliasListFilePath[0]='\0';
 	BotNameFilePath[0]='\0';
 	EvntSubscrListFilePath[0]='\0';
+	UpdateUrlFilePath[0]='\0';
 }
 /*****************************************************************************/
 MyCmdline::~MyCmdline()
@@ -91,6 +96,12 @@ int MyCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 				NetInterface="";
 			else
 				NetInterface=sub_arg;
+			break;
+		case XMPROXY_CMDLINE_OPT_UPDATEURL:
+			if(CmdlineHelper.get_next_subargument(&sub_arg)==0)//no updateurl filepath passed by user
+				strcpy(UpdateUrlFilePath,"");
+			else
+				strcpy(UpdateUrlFilePath,sub_arg);
 			break;
 		default:return 0;break;
 	}
@@ -191,5 +202,11 @@ std::string MyCmdline::get_evnt_subscr_list_filepath()
 std::string MyCmdline::get_net_interface()
 {
 	return NetInterface;
+}
+/*****************************************************************************/
+std::string MyCmdline::get_updateurl_filepath()
+{
+	std::string updateurl=UpdateUrlFilePath;
+	return updateurl;
 }
 /*****************************************************************************/

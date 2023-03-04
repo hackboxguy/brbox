@@ -23,7 +23,7 @@ start() {
 	IFACE_NAME=$(cat /etc/dispsrv/iface-name.txt)
     USB_TETHER=$(ifconfig | grep usb0) #if usb0 network interface exists, then use it
 	[ $? = 0 ] && IFACE_NAME="usb0"
-	service_start /opt/fmw/bin/$APP --iface=$IFACE_NAME --boardtype=$(cat /tmp/BrBoxDevType.txt) --loginfile=$XMPP_LOGIN_DATA --aliaslist=$ALIAS_LIST_DATA --botname=$BOT_NAME_DATA --usbgsm=0 &
+	service_start /opt/fmw/bin/$APP --updateurl=/etc/sysupdate_url.txt --iface=$IFACE_NAME --boardtype=$(cat /tmp/BrBoxDevType.txt) --loginfile=$XMPP_LOGIN_DATA --aliaslist=$ALIAS_LIST_DATA --botname=$BOT_NAME_DATA --usbgsm=0 &
 }
 
 stop() {

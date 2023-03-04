@@ -46,6 +46,7 @@ int main(int argc, const char* argv[])
 	XmpManager.SetBotNameFilePath(CmdLine.get_botname_filepath());//persistent bot-name-file
 	XmpManager.SetEventSubscrListFilePath(CmdLine.get_evnt_subscr_list_filepath());//persistent event subscriber's list file
 	XmpManager.SetNetInterface(CmdLine.get_net_interface());
+	XmpManager.SetUpdateurlFilePath(CmdLine.get_updateurl_filepath());//updateurl filepath
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 

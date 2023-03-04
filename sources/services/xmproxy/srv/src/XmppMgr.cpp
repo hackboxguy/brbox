@@ -79,6 +79,7 @@ XmppMgr::XmppMgr() //:AckToken(0)
 	XmppAdminBuddy="";
 	XmppBotNameFilePath="";
 	XmppNetInterface="";
+	UpdateUrlFile="";
 	DebugLog=false;
 	//GsmDevDetected=false;
 	bboxSmsServerAddr=BBOXSMS_SERVER_ADDR;
@@ -677,11 +678,8 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg,std::string &returnv
 	std::string cmd,URLPath;//cmdArg
 	stringstream msgstream(msg);
 	msgstream >> cmd;
-	//msgstream >> cmdArg;
 	if(cmd.size()<=0)
 		return RPC_SRV_RESULT_UNKNOWN_COMMAND;
-	//if(cmdArg.size()<=0)
-	//	return RPC_SRV_RESULT_ARG_ERROR;
 
 	std::ifstream file(BRBOX_SYS_CONFIG_FILE_PATH);
 	std::string line;
@@ -690,8 +688,22 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_fmw_update(std::string msg,std::string &returnv
 		return RPC_SRV_RESULT_FAIL;//unable to detect system type
 	line+=".uimg";//ex: raspi1-rbox.uimg
 
-	URLPath=GITHUB_FMW_DOWNLOAD_FOLDER;//"http://github.com/hackboxguy/downloads/raw/master/" + "uBrBoxRoot.uimg"
-	URLPath+=line;//cmdArg;
+	std::string customurl="";
+	if(UpdateUrlFile!="")
+	{
+		std::ifstream customurlfile(UpdateUrlFile);
+		std::getline(customurlfile, customurl);
+		if(customurl.size()<=0)
+			{URLPath=GITHUB_FMW_DOWNLOAD_FOLDER;URLPath+=line;}
+		else
+		{
+			URLPath=customurl;
+			LOG_DEBUG_MSG_1_ARG(DebugLog,"BRBOX:xmproxy","XmppMgr::proc_cmd_fmw_update::using customURL=%s",customurl.c_str());
+		}
+	}
+	else
+		{URLPath=GITHUB_FMW_DOWNLOAD_FOLDER;URLPath+=line;}
+
 	//LOG_DEBUG_MSG_1_ARG(true,"BRBOX:xmproxy","XmppMgr::proc_cmd_fmw_update::cmdARG=%s",cmdArg.c_str());
 	//LOG_DEBUG_MSG_1_ARG(true,"BRBOX:xmproxy","XmppMgr::proc_cmd_fmw_update::filepath=%s",URLPath.c_str());
 
@@ -1750,7 +1762,7 @@ RPC_SRV_RESULT XmppMgr::xpandarg(std::string &cmdArg)
 		if (it != AliasList.end())
 			cmdArg=it->second;
 	}
-	RPC_SRV_RESULT_SUCCESS;
+	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
 //split strings by space, expand string if prefixed with  $ sign and merge back the string
@@ -1778,7 +1790,7 @@ RPC_SRV_RESULT XmppMgr::xpandargs(std::string &cmdArg)
 	std::copy( tokens.begin(), tokens.end(), oit );
 	cmdArg = result_stream.str();//merge strings back with space as saparator
 	//cout <<"after: "<< cmdArg <<endl;
-	RPC_SRV_RESULT_SUCCESS;
+	return RPC_SRV_RESULT_SUCCESS;
 }
 /* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT XmppMgr::proc_cmd_buddy_add(std::string msg,std::string &returnval,std::string sender)
