@@ -34,7 +34,7 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 	CmdlineHelper.insert_help_entry((char*)"--evntsubscr=filepath(file path of event subscriber's list)");
 	CmdlineHelper.insert_options_entry((char*)"iface" ,optional_argument,XMPROXY_CMDLINE_OPT_NETINTERFACE);
 	CmdlineHelper.insert_help_entry((char*)"--iface=ethx         (ip of netinterface to print on display)");
-	CmdlineHelper.insert_options_entry((char*)"updateurl" ,optional_argument,XMPROXY_CMDLINE_OPT_LOGIN_FILE);
+	CmdlineHelper.insert_options_entry((char*)"updateurl" ,optional_argument,XMPROXY_CMDLINE_OPT_UPDATEURL);
 	CmdlineHelper.insert_help_entry((char*)"--updateurl=filepath (sysupdate fmw-file url)");
 
 	strcpy(LoginFilePath,XMPROXY_DEFAULT_LOGIN_FILE_PATH);
