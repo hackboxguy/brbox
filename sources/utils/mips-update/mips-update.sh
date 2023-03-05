@@ -239,6 +239,7 @@ fi
 
 if [ "$TEST_ONLY" = "no"  ]; then
 	sysupgrade $TMP_IMAGEFILE #system will automatically reboot
+	return 0 #sysupgrade will anyway reboot the system hence return success
 else
 	sysupgrade --test $TMP_IMAGEFILE
 fi
