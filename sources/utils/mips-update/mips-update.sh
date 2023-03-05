@@ -242,8 +242,6 @@ if [ "$TEST_ONLY" = "no"  ]; then
 else
 	sysupgrade --test $TMP_IMAGEFILE
 fi
-#sysupgrade -i $TMP_IMAGEFILE #system will automatically reboot
-rm -rf $TMP_IMAGEFILE
 
 if [ $? = "0" ]; then
 	echo -e "[OK]"
