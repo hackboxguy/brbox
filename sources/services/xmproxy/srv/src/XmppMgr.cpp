@@ -262,8 +262,8 @@ int XmppMgr::monoshot_callback_function(void* pUserData,ADThreadProducer* pObj)
 		stringstream mystream(cmd.cmdMsg);
 		std::string mycmd;
 		mystream >> mycmd;
-		transform(mycmd.begin(), mycmd.end(), mycmd.begin(), ::tolower);
-		if(mycmd=="alias")
+		//transform(mycmd.begin(), mycmd.end(), mycmd.begin(), ::tolower);
+		if(mycmd=="Alias" || mycmd=="alias")
 		{
 			std::string myreturnval="";
 			RPC_SRV_RESULT myres=RPC_SRV_RESULT_UNKNOWN_COMMAND;//RPC_SRV_RESULT_FAIL;
@@ -1276,10 +1276,8 @@ RPC_SRV_RESULT XmppMgr::RewriteEventSubscrList(std::string listFile,std::vector<
 /* ------------------------------------------------------------------------- */
 RPC_SRV_RESULT XmppMgr::proc_cmd_alias(std::string msg,std::string &returnval)
 {
-	//cout<<"msg="<<msg<<endl;
-	//msg "Alias Light ON=Gpio 2 0"
-	transform(msg.begin(), msg.end(), msg.begin(), ::tolower);//convert all lower case
-	if(msg=="alias")//if it is just the "alias" print the content of AliasList
+	//transform(msg.begin(), msg.end(), msg.begin(), ::tolower);//convert all lower case
+	if(msg=="Alias" || msg=="alias")//if it is just the "alias" print the content of AliasList
 	{
 		returnval='\n';//"";
 		for( Alias::iterator it = AliasList.begin(); it != AliasList.end(); ++it)
