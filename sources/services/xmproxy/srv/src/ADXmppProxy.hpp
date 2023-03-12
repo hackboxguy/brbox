@@ -78,7 +78,7 @@ public:
 	ADXmppProxy();
 	~ADXmppProxy();//{}
 	int disconnect();
-	int connect(char* user,char* password,std::string adminbuddy="");
+	int connect(char* user,char* password,std::string adminbuddy="", std::string bkupadminbuddy="");
 	int send_reply(std::string reply,std::string sender="");
 	int receive_request(std::string request,std::string sender);
 	bool get_connect_sts(){return connected;};
@@ -161,5 +161,6 @@ private:
 	typedef std::map<std::string, Session> Sessions;
 	Sessions mySessions;
 	std::string AdminBuddy;
+	std::string BkupAdminBuddy;
 };
 #endif

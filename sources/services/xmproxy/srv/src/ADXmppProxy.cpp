@@ -23,6 +23,7 @@ ADXmppProxy::ADXmppProxy()
 	//m_chatStateFilter=0;
 	j=NULL;
 	AdminBuddy="";
+	BkupAdminBuddy="";
 	//AcceptThisBuddy="";
 	PingThread.subscribe_thread_callback(this);
 	PingThread.set_thread_properties(THREAD_TYPE_MONOSHOT,(void *)this);
@@ -45,7 +46,7 @@ int ADXmppProxy::disconnect()
 	return 0;
 }
 /*****************************************************************************/
-int ADXmppProxy::connect(char* user,char* password, std::string adminbuddy)
+int ADXmppProxy::connect(char* user,char* password, std::string adminbuddy, std::string bkupadminbuddy)
 {
 	if(j!=NULL)
 		return 0;
@@ -53,6 +54,7 @@ int ADXmppProxy::connect(char* user,char* password, std::string adminbuddy)
 	if(DebugLog)
 		cout<<"ADXmppProxy::connect: Entering===>"<<endl;
 	AdminBuddy=adminbuddy;
+	BkupAdminBuddy=bkupadminbuddy;
 
 	JID jid( user);
 	//myJid=jid;
@@ -176,7 +178,7 @@ int ADXmppProxy::receive_request(std::string req,std::string sender)
 		cout<<"ADXmppProxy::receive_request:received from="<<sender<<" msg="<<req<<endl;
 
 	//if sender is admin, then just process the request else check if sender is in our BuddyList.
-	if(sender == AdminBuddy)
+	if(sender == AdminBuddy || sender == BkupAdminBuddy)
 	{
 		onXmppMessage(req,sender);
 		return 0;
@@ -466,7 +468,7 @@ bool ADXmppProxy::handleSubscriptionRequest( const JID& jid, const std::string& 
 
 	//check if subscriber-buddy needs to be accepted based on available cmdline-arg or through some other means(AdminBuddy),
 	//if subscriber-buddy is to be accepted, then accept the subscription and also send subscription-request to buddy in return
-	if(jid.bare()==AdminBuddy)
+	if(jid.bare()==AdminBuddy || jid.bare()==BkupAdminBuddy)
 	{
 		//StringList groups;
 		//JID id( jid );
@@ -664,7 +666,7 @@ int ADXmppProxy::remove_buddy(std::string buddy)
 /* ------------------------------------------------------------------------- */
 bool ADXmppProxy::is_admin_user(std::string user)
 {
-	if(user == AdminBuddy)
+	if(user == AdminBuddy || user == BkupAdminBuddy)
 		return true;
 	else
 		return false;

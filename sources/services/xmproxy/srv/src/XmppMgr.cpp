@@ -77,6 +77,7 @@ XmppMgr::XmppMgr() //:AckToken(0)
 	XmppUserName="";
 	XmppBotName="";
 	XmppAdminBuddy="";
+	XmppBkupAdminBuddy="";
 	XmppBotNameFilePath="";
 	XmppNetInterface="";
 	UpdateUrlFile="";
@@ -234,7 +235,7 @@ int XmppMgr::thread_callback_function(void* pUserData,ADThreadProducer* pObj)
 		//cout<<"XmppMgr::thread_callback_function: entering xmpp connect"<<endl;
 		LOG_DEBUG_MSG_1_ARG(DebugLog,"BRBOX:xmproxy","XmppMgr::thread_callback_function::xmpp login attempt=%d",++loginAttempt);
 		if(XmppProxy.getOnDemandDisconnect()==false)//user has requested for disconnect via rpc
-			XmppProxy.connect((char*)XmppUserName.c_str(),(char*)XmppUserPw.c_str(),XmppAdminBuddy);
+			XmppProxy.connect((char*)XmppUserName.c_str(),(char*)XmppUserPw.c_str(),XmppAdminBuddy,XmppBkupAdminBuddy);
 		//cout<<"XmppMgr::thread_callback_function: exited xmpp connect"<<endl;
 		//XmppProxy.disconnect();
 		if(XmppProxy.getForcedDisconnect())break;
@@ -506,6 +507,17 @@ RPC_SRV_RESULT XmppMgr::Start(std::string accountFilePath)
 	abstream >> XmppAdminBuddy;
 	if(XmppAdminBuddy.size()<=0)
 		XmppAdminBuddy="";//no-admin-buddy is available
+
+	//read backup-admin-buddy if available(it is advisible to provide adminbuddy)
+	std::getline(file, line);
+	if(line.size()<=0)
+		XmppBkupAdminBuddy="";//no-bkup-admin-buddy is available
+	stringstream adminstream(line);
+	adminstream >> key;           //first-word  ("bkupadminbuddy:")
+	adminstream >> XmppBkupAdminBuddy;
+	if(XmppBkupAdminBuddy.size()<=0)
+		XmppBkupAdminBuddy="";//no-admin-buddy is available
+
 
 	if(DebugLog)
 	{
