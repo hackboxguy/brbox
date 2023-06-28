@@ -1861,7 +1861,8 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_buddy_remove(std::string msg,std::string &retur
 //this function can be called via local rpcclient or via external jabber client(admin)
 RPC_SRV_RESULT XmppMgr::proc_cmd_send_message(std::string to,std::string message,std::string subject)
 {
-	//cout<<"buddy state########:"<<XmppProxy.get_buddy_online_state(to)<<endl;
+	if(XmppProxy.IsMyBuddy(to) == false)
+		return RPC_SRV_RESULT_ACTION_NOT_ALLOWED;//not my buddy, first subscribe and then send message
 	if(XmppProxy.get_buddy_online_state(to)==0)
 		return RPC_SRV_RESULT_OFFLINE_NODE;
 	if(XmppProxy.SendMessageToBuddy(to,message,subject) == true)

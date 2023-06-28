@@ -576,6 +576,25 @@ bool ADXmppProxy::SendMessageToBuddy(std::string address, const std::string & bo
 	return false;//address is not in my buddy-list
 }
 /* ------------------------------------------------------------------------- */
+bool ADXmppProxy::IsMyBuddy(std::string buddyaddress)
+{
+	if(iConnect==false)
+	{
+		if(DebugLog)
+			cout<<"ADXmppProxy::IsMyBuddy:client disconnected, cannot check if its my buddy!!!"<<endl;
+		return false;
+	}
+	Roster *pRoster=j->rosterManager()->roster();
+	Roster::const_iterator it = pRoster->begin();
+	for( ; it != pRoster->end(); ++it )
+	{
+		string str = (*it).second->jidJID().full();//*it;
+		if(buddyaddress==str)//return true only if buddyaddr is in our Roster()
+			return true;
+	}
+	return false;
+}
+/* ------------------------------------------------------------------------- */
 int ADXmppProxy::get_buddy_list(std::string &returnval)
 {
 	//vector<std::string>::iterator it;

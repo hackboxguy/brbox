@@ -136,6 +136,7 @@ public:
 	int proc_cmd_send_message(std::string to,std::string message,std::string subject);//used for sending messages to other clients
 	int get_buddy_online_state(std::string buddy);
 	int get_accept_buddy_list(std::string &returnval);//accept_buddy list filled/removed by accept_buddy/remove_buddy calls
+	bool IsMyBuddy(std::string buddyaddress);
 private:
 	vector<std::string> BuddyList;//authorized accounts that can contact me
 	vector<std::string> AcceptBuddyList;//Accept these buddies if requested by admin
