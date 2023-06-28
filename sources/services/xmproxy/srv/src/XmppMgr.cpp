@@ -521,8 +521,10 @@ RPC_SRV_RESULT XmppMgr::Start(std::string accountFilePath)
 
 	if(DebugLog)
 	{
-		cout<<"XmppMgr::Start:user: "<<XmppUserName<<endl;
-		cout<<"XmppMgr::Start:pw  : "<<XmppUserPw<<endl;
+		cout<<"XmppMgr::Start:user     : "<<XmppUserName<<endl;
+		cout<<"XmppMgr::Start:pw       : "<<XmppUserPw<<endl;
+		cout<<"XmppMgr::Start:admin    : "<<XmppAdminBuddy<<endl;
+		cout<<"XmppMgr::Start:adminbkup: "<<XmppBkupAdminBuddy<<endl;
 	}
 
 	XmppClientThread.start_thread();
@@ -1946,5 +1948,23 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_relay_message(std::string msg,std::string &retu
 		xpandarg(cmdArg2); //e.g: display $line $msg
 		return proc_cmd_send_message(cmdArg,cmdArg2);
 	}
+}
+/* ------------------------------------------------------------------------- */
+//this function can be called via local rpcclient or via external jabber client(admin)
+RPC_SRV_RESULT XmppMgr::proc_cmd_subscribe_message(std::string to,std::string message,std::string subject)
+{
+	if(XmppProxy.subscribe_buddy(to) == 0)
+		return RPC_SRV_RESULT_SUCCESS;
+	else
+		return RPC_SRV_RESULT_FAIL;
+}
+/* ------------------------------------------------------------------------- */
+//this function can be called via local rpcclient or via external jabber client(admin)
+RPC_SRV_RESULT XmppMgr::proc_cmd_add_buddy(std::string to,std::string message,std::string subject)
+{
+	if(XmppProxy.accept_buddy(to) == 0)
+		return RPC_SRV_RESULT_SUCCESS;
+	else
+		return RPC_SRV_RESULT_FAIL;
 }
 /* ------------------------------------------------------------------------- */

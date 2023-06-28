@@ -331,6 +331,8 @@ public:
 	inline bool get_connected_status(){return XmppProxy.get_connected_status();};
 	RPC_SRV_RESULT set_online_status(bool status);//user set online/offline status via rpc
 	RPC_SRV_RESULT proc_cmd_send_message(std::string to,std::string message,std::string subject="message");//used for sending message to other clients
+	RPC_SRV_RESULT proc_cmd_subscribe_message(std::string to,std::string message="hi",std::string subject="message");//used for sending friend request
+	RPC_SRV_RESULT proc_cmd_add_buddy(std::string to,std::string message="hi",std::string subject="message");//used for accepting buddy-request
 	std::string ResponseMsg;
 };
 #endif

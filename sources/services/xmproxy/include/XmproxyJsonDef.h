@@ -17,6 +17,8 @@ typedef enum EJSON_XMPROXY_RPC_TYPES_T
 	EJSON_XMPROXY_RPC_GET_ONLINE_STATUS,
 	EJSON_XMPROXY_RPC_SET_ONLINE_STATUS, //via rpc, force to go offline
 	EJSON_XMPROXY_RPC_SET_SEND_MESSAGE, //send xmpp message to clients from roster
+	EJSON_XMPROXY_RPC_SET_SUBSCRIBE, //send xmpp message for friend-request
+	EJSON_XMPROXY_RPC_SET_ACCEPT_BUDDY, //accept friend request when arrives
 	EJSON_XMPROXY_RPC_END,
 	EJSON_XMPROXY_RPC_NONE
 }EJSON_XMPROXY_RPC_TYPES;
@@ -86,6 +88,26 @@ typedef struct XMPROXY_SENDMSG_PACKET_T
 	char to[512];
 	char msg[1024];
 }XMPROXY_SENDMSG_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_XMPROXY_RPC_SET_SUBSCRIBE
+#define XMPROXY_RPC_SUBSCRIBE            "send_subscribe"
+#define XMPROXY_RPC_SUBSCRIBE_TO_ARG     "to"
+#define XMPROXY_RPC_SUBSCRIBE_MSG_ARG    "msg"
+typedef struct XMPROXY_SUBSCRIBE_PACKET_T
+{
+	char to[512];
+	char msg[1024];
+}XMPROXY_SUBSCRIBE_PACKET;
+/* ------------------------------------------------------------------------- */
+//EJSON_XMPROXY_RPC_SET_ACCEPT_BUDDY
+#define XMPROXY_RPC_ACCEPT_BUDDY            "accept_buddy"
+#define XMPROXY_RPC_ACCEPT_BUDDY_TO_ARG     "to"
+#define XMPROXY_RPC_ACCEPT_BUDDY_MSG_ARG    "msg"
+typedef struct XMPROXY_ACCEPT_BUDDY_PACKET_T
+{
+	char to[512];
+	char msg[1024];
+}XMPROXY_ACCEPT_BUDDY_PACKET;
 /* ------------------------------------------------------------------------- */
 //keep all the data related to smart-eye-service here
 typedef struct XMPROXY_CMN_DATA_CACHE_T

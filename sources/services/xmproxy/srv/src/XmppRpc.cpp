@@ -20,6 +20,8 @@ int XmppRpc::MapJsonToBinary(JsonDataCommObj* pReq,int index)
 		case EJSON_XMPROXY_RPC_GET_ONLINE_STATUS:return json_to_bin_get_online_status(pReq);
 		case EJSON_XMPROXY_RPC_SET_ONLINE_STATUS:return json_to_bin_set_online_status(pReq);
 		case EJSON_XMPROXY_RPC_SET_SEND_MESSAGE :return json_to_bin_set_send_message(pReq);
+		case EJSON_XMPROXY_RPC_SET_SUBSCRIBE    :return json_to_bin_set_subscribe_message(pReq);
+		case EJSON_XMPROXY_RPC_SET_ACCEPT_BUDDY :return json_to_bin_set_accept_buddy(pReq);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL  :return json_to_bin_delete_all(pReq);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE      :break;
 		//case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET   :return json_to_bin_get_total_sms(pReq);
@@ -41,6 +43,8 @@ int XmppRpc::MapBinaryToJson(JsonDataCommObj* pReq,int index)
 		case EJSON_XMPROXY_RPC_GET_ONLINE_STATUS:return bin_to_json_get_online_status(pReq);
 		case EJSON_XMPROXY_RPC_SET_ONLINE_STATUS:return bin_to_json_set_online_status(pReq);
 		case EJSON_XMPROXY_RPC_SET_SEND_MESSAGE :return bin_to_json_set_send_message(pReq);
+		case EJSON_XMPROXY_RPC_SET_SUBSCRIBE    :return bin_to_json_set_subscribe_message(pReq);
+		case EJSON_XMPROXY_RPC_SET_ACCEPT_BUDDY :return bin_to_json_set_accept_buddy(pReq);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL  :return bin_to_json_delete_all(pReq);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE      :break;
 		//case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET   :return bin_to_json_get_total_sms(pReq);
@@ -62,6 +66,8 @@ int XmppRpc::ProcessWork(JsonDataCommObj* pReq,int index,ADJsonRpcMgrProducer* p
 		case EJSON_XMPROXY_RPC_GET_ONLINE_STATUS:return process_get_online_status(pReq);
 		case EJSON_XMPROXY_RPC_SET_ONLINE_STATUS:return process_set_online_status(pReq);
 		case EJSON_XMPROXY_RPC_SET_SEND_MESSAGE :return process_set_send_message(pReq);
+		case EJSON_XMPROXY_RPC_SET_SUBSCRIBE    :return process_set_subscribe_message(pReq);
+		case EJSON_XMPROXY_RPC_SET_ACCEPT_BUDDY :return process_set_accept_buddy(pReq);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE_ALL  :return process_delete_all(pReq,pObj);
 		//case EJSON_BBOXSMS_RPC_SMS_DELETE      :break;
 		//case EJSON_BBOXSMS_RPC_SMS_TOTAL_GET   :return process_get_total_sms(pReq);
@@ -416,6 +422,65 @@ int XmppRpc::process_set_send_message(JsonDataCommObj* pReq)
 	pPanelReq->result=pMgr->proc_cmd_send_message(To,Msg);
 	//TODO: sleep for a while so that response arrives from other end
 	usleep(500000);//sleep 500ms
+	cout<<"ResponseMsg: "<<pMgr->ResponseMsg<<endl;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int XmppRpc::json_to_bin_set_subscribe_message(JsonDataCommObj* pReq)
+{
+	XMPROXY_SUBSCRIBE_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,XMPROXY_SUBSCRIBE_PACKET,RPC_SRV_ACT_WRITE,EJSON_XMPROXY_RPC_SET_SUBSCRIBE);
+	JSON_STRING_TO_STRING(XMPROXY_RPC_SUBSCRIBE_TO_ARG,pPanelCmdObj->to);
+	JSON_STRING_TO_STRING(XMPROXY_RPC_SUBSCRIBE_MSG_ARG,pPanelCmdObj->msg);
+	return 0;
+}
+int XmppRpc::bin_to_json_set_subscribe_message(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,XMPROXY_SUBSCRIBE_PACKET);
+	return 0;
+}
+int XmppRpc::process_set_subscribe_message(JsonDataCommObj* pReq)
+{
+	XmppMgr *pMgr=(XmppMgr*)pDataCache->pXmpMgr;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	XMPROXY_SUBSCRIBE_PACKET* pPacket;
+	pPacket=(XMPROXY_SUBSCRIBE_PACKET*)pPanelReq->dataRef;
+	//pPacket->to;pPacket->msg;
+	//TODO
+	//cout<<"to:"<<pPacket->to<<":msg:"<<pPacket->msg<<endl;
+	std::string To(pPacket->to);
+	std::string Msg(pPacket->msg);
+	pPanelReq->result=pMgr->proc_cmd_subscribe_message(To,Msg);
+	//TODO: sleep for a while so that response arrives from other end
+	usleep(500000);//sleep 500ms
+	cout<<"ResponseMsg: "<<pMgr->ResponseMsg<<endl;
+	return 0;
+}
+/* ------------------------------------------------------------------------- */
+int XmppRpc::json_to_bin_set_accept_buddy(JsonDataCommObj* pReq)
+{
+	XMPROXY_ACCEPT_BUDDY_PACKET* pPanelCmdObj=NULL;
+	PREPARE_JSON_REQUEST(RPC_SRV_REQ,XMPROXY_ACCEPT_BUDDY_PACKET,RPC_SRV_ACT_WRITE,EJSON_XMPROXY_RPC_SET_ACCEPT_BUDDY);
+	JSON_STRING_TO_STRING(XMPROXY_RPC_ACCEPT_BUDDY_TO_ARG,pPanelCmdObj->to);
+	JSON_STRING_TO_STRING(XMPROXY_RPC_ACCEPT_BUDDY_MSG_ARG,pPanelCmdObj->msg);
+	return 0;
+}
+int XmppRpc::bin_to_json_set_accept_buddy(JsonDataCommObj* pReq)
+{
+	PREPARE_JSON_RESP(RPC_SRV_REQ,XMPROXY_ACCEPT_BUDDY_PACKET);
+	return 0;
+}
+int XmppRpc::process_set_accept_buddy(JsonDataCommObj* pReq)
+{
+	XmppMgr *pMgr=(XmppMgr*)pDataCache->pXmpMgr;
+	RPC_SRV_REQ *pPanelReq=NULL;
+	pPanelReq=(RPC_SRV_REQ *)pReq->pDataObj;
+	XMPROXY_ACCEPT_BUDDY_PACKET* pPacket;
+	pPacket=(XMPROXY_ACCEPT_BUDDY_PACKET*)pPanelReq->dataRef;
+	std::string To(pPacket->to);
+	std::string Msg(pPacket->msg);
+	pPanelReq->result=pMgr->proc_cmd_add_buddy(To,Msg);
 	cout<<"ResponseMsg: "<<pMgr->ResponseMsg<<endl;
 	return 0;
 }

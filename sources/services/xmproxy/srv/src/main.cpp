@@ -54,6 +54,8 @@ int main(int argc, const char* argv[])
 	XmppRpc OnlineStsGet(XMPROXY_RPC_ONLINE_STATUS_GET,EJSON_XMPROXY_RPC_GET_ONLINE_STATUS,emulat,dbglog,&DataCache);
 	XmppRpc OnlineStsSet(XMPROXY_RPC_ONLINE_STATUS_SET,EJSON_XMPROXY_RPC_SET_ONLINE_STATUS,emulat,dbglog,&DataCache);
 	XmppRpc SendMsgSet  (XMPROXY_RPC_SEND_MESSAGE_SET ,EJSON_XMPROXY_RPC_SET_SEND_MESSAGE ,emulat,dbglog,&DataCache);
+	XmppRpc SubscribeMsgSet(XMPROXY_RPC_SUBSCRIBE ,EJSON_XMPROXY_RPC_SET_SUBSCRIBE ,emulat,dbglog,&DataCache);
+	XmppRpc AcceptBuddySet(XMPROXY_RPC_ACCEPT_BUDDY ,EJSON_XMPROXY_RPC_SET_ACCEPT_BUDDY ,emulat,dbglog,&DataCache);
 /*	SmsRpc DeletAll (BBOXSMS_RPC_SMS_DELETE_ALL  ,EJSON_BBOXSMS_RPC_SMS_DELETE_ALL  ,emulat,dbglog,&DataCache);
 	SmsRpc Delete   (BBOXSMS_RPC_SMS_DELETE      ,EJSON_BBOXSMS_RPC_SMS_DELETE      ,emulat,dbglog,&DataCache);
 	SmsRpc TotalGet (BBOXSMS_RPC_SMS_TOTAL_GET   ,EJSON_BBOXSMS_RPC_SMS_TOTAL_GET   ,emulat,dbglog,&DataCache);
@@ -66,6 +68,8 @@ int main(int argc, const char* argv[])
 	RpcMgr.AttachRpc(&OnlineStsGet);
 	RpcMgr.AttachRpc(&OnlineStsSet);
 	RpcMgr.AttachRpc(&SendMsgSet);
+	RpcMgr.AttachRpc(&SubscribeMsgSet);
+	RpcMgr.AttachRpc(&AcceptBuddySet);
 /*	RpcMgr.AttachRpc(&DeletAll);
 	RpcMgr.AttachRpc(&Delete);
 	RpcMgr.AttachRpc(&TotalGet);

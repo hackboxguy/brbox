@@ -11,6 +11,11 @@ XmproxyCltCmdline::XmproxyCltCmdline()
 	CmdlineHelper.insert_help_entry((char*)"--connectsts               [get the online status of xmpp connection]");
 	CmdlineHelper.insert_options_entry((char*)"relaymsg" ,optional_argument,EJSON_XMPROXY_RPC_SET_SEND_MESSAGE);
 	CmdlineHelper.insert_help_entry((char*)"--relaymsg=<to>,<msg>      [send the message to a recipient's address]");
+	CmdlineHelper.insert_options_entry((char*)"subscribe" ,optional_argument,EJSON_XMPROXY_RPC_SET_SUBSCRIBE);
+	CmdlineHelper.insert_help_entry((char*)"--subscribe=<to>,<msg>     [send a friend request with msg]");
+	CmdlineHelper.insert_options_entry((char*)"acceptbuddy" ,optional_argument,EJSON_XMPROXY_RPC_SET_ACCEPT_BUDDY);
+	CmdlineHelper.insert_help_entry((char*)"--acceptbuddy=<buddy>,<msg> [accept buddy if friend request arrives]");
+
 	/*CmdlineHelper.insert_options_entry((char*)"deleteall" ,optional_argument,EJSON_BBOXSMS_RPC_SMS_DELETE_ALL);
 	CmdlineHelper.insert_help_entry((char*)"--deleteall                [delete all sms]");
 	CmdlineHelper.insert_options_entry((char*)"delete" ,optional_argument,EJSON_BBOXSMS_RPC_SMS_DELETE);
@@ -57,7 +62,14 @@ int XmproxyCltCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 		case EJSON_XMPROXY_RPC_SET_SEND_MESSAGE:
 			push_send_msg_command(sub_arg,(char*)XMPROXY_RPC_SEND_MESSAGE_SET,EJSON_XMPROXY_RPC_SET_SEND_MESSAGE,
 						     (char*)XMPROXY_RPC_SEND_MESSAGE_TO_ARG,(char*)XMPROXY_RPC_SEND_MESSAGE_MSG_ARG);//,
-						     //(char*)SMARTEYE_RPC_COMPARE_IMG_ARGDIFF);
+			break;
+		case EJSON_XMPROXY_RPC_SET_SUBSCRIBE:
+			push_send_msg_command(sub_arg,(char*)XMPROXY_RPC_SUBSCRIBE,EJSON_XMPROXY_RPC_SET_SUBSCRIBE,
+						     (char*)XMPROXY_RPC_SUBSCRIBE_TO_ARG,(char*)XMPROXY_RPC_SUBSCRIBE_MSG_ARG);//,
+			break;
+		case EJSON_XMPROXY_RPC_SET_ACCEPT_BUDDY:
+			push_send_msg_command(sub_arg,(char*)XMPROXY_RPC_ACCEPT_BUDDY,EJSON_XMPROXY_RPC_SET_ACCEPT_BUDDY,
+						     (char*)XMPROXY_RPC_ACCEPT_BUDDY_TO_ARG,(char*)XMPROXY_RPC_ACCEPT_BUDDY_MSG_ARG);//,
 			break;
 		default:
 			return 0;
@@ -71,6 +83,8 @@ int XmproxyCltCmdline::run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient 
 	switch(pCmdObj->command)
 	{
 		case EJSON_XMPROXY_RPC_SET_SEND_MESSAGE:
+		case EJSON_XMPROXY_RPC_SET_SUBSCRIBE:
+		case EJSON_XMPROXY_RPC_SET_ACCEPT_BUDDY:
 			run_send_msg_command(pCmdObj,pSrvSockConn,pOutMsgList,pWorker);
 			break;
 		default:return -1;
