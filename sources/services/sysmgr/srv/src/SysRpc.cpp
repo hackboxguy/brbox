@@ -29,6 +29,24 @@ bool SysRpc::openwrt_system(void)
 		case ADCMN_BOARD_TYPE_A5_V11    :return true;
 		case ADCMN_BOARD_TYPE_NEXX_3020 :return true;
 		case ADCMN_BOARD_TYPE_GL_MT300NV2:return true;
+		case ADCMN_BOARD_TYPE_RASPI_A:
+		case ADCMN_BOARD_TYPE_RASPI_APLUS:
+		case ADCMN_BOARD_TYPE_RASPI_B:
+		case ADCMN_BOARD_TYPE_RASPI_BPLUS:
+		case ADCMN_BOARD_TYPE_RASPI_B2:
+		case ADCMN_BOARD_TYPE_RASPI_0:
+		case ADCMN_BOARD_TYPE_RASPI_0W:
+		if(pDevInfo->SyscfgType == ADCMN_SYSCFG_TYPE_RASPI_REMOTE_KIT)
+			return true;
+		else
+			return false;
+		case ADCMN_BOARD_TYPE_RASPI_2:
+		case ADCMN_BOARD_TYPE_RASPI_3:
+		case ADCMN_BOARD_TYPE_RASPI_4:
+		if(pDevInfo->SyscfgType == ADCMN_SYSCFG_TYPE_RASPI2_REMOTE_KIT)
+			return true;
+		else
+			return false;
 		default: return false;
 	}
 }

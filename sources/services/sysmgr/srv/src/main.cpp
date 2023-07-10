@@ -44,6 +44,7 @@ int main(int argc, const char* argv[])
 	//read the board-type info from cmdline argument
 	ADCMN_DEV_INFO DevInfo;
 	CmdLine.get_dev_info(&DevInfo);
+	DevInfo.SyscfgType = CmdLine.get_sys_config_enum();//read sysconfig type cmdline arg
 
 	bool dbglog = CmdLine.get_debug_log();
 	bool emulat = CmdLine.get_emulation_mode();

@@ -13,7 +13,7 @@ class MyCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 	std::string DisplayType;
 	std::string DevNode;
 
-	//Chain-callback functions	
+	//Chain-callback functions
 	virtual int parse_my_cmdline_options(int arg, char* sub_arg);
 	virtual int run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);//char* ip);
 	virtual int run_my_autotest(char* ip,int interval_us,int max_loop,int test_num);
@@ -33,6 +33,7 @@ public:
 	//service specific part
 	std::string get_monit_cfg_file();
 	std::string get_sys_config();
+	ADCMN_SYSCFG_TYPE get_sys_config_enum();
 	std::string get_disp_type();
 	std::string get_dev_node();
 };

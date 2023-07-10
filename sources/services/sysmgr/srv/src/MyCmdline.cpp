@@ -66,7 +66,7 @@ int MyCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 			else
 				DevNode=sub_arg;
 			break;
-		default:return 0;break;	
+		default:return 0;break;
 	}
 	return 0;
 }
@@ -140,6 +140,20 @@ std::string MyCmdline::get_sys_config()
 {
 	return SystemConfig;
 }
+ADCMN_SYSCFG_TYPE MyCmdline::get_sys_config_enum()
+{
+	const char *table[]= ADCMN_SYSCFG_TYPE_TABLE;
+	int result;
+	ADCmnStringProcessor string_proc;
+	ADCMN_SYSCFG_TYPE type = ADCMN_SYSCFG_TYPE_UNKNOWN;
+	char* syscfg = (char*)SystemConfig.c_str();
+	result = string_proc.string_to_enum(table,syscfg,ADCMN_SYSCFG_TYPE_UNKNOWN);
+	if(result>=ADCMN_SYSCFG_TYPE_UNKNOWN)
+		type=ADCMN_SYSCFG_TYPE_UNKNOWN;
+	else
+		type=(ADCMN_SYSCFG_TYPE)result;
+	return type;
+}
 /*****************************************************************************/
 std::string MyCmdline::get_disp_type()
 {
@@ -151,4 +165,3 @@ std::string MyCmdline::get_dev_node()
 	return DevNode;
 }
 /*****************************************************************************/
-
