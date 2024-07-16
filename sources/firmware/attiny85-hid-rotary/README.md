@@ -1,11 +1,11 @@
 ## HID-Volume-Control-Knob with Digispark-ATtiny85
-![Volume Control Knob.](/images/volume-control-knob.png "Volume Control Knob.")
+![Volume Control Knob.](/sources/firmware/attiny85-hid-rotary/images/volume-control-knob.png "Volume Control Knob.")
 
 ## Required Items
-![Required Items.](/images/required-items.jpg "Required Items.")
+![Required Items.](/sources/firmware/attiny85-hid-rotary/images/required-items.jpg "Required Items.")
 
 ## Connection
-![Connection Diagram.](/images/connection-diagram.jpg "Connection Diagram.")
+![Connection Diagram.](/sources/firmware/attiny85-hid-rotary/images/connection-diagram.jpg "Connection Diagram.")
 
 | Rotary-Encoder| Digispark-ATtiny85 |
 | ------------- |:------------------:|
