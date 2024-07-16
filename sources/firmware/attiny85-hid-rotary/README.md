@@ -22,7 +22,7 @@
 4. `git clone https://github.com/micronucleus/micronucleus.git`
 5. `cd micronucleus/commandline`
 6. `make`
-7. `sudo ./micronucleus --info` (will show the current micronucleus version)
+7. run `sudo ./micronucleus --info` and insert Disispark-ATtiny85 to USB Port - will show the current micronucleus version
 8. Remove Digispark-ATtiny85 from USB Port
 9. `sudo ./micronucleus --run ../firmware/upgrades/upgrade-t85_default.hex`
 10. Insert Digispark-ATtiny85 to USB Port - New micronucleus bootloader ver-2.6 will be flashed
