@@ -1,5 +1,5 @@
 ## HID-Volume-Control-Knob with Digispark-ATtiny85
-![Volume Control Knob.](/sources/firmware/attiny85-hid-rotary/images/volume-control-knob.png "Volume Control Knob.")
+![Volume Control Knob.](/sources/firmware/attiny85-hid-rotary/images/volume-control-knob.jpg "Volume Control Knob.")
 
 ## Required Items
 ![Required Items.](/sources/firmware/attiny85-hid-rotary/images/required-items.jpg "Required Items.")
