@@ -3,15 +3,17 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#define USEFIM 1 //or #define USEFBV
 /*****************************************************************************/
 MPlayRaspi::MPlayRaspi(std::string DevNode):MPlayer(DevNode)//,I2CBusAccess(DevNode)
 {
 	//sensorI2CAddr=COLOR_SENSOR_ADDR;
 	//ledStatus = 0;//flashlight led on the grove color sensor
 	char command[512];
+#ifdef USEFBV
 	sprintf(command,"dd if=/dev/zero of=/dev/fb0;setterm -cursor off >/dev/tty1");
 	system(command);
-
+#endif
 	//defaults
 	graphics_out_sts=MPLAYSRV_GRAPHICS_OUT_ENABLE;//upon boot, graphics is always enabled.
 	MediaFileType=MPLAYSRV_MEDIAFILE_TYPE_MEDIA;//MPLAYSRV_MEDIAFILE_TYPE_UNKNOWN;
@@ -61,7 +63,11 @@ RPC_SRV_RESULT MPlayRaspi::show_image(std::string imgfile)
 	char command[1024];
 	if(imgfile=="none")
 	{
+#ifdef USEFBV
 		sprintf(command,"dd if=/dev/zero of=/dev/fb0;setterm -cursor off >/dev/tty1");
+#else
+		sprintf(command,"killall -SIGTERM fim;rm -rf %s",IMG_RENDER_FIFO_FILE);
+#endif
 		system(command);
 		return RPC_SRV_RESULT_SUCCESS;
 	}
@@ -70,12 +76,15 @@ RPC_SRV_RESULT MPlayRaspi::show_image(std::string imgfile)
 	sprintf(command,"mkfifo %s",IMG_RENDER_FIFO_FILE);
 	system(command);
 
+#ifdef USEFBV
 	//wake-up sleeping display-output and clear screen
 	sprintf(command,"echo -ne \"\\033[9;2]\">/dev/tty1;dd if=/dev/zero of=/dev/fb0");
 	system(command);
-
 	//using fbv command render the image file
 	sprintf(command,"fbv -f %s < %s &",imgfile.c_str(),IMG_RENDER_FIFO_FILE);
+#else
+	sprintf(command,"fim -q -d /dev/fb0 %s < %s &",imgfile.c_str(),IMG_RENDER_FIFO_FILE);
+#endif
 	system(command);
 	//with following command, frame is rendered on the screen(need to check why?)
 	sprintf(command,"echo . > %s",IMG_RENDER_FIFO_FILE);
