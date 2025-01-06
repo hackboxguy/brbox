@@ -47,6 +47,7 @@ int main(int argc, const char* argv[])
 	XmpManager.SetEventSubscrListFilePath(CmdLine.get_evnt_subscr_list_filepath());//persistent event subscriber's list file
 	XmpManager.SetNetInterface(CmdLine.get_net_interface());
 	XmpManager.SetUpdateurlFilePath(CmdLine.get_updateurl_filepath());//updateurl filepath
+	XmpManager.SetAiAgentUrl(CmdLine.get_ai_agent_url());//ai-agent-url
 	//attach rpc classes to ADJsonRpcMgr
 	ADJsonRpcMgr RpcMgr(SRC_CONTROL_VERSION,dbglog,&DevInfo); //main rpc handler
 

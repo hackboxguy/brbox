@@ -8,8 +8,13 @@ set(LIB_ADSTTNG AdSttngs)   #settings library
 set(LIB_ADCOMMN AdCmn)      #common library
 
 option(WITH_CXMPP_LIB "link with libstrophe xmpp c lib" OFF)
+option(WITH_AI_BOT "link with cpp-httplib" OFF)
 if(WITH_CXMPP_LIB)
   add_definitions(-DUSE_CXMPP_LIB)
+endif()
+if(WITH_AI_BOT)
+	add_definitions(-DUSE_AI_BOT)
+	#find_package(cpp-httplib CONFIG REQUIRED)
 endif()
 
 
@@ -36,9 +41,17 @@ include_directories(${INC_ADSTTNG} ${INC_ADCOMMN} ${INC_SRVCOMMN} ${CMAKE_CURREN
 
 # Specify component's dependency.
 if(WITH_CXMPP_LIB)
-	target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt strophe)
+	if(WITH_AI_BOT)
+		target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt strophe cpp-httplib)
+	else()
+		target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt strophe)
+	endif()
 else()
-	target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt gloox)
+	if(WITH_AI_BOT)
+		target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt gloox cpp-httplib)
+	else()
+		target_link_libraries(${COMPONENT_NAME} ${LIB_ADCOMMN} ${LIB_ADSTTNG} json-c pthread rt gloox)
+	endif()
 endif()
 
 #install the binary and server-rpc-headers to CMAKE_INSTALL_PREFIX destination

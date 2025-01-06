@@ -6,10 +6,12 @@
 #else
 	#include "ADXmppProxy.hpp"
 #endif
-
 #include <iostream>
 #include <vector>
 #include <deque>
+#ifdef USE_AI_BOT
+	#include <httplib.h>
+#endif
 #include "ADCommon.hpp"
 #include "ADThread.hpp"
 #include "ADTimer.hpp"
@@ -201,6 +203,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	std::string XmppBotName;
 	std::string XmppBotNameFilePath;
 	std::string XmppNetInterface;
+	std::string AiAgentUrl;
 #ifdef USE_CXMPP_LIB
 	CXmppProxy XmppProxy;//xmpp client
 #else
@@ -212,7 +215,9 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	typedef std::map<std::string, std::string> Alias;
 	Alias AliasList;
 	std::string UpdateUrlFile;
-
+#ifdef USE_AI_BOT
+	httplib::Client *botcli;
+#endif
 	//struct EventSubscription
 	//{
 	//	std::string subscriber;
@@ -305,7 +310,7 @@ class XmppMgr : public ADXmppConsumer, public ADThreadConsumer, public ADTimerCo
 	RPC_SRV_RESULT ExtendEventSubscrList(std::string listFile,std::string addr,EXMPP_EVNT_TYPES type,int arg);
 	RPC_SRV_RESULT RewriteEventSubscrList(std::string listFile,std::vector<EventSubscrEntry> *pList);
 	RPC_SRV_RESULT hostname_to_ip(char * hostname , char* ip);
-
+	std::string generate_ai_response(std::string& prompt);
 public:
 	XmppMgr();
 	~XmppMgr();
@@ -313,6 +318,7 @@ public:
 	RPC_SRV_RESULT Stop();
 	RPC_SRV_RESULT SendMessage(std::string msg);
 	void SetDebugLog(bool log);
+	void SetAiAgentUrl(std::string url);
 	int AttachHeartBeat(ADTimer* pTimer);
 	RPC_SRV_RESULT RpcResponseCallback(RPC_SRV_RESULT taskRes,int taskID,std::string to);//called by eventHandler
 	RPC_SRV_RESULT RpcResponseCallback(std::string taskRes,int taskID,std::string to);

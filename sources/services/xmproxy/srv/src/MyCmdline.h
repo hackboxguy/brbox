@@ -15,6 +15,7 @@ class MyCmdline:public ADCmdlineHelperConsumer ,public ADCmnStringProcessor
 	char EvntSubscrListFilePath[512];
 	char UpdateUrlFilePath[1024];
 	std::string NetInterface;
+	std::string AiAgentUrl;
 	//Chain-callback functions
 	virtual int parse_my_cmdline_options(int arg, char* sub_arg);
 	virtual int run_my_commands(CmdExecutionObj *pCmdObj,ADJsonRpcClient *pSrvSockConn,ADGenericChain *pOutMsgList,ADThreadedSockClientProducer *pWorker);//char* ip);
@@ -38,6 +39,7 @@ public:
 	std::string get_evnt_subscr_list_filepath();//char* filepath);
 	std::string get_net_interface();
 	std::string get_updateurl_filepath();
+	std::string get_ai_agent_url();
 	//service specific part
 };
 #endif

@@ -12,6 +12,7 @@
 #include "ADCmnPortList.h"
 #include "ADJsonRpcMgr.hpp"
 using namespace std;
+#define MAX_INFERENCE_TIME 100
 /* ------------------------------------------------------------------------- */
 //supported commands over xmpp-channel
 XMPROXY_CMD_TABLE xmproxy_cmd_table[] = //EXMPP_CMD_NONE+1] =
@@ -82,6 +83,10 @@ XmppMgr::XmppMgr() //:AckToken(0)
 	XmppNetInterface="";
 	UpdateUrlFile="";
 	DebugLog=false;
+	AiAgentUrl="";
+#ifdef USE_AI_BOT
+	botcli=NULL;
+#endif
 	//GsmDevDetected=false;
 	bboxSmsServerAddr=BBOXSMS_SERVER_ADDR;
 
@@ -105,6 +110,10 @@ XmppMgr::~XmppMgr()
 	//XmppClientThread.stop_thread();
 	XmppCmdProcessThread.stop_thread();
 	AliasList.clear();
+#ifdef USE_AI_BOT
+	if(botcli!=NULL)
+		delete botcli;
+#endif
 	//myEventList.clear();
 }
 /* ------------------------------------------------------------------------- */
@@ -155,6 +164,19 @@ void XmppMgr::SetUSBGsmSts(bool sts)
 				break;
 		}
 	}
+}
+/* ------------------------------------------------------------------------- */
+void XmppMgr::SetAiAgentUrl(std::string url)
+{
+#ifdef USE_AI_BOT
+	if(botcli!=NULL)
+		return;//already called this function once
+	AiAgentUrl=url;
+	botcli = new httplib::Client(url);
+	botcli->set_connection_timeout(MAX_INFERENCE_TIME, 0);//time taken to serve the query from the ai model
+	botcli->set_read_timeout(MAX_INFERENCE_TIME, 0);//time taken to serve the query from the ai model
+	botcli->set_write_timeout(MAX_INFERENCE_TIME, 0);//time taken to serve the query from the ai model
+#endif
 }
 /* ------------------------------------------------------------------------- */
 void XmppMgr::SetOpenWrtCmdGroupSts(bool sts)
@@ -217,6 +239,11 @@ int XmppMgr::onXmppMessage(std::string msg,std::string sender,ADXmppProducer* pO
 		//cout<<"###reveived resp from another bot####### : "<<msg<<endl;
 		ResponseMsg=msg;//keep this in a cache for later use
 		return 0;//just consume this message(do not autoreply)
+	}
+	else if (AiAgentUrl!="")
+	{
+		//redirect user commands to ollama hosted ai model
+		XmppProxy.send_reply(generate_ai_response(msg),sender);
 	}
 	else
 	{
@@ -1967,5 +1994,40 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_add_buddy(std::string to,std::string message,st
 		return RPC_SRV_RESULT_SUCCESS;
 	else
 		return RPC_SRV_RESULT_FAIL;
+}
+/* ------------------------------------------------------------------------- */
+std::string XmppMgr::generate_ai_response(std::string& prompt)
+{
+#ifdef USE_AI_BOT
+	json_object* payload = json_object_new_object();
+	json_object_object_add(payload, "model", json_object_new_string("llama2:7b"));
+	json_object_object_add(payload, "prompt", json_object_new_string(prompt.c_str()));
+	//json_object_object_add(payload, "stream", json_object_new_string("false"));
+	json_object_object_add(payload, "stream", json_object_new_boolean(false));
+
+	// Convert JSON object to string and print it
+	const char* json_payload = json_object_to_json_string(payload);
+	//printf("JSON Payload: %s\n", json_payload);  // Print the JSON body
+
+	auto res = botcli->Post("/api/generate", json_payload, "application/json");
+
+	if (res && res->status == 200)
+	{
+		json_object* response = json_tokener_parse(res->body.c_str());
+		json_object* response_text;
+		if (json_object_object_get_ex(response, "response", &response_text))
+		{
+			std::string result = json_object_get_string(response_text);
+			//cout << "ollama returned-"<<result<<endl;
+			json_object_put(response);
+			json_object_put(payload);
+			return result;
+		}
+		json_object_put(response);
+	}
+	//json_object_put(options);
+	json_object_put(payload);
+#endif
+	return "Error generating response";
 }
 /* ------------------------------------------------------------------------- */

@@ -10,6 +10,7 @@ typedef enum XMPROXY_CMDLINE_OPT_T
 	XMPROXY_CMDLINE_OPT_EVNT_SUBSCR_LIST_FILE,
 	XMPROXY_CMDLINE_OPT_NETINTERFACE, //iface
 	XMPROXY_CMDLINE_OPT_UPDATEURL, //updateurl
+	XMPROXY_CMDLINE_OPT_AIAGENT, //aiagent
 	XMPROXY_CMDLINE_OPT_UNKNOWN,
 	XMPROXY_CMDLINE_OPT_NONE
 }XMPROXY_CMDLINE_OPT;
@@ -18,6 +19,7 @@ typedef enum XMPROXY_CMDLINE_OPT_T
 MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_str):CmdlineHelper(cmdline_mode)
 {
 	NetInterface="";
+	AiAgentUrl="";
 	port_number=portnum;
 	strcpy(version_number,version_str);
 	CmdlineHelper.attach_helper(this);
@@ -36,6 +38,8 @@ MyCmdline::MyCmdline(CMDLINE_HELPER_MODE cmdline_mode,int portnum,char* version_
 	CmdlineHelper.insert_help_entry((char*)"--iface=ethx         (ip of netinterface to print on display)");
 	CmdlineHelper.insert_options_entry((char*)"updateurl" ,optional_argument,XMPROXY_CMDLINE_OPT_UPDATEURL);
 	CmdlineHelper.insert_help_entry((char*)"--updateurl=filepath (sysupdate fmw-file url)");
+	CmdlineHelper.insert_options_entry((char*)"aiagent" ,optional_argument,XMPROXY_CMDLINE_OPT_AIAGENT);
+	CmdlineHelper.insert_help_entry((char*)"--aiagent=url (ollama AI agent url)");
 
 	strcpy(LoginFilePath,XMPROXY_DEFAULT_LOGIN_FILE_PATH);
 	UsbGSMSts=false;
@@ -102,6 +106,12 @@ int MyCmdline::parse_my_cmdline_options(int arg, char* sub_arg)
 				strcpy(UpdateUrlFilePath,"");
 			else
 				strcpy(UpdateUrlFilePath,sub_arg);
+			break;
+		case XMPROXY_CMDLINE_OPT_AIAGENT:
+			if(CmdlineHelper.get_next_subargument(&sub_arg)==0)//no aiagent-url passed by user
+				AiAgentUrl="";
+			else
+				AiAgentUrl=sub_arg;
 			break;
 		default:return 0;break;
 	}
@@ -208,5 +218,10 @@ std::string MyCmdline::get_updateurl_filepath()
 {
 	std::string updateurl=UpdateUrlFilePath;
 	return updateurl;
+}
+/*****************************************************************************/
+std::string MyCmdline::get_ai_agent_url()
+{
+	return AiAgentUrl;
 }
 /*****************************************************************************/
