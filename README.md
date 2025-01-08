@@ -1,7 +1,8 @@
-
 # brbox
 
-**brbox** is a bare-metal Linux system built with Buildroot. It provides the foundational features of an embedded Linux system, serving as a base for extending and integrating various applications. 
+**brbox** is a wrapper tools/script around buildroot to help in creating bare-metal bootable Linux images for different single-board-computers. It provides the foundational features of an embedded Linux system, serving as a base for extending and integrating various applications.
+
+**Update!!:** A more recent, cleaner and well maintained version of brbox image creation is available [here](https://github.com/hackboxguy/br-wrapper)
 
 ### Key Features
 1. **Failsafe In-System Programmability**: Allows network-based Linux system updates using backup and main rootfs copies(A/B).
@@ -39,20 +40,21 @@
    mkdir -p /home/user/sandbox
    cd /home/user/sandbox
    ```
-2. Clone the repository:
+2. Clone the repository(with softlink, retain dl folder to avoid repeated downloads):
    ```bash
-   svn co http://github.com/hackboxguy/brbox
-   cd brbox/trunk
-   ln -s /home/user/dl dl
+   git clone https://github.com/hackboxguy/brbox.git
+   cd brbox
+   mkdir -p ~/dl
+   ln -s ~/dl dl
    ```
-3. Prepare and build the system(e.g for raspberry-pi-0):
+3. Prepare and build the system(e.g for pc-x86-64-efi):
    ```bash
    ./prepare-buildroot.sh
-   ./build-image.sh -o /mnt/buildramdisk -v 01.00 -s mypw -b raspi0
+   ./build-image.sh -o /mnt/buildramdisk -v 01.00 -s mypw -b pc-x86-64-efi
    ```
-   - `-o`: Output folder  
-   - `-v`: Build version number  
-   - `-s`: Your sudo password  
+   - `-o`: Output folder
+   - `-v`: Build version number
+   - `-s`: Your sudo password
    - `-s`: [board type](https://github.com/hackboxguy/brbox/blob/a30dc0581392fada006db40733abf6883c28bf12/build-image.sh#L30)
 
 The first build may take 1–2 hours. Once complete, the following files will be generated:
@@ -98,10 +100,10 @@ The first build may take 1–2 hours. Once complete, the following files will be
 ## Building brbox for Raspberry Pi 1
 1. Create and build the image:
    ```bash
-   cd /home/user/sandbox/
-   svn co https://github.com/hackboxguy/brbox
-   cd brbox/trunk
-   ln -s /home/user/dl dl
+   cd ~/
+   git clone https://github.com/hackboxguy/brbox.git
+   cd brbox
+   mkdir -p ~/dl/;ln -s ~/dl dl
    ./prepare-buildroot.sh
    time ./build-image.sh -o /mnt/buildramdisk -v 00.01 -s my_sudo_pw -b raspi1
    ```
@@ -111,31 +113,6 @@ The first build may take 1–2 hours. Once complete, the following files will be
    ```
    Replace `/dev/sdX` with the correct device node.
 3. Boot your Raspberry Pi with the SD card and log in as `root` with the password `brb0x`.
-
----
-
-## Cross-Compiling for Raspberry Pi 1 on x86 Host
-1. Set up the toolchain:
-   ```bash
-   cd /home/user/sandbox/
-   svn co https://github.com/hackboxguy/downloads
-   cp downloads/toolchain/brbox-raspi1-disptst.tar.xz /opt
-   cd /opt/
-   tar -xvf brbox-raspi1-disptst.tar.xz
-   ln -s brbox-raspi1-disptst/ brbox-raspi1-arm
-   ```
-2. Compile the source code:
-   ```bash
-   cd /home/user/sandbox/
-   svn co https://github.com/hackboxguy/brbox
-   cd brbox/trunk/sources
-   cmake -H. -BOutput -DCMAKE_INSTALL_PREFIX=/home/usr/tmp/brbox-install -DCMAKE_TOOLCHAIN_FILE=cmake/brbox-raspi1-arm.cmake
-   cmake --build Output -- install -j4
-   ```
-3. Transfer binaries to the Raspberry Pi:
-   ```bash
-   scp -r /home/usr/tmp/brbox-install <raspi-ip>:/path/to/target
-   ```
 
 ---
 
