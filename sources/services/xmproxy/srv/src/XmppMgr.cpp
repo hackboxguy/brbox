@@ -1793,6 +1793,8 @@ RPC_SRV_RESULT XmppMgr::proc_cmd_set_display_backlight(std::string msg)
 //removes first $ sign and expands the argument with alias if found
 RPC_SRV_RESULT XmppMgr::xpandarg(std::string &cmdArg)
 {
+	if (cmdArg.size() <= 0)
+		return RPC_SRV_RESULT_FAIL; // dont do anything
 	if(cmdArg.at(0) == '$')
 	{
 		cmdArg.erase(0,1);//remote first $ char
